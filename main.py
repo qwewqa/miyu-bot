@@ -11,7 +11,10 @@ with open('config.json') as f:
     bot_token = json.load(f)['token']
 
 bot = commands.Bot(command_prefix='!', case_insensitive=True)
+
 asset_manager = AssetManager('assets')
+
+bot.load_extension('miyu_bot.commands.cogs.card')
 bot.load_extension('miyu_bot.commands.cogs.music')
 bot.load_extension('miyu_bot.commands.cogs.utility')
 

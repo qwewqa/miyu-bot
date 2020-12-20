@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 import discord
@@ -111,42 +112,73 @@ class Music(commands.Cog):
             return
         self.logger.info(f'Found "{song}" ({romanize(song.name)[1]}).')
 
-        chart: ChartMaster = song.charts[difficulty]
+        embeds, files = self.get_chart_embed_info(song)
 
-        chart_data = chart.load_chart_data()
-        note_counts = chart_data.get_note_counts()
+        message = await ctx.send(files=files, embed=embeds[difficulty - 1])
 
-        thumb = discord.File(song.jacket_path, filename='jacket.png')
-        render = discord.File(chart.image_path, filename='render.png')
+        reaction_emote_ids = [
+            790050636568723466,
+            790050636489555998,
+            790050636548276252,
+            790050636225052694,
+        ]
 
-        embed = discord.Embed(title=f'{song.name} [{difficulty.name}]')
-        embed.set_thumbnail(url=f'attachment://jacket.png')
-        embed.set_image(url=f'attachment://render.png')
+        for emote_id in reaction_emote_ids:
+            await message.add_reaction(self.bot.get_emoji(emote_id))
 
-        embed.add_field(name='Info',
-                        value=f'Level: {chart.display_level}\n'
-                              f'Unit: {song.special_unit_name or song.unit.name}\n'
-                              f'Category: {song.category.name}\n'
-                              f'BPM: {song.bpm}',
-                        inline=False)
-        embed.add_field(name='Combo',
-                        value=f'Max Combo: {chart.note_counts[ChartSectionType.Full].count}\n'
-                              f'Taps: {note_counts["tap"]} (dark: {note_counts["tap1"]}, light: {note_counts["tap2"]})\n'
-                              f'Scratches: {note_counts["scratch"]} (left: {note_counts["scratch_left"]}, right: {note_counts["scratch_right"]})\n'
-                              f'Stops: {note_counts["stop"]} (head: {note_counts["stop_start"]}, tail: {note_counts["stop_end"]})\n'
-                              f'Long: {note_counts["long"]} (head: {note_counts["long_start"]}, tail: {note_counts["long_end"]})\n'
-                              f'Slide: {note_counts["slide"]} (tick: {note_counts["slide_tick"]}, flick {note_counts["slide_flick"]})',
-                        inline=True)
-        embed.add_field(name='Ratings',
-                        value=f'NTS: {round(chart.trends[0] * 100, 2)}%\n'
-                              f'DNG: {round(chart.trends[1] * 100, 2)}%\n'
-                              f'SCR: {round(chart.trends[2] * 100, 2)}%\n'
-                              f'EFT: {round(chart.trends[3] * 100, 2)}%\n'
-                              f'TEC: {round(chart.trends[4] * 100, 2)}%\n',
-                        inline=True)
-        embed.set_footer(text='1 column = 10 seconds')
+        def check(rxn, usr):
+            return usr == ctx.author and rxn.emoji.id in reaction_emote_ids
 
-        await ctx.send(files=[thumb, render], embed=embed)
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60, check=check)
+                self.logger.debug(f'Reaction {reaction} from user {user}.')
+                emote_index = reaction_emote_ids.index(reaction.emoji.id)
+                await message.edit(embed=embeds[emote_index])
+                await message.remove_reaction(reaction, user)
+            except asyncio.TimeoutError:
+                break
+
+    def get_chart_embed_info(self, song):
+        embeds = []
+        files = [discord.File(song.jacket_path, filename=f'jacket.png')]
+        for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
+            chart = song.charts[difficulty]
+            embed = discord.Embed(title=f'{song.name} [{chart.difficulty.name}]')
+            embed.set_thumbnail(url=f'attachment://jacket.png')
+            embed.set_image(
+                url=f'https://qwewqa.github.io/d4dj-dumps/{chart.image_path.relative_to(asset_manager.path).as_posix()}'
+            )
+
+            chart_data = chart.load_chart_data()
+            note_counts = chart_data.get_note_counts()
+
+            embed.add_field(name='Info',
+                            value=f'Level: {chart.display_level}\n'
+                                  f'Unit: {song.special_unit_name or song.unit.name}\n'
+                                  f'Category: {song.category.name}\n'
+                                  f'BPM: {song.bpm}',
+                            inline=False)
+            embed.add_field(name='Combo',
+                            value=f'Max Combo: {chart.note_counts[ChartSectionType.Full].count}\n'
+                                  f'Taps: {note_counts["tap"]} (dark: {note_counts["tap1"]}, light: {note_counts["tap2"]})\n'
+                                  f'Scratches: {note_counts["scratch"]} (left: {note_counts["scratch_left"]}, right: {note_counts["scratch_right"]})\n'
+                                  f'Stops: {note_counts["stop"]} (head: {note_counts["stop_start"]}, tail: {note_counts["stop_end"]})\n'
+                                  f'Long: {note_counts["long"]} (head: {note_counts["long_start"]}, tail: {note_counts["long_end"]})\n'
+                                  f'Slide: {note_counts["slide"]} (tick: {note_counts["slide_tick"]}, flick {note_counts["slide_flick"]})',
+                            inline=True)
+            embed.add_field(name='Ratings',
+                            value=f'NTS: {round(chart.trends[0] * 100, 2)}%\n'
+                                  f'DNG: {round(chart.trends[1] * 100, 2)}%\n'
+                                  f'SCR: {round(chart.trends[2] * 100, 2)}%\n'
+                                  f'EFT: {round(chart.trends[3] * 100, 2)}%\n'
+                                  f'TEC: {round(chart.trends[4] * 100, 2)}%\n',
+                            inline=True)
+            embed.set_footer(text='1 column = 10 seconds')
+
+            embeds.append(embed)
+
+        return embeds, files
 
 
 def setup(bot):

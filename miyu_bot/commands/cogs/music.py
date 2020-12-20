@@ -7,17 +7,17 @@ from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
 from main import asset_manager
-from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
+from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMap
 
 
-class Charts(commands.Cog):
-    def __init__(self, bot):
+class Music(commands.Cog):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.music = self.get_music()
 
     def get_music(self):
-        music = FuzzyMatcher(lambda m: m.is_released)
+        music = FuzzyMap(lambda m: m.is_released)
         for m in asset_manager.music_master.values():
             music[f'{m.name} {m.special_unit_name}'] = m
         return music
@@ -37,15 +37,62 @@ class Charts(commands.Cog):
         'es': ChartDifficulty.Easy,
     }
 
-    @commands.command()
-    async def chart(self, ctx, *, arg):
-        self.logger.info(f'Searching for chart "{arg}".')
+    @staticmethod
+    def format_info(info_entries: dict):
+        return '\n'.join(f'{k}: {v}' for k, v in info_entries.items() if v)
 
-        arg = arg.strip()
+    @commands.command(name='song',
+                      aliases=['music'],
+                      description='Finds the song with the given name.',
+                      help='!song grgr')
+    async def song(self, ctx: commands.Context, *, arg: str):
+        self.logger.info(f'Searching for song "{arg}".')
 
-        if not arg:
-            await ctx.send('Argument is empty.')
+        song: MusicMaster = self.music[arg]
+        if not song:
+            msg = f'Failed to find song "{arg}".'
+            await ctx.send(msg)
+            self.logger.info(msg)
             return
+        self.logger.info(f'Found "{song}" ({romanize(song.name)[1]}).')
+
+        thumb = discord.File(song.jacket_path, filename='jacket.png')
+
+        embed = discord.Embed(title=song.name)
+        embed.set_thumbnail(url=f'attachment://jacket.png')
+
+        artist_info = {
+            'Lyricist': song.lyricist,
+            'Composer': song.composer,
+            'Arranger': song.arranger,
+            'Unit': song.unit.name,
+            'Special Unit Name': song.special_unit_name,
+        }
+
+        music_info = {
+            'Category': song.category.name,
+            'BPM': song.bpm,
+            'Section Trend': song.section_trend.name,
+            'Sort Order': song.default_order,
+            'Levels': ', '.join(c.display_level for c in song.charts.values()),
+            'Release Date': song.start_datetime,
+        }
+
+        embed.add_field(name='Artist',
+                        value=self.format_info(artist_info),
+                        inline=False)
+        embed.add_field(name='Info',
+                        value=self.format_info(music_info),
+                        inline=False)
+
+        await ctx.send(files=[thumb], embed=embed)
+
+    @commands.command(name='chart',
+                      aliases=[],
+                      description='Finds the chart with the given name.',
+                      help='!chart grgr\n!chart grgr normal')
+    async def chart(self, ctx: commands.Context, *, arg: str):
+        self.logger.info(f'Searching for chart "{arg}".')
 
         split_args = arg.split()
 
@@ -72,12 +119,12 @@ class Charts(commands.Cog):
         thumb = discord.File(song.jacket_path, filename='jacket.png')
         render = discord.File(chart.image_path, filename='render.png')
 
-        embed = discord.Embed(title=song.name)
+        embed = discord.Embed(title=f'{song.name} [{difficulty.name}]')
         embed.set_thumbnail(url=f'attachment://jacket.png')
         embed.set_image(url=f'attachment://render.png')
 
         embed.add_field(name='Info',
-                        value=f'Difficulty: {chart.display_level} ({chart.difficulty.name})\n'
+                        value=f'Level: {chart.display_level}\n'
                               f'Unit: {song.special_unit_name or song.unit.name}\n'
                               f'Category: {song.category.name}\n'
                               f'BPM: {song.bpm}',
@@ -96,11 +143,11 @@ class Charts(commands.Cog):
                               f'SCR: {round(chart.trends[2] * 100, 2)}%\n'
                               f'EFT: {round(chart.trends[3] * 100, 2)}%\n'
                               f'TEC: {round(chart.trends[4] * 100, 2)}%\n',
-                        inline=True
-                        )
+                        inline=True)
+        embed.set_footer(text='1 column = 10 seconds')
 
         await ctx.send(files=[thumb, render], embed=embed)
 
 
 def setup(bot):
-    bot.add_cog(Charts(bot))
+    bot.add_cog(Music(bot))

@@ -9,6 +9,7 @@ from discord.ext import commands
 
 from main import asset_manager
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMap
+from miyu_bot.commands.common.reaction_message import make_tabbed_message
 
 
 class Music(commands.Cog):
@@ -18,7 +19,7 @@ class Music(commands.Cog):
         self.music = self.get_music()
 
     def get_music(self):
-        music = FuzzyMap(lambda m: m.is_released)
+        music = FuzzyMap(lambda m: m.is_released and not m.is_tutorial)
         for m in asset_manager.music_master.values():
             music[f'{m.name} {m.special_unit_name}'] = m
         return music
@@ -123,21 +124,7 @@ class Music(commands.Cog):
             790050636225052694,
         ]
 
-        for emote_id in reaction_emote_ids:
-            await message.add_reaction(self.bot.get_emoji(emote_id))
-
-        def check(rxn, usr):
-            return usr == ctx.author and rxn.emoji.id in reaction_emote_ids
-
-        while True:
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=60, check=check)
-                self.logger.debug(f'Reaction {reaction} from user {user}.')
-                emote_index = reaction_emote_ids.index(reaction.emoji.id)
-                await message.edit(embed=embeds[emote_index])
-                await message.remove_reaction(reaction, user)
-            except asyncio.TimeoutError:
-                break
+        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emote_ids, embeds))
 
     def get_chart_embed_info(self, song):
         embeds = []

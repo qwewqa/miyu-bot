@@ -19,7 +19,7 @@ class Music(commands.Cog):
         self.music = self.get_music()
 
     def get_music(self):
-        music = FuzzyMap(lambda m: m.is_released and not m.is_tutorial)
+        music = FuzzyMap(lambda m: m.is_released)
         for m in asset_manager.music_master.values():
             music[f'{m.name} {m.special_unit_name}'] = m
         return music
@@ -126,6 +126,48 @@ class Music(commands.Cog):
 
         asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emote_ids, embeds))
 
+    @commands.command(name='sections',
+                      aliases=['mixes'],
+                      description='Finds the sections of the chart with the given name.',
+                      help='!sections grgr')
+    async def sections(self, ctx: commands.Context, *, arg: str):
+        self.logger.info(f'Searching for chart sections "{arg}".')
+
+        split_args = arg.split()
+
+        difficulty = ChartDifficulty.Expert
+        if len(split_args) >= 2:
+            final_word = split_args[-1]
+            if final_word in self.difficulty_names:
+                difficulty = self.difficulty_names[final_word]
+                arg = ''.join(split_args[:-1])
+
+        song: MusicMaster = self.music[arg]
+        if not song:
+            msg = f'Failed to find chart "{arg}".'
+            await ctx.send(msg)
+            self.logger.info(msg)
+            return
+        if not song.enable_long_mix:
+            msg = f'Song "{song.name}" does not have mix enabled.'
+            await ctx.send(msg)
+            self.logger.info(msg)
+            return
+        self.logger.info(f'Found "{song}" ({romanize(song.name)[1]}).')
+
+        embeds, files = self.get_mix_embed_info(song)
+
+        message = await ctx.send(files=files, embed=embeds[difficulty - 1])
+
+        reaction_emote_ids = [
+            790050636568723466,
+            790050636489555998,
+            790050636548276252,
+            790050636225052694,
+        ]
+
+        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emote_ids, embeds))
+
     def get_chart_embed_info(self, song):
         embeds = []
         files = [discord.File(song.jacket_path, filename=f'jacket.png')]
@@ -160,6 +202,59 @@ class Music(commands.Cog):
                                   f'SCR: {round(chart.trends[2] * 100, 2)}%\n'
                                   f'EFT: {round(chart.trends[3] * 100, 2)}%\n'
                                   f'TEC: {round(chart.trends[4] * 100, 2)}%\n',
+                            inline=True)
+            embed.set_footer(text='1 column = 10 seconds')
+
+            embeds.append(embed)
+
+        return embeds, files
+
+    def get_mix_embed_info(self, song):
+        embeds = []
+        files = [discord.File(song.jacket_path, filename=f'jacket.png')]
+
+        for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
+            chart: ChartMaster = song.charts[difficulty]
+            embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]')
+            embed.set_thumbnail(url=f'attachment://jacket.png')
+            embed.set_image(
+                url=f'https://qwewqa.github.io/d4dj-dumps/{chart.mix_path.relative_to(asset_manager.path).as_posix()}'
+            )
+
+            note_counts = chart.note_counts
+            mix_info = chart.mix_info
+
+            info = {
+                'Level': chart.display_level,
+                'Unit': song.unit.name,
+                'BPM': song.bpm,
+                'Section Trend': song.section_trend.name,
+            }
+
+            begin = {
+                'Time': f'{round(mix_info[ChartSectionType.Begin].duration, 2)}s',
+                'Combo': note_counts[ChartSectionType.Begin].count,
+            }
+            middle = {
+                'Time': f'{round(mix_info[ChartSectionType.Middle].duration, 2)}s',
+                'Combo': note_counts[ChartSectionType.Middle].count,
+            }
+            end = {
+                'Time': f'{round(mix_info[ChartSectionType.End].duration, 2)}s',
+                'Combo': note_counts[ChartSectionType.End].count,
+            }
+
+            embed.add_field(name='Info',
+                            value=self.format_info(info),
+                            inline=False)
+            embed.add_field(name='Begin',
+                            value=self.format_info(begin),
+                            inline=True)
+            embed.add_field(name='Middle',
+                            value=self.format_info(middle),
+                            inline=True)
+            embed.add_field(name='End',
+                            value=self.format_info(end),
                             inline=True)
             embed.set_footer(text='1 column = 10 seconds')
 

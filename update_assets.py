@@ -12,7 +12,7 @@ async def main():
     await revision_manager.repair_downloads()
     await revision_manager.update_assets()
     manager = AssetManager('assets')
-    manager.render_charts()
+    manager.render_charts_by_master()
 
 
 if __name__ == '__main__':

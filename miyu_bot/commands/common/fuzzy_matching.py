@@ -52,6 +52,7 @@ class FuzzyMatchConfig:
     special_substitution_weights: Dict[Tuple[str, str], float] = field(default_factory=lambda: {
         ('v', 'b'): 0.0,
         ('l', 'r'): 0.0,
+        ('c', 'k'): 0.0,
     })
     word_match_weight: float = -0.2
     acronym_match_weight: float = -0.3

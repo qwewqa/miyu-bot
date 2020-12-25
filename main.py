@@ -15,6 +15,7 @@ bot = commands.Bot(command_prefix='!', case_insensitive=True)
 asset_manager = AssetManager('assets')
 
 bot.load_extension('miyu_bot.commands.cogs.card')
+bot.load_extension('miyu_bot.commands.cogs.event')
 bot.load_extension('miyu_bot.commands.cogs.music')
 bot.load_extension('miyu_bot.commands.cogs.utility')
 

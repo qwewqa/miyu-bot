@@ -17,7 +17,7 @@ class FuzzyMap:
         self.logger = logging.getLogger(__name__)
 
     def values(self):
-        return (v for v in self._values.values() if self.filter(v))
+        return FuzzyDictValuesView(self)
 
     def __delitem__(self, key):
         k = romanize(key)
@@ -40,6 +40,17 @@ class FuzzyMap:
             return None
         self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
         return self._values[result]
+
+
+class FuzzyDictValuesView:
+    def __init__(self, map: FuzzyMap):
+        self._map = map
+
+    def __contains__(self, item):
+        return item in self._map._values.values() and self._map.filter(item)
+
+    def __iter__(self):
+        yield from (v for v in self._map._values.values() if self._map.filter(v))
 
 
 @dataclass

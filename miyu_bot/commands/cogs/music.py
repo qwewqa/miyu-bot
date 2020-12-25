@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Optional, Tuple
 
 import discord
 from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
@@ -8,6 +9,8 @@ from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
 from main import asset_manager
+from miyu_bot.commands.common.emoji import difficulty_emoji_id
+from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMap
 from miyu_bot.commands.common.reaction_message import make_tabbed_message
 
@@ -16,13 +19,9 @@ class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.music = self.get_music()
-
-    def get_music(self):
-        music = FuzzyMap(lambda m: m.is_released)
+        self.music = FuzzyMap(lambda m: m.is_released)
         for m in asset_manager.music_master.values():
-            music[f'{m.name} {m.special_unit_name}'] = m
-        return music
+            self.music[f'{m.name} {m.special_unit_name}'] = m
 
     difficulty_names = {
         'expert': ChartDifficulty.Expert,
@@ -39,10 +38,6 @@ class Music(commands.Cog):
         'es': ChartDifficulty.Easy,
     }
 
-    @staticmethod
-    def format_info(info_entries: dict):
-        return '\n'.join(f'{k}: {v}' for k, v in info_entries.items() if v)
-
     @commands.command(name='song',
                       aliases=['music'],
                       description='Finds the song with the given name.',
@@ -50,13 +45,14 @@ class Music(commands.Cog):
     async def song(self, ctx: commands.Context, *, arg: str):
         self.logger.info(f'Searching for song "{arg}".')
 
-        song: MusicMaster = self.music[arg]
+        song = self.get_song(arg)
+
         if not song:
             msg = f'Failed to find song "{arg}".'
             await ctx.send(msg)
             self.logger.info(msg)
             return
-        self.logger.info(f'Found "{song}" ({romanize(song.name)[1]}).')
+        self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
         thumb = discord.File(song.jacket_path, filename='jacket.png')
 
@@ -81,10 +77,10 @@ class Music(commands.Cog):
         }
 
         embed.add_field(name='Artist',
-                        value=self.format_info(artist_info),
+                        value=format_info(artist_info),
                         inline=False)
         embed.add_field(name='Info',
-                        value=self.format_info(music_info),
+                        value=format_info(music_info),
                         inline=False)
 
         await ctx.send(files=[thumb], embed=embed)
@@ -96,35 +92,28 @@ class Music(commands.Cog):
     async def chart(self, ctx: commands.Context, *, arg: str):
         self.logger.info(f'Searching for chart "{arg}".')
 
-        split_args = arg.split()
+        name, difficulty = self.parse_chart_args(arg)
+        song = self.get_song(name)
 
-        difficulty = ChartDifficulty.Expert
-        if len(split_args) >= 2:
-            final_word = split_args[-1]
-            if final_word in self.difficulty_names:
-                difficulty = self.difficulty_names[final_word]
-                arg = ''.join(split_args[:-1])
-
-        song: MusicMaster = self.music[arg]
         if not song:
-            msg = f'Failed to find chart "{arg}".'
+            msg = f'Failed to find chart "{name}".'
             await ctx.send(msg)
             self.logger.info(msg)
             return
-        self.logger.info(f'Found "{song}" ({romanize(song.name)[1]}).')
+        self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
         embeds, files = self.get_chart_embed_info(song)
 
         message = await ctx.send(files=files, embed=embeds[difficulty - 1])
 
-        reaction_emote_ids = [
+        reaction_emoji_ids = [
             790050636568723466,
             790050636489555998,
             790050636548276252,
             790050636225052694,
         ]
 
-        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emote_ids, embeds))
+        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emoji_ids, embeds))
 
     @commands.command(name='sections',
                       aliases=['mixes'],
@@ -133,18 +122,11 @@ class Music(commands.Cog):
     async def sections(self, ctx: commands.Context, *, arg: str):
         self.logger.info(f'Searching for chart sections "{arg}".')
 
-        split_args = arg.split()
+        name, difficulty = self.parse_chart_args(arg)
+        song = self.get_song(name)
 
-        difficulty = ChartDifficulty.Expert
-        if len(split_args) >= 2:
-            final_word = split_args[-1]
-            if final_word in self.difficulty_names:
-                difficulty = self.difficulty_names[final_word]
-                arg = ''.join(split_args[:-1])
-
-        song: MusicMaster = self.music[arg]
         if not song:
-            msg = f'Failed to find chart "{arg}".'
+            msg = f'Failed to find chart "{name}".'
             await ctx.send(msg)
             self.logger.info(msg)
             return
@@ -153,20 +135,15 @@ class Music(commands.Cog):
             await ctx.send(msg)
             self.logger.info(msg)
             return
-        self.logger.info(f'Found "{song}" ({romanize(song.name)[1]}).')
+        self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
         embeds, files = self.get_mix_embed_info(song)
 
         message = await ctx.send(files=files, embed=embeds[difficulty - 1])
 
-        reaction_emote_ids = [
-            790050636568723466,
-            790050636489555998,
-            790050636548276252,
-            790050636225052694,
-        ]
+        reaction_emoji_ids = difficulty_emoji_id.values()
 
-        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emote_ids, embeds))
+        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emoji_ids, embeds))
 
     def get_chart_embed_info(self, song):
         embeds = []
@@ -245,22 +222,42 @@ class Music(commands.Cog):
             }
 
             embed.add_field(name='Info',
-                            value=self.format_info(info),
+                            value=format_info(info),
                             inline=False)
             embed.add_field(name='Begin',
-                            value=self.format_info(begin),
+                            value=format_info(begin),
                             inline=True)
             embed.add_field(name='Middle',
-                            value=self.format_info(middle),
+                            value=format_info(middle),
                             inline=True)
             embed.add_field(name='End',
-                            value=self.format_info(end),
+                            value=format_info(end),
                             inline=True)
             embed.set_footer(text='1 column = 10 seconds')
 
             embeds.append(embed)
 
         return embeds, files
+
+    def parse_chart_args(self, arg: str) -> Tuple[str, ChartDifficulty]:
+        split_args = arg.split()
+
+        difficulty = ChartDifficulty.Expert
+        if len(split_args) >= 2:
+            final_word = split_args[-1]
+            if final_word in self.difficulty_names:
+                difficulty = self.difficulty_names[final_word]
+                arg = ''.join(split_args[:-1])
+        return arg, difficulty
+
+    def get_song(self, name_or_id: str) -> Optional[MusicMaster]:
+        try:
+            song = asset_manager.music_master[int(name_or_id)]
+            if song not in self.music.values():
+                song = self.music[name_or_id]
+            return song
+        except (KeyError, ValueError):
+            return self.music[name_or_id]
 
 
 def setup(bot):

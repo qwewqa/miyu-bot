@@ -2,7 +2,7 @@ import datetime
 import logging
 
 import discord
-from d4dj_utils.master.event_master import EventMaster
+from d4dj_utils.master.event_master import EventMaster, EventState
 from discord.ext import commands
 
 from main import asset_manager
@@ -17,7 +17,7 @@ class Event(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.events = FuzzyMap(
-            lambda e: e.start_datetime < datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=-8)
+            lambda e: e.start_datetime < datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8)
         )
         for e in asset_manager.event_master.values():
             self.events[e.name] = e
@@ -86,6 +86,65 @@ class Event(commands.Cog):
                             'Character': f'{self.bot.get_emoji(parameter_bonus_emoji_by_id[event.bonus.character_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
                             'Both': f'{self.bot.get_emoji(parameter_bonus_emoji_by_id[event.bonus.all_match_parameter_bonus_id])} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
                         }),
+                        inline=True)
+
+        await ctx.send(files=[logo], embed=embed)
+
+    @commands.command(name='timeleft',
+                      aliases=['tl', 'time_left'],
+                      description='Displays the time left in the current event',
+                      help='!timeleft')
+    async def time_left(self, ctx: commands.Context):
+        latest: EventMaster = min((v for v in self.events.values() if v.state() < EventState.Ended),
+                                  key=lambda e: e.start_datetime)
+        state = latest.state()
+
+        logo = discord.File(latest.logo_path, filename='logo.png')
+
+        embed = discord.Embed(title=latest.name)
+        embed.set_thumbnail(url=f'attachment://logo.png')
+
+        progress = None
+
+        if state == EventState.Upcoming:
+            time_delta_heading = 'Time Until Start'
+            time_delta = latest.start_datetime - datetime.datetime.now(datetime.timezone.utc)
+            date_heading = 'Start Date'
+            date_value = latest.start_datetime
+        elif state == EventState.Open:
+            time_delta_heading = 'Time Until Close'
+            time_delta = latest.reception_close_datetime - datetime.datetime.now(datetime.timezone.utc)
+            progress = 1 - (time_delta / (latest.reception_close_datetime - latest.start_datetime))
+            date_heading = 'Close Date'
+            date_value = latest.reception_close_datetime
+        elif state in (EventState.Closing, EventState.Ranks_Fixed):
+            time_delta_heading = 'Time Until Results'
+            time_delta = latest.result_announcement_datetime - datetime.datetime.now(datetime.timezone.utc)
+            date_heading = 'Results Date'
+            date_value = latest.result_announcement_datetime
+        elif state == EventState.Results:
+            time_delta_heading = 'Time Until End'
+            time_delta = latest.end_datetime - datetime.datetime.now(datetime.timezone.utc)
+            date_heading = 'End Date'
+            date_value = latest.end_datetime
+        else:
+            time_delta_heading = 'Time Since End'
+            time_delta = datetime.datetime.now(datetime.timezone.utc) - latest.end_datetime
+            date_heading = 'End Date'
+            date_value = latest.end_datetime
+
+        days = time_delta.days
+        hours, rem = divmod(time_delta.seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
+
+        embed.add_field(name=time_delta_heading,
+                        value=f'{days}d {hours}h {minutes}m',
+                        inline=True)
+        embed.add_field(name='Progress',
+                        value=f'{round(progress * 100, 2)}%' if progress is not None else 'N/A',
+                        inline=True)
+        embed.add_field(name=date_heading,
+                        value=str(date_value),
                         inline=True)
 
         await ctx.send(files=[logo], embed=embed)

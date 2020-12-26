@@ -51,6 +51,7 @@ class Event(commands.Cog):
 
         embed.add_field(name='Dates',
                         value=format_info({
+                            'Duration': event.duration,
                             'Start': event.start_datetime,
                             'Close': event.reception_close_datetime,
                             'Rank Fix': event.rank_fix_start_datetime,

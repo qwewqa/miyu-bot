@@ -21,7 +21,8 @@ class Music(commands.Cog):
         self.logger = logging.getLogger(__name__)
         self.music = FuzzyMap(lambda m: m.is_released)
         for m in asset_manager.music_master.values():
-            self.music[f'{m.name} {m.special_unit_name}'] = m
+            if not self.music.has_exact(f'{m.name} {m.special_unit_name}'):
+                self.music[f'{m.name} {m.special_unit_name}'] = m
 
     difficulty_names = {
         'expert': ChartDifficulty.Expert,

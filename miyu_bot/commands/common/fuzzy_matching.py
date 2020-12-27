@@ -19,6 +19,9 @@ class FuzzyMap:
     def values(self):
         return FuzzyDictValuesView(self)
 
+    def has_exact(self, key):
+        return romanize(key) in self._values
+
     def __delitem__(self, key):
         k = romanize(key)
         self._values.__delitem__(k)

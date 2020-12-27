@@ -14,7 +14,7 @@ from main import asset_manager
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMap
-from miyu_bot.commands.common.reaction_message import run_tabbed_message
+from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
 class Music(commands.Cog):
@@ -145,12 +145,24 @@ class Music(commands.Cog):
         asyncio.ensure_future(run_tabbed_message(ctx, message, self.reaction_emojis, embeds))
 
     @commands.command(name='songs',
-                      aliases=['search_songs'],
+                      aliases=['songsearch', 'song_search'],
                       description='Finds songs matching the given name.',
                       help='!songs grgr')
-    async def songs(self, ctx: commands.Context, *, arg: str):
-        self.logger.info(f'Searching for songs sections "{arg}".')
-        songs = self.music.get_sorted(arg)
+    async def songs(self, ctx: commands.Context, *, arg: str = ""):
+        if arg:
+            self.logger.info(f'Searching for songs "{arg}".')
+            songs = self.music.get_sorted(arg)
+            listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
+                       songs]
+            asyncio.ensure_future(run_paged_message(ctx, f'Song Search "{arg}"', listing))
+        else:
+            self.logger.info('Listing songs.')
+            songs = sorted(self.music.values(), key=lambda m: -m.default_order)
+            songs = [*songs[1:], songs[0]]  # lesson is always first
+            listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
+                       songs]
+            asyncio.ensure_future(run_paged_message(ctx, f'All Songs', listing))
+
         return
 
     def get_chart_embed_info(self, song):

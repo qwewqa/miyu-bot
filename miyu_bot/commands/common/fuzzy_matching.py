@@ -38,11 +38,15 @@ class FuzzyMap:
             self.logger.debug(f'Rejected key "{key}" due to length.')
             return None
         key = romanize(key)
-        result = self.matcher.closest_match(key, (k for k, v in self._values.items() if self.filter(v)))
-        if not result:
+        try:
+            matcher = self.matcher
+            result = min((score, item) for score, item in
+                         ((matcher.score(key, item[0]), item) for item in self._values.items()) if score <= 0)[1][1]
+            self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
+            return result
+        except ValueError:
+            self.logger.info(f'Found no results for key "{key}" in time {timeit.default_timer() - start_time}.')
             return None
-        self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
-        return self._values[result]
 
     def get_sorted(self, key: str):
         start_time = timeit.default_timer()
@@ -97,16 +101,6 @@ class FuzzyMatcher:
         for i in range(length + 1):
             self.array[i][0] = i * self.config.deletion_weight
             self.array[0][i] = i * self.config.insertion_weight
-
-    def closest_match(self, source: str, targets: Iterable[str]) -> Optional[str]:
-        threshold = 0
-        closest = None
-        for target in targets:
-            score = self.score(source, target, threshold)
-            if score <= 0:
-                threshold = score
-                closest = target
-        return closest
 
     def score(self, source: str, target: str, threshold=0.0):
         # target must not be empty

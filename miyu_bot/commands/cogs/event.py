@@ -26,16 +26,19 @@ class Event(commands.Cog):
                       aliases=['ev'],
                       description='Finds the event with the given name.',
                       help='!event pkcooking')
-    async def event(self, ctx: commands.Context, *, arg: str):
+    async def event(self, ctx: commands.Context, *, arg: str = ""):
         self.logger.info(f'Searching for event "{arg}".')
 
         event: EventMaster
-        try:
-            event = asset_manager.event_master[int(arg)]
-            if event not in self.events.values():
+        if arg:
+            try:
+                event = asset_manager.event_master[int(arg)]
+                if event not in self.events.values():
+                    event = self.events[arg]
+            except (ValueError, KeyError):
                 event = self.events[arg]
-        except (ValueError, KeyError):
-            event = self.events[arg]
+        else:
+            event = self.get_latest_event()
 
         if not event:
             msg = f'Failed to find event "{arg}".'
@@ -88,6 +91,7 @@ class Event(commands.Cog):
                             'Both': f'{self.bot.get_emoji(parameter_bonus_emoji_by_id[event.bonus.all_match_parameter_bonus_id])} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
                         }),
                         inline=True)
+        embed.set_footer(text=f'Event Id: {event.id}')
 
         await ctx.send(files=[logo], embed=embed)
 
@@ -96,8 +100,8 @@ class Event(commands.Cog):
                       description='Displays the time left in the current event',
                       help='!timeleft')
     async def time_left(self, ctx: commands.Context):
-        latest: EventMaster = min((v for v in self.events.values() if v.state() < EventState.Ended),
-                                  key=lambda e: e.start_datetime)
+        latest = self.get_latest_event()
+
         state = latest.state()
 
         logo = discord.File(latest.logo_path, filename='logo.png')
@@ -149,6 +153,14 @@ class Event(commands.Cog):
                         inline=True)
 
         await ctx.send(files=[logo], embed=embed)
+
+    def get_latest_event(self) -> EventMaster:
+        """Returns the oldest event that has not ended or the newest event otherwise."""
+        try:
+            return min((v for v in self.events.values() if v.state() < EventState.Ended),
+                       key=lambda e: e.start_datetime)
+        except ValueError:
+            return max(self.events.values(), key=lambda v: v.start_datetime)
 
 
 def setup(bot):

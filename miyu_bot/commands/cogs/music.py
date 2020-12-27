@@ -70,6 +70,7 @@ class Music(commands.Cog):
 
         music_info = {
             'Category': song.category.name,
+            'Duration': self.format_duration(self.get_music_duration(song)),
             'BPM': song.bpm,
             'Section Trend': song.section_trend.name,
             'Sort Order': song.default_order,
@@ -162,6 +163,7 @@ class Music(commands.Cog):
 
             embed.add_field(name='Info',
                             value=f'Level: {chart.display_level}\n'
+                                  f'Duration: {self.format_duration(self.get_music_duration(song))}\n'
                                   f'Unit: {song.special_unit_name or song.unit.name}\n'
                                   f'Category: {song.category.name}\n'
                                   f'BPM: {song.bpm}',
@@ -259,6 +261,16 @@ class Music(commands.Cog):
             return song
         except (KeyError, ValueError):
             return self.music[name_or_id]
+
+    def get_music_duration(self, music: MusicMaster):
+        with contextlib.closing(wave.open(str(music.audio_path.with_name(music.audio_path.name + '.wav')), 'r')) as f:
+            frames = f.getnframes()
+            rate = f.getframerate()
+            duration = frames / float(rate)
+            return duration
+
+    def format_duration(self, seconds):
+        return f'{int(seconds // 60)}m {round(seconds % 60, 2)}s'
 
 
 def setup(bot):

@@ -1,5 +1,7 @@
 import asyncio
+import contextlib
 import logging
+import wave
 from typing import Optional, Tuple
 
 import discord
@@ -9,10 +11,10 @@ from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
 from main import asset_manager
-from miyu_bot.commands.common.emoji import difficulty_emoji_id
+from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMap
-from miyu_bot.commands.common.reaction_message import make_tabbed_message
+from miyu_bot.commands.common.reaction_message import run_tabbed_message
 
 
 class Music(commands.Cog):
@@ -23,6 +25,10 @@ class Music(commands.Cog):
         for m in asset_manager.music_master.values():
             if not self.music.has_exact(f'{m.name} {m.special_unit_name}'):
                 self.music[f'{m.name} {m.special_unit_name}'] = m
+
+    @property
+    def reaction_emojis(self):
+        return [self.bot.get_emoji(eid) for eid in difficulty_emoji_ids.values()]
 
     difficulty_names = {
         'expert': ChartDifficulty.Expert,
@@ -108,14 +114,7 @@ class Music(commands.Cog):
 
         message = await ctx.send(files=files, embed=embeds[difficulty - 1])
 
-        reaction_emoji_ids = [
-            790050636568723466,
-            790050636489555998,
-            790050636548276252,
-            790050636225052694,
-        ]
-
-        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emoji_ids, embeds))
+        asyncio.ensure_future(run_tabbed_message(ctx, message, self.reaction_emojis, embeds))
 
     @commands.command(name='sections',
                       aliases=['mixes'],
@@ -143,9 +142,16 @@ class Music(commands.Cog):
 
         message = await ctx.send(files=files, embed=embeds[difficulty - 1])
 
-        reaction_emoji_ids = difficulty_emoji_id.values()
+        asyncio.ensure_future(run_tabbed_message(ctx, message, self.reaction_emojis, embeds))
 
-        asyncio.ensure_future(make_tabbed_message(ctx, message, reaction_emoji_ids, embeds))
+    @commands.command(name='songs',
+                      aliases=['search_songs'],
+                      description='Finds songs matching the given name.',
+                      help='!songs grgr')
+    async def songs(self, ctx: commands.Context, *, arg: str):
+        self.logger.info(f'Searching for songs sections "{arg}".')
+        songs = self.music.get_sorted(arg)
+        return
 
     def get_chart_embed_info(self, song):
         embeds = []

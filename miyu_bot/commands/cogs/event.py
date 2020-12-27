@@ -6,8 +6,8 @@ from d4dj_utils.master.event_master import EventMaster, EventState
 from discord.ext import commands
 
 from main import asset_manager
-from miyu_bot.commands.common.emoji import attribute_emoji_by_id, unit_emoji_by_id, parameter_bonus_emoji_by_id, \
-    event_point_emoji
+from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, \
+    event_point_emoji_id
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import FuzzyMap, romanize
 
@@ -69,26 +69,26 @@ class Event(commands.Cog):
                         inline=True)
         embed.add_field(name='Bonus Characters',
                         value='\n'.join(
-                            f'{self.bot.get_emoji(unit_emoji_by_id[char.unit_id])} {char.full_name_english}'
+                            f'{self.bot.get_emoji(unit_emoji_ids_by_unit_id[char.unit_id])} {char.full_name_english}'
                             for char in event.bonus.characters
                         ),
                         inline=True)
         embed.add_field(name='Bonus Attribute',
-                        value=f'{self.bot.get_emoji(attribute_emoji_by_id[event.bonus.attribute_id])} '
+                        value=f'{self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[event.bonus.attribute_id])} '
                               f'{event.bonus.attribute.en_name.capitalize()}' if event.bonus.attribute else 'None',
                         inline=True)
         embed.add_field(name='Point Bonus',
                         value=format_info({
-                            'Attribute': f'{self.bot.get_emoji(event_point_emoji)} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
-                            'Character': f'{self.bot.get_emoji(event_point_emoji)} +{event.bonus.character_match_point_bonus_value}%' if event.bonus.character_match_point_bonus_value else 'None',
-                            'Both': f'{self.bot.get_emoji(event_point_emoji)} +{event.bonus.all_match_point_bonus_value}%' if event.bonus.all_match_point_bonus_value else 'None',
+                            'Attribute': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
+                            'Character': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.character_match_point_bonus_value}%' if event.bonus.character_match_point_bonus_value else 'None',
+                            'Both': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.all_match_point_bonus_value}%' if event.bonus.all_match_point_bonus_value else 'None',
                         }),
                         inline=True)
         embed.add_field(name='Parameter Bonus',
                         value=format_info({
-                            'Attribute': f'{self.bot.get_emoji(parameter_bonus_emoji_by_id[event.bonus.attribute_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
-                            'Character': f'{self.bot.get_emoji(parameter_bonus_emoji_by_id[event.bonus.character_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
-                            'Both': f'{self.bot.get_emoji(parameter_bonus_emoji_by_id[event.bonus.all_match_parameter_bonus_id])} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
+                            'Attribute': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.attribute_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
+                            'Character': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.character_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
+                            'Both': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.all_match_parameter_bonus_id])} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
                         }),
                         inline=True)
         embed.set_footer(text=f'Event Id: {event.id}')

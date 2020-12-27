@@ -1,6 +1,6 @@
 from d4dj_utils.master.chart_master import ChartDifficulty
 
-difficulty_emoji_id = {
+difficulty_emoji_ids = {
     ChartDifficulty.Easy: 790050636568723466,
     ChartDifficulty.Normal: 790050636489555998,
     ChartDifficulty.Hard: 790050636548276252,
@@ -8,16 +8,16 @@ difficulty_emoji_id = {
 }
 
 # \:buff_power: \:buff_heart: \:buff_technique: \:buff_physical:
-parameter_bonus_emoji = {
+parameter_bonus_emoji_Ids = {
     'all': 792095555634331668,
     'heart': 792096971040620564,
     'technique': 792096971090558986,
     'physical': 792096971002216488,
 }
 
-parameter_bonus_emoji_by_id = {i: v for i, v in enumerate(parameter_bonus_emoji.values())}
+parameter_bonus_emoji_ids_by_parameter_id = {i: v for i, v in enumerate(parameter_bonus_emoji_Ids.values())}
 
-unit_emoji = {
+unit_emoji_ids = {
     'happy_around': 792069679442821121,
     'peaky_pkey': 792076165916524544,
     'photon_maiden': 792069679455535136,
@@ -26,9 +26,9 @@ unit_emoji = {
     'lyrical_lily': 792069679673114644,
 }
 
-unit_emoji_by_id = {i + 1: v for i, v in enumerate(unit_emoji.values())}
+unit_emoji_ids_by_unit_id = {i + 1: v for i, v in enumerate(unit_emoji_ids.values())}
 
-attribute_emoji = {
+attribute_emoji_ids = {
     'street': 791903477986361345,
     'party': 791903477999599677,
     'cute': 791903477743616003,
@@ -36,6 +36,6 @@ attribute_emoji = {
     'elegant': 791903477969321985,
 }
 
-attribute_emoji_by_id = {i + 1: v for i, v in enumerate(attribute_emoji.values())}
+attribute_emoji_ids_by_attribute_id = {i + 1: v for i, v in enumerate(attribute_emoji_ids.values())}
 
-event_point_emoji = 792097816931598336
+event_point_emoji_id = 792097816931598336

@@ -44,6 +44,17 @@ class FuzzyMap:
         self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
         return self._values[result]
 
+    def get_sorted(self, key: str):
+        start_time = timeit.default_timer()
+        if len(key) > self.max_length:
+            self.logger.debug(f'Rejected key "{key}" due to length.')
+            return []
+        key = romanize(key)
+        values = [item[1] for score, item in
+                  sorted((self.matcher.score(key, item[0]), item) for item in self._values.items()) if score <= 0]
+        self.logger.info(f'Searched key "{key}" in time {timeit.default_timer() - start_time}.')
+        return values
+
 
 class FuzzyDictValuesView:
     def __init__(self, map: FuzzyMap):

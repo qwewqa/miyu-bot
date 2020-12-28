@@ -93,7 +93,7 @@ class FuzzyDictValuesView:
         return item in self._map._values.values() and self._map.filter(item)
 
     def __iter__(self):
-        yield from iter(self._map.filtered_items)
+        yield from (v for _, v in self._map.filtered_items)
 
 
 @dataclass
@@ -109,6 +109,7 @@ class FuzzyMatchConfig:
         ('c', 'k'): 0.0,
     })
     word_match_weight: float = -0.2
+    whole_match_weight: float = -0.25
     acronym_match_weight: float = -0.3
 
 
@@ -143,6 +144,7 @@ class FuzzyMatcher:
         match_weight = config.match_weight
         special_substitution_weights = config.special_substitution_weights
         word_match_weight = config.word_match_weight
+        whole_match_weight = config.whole_match_weight
         acronym_match_weight = config.acronym_match_weight
 
         if not a:
@@ -159,7 +161,7 @@ class FuzzyMatcher:
                          word_match_weight * max(sum(a == b for a, b in
                                                      zip(source, w[0] + strip_vowels(w[1:]))) for w in
                                                  words),
-                         word_match_weight * sum(a == b for a, b in zip(strip_spaces(source), strip_spaces(target))),
+                         whole_match_weight * sum(a == b for a, b in zip(strip_spaces(source), strip_spaces(target))),
                          acronym_match_weight * sum(
                              a == b for a, b in zip(source, ''.join(w[0] for w in words))))
 

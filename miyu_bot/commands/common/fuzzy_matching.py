@@ -2,6 +2,7 @@ import logging
 import math
 import re
 import timeit
+import datetime
 from dataclasses import dataclass, field
 from typing import Dict, Tuple, List, Optional, Iterable
 
@@ -9,12 +10,31 @@ import pykakasi
 
 
 class FuzzyMap:
-    def __init__(self, filter=None, matcher=None):
+    def __init__(self, filter=None, matcher=None, additive_only_filter=True):
         self.filter = filter or (lambda n: True)
         self.matcher = matcher or FuzzyMatcher()
         self._values = {}
         self.max_length = 0
         self.logger = logging.getLogger(__name__)
+        self._stale = True
+        self.additive_only_filter = additive_only_filter
+
+    @property
+    def filtered_items(self):
+        if not self.additive_only_filter:
+            return [item for item in self._values.items() if self.filter(item[1])]
+        if self._needs_update:
+            self._update_items()
+        return self._filtered_items
+
+    @property
+    def _needs_update(self):
+        return self._stale or any(self.filter(item[1]) for item in self._filtered_out_items)
+
+    def _update_items(self):
+        self._filtered_items = [item for item in self._values.items() if self.filter(item[1])]
+        self._filtered_out_items = [item for item in self._values.items() if not self.filter(item[1])]
+        self._stale = False
 
     def values(self):
         return FuzzyDictValuesView(self)
@@ -25,12 +45,14 @@ class FuzzyMap:
     def __delitem__(self, key):
         k = romanize(key)
         self._values.__delitem__(k)
+        self._stale = True
 
     def __setitem__(self, key, value):
         k = romanize(key)
         self._values[k] = value
         self.max_length = max(self.max_length, math.ceil(len(k) * 1.1))
         self.matcher.set_max_length(self.max_length)
+        self._stale = True
 
     def __getitem__(self, key):
         start_time = timeit.default_timer()
@@ -41,7 +63,7 @@ class FuzzyMap:
         try:
             matcher = self.matcher
             result = min((score, item) for score, item in
-                         ((matcher.score(key, item[0]), item) for item in self._values.items() if self.filter(item[1]))
+                         ((matcher.score(key, item[0]), item) for item in self.filtered_items)
                          if score <= 0)[1][1]
             self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
             return result
@@ -57,7 +79,7 @@ class FuzzyMap:
         key = romanize(key)
         values = [item[1] for score, item in
                   sorted(
-                      (self.matcher.score(key, item[0]), item) for item in self._values.items() if self.filter(item[1]))
+                      (self.matcher.score(key, item[0]), item) for item in self.filtered_items)
                   if score <= 0]
         self.logger.info(f'Searched key "{key}" in time {timeit.default_timer() - start_time}.')
         return values
@@ -71,7 +93,7 @@ class FuzzyDictValuesView:
         return item in self._map._values.values() and self._map.filter(item)
 
     def __iter__(self):
-        yield from (v for v in self._map._values.values() if self._map.filter(v))
+        yield from iter(self._map.filtered_items)
 
 
 @dataclass

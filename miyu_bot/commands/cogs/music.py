@@ -288,7 +288,9 @@ class Music(commands.Cog):
             return duration
 
     def format_duration(self, seconds):
-        return f'{int(seconds // 60)}m {round(seconds % 60, 2)}s'
+        minutes = int(seconds // 60)
+        seconds = round(seconds % 60, 2)
+        return f'{minutes}:{str(int(seconds)).zfill(2)}.{str(int(seconds % 1 * 100)).zfill(2)}'
 
 
 def setup(bot):

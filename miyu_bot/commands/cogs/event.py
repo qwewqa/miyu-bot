@@ -6,7 +6,8 @@ from d4dj_utils.master.event_master import EventMaster, EventState
 from discord.ext import commands
 
 from main import asset_manager
-from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, \
+from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
+    parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import FuzzyMap, romanize
@@ -52,9 +53,15 @@ class Event(commands.Cog):
         embed = discord.Embed(title=event.name)
         embed.set_thumbnail(url=f'attachment://logo.png')
 
+        duration_hour_part = round((event.duration.seconds / 3600), 2)
+        duration_hour_part = duration_hour_part if not duration_hour_part.is_integer() else int(duration_hour_part)
+        duration_hours = round((event.duration.days * 24 + event.duration.seconds / 3600), 2)
+        duration_hours = duration_hours if not duration_hours.is_integer() else int(duration_hours)
+
         embed.add_field(name='Dates',
                         value=format_info({
-                            'Duration': event.duration,
+                            'Duration': f'{event.duration.days} days, {duration_hour_part} hours '
+                                        f'({duration_hours} hours)',
                             'Start': event.start_datetime,
                             'Close': event.reception_close_datetime,
                             'Rank Fix': event.rank_fix_start_datetime,

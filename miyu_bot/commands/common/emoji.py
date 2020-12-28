@@ -9,7 +9,7 @@ difficulty_emoji_ids = {
 
 # \:buff_power: \:buff_heart: \:buff_technique: \:buff_physical:
 parameter_bonus_emoji_Ids = {
-    'all': 792095555634331668,
+    'all': 792930826735583293,
     'heart': 792096971040620564,
     'technique': 792096971090558986,
     'physical': 792096971002216488,

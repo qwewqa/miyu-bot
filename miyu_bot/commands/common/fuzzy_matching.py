@@ -9,7 +9,7 @@ import pykakasi
 
 
 class FuzzyMap:
-    def __init__(self, filter=lambda: True, matcher=None):
+    def __init__(self, filter=None, matcher=None):
         self.filter = filter or (lambda n: True)
         self.matcher = matcher or FuzzyMatcher()
         self._values = {}
@@ -41,7 +41,8 @@ class FuzzyMap:
         try:
             matcher = self.matcher
             result = min((score, item) for score, item in
-                         ((matcher.score(key, item[0]), item) for item in self._values.items()) if score <= 0)[1][1]
+                         ((matcher.score(key, item[0]), item) for item in self._values.items() if self.filter(item[1]))
+                         if score <= 0)[1][1]
             self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
             return result
         except ValueError:
@@ -55,7 +56,9 @@ class FuzzyMap:
             return []
         key = romanize(key)
         values = [item[1] for score, item in
-                  sorted((self.matcher.score(key, item[0]), item) for item in self._values.items()) if score <= 0]
+                  sorted(
+                      (self.matcher.score(key, item[0]), item) for item in self._values.items() if self.filter(item[1]))
+                  if score <= 0]
         self.logger.info(f'Searched key "{key}" in time {timeit.default_timer() - start_time}.')
         return values
 
@@ -129,14 +132,12 @@ class FuzzyMatcher:
             for i in range(l_tgt + 1):
                 a[0][i] = i * insertion_weight
 
-        def strip_vowels(s):
-            return re.sub('[aeoiu]', '', s)
-
         words = target.split()
         word_bonus = min(word_match_weight * max(sum(a == b for a, b in zip(source, w)) for w in words),
                          word_match_weight * max(sum(a == b for a, b in
                                                      zip(source, w[0] + strip_vowels(w[1:]))) for w in
                                                  words),
+                         word_match_weight * sum(a == b for a, b in zip(strip_spaces(source), strip_spaces(target))),
                          acronym_match_weight * sum(
                              a == b for a, b in zip(source, ''.join(w[0] for w in words))))
 
@@ -160,6 +161,14 @@ class FuzzyMatcher:
                 return 1
 
         return a[l_src][l_tgt] + word_bonus + base_score
+
+
+def strip_spaces(s):
+    return re.sub(' ', '', s)
+
+
+def strip_vowels(s):
+    return re.sub('[aeoiu]', '', s)
 
 
 def romanize(s: str) -> str:

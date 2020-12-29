@@ -9,9 +9,9 @@ from typing import Dict, Tuple, List, Optional, Iterable
 import pykakasi
 
 
-class FuzzyMap:
-    def __init__(self, filter=None, matcher=None, additive_only_filter=True):
-        self.filter = filter or (lambda n: True)
+class FuzzyFilteredMap:
+    def __init__(self, filter_function=None, matcher=None, additive_only_filter=True):
+        self.filter = filter_function or (lambda n: True)
         self.matcher = matcher or FuzzyMatcher()
         self._values = {}
         self.max_length = 0
@@ -56,10 +56,10 @@ class FuzzyMap:
 
     def __getitem__(self, key):
         start_time = timeit.default_timer()
+        key = romanize(key)
         if len(key) > self.max_length:
             self.logger.debug(f'Rejected key "{key}" due to length.')
             return None
-        key = romanize(key)
         try:
             matcher = self.matcher
             result = min((score, item) for score, item in
@@ -86,7 +86,7 @@ class FuzzyMap:
 
 
 class FuzzyDictValuesView:
-    def __init__(self, map: FuzzyMap):
+    def __init__(self, map: FuzzyFilteredMap):
         self._map = map
 
     def __contains__(self, item):
@@ -197,6 +197,7 @@ def strip_vowels(s):
 
 def romanize(s: str) -> str:
     kks = pykakasi.kakasi()
+    s = str(s)
     s = re.sub('[\']', '', s)
     s = re.sub('[・]', ' ', s)
     s = re.sub('[A-Za-z]+', lambda ele: f' {ele[0]} ', s)

@@ -13,7 +13,8 @@ from discord.ext import commands
 from main import asset_manager
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMap
+from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyFilteredMap
+from miyu_bot.commands.common.master_asset_manager import MasterAssetManager
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
@@ -21,10 +22,11 @@ class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.music = FuzzyMap(lambda m: m.is_released)
-        for m in asset_manager.music_master.values():
-            if not self.music.has_exact(f'{m.name} {m.special_unit_name}'):
-                self.music[f'{m.name} {m.special_unit_name}'] = m
+        self.music = MasterAssetManager(
+            asset_manager.music_master,
+            naming_function=lambda m: f'{m.name} {m.special_unit_name}',
+            filter_function=lambda m: m.is_released,
+        )
 
     @property
     def reaction_emojis(self):
@@ -52,7 +54,7 @@ class Music(commands.Cog):
     async def song(self, ctx: commands.Context, *, arg: str):
         self.logger.info(f'Searching for song "{arg}".')
 
-        song = self.get_song(arg)
+        song = self.music.get(arg, ctx)
 
         if not song:
             msg = f'Failed to find song "{arg}".'
@@ -101,7 +103,7 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for chart "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
-        song = self.get_song(name)
+        song = self.music.get(name, ctx)
 
         if not song:
             msg = f'Failed to find chart "{name}".'
@@ -124,7 +126,7 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for chart sections "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
-        song = self.get_song(name)
+        song = self.music.get(name, ctx)
 
         if not song:
             msg = f'Failed to find chart "{name}".'
@@ -151,13 +153,13 @@ class Music(commands.Cog):
     async def songs(self, ctx: commands.Context, *, arg: str = ""):
         if arg:
             self.logger.info(f'Searching for songs "{arg}".')
-            songs = self.music.get_sorted(arg)
+            songs = self.music.get_sorted(arg, ctx)
             listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
                        songs]
             asyncio.ensure_future(run_paged_message(ctx, f'Song Search "{arg}"', listing))
         else:
             self.logger.info('Listing songs.')
-            songs = sorted(self.music.values(), key=lambda m: -m.default_order)
+            songs = sorted(self.music.values(ctx), key=lambda m: -m.default_order)
             songs = [*songs[1:], songs[0]]  # lesson is always first
             listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
                        songs]
@@ -270,15 +272,6 @@ class Music(commands.Cog):
                 difficulty = self.difficulty_names[final_word]
                 arg = ''.join(split_args[:-1])
         return arg, difficulty
-
-    def get_song(self, name_or_id: str) -> Optional[MusicMaster]:
-        try:
-            song = asset_manager.music_master[int(name_or_id)]
-            if song not in self.music.values():
-                song = self.music[name_or_id]
-            return song
-        except (KeyError, ValueError):
-            return self.music[name_or_id]
 
     def get_music_duration(self, music: MusicMaster):
         with contextlib.closing(wave.open(str(music.audio_path.with_name(music.audio_path.name + '.wav')), 'r')) as f:

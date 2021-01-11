@@ -1,12 +1,39 @@
+from functools import cached_property
 from typing import Callable, Any, Optional
 
+from d4dj_utils.manager.asset_manager import AssetManager
 from d4dj_utils.master.master_asset import MasterDict
 from discord.ext import commands
 
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
 
+import datetime as dt
 
-class MasterAssetManager:
+
+class MasterFilterManager:
+    def __init__(self, manager: AssetManager):
+        self.manager = manager
+
+    @cached_property
+    def music(self):
+        return MasterFilter(
+            self.manager.music_master,
+            naming_function=lambda m: f'{m.name} {m.special_unit_name}',
+            filter_function=lambda m: m.is_released,
+            fallback_naming_function=lambda m: m.id,
+        )
+
+    @cached_property
+    def events(self):
+        return MasterFilter(
+            self.manager.event_master,
+            naming_function=lambda e: e.name,
+            filter_function=lambda e: e.start_datetime < dt.datetime.now(
+                dt.timezone.utc) + dt.timedelta(hours=12),
+        )
+
+
+class MasterFilter:
     def __init__(self, masters: MasterDict, naming_function: Callable[[Any], str], filter_function=lambda _: True,
                  fallback_naming_function: Optional[Callable[[Any], str]] = None):
         self.masters = masters

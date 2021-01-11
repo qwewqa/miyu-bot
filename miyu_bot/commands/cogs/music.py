@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 import logging
 import wave
-from typing import Optional, Tuple
+from typing import Tuple
 
 import discord
 from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
@@ -10,11 +10,10 @@ from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
-from main import asset_manager
+from main import asset_manager, masters
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyFilteredMap
-from miyu_bot.commands.common.master_asset_manager import MasterAssetManager
+from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
@@ -22,12 +21,6 @@ class Music(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.music = MasterAssetManager(
-            asset_manager.music_master,
-            naming_function=lambda m: f'{m.name} {m.special_unit_name}',
-            filter_function=lambda m: m.is_released,
-            fallback_naming_function=lambda m: m.id,
-        )
 
     @property
     def reaction_emojis(self):
@@ -55,7 +48,7 @@ class Music(commands.Cog):
     async def song(self, ctx: commands.Context, *, arg: str):
         self.logger.info(f'Searching for song "{arg}".')
 
-        song = self.music.get(arg, ctx)
+        song = masters.music.get(arg, ctx)
 
         if not song:
             msg = f'Failed to find song "{arg}".'
@@ -68,7 +61,7 @@ class Music(commands.Cog):
             thumb = discord.File(song.jacket_path, filename='jacket.png')
         except FileNotFoundError:
             # dig delight is just a fallback
-            thumb = discord.File(self.music.get('110001', ctx).jacket_path, filename='jacket.png')
+            thumb = discord.File(masters.music.get('110001', ctx).jacket_path, filename='jacket.png')
 
         embed = discord.Embed(title=song.name)
         embed.set_thumbnail(url=f'attachment://jacket.png')
@@ -108,7 +101,7 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for chart "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
-        song = self.music.get(name, ctx)
+        song = masters.music.get(name, ctx)
 
         if not song:
             msg = f'Failed to find chart "{name}".'
@@ -131,7 +124,7 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for chart sections "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
-        song = self.music.get(name, ctx)
+        song = masters.music.get(name, ctx)
 
         if not song:
             msg = f'Failed to find chart "{name}".'
@@ -163,7 +156,7 @@ class Music(commands.Cog):
         elif arg == 'duration':
             sort = 'duration'
             arg = ''
-        songs = self.music.get_sorted(arg, ctx)
+        songs = masters.music.get_sorted(arg, ctx)
         if sort == 'relevance':
             listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
                        songs]
@@ -187,7 +180,7 @@ class Music(commands.Cog):
             thumb = discord.File(song.jacket_path, filename='jacket.png')
         except FileNotFoundError:
             # dig delight is just a fallback
-            thumb = discord.File(self.music.get('110001', None).jacket_path, filename='jacket.png')
+            thumb = discord.File(masters.music.get('110001', None).jacket_path, filename='jacket.png')
 
         files = [thumb]
 

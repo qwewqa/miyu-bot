@@ -7,25 +7,19 @@ from d4dj_utils.master.event_master import EventMaster, EventState
 from discord.ext import commands
 from pytz import UnknownTimeZoneError
 
-from main import asset_manager
+from main import asset_manager, masters
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.master_asset_manager import MasterAssetManager
+from miyu_bot.commands.common.master_asset_manager import MasterFilter
 
 
 class Event(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.events = MasterAssetManager(
-            asset_manager.event_master,
-            naming_function=lambda e: e.name,
-            filter_function=lambda e: e.start_datetime < dt.datetime.now(
-                dt.timezone.utc) + dt.timedelta(hours=12),
-        )
 
     @commands.command(name='event',
                       aliases=['ev'],
@@ -36,7 +30,7 @@ class Event(commands.Cog):
 
         event: EventMaster
         if arg:
-            event = self.events.get(arg, ctx)
+            event = masters.events.get(arg, ctx)
         else:
             event = self.get_latest_event(ctx)
 
@@ -51,7 +45,7 @@ class Event(commands.Cog):
             logo = discord.File(event.logo_path, filename='logo.png')
         except FileNotFoundError:
             # Just a fallback
-            logo = discord.File(self.events.get('1', ctx).logo_path, filename='logo.png')
+            logo = discord.File(masters.events.get('1', ctx).logo_path, filename='logo.png')
 
         embed = discord.Embed(title=event.name)
         embed.set_thumbnail(url=f'attachment://logo.png')
@@ -191,14 +185,14 @@ class Event(commands.Cog):
         """Returns the oldest event that has not ended or the newest event otherwise."""
         try:
             # NY event overlapped with previous event
-            return min((v for v in self.events.values(ctx) if v.state() == EventState.Open),
+            return min((v for v in masters.events.values(ctx) if v.state() == EventState.Open),
                        key=lambda e: e.start_datetime)
         except ValueError:
             try:
-                return min((v for v in self.events.values(ctx) if v.state() < EventState.Ended),
+                return min((v for v in masters.events.values(ctx) if v.state() < EventState.Ended),
                            key=lambda e: e.start_datetime)
             except ValueError:
-                return max(self.events.values(ctx), key=lambda v: v.start_datetime)
+                return max(masters.events.values(ctx), key=lambda v: v.start_datetime)
 
 
 def setup(bot):

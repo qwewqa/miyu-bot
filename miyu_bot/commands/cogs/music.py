@@ -60,8 +60,8 @@ class Music(commands.Cog):
         try:
             thumb = discord.File(song.jacket_path, filename='jacket.png')
         except FileNotFoundError:
-            # dig delight is just a fallback
-            thumb = discord.File(masters.music.get('110001', ctx).jacket_path, filename='jacket.png')
+            # Just a fallback
+            thumb = discord.File(asset_manager.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
 
         embed = discord.Embed(title=song.name)
         embed.set_thumbnail(url=f'attachment://jacket.png')

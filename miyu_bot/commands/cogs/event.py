@@ -45,7 +45,7 @@ class Event(commands.Cog):
             logo = discord.File(event.logo_path, filename='logo.png')
         except FileNotFoundError:
             # Just a fallback
-            logo = discord.File(masters.events.get('1', ctx).logo_path, filename='logo.png')
+            logo = discord.File(asset_manager.path / 'ondemand/stamp/stamp_10006.png', filename='logo.png')
 
         embed = discord.Embed(title=event.name)
         embed.set_thumbnail(url=f'attachment://logo.png')

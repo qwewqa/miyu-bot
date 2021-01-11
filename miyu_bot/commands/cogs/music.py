@@ -26,6 +26,7 @@ class Music(commands.Cog):
             asset_manager.music_master,
             naming_function=lambda m: f'{m.name} {m.special_unit_name}',
             filter_function=lambda m: m.is_released,
+            fallback_naming_function=lambda m: m.id,
         )
 
     @property
@@ -63,7 +64,11 @@ class Music(commands.Cog):
             return
         self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
-        thumb = discord.File(song.jacket_path, filename='jacket.png')
+        try:
+            thumb = discord.File(song.jacket_path, filename='jacket.png')
+        except FileNotFoundError:
+            # dig delight is just a fallback
+            thumb = discord.File(self.music.get('110001', ctx).jacket_path, filename='jacket.png')
 
         embed = discord.Embed(title=song.name)
         embed.set_thumbnail(url=f'attachment://jacket.png')
@@ -150,26 +155,42 @@ class Music(commands.Cog):
                       aliases=['songsearch', 'song_search'],
                       description='Finds songs matching the given name.',
                       help='!songs grgr')
-    async def songs(self, ctx: commands.Context, *, arg: str = ""):
-        if arg:
-            self.logger.info(f'Searching for songs "{arg}".')
-            songs = self.music.get_sorted(arg, ctx)
+    async def songs(self, ctx: commands.Context, *, arg: str = ''):
+        self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
+        sort = 'relevance'
+        if not arg:
+            sort = 'default'
+        elif arg == 'duration':
+            sort = 'duration'
+            arg = ''
+        songs = self.music.get_sorted(arg, ctx)
+        if sort == 'relevance':
             listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
                        songs]
-            asyncio.ensure_future(run_paged_message(ctx, f'Song Search "{arg}"', listing))
+        elif sort == 'duration':
+            songs = sorted(songs, key=lambda s: self.get_music_duration(s))
+            listing = [
+                f'{self.format_duration(self.get_music_duration(song))} {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}'
+                for song in songs]
         else:
-            self.logger.info('Listing songs.')
-            songs = sorted(self.music.values(ctx), key=lambda m: -m.default_order)
-            songs = [*songs[1:], songs[0]]  # lesson is always first
+            songs = sorted(songs, key=lambda s: -s.default_order)
             listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
-                       songs]
-            asyncio.ensure_future(run_paged_message(ctx, f'All Songs', listing))
+                       [*songs[1:], songs[0]]]  # lesson is always first
+        asyncio.ensure_future(run_paged_message(ctx, f'Song Search "{arg}"' if arg else 'Songs', listing))
 
         return
 
     def get_chart_embed_info(self, song):
         embeds = []
-        files = [discord.File(song.jacket_path, filename=f'jacket.png')]
+
+        try:
+            thumb = discord.File(song.jacket_path, filename='jacket.png')
+        except FileNotFoundError:
+            # dig delight is just a fallback
+            thumb = discord.File(self.music.get('110001', None).jacket_path, filename='jacket.png')
+
+        files = [thumb]
+
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart = song.charts[difficulty]
             embed = discord.Embed(title=f'{song.name} [{chart.difficulty.name}]')

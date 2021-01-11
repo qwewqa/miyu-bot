@@ -1,16 +1,18 @@
-import datetime
+import datetime as dt
 import logging
 
 import discord
+import pytz
 from d4dj_utils.master.event_master import EventMaster, EventState
 from discord.ext import commands
+from pytz import UnknownTimeZoneError
 
 from main import asset_manager
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
+from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.master_asset_manager import MasterAssetManager
 
 
@@ -21,7 +23,8 @@ class Event(commands.Cog):
         self.events = MasterAssetManager(
             asset_manager.event_master,
             naming_function=lambda e: e.name,
-            filter_function=lambda e: e.start_datetime < datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8),
+            filter_function=lambda e: e.start_datetime < dt.datetime.now(
+                dt.timezone.utc) + dt.timedelta(hours=12),
         )
 
     @commands.command(name='event',
@@ -44,7 +47,11 @@ class Event(commands.Cog):
             return
         self.logger.info(f'Found event "{event}" ({romanize(event.name)}).')
 
-        logo = discord.File(event.logo_path, filename='logo.png')
+        try:
+            logo = discord.File(event.logo_path, filename='logo.png')
+        except FileNotFoundError:
+            # Just a fallback
+            logo = discord.File(self.events.get('1', ctx).logo_path, filename='logo.png')
 
         embed = discord.Embed(title=event.name)
         embed.set_thumbnail(url=f'attachment://logo.png')
@@ -98,6 +105,29 @@ class Event(commands.Cog):
 
         await ctx.send(files=[logo], embed=embed)
 
+    @commands.command(name='time',
+                      aliases=[],
+                      description='Displays the current time',
+                      help='!time')
+    async def time(self, ctx: commands.Context, *, arg=''):
+        embed = discord.Embed(title='Time')
+
+        def format_time(t: dt.datetime):
+            return str(t.replace(microsecond=0))
+
+        embed.add_field(name='Asia/Tokyo', value=format_time(dt.datetime.now(pytz.timezone('Asia/Tokyo'))), inline=False)
+
+        if arg:
+            try:
+                embed.add_field(name=arg, value=format_time(dt.datetime.now(pytz.timezone(arg))), inline=False)
+            except UnknownTimeZoneError:
+                await ctx.send(content=f'Invalid timezone "{arg}".')
+                return
+        else:
+            embed.add_field(name='UTC', value=format_time(dt.datetime.now(dt.timezone.utc)), inline=False)
+
+        await ctx.send(embed=embed)
+
     @commands.command(name='timeleft',
                       aliases=['tl', 'time_left'],
                       description='Displays the time left in the current event',
@@ -116,28 +146,28 @@ class Event(commands.Cog):
 
         if state == EventState.Upcoming:
             time_delta_heading = 'Time Until Start'
-            time_delta = latest.start_datetime - datetime.datetime.now(datetime.timezone.utc)
+            time_delta = latest.start_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'Start Date'
             date_value = latest.start_datetime
         elif state == EventState.Open:
             time_delta_heading = 'Time Until Close'
-            time_delta = latest.reception_close_datetime - datetime.datetime.now(datetime.timezone.utc)
+            time_delta = latest.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
             progress = 1 - (time_delta / (latest.reception_close_datetime - latest.start_datetime))
             date_heading = 'Close Date'
             date_value = latest.reception_close_datetime
         elif state in (EventState.Closing, EventState.Ranks_Fixed):
             time_delta_heading = 'Time Until Results'
-            time_delta = latest.result_announcement_datetime - datetime.datetime.now(datetime.timezone.utc)
+            time_delta = latest.result_announcement_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'Results Date'
             date_value = latest.result_announcement_datetime
         elif state == EventState.Results:
             time_delta_heading = 'Time Until End'
-            time_delta = latest.end_datetime - datetime.datetime.now(datetime.timezone.utc)
+            time_delta = latest.end_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'End Date'
             date_value = latest.end_datetime
         else:
             time_delta_heading = 'Time Since End'
-            time_delta = datetime.datetime.now(datetime.timezone.utc) - latest.end_datetime
+            time_delta = dt.datetime.now(dt.timezone.utc) - latest.end_datetime
             date_heading = 'End Date'
             date_value = latest.end_datetime
 
@@ -160,10 +190,15 @@ class Event(commands.Cog):
     def get_latest_event(self, ctx: commands.Context) -> EventMaster:
         """Returns the oldest event that has not ended or the newest event otherwise."""
         try:
-            return min((v for v in self.events.values(ctx) if v.state() < EventState.Ended),
+            # NY event overlapped with previous event
+            return min((v for v in self.events.values(ctx) if v.state() == EventState.Open),
                        key=lambda e: e.start_datetime)
         except ValueError:
-            return max(self.events.values(ctx), key=lambda v: v.start_datetime)
+            try:
+                return min((v for v in self.events.values(ctx) if v.state() < EventState.Ended),
+                           key=lambda e: e.start_datetime)
+            except ValueError:
+                return max(self.events.values(ctx), key=lambda v: v.start_datetime)
 
 
 def setup(bot):

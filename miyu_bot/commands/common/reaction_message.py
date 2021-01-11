@@ -15,7 +15,7 @@ async def run_tabbed_message(ctx: Context, message: Message, emojis: List[Emoji]
     await run_reaction_message(ctx, message, emojis, callback, timeout)
 
 
-async def run_paged_message(ctx: Context, title: str, content: List[str], page_size: int = 15,
+async def run_paged_message(ctx: Context, title: str, content: List[str], page_size: int = 15, numbered: bool = True,
                             timeout=300, double_arrow_threshold=4):
     if not content:
         embed = discord.Embed(title=title).set_footer(text='Page 0/0')
@@ -25,14 +25,18 @@ async def run_paged_message(ctx: Context, title: str, content: List[str], page_s
     page_contents = [content[i:i + page_size] for i in range(0, len(content), page_size)]
 
     item_number = 0
+    max_item_number_length = len(str(len(content)))
 
     def format_item(item):
         nonlocal item_number
         item_number += 1
-        return f'{item_number}. {item}'
+        if numbered:
+            return f'{item_number}.{" " * (max_item_number_length - len(str(item_number)))} {item}'
+        else:
+            return str(item)
 
     embeds = [
-        discord.Embed(title=title, description='\n'.join((format_item(i) for i in page))).set_footer(
+        discord.Embed(title=title, description='```' + '\n'.join((format_item(i) for i in page)) + '```').set_footer(
             text=f'Page {i + 1}/{len(page_contents)}')
         for i, page in enumerate(page_contents)]
 

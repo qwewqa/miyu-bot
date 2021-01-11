@@ -107,6 +107,7 @@ class FuzzyMatchConfig:
         ('v', 'b'): 0.0,
         ('l', 'r'): 0.0,
         ('c', 'k'): 0.0,
+        ('y', 'i'): 0.4,
     })
     word_match_weight: float = -0.2
     whole_match_weight: float = -0.25
@@ -129,7 +130,8 @@ class FuzzyMatcher:
             self.array[0][i] = i * self.config.insertion_weight
 
     def score(self, source: str, target: str, threshold=0.0):
-        # target must not be empty
+        if not target:
+            return 1
 
         l_src = len(source)
         l_tgt = len(target)

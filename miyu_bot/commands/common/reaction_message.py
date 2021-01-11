@@ -1,14 +1,17 @@
 import asyncio
-from typing import List, Callable, Awaitable, Union, Optional
+from typing import List, Callable, Awaitable, Union
 
 import discord
-from discord import Message, Embed, Emoji, PartialEmoji
+from discord import Message, Embed, Emoji
 from discord.ext.commands import Context
 
 AnyEmoji = Union[str, Emoji]
 
 
-async def run_tabbed_message(ctx: Context, message: Message, emojis: List[Emoji], embeds: List[Embed], timeout=300):
+async def run_tabbed_message(ctx: Context, message: Message, emojis: List[AnyEmoji], embeds: List[Embed], timeout=300):
+    if len(emojis) != len(embeds):
+        raise ValueError('Emojis and embeds must have the same number of elements.')
+
     async def callback(emoji, _ctx, _message):
         await message.edit(embed=embeds[emojis.index(emoji)])
 
@@ -16,7 +19,10 @@ async def run_tabbed_message(ctx: Context, message: Message, emojis: List[Emoji]
 
 
 async def run_paged_message(ctx: Context, title: str, content: List[str], page_size: int = 15, numbered: bool = True,
-                            timeout=300, double_arrow_threshold=4):
+                            timeout=300, max_tabbed_pages=4):
+    if max_tabbed_pages > 9:
+        raise ValueError('max_tabbed_pages must be 9 or less.')
+
     if not content:
         embed = discord.Embed(title=title).set_footer(text='Page 0/0')
         await ctx.send(embed=embed)
@@ -45,35 +51,36 @@ async def run_paged_message(ctx: Context, title: str, content: List[str], page_s
     if len(embeds) == 1:
         return
 
-    double_left_arrow = '⏪'
-    double_right_arrow = '⏩'
-    left_arrow = '◀'
-    right_arrow = '▶'
-
-    if 0 < double_arrow_threshold <= len(embeds):
-        arrows = [double_left_arrow, left_arrow, right_arrow, double_right_arrow]
+    if len(embeds) <= max_tabbed_pages:
+        reaction_emoji = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+        await run_tabbed_message(ctx, message, reaction_emoji[:len(embeds)], embeds, timeout=timeout)
     else:
-        arrows = [left_arrow, right_arrow]
+        double_left_arrow = '⏪'
+        double_right_arrow = '⏩'
+        left_arrow = '◀'
+        right_arrow = '▶'
 
-    index = 0
+        arrows = [double_left_arrow, left_arrow, right_arrow, double_right_arrow]
 
-    async def callback(emoji, _ctx, _message):
-        nonlocal index
-        start_index = index
-        if emoji == double_left_arrow:
-            index = 0
-        elif emoji == left_arrow:
-            index -= 1
-        elif emoji == right_arrow:
-            index += 1
-        elif emoji == double_right_arrow:
-            index = len(embeds) - 1
-        index = min(len(embeds) - 1, max(0, index))
+        index = 0
 
-        if index != start_index:
-            await message.edit(embed=embeds[index])
+        async def callback(emoji, _ctx, _message):
+            nonlocal index
+            start_index = index
+            if emoji == double_left_arrow:
+                index = 0
+            elif emoji == left_arrow:
+                index -= 1
+            elif emoji == right_arrow:
+                index += 1
+            elif emoji == double_right_arrow:
+                index = len(embeds) - 1
+            index = min(len(embeds) - 1, max(0, index))
 
-    await run_reaction_message(ctx, message, arrows, callback, timeout)
+            if index != start_index:
+                await message.edit(embed=embeds[index])
+
+        await run_reaction_message(ctx, message, arrows, callback, timeout)
 
 
 async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyEmoji],

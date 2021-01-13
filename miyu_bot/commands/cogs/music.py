@@ -153,7 +153,7 @@ class Music(commands.Cog):
         sort = 'relevance'
         if not arg:
             sort = 'default'
-        elif arg == 'duration':
+        elif arg == 'sort=duration':
             sort = 'duration'
             arg = ''
         songs = masters.music.get_sorted(arg, ctx)
@@ -169,9 +169,8 @@ class Music(commands.Cog):
             songs = sorted(songs, key=lambda s: -s.default_order)
             listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
                        [*songs[1:], songs[0]]]  # lesson is always first
-        asyncio.ensure_future(run_paged_message(ctx, f'Song Search "{arg}"' if arg else 'Songs', listing))
-
-        return
+        embed = discord.Embed(title='Song Search "{arg}"' if arg else 'Songs')
+        asyncio.ensure_future(run_paged_message(ctx, embed, listing))
 
     def get_chart_embed_info(self, song):
         embeds = []

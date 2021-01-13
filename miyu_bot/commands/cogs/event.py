@@ -1,6 +1,9 @@
+import asyncio
 import datetime as dt
 import logging
 
+import aiohttp
+import dateutil.parser
 import discord
 import pytz
 from d4dj_utils.master.event_master import EventMaster, EventState
@@ -14,6 +17,7 @@ from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, 
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.master_asset_manager import MasterFilter
+from miyu_bot.commands.common.reaction_message import run_paged_message
 
 
 class Event(commands.Cog):
@@ -109,7 +113,8 @@ class Event(commands.Cog):
         def format_time(t: dt.datetime):
             return str(t.replace(microsecond=0))
 
-        embed.add_field(name='Asia/Tokyo', value=format_time(dt.datetime.now(pytz.timezone('Asia/Tokyo'))), inline=False)
+        embed.add_field(name='Asia/Tokyo', value=format_time(dt.datetime.now(pytz.timezone('Asia/Tokyo'))),
+                        inline=False)
 
         if arg:
             try:
@@ -193,6 +198,29 @@ class Event(commands.Cog):
                            key=lambda e: e.start_datetime)
             except ValueError:
                 return max(masters.events.values(ctx), key=lambda v: v.start_datetime)
+
+    @commands.command(name='t20',
+                      aliases=['top20', 'top_20'],
+                      description='Displays the top 20 in the main leaderboard',
+                      help='!t20')
+    async def time_left(self, ctx: commands.Context):
+        async with aiohttp.ClientSession() as session:
+            async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
+                leaderboard = await resp.json(encoding='utf-8')
+
+        latest = self.get_latest_event(ctx)
+        logo = discord.File(latest.logo_path, filename='logo.png')
+        embed = discord.Embed(title=f'{latest.name} t20').set_thumbnail(url=f'attachment://logo.png')
+        max_points_digits = len(str(leaderboard[0]['points']))
+        nl = "\n"
+        update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)
+        update_date = update_date.astimezone(pytz.timezone('Asia/Tokyo'))
+        header = f'Updated {update_date}\n\nRank  {"Points".ljust(max_points_digits)}  Name'
+        listing = [
+            f'{str(player["rank"]).ljust(4)}  {str(player["points"]).ljust(max_points_digits)}  {player["name"].replace(nl, "")}'
+            for player in leaderboard]
+        paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, files=[logo], numbered=False)
+        asyncio.ensure_future(paged)
 
 
 def setup(bot):

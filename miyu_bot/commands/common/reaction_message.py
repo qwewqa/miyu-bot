@@ -18,13 +18,16 @@ async def run_tabbed_message(ctx: Context, message: Message, emojis: List[AnyEmo
     await run_reaction_message(ctx, message, emojis, callback, timeout)
 
 
-async def run_paged_message(ctx: Context, title: str, content: List[str], page_size: int = 15, numbered: bool = True,
-                            timeout=300, max_tabbed_pages=4):
+async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
+                            header='', numbered: bool = True, timeout=300, max_tabbed_pages=4, files=None):
+    if header:
+        header = header + '\n'
+
     if max_tabbed_pages > 9:
         raise ValueError('max_tabbed_pages must be 9 or less.')
 
     if not content:
-        embed = discord.Embed(title=title).set_footer(text='Page 0/0')
+        embed = base_embed.copy().set_footer(text='Page 0/0')
         await ctx.send(embed=embed)
         return
 
@@ -42,11 +45,13 @@ async def run_paged_message(ctx: Context, title: str, content: List[str], page_s
             return str(item)
 
     embeds = [
-        discord.Embed(title=title, description='```' + '\n'.join((format_item(i) for i in page)) + '```').set_footer(
-            text=f'Page {i + 1}/{len(page_contents)}')
+        base_embed.from_dict({
+            **base_embed.to_dict(),
+            'description': '```' + header + '\n'.join((format_item(i) for i in page)) + '```',
+        }).set_footer(text=f'Page {i + 1}/{len(page_contents)}')
         for i, page in enumerate(page_contents)]
 
-    message = await ctx.send(embed=embeds[0])
+    message = await ctx.send(embed=embeds[0], files=files or [])
 
     if len(embeds) == 1:
         return

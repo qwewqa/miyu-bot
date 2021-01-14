@@ -29,7 +29,7 @@ class Event(commands.Cog):
                       aliases=['ev'],
                       description='Finds the event with the given name.',
                       help='!event pkcooking')
-    async def event(self, ctx: commands.Context, *, arg: commands.clean_content = ""):
+    async def event(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for event "{arg}".')
 
         event: EventMaster
@@ -203,7 +203,7 @@ class Event(commands.Cog):
                       aliases=['top20', 'top_20'],
                       description='Displays the top 20 in the main leaderboard',
                       help='!t20')
-    async def time_left(self, ctx: commands.Context):
+    async def t20(self, ctx: commands.Context):
         async with aiohttp.ClientSession() as session:
             async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
                 leaderboard = await resp.json(encoding='utf-8')

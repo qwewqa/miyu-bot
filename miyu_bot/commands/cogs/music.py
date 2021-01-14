@@ -287,7 +287,7 @@ class Music(commands.Cog):
 
         return embeds, files
 
-    def parse_chart_args(self, arg: commands.clean_content) -> Tuple[str, ChartDifficulty]:
+    def parse_chart_args(self, arg: str) -> Tuple[str, ChartDifficulty]:
         split_args = arg.split()
 
         difficulty = ChartDifficulty.Expert

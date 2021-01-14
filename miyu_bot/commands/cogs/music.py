@@ -48,7 +48,7 @@ class Music(commands.Cog):
                       aliases=['music'],
                       description='Finds the song with the given name.',
                       help='!song grgr')
-    async def song(self, ctx: commands.Context, *, arg: str):
+    async def song(self, ctx: commands.Context, *, arg: commands.clean_content):
         self.logger.info(f'Searching for song "{arg}".')
 
         song = masters.music.get(arg, ctx)
@@ -100,7 +100,7 @@ class Music(commands.Cog):
                       aliases=[],
                       description='Finds the chart with the given name.',
                       help='!chart grgr\n!chart grgr normal')
-    async def chart(self, ctx: commands.Context, *, arg: str):
+    async def chart(self, ctx: commands.Context, *, arg: commands.clean_content):
         self.logger.info(f'Searching for chart "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
@@ -123,7 +123,7 @@ class Music(commands.Cog):
                       aliases=['mixes'],
                       description='Finds the sections of the chart with the given name.',
                       help='!sections grgr')
-    async def sections(self, ctx: commands.Context, *, arg: str):
+    async def sections(self, ctx: commands.Context, *, arg: commands.clean_content):
         self.logger.info(f'Searching for chart sections "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
@@ -151,7 +151,7 @@ class Music(commands.Cog):
                       aliases=['songsearch', 'song_search'],
                       description='Finds songs matching the given name.',
                       help='!songs grgr')
-    async def songs(self, ctx: commands.Context, *, arg: str = ''):
+    async def songs(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
         arguments = parse_arguments(arg)
         songs = masters.music.get_sorted(arguments.text_argument, ctx)
@@ -287,7 +287,7 @@ class Music(commands.Cog):
 
         return embeds, files
 
-    def parse_chart_args(self, arg: str) -> Tuple[str, ChartDifficulty]:
+    def parse_chart_args(self, arg: commands.clean_content) -> Tuple[str, ChartDifficulty]:
         split_args = arg.split()
 
         difficulty = ChartDifficulty.Expert

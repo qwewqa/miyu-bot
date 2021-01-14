@@ -29,7 +29,7 @@ class Event(commands.Cog):
                       aliases=['ev'],
                       description='Finds the event with the given name.',
                       help='!event pkcooking')
-    async def event(self, ctx: commands.Context, *, arg: str = ""):
+    async def event(self, ctx: commands.Context, *, arg: commands.clean_content = ""):
         self.logger.info(f'Searching for event "{arg}".')
 
         event: EventMaster

@@ -34,7 +34,14 @@ class Event(commands.Cog):
 
         event: EventMaster
         if arg:
-            event = masters.events.get(arg, ctx)
+            if arg[0] in ['-', '+']:
+                try:
+                    latest = self.get_latest_event(ctx)
+                    event = masters.events.get(str(latest.id + int(arg)), ctx)
+                except ValueError:
+                    event = masters.events.get(arg, ctx)
+            else:
+                event = masters.events.get(arg, ctx)
         else:
             event = self.get_latest_event(ctx)
 

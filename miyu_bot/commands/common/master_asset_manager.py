@@ -1,4 +1,4 @@
-from functools import cached_property
+from functools import lru_cache
 from typing import Callable, Any, Optional
 
 from d4dj_utils.manager.asset_manager import AssetManager
@@ -14,7 +14,8 @@ class MasterFilterManager:
     def __init__(self, manager: AssetManager):
         self.manager = manager
 
-    @cached_property
+    @property
+    @lru_cache(None)
     def music(self):
         return MasterFilter(
             self.manager.music_master,
@@ -23,7 +24,8 @@ class MasterFilterManager:
             fallback_naming_function=lambda m: m.id,
         )
 
-    @cached_property
+    @property
+    @lru_cache(None)
     def events(self):
         return MasterFilter(
             self.manager.event_master,

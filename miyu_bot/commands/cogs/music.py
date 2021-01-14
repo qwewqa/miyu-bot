@@ -1,7 +1,9 @@
 import asyncio
 import contextlib
+import enum
 import logging
 import wave
+from functools import lru_cache
 from typing import Tuple
 
 import discord
@@ -11,6 +13,7 @@ from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
 from main import asset_manager, masters
+from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
@@ -131,7 +134,7 @@ class Music(commands.Cog):
             await ctx.send(msg)
             self.logger.info(msg)
             return
-        if not song.enable_long_mix:
+        if not song.mix_info:
             msg = f'Song "{song.name}" does not have mix enabled.'
             await ctx.send(msg)
             self.logger.info(msg)
@@ -150,26 +153,35 @@ class Music(commands.Cog):
                       help='!songs grgr')
     async def songs(self, ctx: commands.Context, *, arg: str = ''):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
-        sort = 'relevance'
-        if not arg:
-            sort = 'default'
-        elif arg == 'sort=duration':
-            sort = 'duration'
-            arg = ''
-        songs = masters.music.get_sorted(arg, ctx)
-        if sort == 'relevance':
-            listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
-                       songs]
-        elif sort == 'duration':
-            songs = sorted(songs, key=lambda s: self.get_music_duration(s))
-            listing = [
-                f'{self.format_duration(self.get_music_duration(song))} {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}'
-                for song in songs]
-        else:
-            songs = sorted(songs, key=lambda s: -s.default_order)
-            listing = [f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}' for song in
-                       [*songs[1:], songs[0]]]  # lesson is always first
-        embed = discord.Embed(title='Song Search "{arg}"' if arg else 'Songs')
+        arguments = parse_arguments(arg)
+        songs = masters.music.get_sorted(arguments.text_argument, ctx)
+
+        try:
+            sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
+                                       allowed_operators=['<', '>', '='], converter=music_attribute_names)
+            reverse_sort = sort_op == '<'
+            display, _ = arguments.single('display', sort, allowed_operators=['='], converter=music_attribute_names)
+            arguments.require_all_arguments_used()
+        except ArgumentError as e:
+            await ctx.send(str(e))
+            return
+
+        if not (arguments.text_argument and sort == MusicAttribute.DefaultOrder):
+            songs = sorted(songs, key=lambda s: sort.get_from_music(s))
+            if sort == MusicAttribute.DefaultOrder:
+                songs = [*songs[1:], songs[0]]
+            if reverse_sort:
+                songs = reversed(songs)
+
+        listing = []
+        for song in songs:
+            display_prefix = display.get_formatted_from_music(song)
+            if display_prefix:
+                listing.append(f'{display_prefix} : {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
+            else:
+                listing.append(f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
+
+        embed = discord.Embed(title=f'Song Search "{arg}"' if arg else 'Songs')
         asyncio.ensure_future(run_paged_message(ctx, embed, listing))
 
     def get_chart_embed_info(self, song):
@@ -286,17 +298,66 @@ class Music(commands.Cog):
                 arg = ''.join(split_args[:-1])
         return arg, difficulty
 
-    def get_music_duration(self, music: MusicMaster):
+    _music_durations = {}
+
+    @staticmethod
+    def get_music_duration(music: MusicMaster):
+        if music.id in Music._music_durations:
+            return Music._music_durations[music.id]
         with contextlib.closing(wave.open(str(music.audio_path.with_name(music.audio_path.name + '.wav')), 'r')) as f:
             frames = f.getnframes()
             rate = f.getframerate()
             duration = frames / float(rate)
+            Music._music_durations[music.id] = duration
             return duration
 
-    def format_duration(self, seconds):
+    @staticmethod
+    def format_duration(seconds):
         minutes = int(seconds // 60)
         seconds = round(seconds % 60, 2)
         return f'{minutes}:{str(int(seconds)).zfill(2)}.{str(int(seconds % 1 * 100)).zfill(2)}'
+
+
+class MusicAttribute(enum.Enum):
+    DefaultOrder = enum.auto()
+    Name = enum.auto()
+    Unit = enum.auto()
+    Level = enum.auto()
+    Duration = enum.auto()
+    Date = enum.auto()
+
+    def get_from_music(self, music: MusicMaster):
+        return {
+            self.DefaultOrder: -music.default_order,
+            self.Name: music.name,
+            self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
+            self.Level: music.charts[4].display_level,
+            self.Duration: Music.get_music_duration(music),
+            self.Date: music.start_datetime
+        }[self]
+
+    def get_formatted_from_music(self, music: MusicMaster):
+        return {
+            self.DefaultOrder: None,
+            self.Name: None,
+            self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
+            self.Level: music.charts[4].display_level,
+            self.Duration: Music.format_duration(Music.get_music_duration(music)),
+            self.Date: str(music.start_datetime.date()),
+        }[self]
+
+
+music_attribute_names = {
+    'default': MusicAttribute.DefaultOrder,
+    'name': MusicAttribute.Name,
+    'relevance': MusicAttribute.Name,
+    'unit': MusicAttribute.Unit,
+    'level': MusicAttribute.Level,
+    'difficulty': MusicAttribute.Level,
+    'duration': MusicAttribute.Duration,
+    'length': MusicAttribute.Duration,
+    'date': MusicAttribute.Date,
+}
 
 
 def setup(bot):

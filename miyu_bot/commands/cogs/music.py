@@ -13,7 +13,7 @@ from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
 from main import asset_manager, masters
-from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError
+from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError, list_operator_for
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
@@ -158,17 +158,27 @@ class Music(commands.Cog):
 
         try:
             sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
-                                       allowed_operators=['<', '>', '='], converter=music_attribute_names)
+                                             allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
             reverse_sort = sort_op == '<'
-            display, _ = arguments.single('display', sort, allowed_operators=['='], converter=music_attribute_names)
+            display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
+                                          converter=music_attribute_aliases)
+
+            def difficulty_converter(d):
+                return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
+
+            difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True, converter=difficulty_converter)
             arguments.require_all_arguments_used()
         except ArgumentError as e:
             await ctx.send(str(e))
             return
 
+        for value, op in difficulty:
+            operator = list_operator_for(op)
+            songs = [song for song in songs if operator(song.charts[4].level, value)]
+
         if not (arguments.text_argument and sort == MusicAttribute.DefaultOrder):
             songs = sorted(songs, key=lambda s: sort.get_from_music(s))
-            if sort == MusicAttribute.DefaultOrder:
+            if sort == MusicAttribute.DefaultOrder and songs and songs[0].id == 1:
                 songs = [*songs[1:], songs[0]]
             if reverse_sort:
                 songs = reversed(songs)
@@ -177,7 +187,8 @@ class Music(commands.Cog):
         for song in songs:
             display_prefix = display.get_formatted_from_music(song)
             if display_prefix:
-                listing.append(f'{display_prefix} : {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
+                listing.append(
+                    f'{display_prefix} : {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
             else:
                 listing.append(f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
 
@@ -350,7 +361,7 @@ class MusicAttribute(enum.Enum):
         }[self]
 
 
-music_attribute_names = {
+music_attribute_aliases = {
     'default': MusicAttribute.DefaultOrder,
     'name': MusicAttribute.Name,
     'id': MusicAttribute.Id,
@@ -358,6 +369,7 @@ music_attribute_names = {
     'unit': MusicAttribute.Unit,
     'level': MusicAttribute.Level,
     'difficulty': MusicAttribute.Level,
+    'diff': MusicAttribute.Level,
     'duration': MusicAttribute.Duration,
     'length': MusicAttribute.Duration,
     'date': MusicAttribute.Date,

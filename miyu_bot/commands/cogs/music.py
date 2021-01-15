@@ -116,9 +116,8 @@ class Music(commands.Cog):
 
         embeds, files = self.get_chart_embed_info(song)
 
-        message = await ctx.send(files=files, embed=embeds[difficulty - 1])
-
-        asyncio.ensure_future(run_tabbed_message(ctx, message, self.reaction_emojis, embeds))
+        # Difficulty enum easy-expert are 1-4, one more than the embed index
+        asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, files, difficulty - 1))
 
     @commands.command(name='sections',
                       aliases=['mixes'],
@@ -144,9 +143,7 @@ class Music(commands.Cog):
 
         embeds, files = self.get_mix_embed_info(song)
 
-        message = await ctx.send(files=files, embed=embeds[difficulty - 1])
-
-        asyncio.ensure_future(run_tabbed_message(ctx, message, self.reaction_emojis, embeds))
+        asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, files, difficulty - 1))
 
     @commands.command(name='songs',
                       aliases=['songsearch', 'song_search'],

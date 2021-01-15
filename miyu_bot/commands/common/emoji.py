@@ -39,3 +39,8 @@ attribute_emoji_ids = {
 attribute_emoji_ids_by_attribute_id = {i + 1: v for i, v in enumerate(attribute_emoji_ids.values())}
 
 event_point_emoji_id = 792097816931598336
+
+rarity_emoji_ids = {
+    'base': 799650003659915294,
+    'limit_break': 799650003303268393
+}

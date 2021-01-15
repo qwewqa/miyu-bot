@@ -8,9 +8,13 @@ from discord.ext.commands import Context
 AnyEmoji = Union[str, Emoji]
 
 
-async def run_tabbed_message(ctx: Context, message: Message, emojis: List[AnyEmoji], embeds: List[Embed], timeout=300):
+async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[Embed], files=None, starting_index=0, timeout=300):
+    if not files:
+        files = []
     if len(emojis) != len(embeds):
         raise ValueError('Emojis and embeds must have the same number of elements.')
+
+    message = await ctx.send(files=files, embed=embeds[starting_index])
 
     async def callback(emoji, _ctx, _message):
         await message.edit(embed=embeds[emojis.index(emoji)])

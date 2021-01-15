@@ -34,6 +34,7 @@ class Event(commands.Cog):
 
         event: EventMaster
         if arg:
+            # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
             if arg[0] in ['-', '+']:
                 try:
                     latest = self.get_latest_event(ctx)

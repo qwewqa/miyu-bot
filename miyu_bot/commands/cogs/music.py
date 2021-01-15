@@ -321,6 +321,7 @@ class Music(commands.Cog):
 class MusicAttribute(enum.Enum):
     DefaultOrder = enum.auto()
     Name = enum.auto()
+    Id = enum.auto()
     Unit = enum.auto()
     Level = enum.auto()
     Duration = enum.auto()
@@ -330,6 +331,7 @@ class MusicAttribute(enum.Enum):
         return {
             self.DefaultOrder: -music.default_order,
             self.Name: music.name,
+            self.Id: music.id,
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
             self.Level: music.charts[4].display_level,
             self.Duration: Music.get_music_duration(music),
@@ -340,6 +342,7 @@ class MusicAttribute(enum.Enum):
         return {
             self.DefaultOrder: None,
             self.Name: None,
+            self.Id: str(music.id).zfill(7),
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
             self.Level: music.charts[4].display_level,
             self.Duration: Music.format_duration(Music.get_music_duration(music)),
@@ -350,6 +353,7 @@ class MusicAttribute(enum.Enum):
 music_attribute_names = {
     'default': MusicAttribute.DefaultOrder,
     'name': MusicAttribute.Name,
+    'id': MusicAttribute.Id,
     'relevance': MusicAttribute.Name,
     'unit': MusicAttribute.Unit,
     'level': MusicAttribute.Level,

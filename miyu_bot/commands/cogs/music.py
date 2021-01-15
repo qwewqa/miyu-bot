@@ -17,6 +17,7 @@ from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentE
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
+from miyu_bot.commands.common.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
@@ -166,7 +167,8 @@ class Music(commands.Cog):
             def difficulty_converter(d):
                 return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
 
-            difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True, converter=difficulty_converter)
+            difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True,
+                                              converter=difficulty_converter)
             arguments.require_all_arguments_used()
         except ArgumentError as e:
             await ctx.send(str(e))
@@ -201,17 +203,19 @@ class Music(commands.Cog):
         try:
             thumb = discord.File(song.jacket_path, filename='jacket.png')
         except FileNotFoundError:
-            # dig delight is just a fallback
-            thumb = discord.File(masters.music.get('110001', None).jacket_path, filename='jacket.png')
+            # fallback
+            thumb = discord.File(asset_manager.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
 
         files = [thumb]
 
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart = song.charts[difficulty]
+            chart_hash = hash_master(chart)
+            chart_path = chart.image_path
             embed = discord.Embed(title=f'{song.name} [{chart.difficulty.name}]')
             embed.set_thumbnail(url=f'attachment://jacket.png')
             embed.set_image(
-                url=f'https://qwewqa.github.io/d4dj-dumps/{chart.image_path.relative_to(asset_manager.path).as_posix()}'
+                url=f'https://qwewqa.github.io/d4dj-dumps/music/charts/{chart_path.stem}_{chart_hash}{chart_path.suffix}'
             )
 
             chart_data = chart.load_chart_data()

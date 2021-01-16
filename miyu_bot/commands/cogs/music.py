@@ -4,6 +4,7 @@ import enum
 import logging
 import wave
 from functools import lru_cache
+from inspect import cleandoc
 from typing import Tuple
 
 import discord
@@ -148,7 +149,20 @@ class Music(commands.Cog):
     @commands.command(name='songs',
                       aliases=['songsearch', 'song_search'],
                       description='Finds songs matching the given name.',
-                      help='!songs grgr')
+                      brief='!songs lhg',
+                      help=cleandoc('''
+                      Named arguments:
+                        - sort (<, =) [default|name|id|unit|level|difficulty|duration|date]
+                        - [display|disp] = [default|name|id|unit|level|difficulty|duration|date]
+                        - [difficulty|diff|level] ? <difficulty (11, 11.5, 11+, ...)>...
+                       
+                      Extended examples:
+                        - Songs in descending difficulty order
+                            !songs sort<difficulty
+                        - Songs with difficulty from 11+ to 13+
+                            !songs diff>=11+ diff<=13+
+                        - Songs with difficulty exactly 10 or 14, sorted alphabetically, displaying duration
+                            !songs diff=10,14 sort=name disp=duration'''))
     async def songs(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
         arguments = parse_arguments(arg)

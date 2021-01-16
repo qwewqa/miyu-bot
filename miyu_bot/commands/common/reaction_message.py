@@ -78,6 +78,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         for i, page in enumerate(page_contents)]
 
     if len(embeds) == 1:
+        await ctx.send(embed=embeds[0])
         return
 
     if len(embeds) <= max_tabbed_pages:

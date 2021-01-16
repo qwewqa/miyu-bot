@@ -7,6 +7,7 @@ from d4dj_utils.manager.asset_manager import AssetManager
 from d4dj_utils.master.master_asset import MasterDict, MasterAsset
 from discord.ext import commands
 
+from miyu_bot.commands.common.aliases.event import event_aliases
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 
 import datetime as dt
@@ -23,19 +24,22 @@ class MasterFilterManager:
         )
         self.events = MasterFilter(
             self.manager.event_master,
+            aliases=event_aliases,
             naming_function=lambda e: e.name,
-            filter_function=lambda e: e.start_datetime < dt.datetime.now(
-                dt.timezone.utc) + dt.timedelta(hours=12),
+            filter_function=lambda e: e.start_datetime < dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=12),
         )
         self.cards = MasterFilter(
             self.manager.card_master,
-            naming_function=lambda c: f'{c.rarity_id}★ {c.name} {c.character.full_name_english}',
+            naming_function=lambda c: c.name,
             filter_function=lambda c: c.is_released,
         )
 
 
 class MasterFilter:
-    def __init__(self, masters: MasterDict, naming_function: Callable[[Any], str], filter_function=lambda _: True,
+    def __init__(self, masters: MasterDict,
+                 naming_function: Callable[[Any], str],
+                 aliases: Optional[dict] = None,
+                 filter_function=lambda _: True,
                  fallback_naming_function: Optional[Callable[[Any], str]] = None):
         self.masters = masters
         self.default_filter = FuzzyFilteredMap(filter_function)
@@ -50,6 +54,12 @@ class MasterFilter:
                 continue
             self.default_filter.set_unprocessed(name, master)
             self.unrestricted_filter.set_unprocessed(name, master)
+        if aliases:
+            for alias, mid in aliases.items():
+                master = masters[mid]
+                alias = romanize(alias)
+                self.default_filter.set_unprocessed(alias, master)
+                self.unrestricted_filter.set_unprocessed(alias, master)
 
     def get(self, name_or_id: str, ctx: Optional[commands.Context]):
         if ctx and ctx.channel.id in no_filter_channels:

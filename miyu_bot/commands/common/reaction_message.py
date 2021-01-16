@@ -8,7 +8,8 @@ from discord.ext.commands import Context
 AnyEmoji = Union[str, Emoji]
 
 
-async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[Embed], files=None, starting_index=0, timeout=300):
+async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[Embed], files=None, starting_index=0,
+                             timeout=300):
     if not files:
         files = []
     if len(emojis) != len(embeds):
@@ -20,6 +21,27 @@ async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[
         await message.edit(embed=embeds[emojis.index(emoji)])
 
     await run_reaction_message(ctx, message, emojis, callback, timeout)
+
+
+async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[[int], discord.Embed], timeout=300):
+    left_arrow = '◀'
+    right_arrow = '▶'
+    arrows = [left_arrow, right_arrow]
+
+    message = await ctx.send(embed=embed_generator(0))
+
+    async def callback(emoji, _ctx, _message):
+        if emoji == left_arrow:
+            new_embed = embed_generator(-1)
+        elif emoji == right_arrow:
+            new_embed = embed_generator(1)
+        else:
+            return
+
+        if new_embed:
+            await message.edit(embed=new_embed)
+
+    await run_reaction_message(ctx, message, arrows, callback, timeout)
 
 
 async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
@@ -55,15 +77,15 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         }).set_footer(text=f'Page {i + 1}/{len(page_contents)}')
         for i, page in enumerate(page_contents)]
 
-    message = await ctx.send(embed=embeds[0], files=files or [])
-
     if len(embeds) == 1:
         return
 
     if len(embeds) <= max_tabbed_pages:
         reaction_emoji = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-        await run_tabbed_message(ctx, message, reaction_emoji[:len(embeds)], embeds, timeout=timeout)
+        await run_tabbed_message(ctx, reaction_emoji[:len(embeds)], embeds, timeout=timeout)
     else:
+        message = await ctx.send(embed=embeds[0], files=files or [])
+
         double_left_arrow = '⏪'
         double_right_arrow = '⏩'
         left_arrow = '◀'

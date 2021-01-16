@@ -17,7 +17,7 @@ from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, 
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.master_asset_manager import MasterFilter, hash_master
-from miyu_bot.commands.common.reaction_message import run_paged_message
+from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message
 
 
 class Event(commands.Cog):
@@ -53,11 +53,24 @@ class Event(commands.Cog):
             return
         self.logger.info(f'Found event "{event}" ({romanize(event.name)}).')
 
+        current_id = event.id
+
+        def generator(n):
+            nonlocal current_id
+            new_event = masters.events.get(current_id + n, ctx)
+            if new_event:
+                current_id = new_event.id
+                return self.get_event_embed(new_event)
+
+        asyncio.ensure_future(run_dynamically_paged_message(ctx, generator))
+
+    def get_event_embed(self, event):
         embed = discord.Embed(title=event.name)
 
         event_hash = hash_master(event)
         event_logo_path = event.logo_path
-        embed.set_thumbnail(url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
+        embed.set_thumbnail(
+            url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
 
         duration_hour_part = round((event.duration.seconds / 3600), 2)
         duration_hour_part = duration_hour_part if not duration_hour_part.is_integer() else int(duration_hour_part)
@@ -106,7 +119,7 @@ class Event(commands.Cog):
                         inline=True)
         embed.set_footer(text=f'Event Id: {event.id}')
 
-        await ctx.send(embed=embed)
+        return embed
 
     @commands.command(name='time',
                       aliases=[],

@@ -1,7 +1,7 @@
 import hashlib
 from functools import lru_cache
 from timeit import default_timer
-from typing import Callable, Any, Optional
+from typing import Callable, Any, Optional, Union
 
 from d4dj_utils.manager.asset_manager import AssetManager
 from d4dj_utils.master.master_asset import MasterDict, MasterAsset
@@ -61,11 +61,13 @@ class MasterFilter:
                 self.default_filter.set_unprocessed(alias, master)
                 self.unrestricted_filter.set_unprocessed(alias, master)
 
-    def get(self, name_or_id: str, ctx: Optional[commands.Context]):
+    def get(self, name_or_id: Union[str, int], ctx: Optional[commands.Context]):
         if ctx and ctx.channel.id in no_filter_channels:
             try:
                 return self.masters[int(name_or_id)]
             except (KeyError, ValueError):
+                if isinstance(name_or_id, int):
+                    return None
                 return self.unrestricted_filter[name_or_id]
         else:
             try:
@@ -74,6 +76,8 @@ class MasterFilter:
                     master = self.default_filter[name_or_id]
                 return master
             except (KeyError, ValueError):
+                if isinstance(name_or_id, int):
+                    return None
                 return self.default_filter[name_or_id]
 
     def get_sorted(self, name: str, ctx: commands.Context):

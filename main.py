@@ -27,7 +27,7 @@ bot.load_extension('miyu_bot.commands.cogs.utility')
 @bot.event
 async def on_ready():
     logging.getLogger(__name__).info(f'Current server count: {len(bot.guilds)}')
-    await bot.change_presence(activity=discord.Game(name='test'))
+    await bot.change_presence(activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
 
 
 bot.run(bot_token)

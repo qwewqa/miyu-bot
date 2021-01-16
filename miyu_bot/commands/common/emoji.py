@@ -8,14 +8,14 @@ difficulty_emoji_ids = {
 }
 
 # \:buff_power: \:buff_heart: \:buff_technique: \:buff_physical:
-parameter_bonus_emoji_Ids = {
+parameter_bonus_emoji_ids = {
     'all': 792930826735583293,
     'heart': 792096971040620564,
     'technique': 792096971090558986,
     'physical': 792096971002216488,
 }
 
-parameter_bonus_emoji_ids_by_parameter_id = {i: v for i, v in enumerate(parameter_bonus_emoji_Ids.values())}
+parameter_bonus_emoji_ids_by_parameter_id = {i: v for i, v in enumerate(parameter_bonus_emoji_ids.values())}
 
 unit_emoji_ids = {
     'happy_around': 792069679442821121,

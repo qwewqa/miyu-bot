@@ -14,7 +14,7 @@ class FuzzyFilteredMap:
         self.filter = filter_function or (lambda n: True)
         self.matcher = matcher or FuzzyMatcher()
         self._values = {}
-        self.max_length = 0
+        self.length_cutoff = 0
         self.logger = logging.getLogger(__name__)
         self._stale = True
         self.additive_only_filter = additive_only_filter
@@ -42,22 +42,29 @@ class FuzzyFilteredMap:
     def has_exact(self, key):
         return romanize(key) in self._values
 
+    def has_exact_unprocessed(self, key):
+        return key in self._values
+
     def __delitem__(self, key):
         k = romanize(key)
         self._values.__delitem__(k)
         self._stale = True
 
     def __setitem__(self, key, value):
-        k = romanize(key)
-        self._values[k] = value
-        self.max_length = max(self.max_length, math.ceil(len(k) * 1.1))
-        self.matcher.set_max_length(self.max_length)
+        self.set_unprocessed(romanize(key), value)
+
+    def set_unprocessed(self, key, value):
+        self._values[key] = value
+        new_cutoff = math.ceil(len(key) * 1.1)
+        if new_cutoff > self.length_cutoff:
+            self.length_cutoff = new_cutoff
+            self.matcher.set_max_length(new_cutoff)
         self._stale = True
 
     def __getitem__(self, key):
         start_time = timeit.default_timer()
         key = romanize(key)
-        if len(key) > self.max_length:
+        if len(key) > self.length_cutoff:
             self.logger.debug(f'Rejected key "{key}" due to length.')
             return None
         try:
@@ -73,7 +80,7 @@ class FuzzyFilteredMap:
 
     def get_sorted(self, key: str):
         start_time = timeit.default_timer()
-        if len(key) > self.max_length:
+        if len(key) > self.length_cutoff:
             self.logger.debug(f'Rejected key "{key}" due to length.')
             return []
         key = romanize(key)
@@ -197,13 +204,14 @@ def strip_vowels(s):
     return re.sub('[aeoiu]', '', s)
 
 
+_kks = pykakasi.kakasi()
+
+
 def romanize(s: str) -> str:
-    kks = pykakasi.kakasi()
     s = str(s)
-    s = re.sub('[\']', '', s)
-    s = re.sub('[・]', ' ', s)
+    s = re.sub('[\'・]', '', s)
     s = re.sub('[A-Za-z]+', lambda ele: f' {ele[0]} ', s)
     s = re.sub('[0-9]+', lambda ele: f' {ele[0]} ', s)
-    s = ' '.join(c['hepburn'].strip().lower() for c in kks.convert(s))
+    s = ' '.join(c['hepburn'].strip().lower() for c in _kks.convert(s))
     s = re.sub(r'[^a-zA-Z0-9_ ]+', '', s)
     return ' '.join(s.split())

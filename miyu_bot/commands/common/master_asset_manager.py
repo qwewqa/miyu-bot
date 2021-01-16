@@ -1,12 +1,13 @@
 import hashlib
 from functools import lru_cache
+from timeit import default_timer
 from typing import Callable, Any, Optional
 
 from d4dj_utils.manager.asset_manager import AssetManager
 from d4dj_utils.master.master_asset import MasterDict, MasterAsset
 from discord.ext import commands
 
-from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
+from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 
 import datetime as dt
 
@@ -14,33 +15,21 @@ import datetime as dt
 class MasterFilterManager:
     def __init__(self, manager: AssetManager):
         self.manager = manager
-
-    @property
-    @lru_cache(None)
-    def music(self):
-        return MasterFilter(
+        self.music = MasterFilter(
             self.manager.music_master,
             naming_function=lambda m: f'{m.name} {m.special_unit_name}',
             filter_function=lambda m: m.is_released,
             fallback_naming_function=lambda m: m.id,
         )
-
-    @property
-    @lru_cache(None)
-    def events(self):
-        return MasterFilter(
+        self.events = MasterFilter(
             self.manager.event_master,
             naming_function=lambda e: e.name,
             filter_function=lambda e: e.start_datetime < dt.datetime.now(
                 dt.timezone.utc) + dt.timedelta(hours=12),
         )
-
-    @property
-    @lru_cache(None)
-    def cards(self):
-        return MasterFilter(
+        self.cards = MasterFilter(
             self.manager.card_master,
-            naming_function=lambda c: c.name,
+            naming_function=lambda c: f'{c.rarity_id}★ {c.name} {c.character.full_name_english}',
             filter_function=lambda c: c.is_released,
         )
 
@@ -52,13 +41,15 @@ class MasterFilter:
         self.default_filter = FuzzyFilteredMap(filter_function)
         self.unrestricted_filter = FuzzyFilteredMap()
         for master in masters.values():
-            name = naming_function(master)
-            if self.default_filter.has_exact(name) and fallback_naming_function:
-                name = fallback_naming_function(master)
-            if self.default_filter.has_exact(name):
+            name = romanize(naming_function(master))
+            if fallback_naming_function and self.default_filter.has_exact_unprocessed(name):
+                name = romanize(fallback_naming_function(master))
+                if self.default_filter.has_exact_unprocessed(name):
+                    continue
+            elif self.default_filter.has_exact_unprocessed(name):
                 continue
-            self.default_filter[name] = master
-            self.unrestricted_filter[name] = master
+            self.default_filter.set_unprocessed(name, master)
+            self.unrestricted_filter.set_unprocessed(name, master)
 
     def get(self, name_or_id: str, ctx: Optional[commands.Context]):
         if ctx and ctx.channel.id in no_filter_channels:

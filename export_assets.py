@@ -19,12 +19,16 @@ def main():
     card_dir = target_dir / 'cards'
     card_icon_dir = card_dir / 'icons'
     card_art_dir = card_dir / 'art'
+    event_dir = target_dir / 'events'
+    event_logo_dir = event_dir / 'logos'
 
     music_dir.mkdir(exist_ok=True)
     chart_dir.mkdir(exist_ok=True)
     card_dir.mkdir(exist_ok=True)
     card_icon_dir.mkdir(exist_ok=True)
     card_art_dir.mkdir(exist_ok=True)
+    event_dir.mkdir(exist_ok=True)
+    event_logo_dir.mkdir(exist_ok=True)
 
     for music in asset_manager.music_master.values():
         for chart in music.charts.values():
@@ -46,6 +50,15 @@ def main():
                 icon_target = card_icon_dir / f'{icon_path.stem}_{card_hash}{icon_path.suffix}'
                 shutil.copy(art_path, art_target)
                 shutil.copy(icon_path, icon_target)
+        except FileNotFoundError:
+            pass
+
+    for event in asset_manager.event_master.values():
+        try:
+            event_hash = hash_master(event)
+            logo_path = event.logo_path
+            logo_target = event_logo_dir / f'{logo_path.stem}_{event_hash}{logo_path.suffix}'
+            shutil.copy(logo_path, logo_target)
         except FileNotFoundError:
             pass
 

@@ -152,17 +152,22 @@ class Music(commands.Cog):
                       brief='!songs lhg',
                       help=cleandoc('''
                       Named arguments:
-                        - sort (<, =) [default|name|id|unit|level|difficulty|duration|date]
-                        - [display|disp] = [default|name|id|unit|level|difficulty|duration|date]
-                        - [difficulty|diff|level] ? <difficulty (11, 11.5, 11+, ...)>...
+                        sort (<, =) [default|name|id|unit|level|difficulty|duration|date]
+                        [display|disp] = [default|name|id|unit|level|difficulty|duration|date]
+                        [difficulty|diff|level] ? <difficulty (11, 11.5, 11+, ...)>...
+                        
+                      Tags:
+                        unit: [happy_around|peaky_p-key|photon_maiden|merm4id|rondo|lyrical_lily|other]
                        
                       Extended examples:
-                        - Songs in descending difficulty order
-                            !songs sort<difficulty
-                        - Songs with difficulty from 11+ to 13+
-                            !songs diff>=11+ diff<=13+
-                        - Songs with difficulty exactly 10 or 14, sorted alphabetically, displaying duration
-                            !songs diff=10,14 sort=name disp=duration'''))
+                        Songs in descending difficulty order
+                          !songs sort<difficulty
+                        Songs with difficulty from 11+ to 13+
+                          !songs diff>=11+ diff<=13+
+                        Songs with difficulty exactly 10 or 14, sorted alphabetically, displaying duration
+                          !songs diff=10,14 sort=name disp=duration
+                        Songs by happy around
+                          !songs $happy_around'''))
     async def songs(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
         arguments = parse_arguments(arg)
@@ -171,9 +176,27 @@ class Music(commands.Cog):
         try:
             sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
                                              allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
-            reverse_sort = sort_op == '<'
+            reverse_sort = sort_op == '<' or arguments.tag('reverse')
             display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                           converter=music_attribute_aliases)
+            units = arguments.tags(
+                names=['happy_around', 'peaky_p-key', 'photon_maiden', 'merm4id', 'rondo', 'lyrical_lily', 'other'],
+                aliases={
+                    'hapiara': 'happy_around',
+                    'ha': 'happy_around',
+                    'peaky': 'peaky_p-key',
+                    'p-key': 'peaky_p-key',
+                    'pkey': 'peaky_p-key',
+                    'pkpk': 'peaky_p-key',
+                    'photome': 'photon_maiden',
+                    'photon': 'photon_maiden',
+                    'pm': 'photon_maiden',
+                    'mermaid': 'merm4id',
+                    'riririri': 'lyrical_lily',
+                    'lililili': 'lyrical_lily',
+                    'lily': 'lyrical_lily',
+                    'lili': 'lyrical_lily',
+                })
 
             def difficulty_converter(d):
                 return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
@@ -188,6 +211,24 @@ class Music(commands.Cog):
         for value, op in difficulty:
             operator = list_operator_for(op)
             songs = [song for song in songs if operator(song.charts[4].level, value)]
+
+        if units:
+            unit_ids = {
+                'happy_around': 1,
+                'peaky_p-key': 2,
+                'photon_maiden': 3,
+                'merm4id': 4,
+                'rondo': 5,
+                'lyrical_lily': 6,
+            }
+            allowed_unit_ids = set()
+            for unit in units:
+                if unit == 'other':
+                    allowed_unit_ids.add(30)
+                    allowed_unit_ids.add(50)
+                else:
+                    allowed_unit_ids.add(unit_ids[unit])
+            songs = [song for song in songs if song.unit.id in allowed_unit_ids]
 
         if not (arguments.text_argument and sort == MusicAttribute.DefaultOrder):
             songs = sorted(songs, key=lambda s: sort.get_from_music(s))

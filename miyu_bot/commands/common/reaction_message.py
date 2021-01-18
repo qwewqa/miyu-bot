@@ -47,7 +47,7 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
 async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
                             header='', numbered: bool = True, timeout=300, max_tabbed_pages=4, files=None):
     if header:
-        header = header + '\n'
+        header = f'`{header}`\n'
 
     if max_tabbed_pages > 9:
         raise ValueError('max_tabbed_pages must be 9 or less.')
@@ -73,7 +73,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
     embeds = [
         base_embed.from_dict({
             **base_embed.to_dict(),
-            'description': '' + header + '\n'.join((format_item(i) for i in page)) + '',
+            'description': header + '\n'.join((format_item(i) for i in page)),
         }).set_footer(text=f'Page {i + 1}/{len(page_contents)}')
         for i, page in enumerate(page_contents)]
 

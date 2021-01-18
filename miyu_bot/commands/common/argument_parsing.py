@@ -30,6 +30,7 @@ def _parse_named_argument(arg):
 
 
 def parse_arguments(arg):
+    arg = arg.lower()
     named_arguments_parsed = [_parse_named_argument(na[0]) for na in _param_re.findall(arg)]
     arg = _param_re.sub('', arg)
     # Technically, the order (named arguments then tags)
@@ -50,15 +51,41 @@ class ArgumentError(Exception):
 
 class ParsedArguments:
     text_argument: str
+    word_arguments: Set[str]
     tag_arguments: Set[str]
     named_arguments: Dict[str, List[ArgumentValue]]
 
-    def __init__(self, text, tags, named_arguments):
+    def __init__(self, text: str, tags: Set[str], named_arguments: Dict[str, List[ArgumentValue]]):
         self.text_argument = text
+        self.word_arguments = set(text.split())
         self.tag_arguments = tags
         self.named_arguments = named_arguments
         self.used_named_arguments = set()
         self.used_tags = set()
+        self.used_words = set()
+
+    def word(self, value: str):
+        if value in self.word_arguments:
+            self.used_words.add(value)
+            return True
+        return False
+
+    def words(self, values: Optional[Iterable[str]] = None, aliases: Optional[Dict[str, str]] = None):
+        results = set()
+        if values is not None:
+            for value in values:
+                if value in self.word_arguments:
+                    results.add(value)
+                    self.used_words.add(value)
+        if aliases is not None:
+            for alias, value in aliases.items():
+                if alias in self.word_arguments:
+                    results.add(value)
+                    self.used_words.add(alias)
+        return results
+
+    def text(self):
+        return ' '.join(word for word in self.text_argument.split() if word not in self.used_words)
 
     def tag(self, name: str):
         if name in self.tag_arguments:
@@ -84,7 +111,7 @@ class ParsedArguments:
                is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:
             allowed_operators = {'>', '<', '>=', '<=', '!=', '==', '='}
-        if not isinstance(default, tuple) and default is not None:
+        if not isinstance(default, tuple):
             default = ArgumentValue(default, '=')
         if not isinstance(names, list):
             names = [names]
@@ -208,5 +235,5 @@ def list_operator_for(operator: str):
 
 if __name__ == '__main__':
     a = (
-        parse_arguments(r'sort=default df rating>=13.5,$asd a fds $foo $bar name="a",b," asf,ds ",\'sdf\',dsf $foobar'))
+        parse_arguments(r'sort=default dff f word1 word2 word3 rating>=13.5,$asd a fds $foo $bar name="a",b," asf,ds ",\'sdf\',dsf $foobar'))
     print(a)

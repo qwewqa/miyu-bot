@@ -16,7 +16,7 @@ from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids
 from miyu_bot.commands.common.event import get_latest_event
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.master_asset_manager import hash_master
-from miyu_bot.commands.common.name_aliases import characters_by_name, attributes_by_name, units_by_name
+from miyu_bot.commands.common.name_aliases import characters_by_name, attributes_by_name, units_by_name, unit_aliases
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message
 
 
@@ -123,10 +123,11 @@ class Card(commands.Cog):
         # Not used, but here because it's a valid argument before running require_all_arguments_used.
         display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                       converter=card_attribute_aliases)
-        character = {characters_by_name[c].id for c in arguments.words(characters_by_name.keys())}
-        unit = {units_by_name[a].id for a in arguments.words(units_by_name.keys())}
-        rarity = {int(r[0]) for r in arguments.words(['4*', '3*', '2*', '1*', r'4\*', r'3\*', r'2\*', r'1\*'])}
-        attribute = {attributes_by_name[a].id for a in arguments.words(attributes_by_name.keys())}
+        characters = {characters_by_name[c].id for c in arguments.words(characters_by_name.keys())}
+        units = {units_by_name[unit].id
+                 for unit in arguments.tags(names=units_by_name.keys(), aliases=unit_aliases)}
+        rarities = {int(r[0]) for r in arguments.words(['4*', '3*', '2*', '1*', r'4\*', r'3\*', r'2\*', r'1\*'])}
+        attributes = {attributes_by_name[a].id for a in arguments.words(attributes_by_name.keys())}
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 
@@ -134,13 +135,13 @@ class Card(commands.Cog):
             latest_event = get_latest_event(ctx)
             bonus: EventSpecificBonusMaster = latest_event.bonus
 
-            if not character:
-                character.update(bonus.character_ids)
+            if not characters:
+                characters.update(bonus.character_ids)
             elif bonus.character_ids:
-                character = {char for char in character if char in bonus.character_ids}
+                characters = {char for char in characters if char in bonus.character_ids}
 
             if bonus.attribute_id:
-                attribute = {bonus.attribute_id}
+                attributes = {bonus.attribute_id}
 
             if not arguments.has_named('sort'):
                 sort = CardAttribute.Date
@@ -155,14 +156,14 @@ class Card(commands.Cog):
                 cards = cards[::-1]
             if reverse_sort:
                 cards = cards[::-1]
-        if character:
-            cards = [card for card in cards if card.character.id in character]
-        if unit:
-            cards = [card for card in cards if card.character.unit.id in unit]
-        if rarity:
-            cards = [card for card in cards if card.rarity_id in rarity]
-        if attribute:
-            cards = [card for card in cards if card.attribute.id in attribute]
+        if characters:
+            cards = [card for card in cards if card.character.id in characters]
+        if units:
+            cards = [card for card in cards if card.character.unit.id in units]
+        if rarities:
+            cards = [card for card in cards if card.rarity_id in rarities]
+        if attributes:
+            cards = [card for card in cards if card.attribute.id in attributes]
 
         return cards
 

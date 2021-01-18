@@ -19,6 +19,7 @@ from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.master_asset_manager import hash_master
+from miyu_bot.commands.common.name_aliases import units_by_name, unit_aliases
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
@@ -178,24 +179,8 @@ class Music(commands.Cog):
             reverse_sort = sort_op == '<' or arguments.tag('reverse')
             display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                           converter=music_attribute_aliases)
-            units = arguments.tags(
-                names=['happy_around', 'peaky_p-key', 'photon_maiden', 'merm4id', 'rondo', 'lyrical_lily', 'other'],
-                aliases={
-                    'hapiara': 'happy_around',
-                    'ha': 'happy_around',
-                    'peaky': 'peaky_p-key',
-                    'p-key': 'peaky_p-key',
-                    'pkey': 'peaky_p-key',
-                    'pkpk': 'peaky_p-key',
-                    'photome': 'photon_maiden',
-                    'photon': 'photon_maiden',
-                    'pm': 'photon_maiden',
-                    'mermaid': 'merm4id',
-                    'riririri': 'lyrical_lily',
-                    'lililili': 'lyrical_lily',
-                    'lily': 'lyrical_lily',
-                    'lili': 'lyrical_lily',
-                })
+            units = {units_by_name[unit].id
+                     for unit in arguments.tags(names=units_by_name.keys(), aliases=unit_aliases)}
 
             def difficulty_converter(d):
                 return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
@@ -215,22 +200,7 @@ class Music(commands.Cog):
             songs = [song for song in songs if operator(song.charts[4].level, value)]
 
         if units:
-            unit_ids = {
-                'happy_around': 1,
-                'peaky_p-key': 2,
-                'photon_maiden': 3,
-                'merm4id': 4,
-                'rondo': 5,
-                'lyrical_lily': 6,
-            }
-            allowed_unit_ids = set()
-            for unit in units:
-                if unit == 'other':
-                    allowed_unit_ids.add(30)
-                    allowed_unit_ids.add(50)
-                else:
-                    allowed_unit_ids.add(unit_ids[unit])
-            songs = [song for song in songs if song.unit.id in allowed_unit_ids]
+            songs = [song for song in songs if song.unit.id in units]
 
         if not (arguments.text_argument and sort == MusicAttribute.DefaultOrder):
             songs = sorted(songs, key=lambda s: sort.get_sort_key_from_music(s))

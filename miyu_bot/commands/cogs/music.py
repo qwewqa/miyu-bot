@@ -311,10 +311,12 @@ class Music(commands.Cog):
 
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart: ChartMaster = song.charts[difficulty]
+            chart_hash = hash_master(chart)
+            mix_path = chart.mix_path
             embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]')
             embed.set_thumbnail(url=f'attachment://jacket.png')
             embed.set_image(
-                url=f'https://qwewqa.github.io/d4dj-dumps/{chart.mix_path.relative_to(asset_manager.path).as_posix()}'
+                url=f'https://qwewqa.github.io/d4dj-dumps/music/charts/{mix_path.stem}_{chart_hash}{mix_path.suffix}'
             )
 
             note_counts = chart.note_counts

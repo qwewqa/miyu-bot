@@ -37,6 +37,9 @@ def main():
                 chart_path = chart.image_path
                 target_path = chart_dir / f'{chart_path.stem}_{chart_hash}{chart_path.suffix}'
                 shutil.copy(chart_path, target_path)
+                mix_path = chart.mix_path
+                target_path = chart_dir / f'{mix_path.stem}_{chart_hash}{mix_path.suffix}'
+                shutil.copy(mix_path, target_path)
             except FileNotFoundError:
                 pass
 

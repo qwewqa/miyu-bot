@@ -66,14 +66,14 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         nonlocal item_number
         item_number += 1
         if numbered:
-            return f'{item_number}.{" " * (max_item_number_length - len(str(item_number)))} {item}'
+            return f'`{item_number}.{" " * (max_item_number_length - len(str(item_number)))} {item}`'
         else:
-            return str(item)
+            return f'`{item}`'
 
     embeds = [
         base_embed.from_dict({
             **base_embed.to_dict(),
-            'description': '```' + header + '\n'.join((format_item(i) for i in page)) + '```',
+            'description': '' + header + '\n'.join((format_item(i) for i in page)) + '',
         }).set_footer(text=f'Page {i + 1}/{len(page_contents)}')
         for i, page in enumerate(page_contents)]
 

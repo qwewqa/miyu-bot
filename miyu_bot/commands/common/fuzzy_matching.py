@@ -118,7 +118,7 @@ class FuzzyMatchConfig:
     })
     word_match_weight: float = -0.2
     whole_match_weight: float = -0.25
-    acronym_match_weight: float = -0.3
+    acronym_match_weight: float = -0.25
 
 
 class FuzzyMatcher:

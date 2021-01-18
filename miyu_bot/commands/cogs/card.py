@@ -109,9 +109,9 @@ class Card(commands.Cog):
             display_prefix = display.get_formatted_from_card(card)
             if display_prefix:
                 listing.append(
-                    f'{display_prefix} : {self.format_card_name(card)}')
+                    f'{display_prefix} {self.format_card_name_for_list(card)}')
             else:
-                listing.append(self.format_card_name(card))
+                listing.append(self.format_card_name_for_list(card))
 
         embed = discord.Embed(title=f'Card Search "{arg}"' if arg else 'Cards')
         asyncio.ensure_future(run_paged_message(ctx, embed, listing))
@@ -127,7 +127,8 @@ class Card(commands.Cog):
         units = {units_by_name[unit].id
                  for unit in arguments.tags(names=units_by_name.keys(), aliases=unit_aliases)}
         rarities = {int(r[0]) for r in arguments.words(['4*', '3*', '2*', '1*', r'4\*', r'3\*', r'2\*', r'1\*'])}
-        attributes = {attributes_by_name[a].id for a in arguments.words(attributes_by_name.keys())}
+        attributes = {attributes_by_name[a].id
+                      for a in arguments.words(attributes_by_name.keys()) | arguments.tags(attributes_by_name.keys())}
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 
@@ -212,6 +213,11 @@ class Card(commands.Cog):
 
     def format_card_name(self, card):
         return f'{card.rarity_id}★ {card.name} {card.character.full_name_english}'
+
+    def format_card_name_for_list(self, card):
+        unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
+        attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
+        return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.full_name_english}'
 
 
 class CardAttribute(enum.Enum):

@@ -12,7 +12,8 @@ units_by_name['rondo'] = units_by_name['燐舞曲']
 units_by_name['special'] = units_by_name['スペシャル']
 units_by_name['other'] = units_by_name['その他']
 unit_aliases = {
-    'happyaround': 'happy_around',
+    'happyaround': 'happy_around!',
+    'happy_around': 'happy_around!',
     'hapiara': 'happy_around',
     'ha': 'happy_around',
     'peakyp-key': 'peaky_p-key',

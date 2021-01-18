@@ -133,8 +133,15 @@ class Card(commands.Cog):
         if event_bonus:
             latest_event = get_latest_event(ctx)
             bonus: EventSpecificBonusMaster = latest_event.bonus
-            character.update(bonus.character_ids)
-            attribute.add(bonus.attribute_id)
+
+            if not character:
+                character.update(bonus.character_ids)
+            elif bonus.character_ids:
+                character = {char for char in character if char in bonus.character_ids}
+
+            if bonus.attribute_id:
+                attribute = {bonus.attribute_id}
+
             if not arguments.has_named('sort'):
                 sort = CardAttribute.Date
 

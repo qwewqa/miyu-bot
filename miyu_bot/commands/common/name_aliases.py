@@ -14,7 +14,8 @@ units_by_name['other'] = units_by_name['その他']
 unit_aliases = {
     'happyaround': 'happy_around!',
     'happy_around': 'happy_around!',
-    'hapiara': 'happy_around',
+    'hapiara': 'happy_around!',
+    'happy': 'happy_around!',
     'ha': 'happy_around',
     'peakyp-key': 'peaky_p-key',
     'peakypkey': 'peaky_p-key',

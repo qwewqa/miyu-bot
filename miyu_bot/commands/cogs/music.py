@@ -56,7 +56,7 @@ class Music(commands.Cog):
         song = masters.music.get(arg, ctx)
 
         if not song:
-            msg = f'Failed to find song "{arg}".'
+            msg = f'No results for song "{arg}".'
             await ctx.send(msg)
             self.logger.info(msg)
             return
@@ -171,7 +171,6 @@ class Music(commands.Cog):
     async def songs(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
         arguments = parse_arguments(arg)
-        songs = masters.music.get_sorted(arguments.text_argument, ctx)
 
         try:
             sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
@@ -203,6 +202,9 @@ class Music(commands.Cog):
 
             difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True,
                                               converter=difficulty_converter)
+
+            songs = masters.music.get_sorted(arguments.text(), ctx)
+
             arguments.require_all_arguments_used()
         except ArgumentError as e:
             await ctx.send(str(e))
@@ -231,11 +233,13 @@ class Music(commands.Cog):
             songs = [song for song in songs if song.unit.id in allowed_unit_ids]
 
         if not (arguments.text_argument and sort == MusicAttribute.DefaultOrder):
-            songs = sorted(songs, key=lambda s: sort.get_from_music(s))
+            songs = sorted(songs, key=lambda s: sort.get_sort_key_from_music(s))
             if sort == MusicAttribute.DefaultOrder and songs and songs[0].id == 1:
                 songs = [*songs[1:], songs[0]]
+            if sort in [MusicAttribute.Level, MusicAttribute.Date]:
+                songs = songs[::-1]
             if reverse_sort:
-                songs = reversed(songs)
+                songs = songs[::-1]
 
         listing = []
         for song in songs:
@@ -394,7 +398,7 @@ class MusicAttribute(enum.Enum):
     Duration = enum.auto()
     Date = enum.auto()
 
-    def get_from_music(self, music: MusicMaster):
+    def get_sort_key_from_music(self, music: MusicMaster):
         return {
             self.DefaultOrder: -music.default_order,
             self.Name: music.name,

@@ -14,6 +14,7 @@ from main import asset_manager, masters
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
+from miyu_bot.commands.common.event import get_latest_event
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.master_asset_manager import MasterFilter, hash_master
@@ -37,14 +38,14 @@ class Event(commands.Cog):
             # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
             if arg[0] in ['-', '+']:
                 try:
-                    latest = self.get_latest_event(ctx)
+                    latest = get_latest_event(ctx)
                     event = masters.events.get(str(latest.id + int(arg)), ctx)
                 except ValueError:
                     event = masters.events.get(arg, ctx)
             else:
                 event = masters.events.get(arg, ctx)
         else:
-            event = self.get_latest_event(ctx)
+            event = get_latest_event(ctx)
 
         if not event:
             msg = f'Failed to find event "{arg}".'
@@ -150,7 +151,7 @@ class Event(commands.Cog):
                       description='Displays the time left in the current event',
                       help='!timeleft')
     async def time_left(self, ctx: commands.Context):
-        latest = self.get_latest_event(ctx)
+        latest = get_latest_event(ctx)
 
         state = latest.state()
 
@@ -204,19 +205,6 @@ class Event(commands.Cog):
 
         await ctx.send(files=[logo], embed=embed)
 
-    def get_latest_event(self, ctx: commands.Context) -> EventMaster:
-        """Returns the oldest event that has not ended or the newest event otherwise."""
-        try:
-            # NY event overlapped with previous event
-            return min((v for v in masters.events.values(ctx) if v.state() == EventState.Open),
-                       key=lambda e: e.start_datetime)
-        except ValueError:
-            try:
-                return min((v for v in masters.events.values(ctx) if v.state() < EventState.Ended),
-                           key=lambda e: e.start_datetime)
-            except ValueError:
-                return max(masters.events.values(ctx), key=lambda v: v.start_datetime)
-
     @commands.command(name='t20',
                       aliases=['top20', 'top_20'],
                       description='Displays the top 20 in the main leaderboard',
@@ -226,7 +214,7 @@ class Event(commands.Cog):
             async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
                 leaderboard = await resp.json(encoding='utf-8')
 
-        latest = self.get_latest_event(ctx)
+        latest = get_latest_event(ctx)
         logo = discord.File(latest.logo_path, filename='logo.png')
         embed = discord.Embed(title=f'{latest.name} t20').set_thumbnail(url=f'attachment://logo.png')
         max_points_digits = len(str(leaderboard[0]['points']))

@@ -30,7 +30,7 @@ class MasterFilterManager:
         )
         self.cards = MasterFilter(
             self.manager.card_master,
-            naming_function=lambda c: c.name,
+            naming_function=lambda c: f'{c.name} {c.character.first_name_english}',
             filter_function=lambda c: c.is_released,
         )
 

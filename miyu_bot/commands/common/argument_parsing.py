@@ -107,6 +107,9 @@ class ParsedArguments:
                     self.used_tags.add(alias)
         return results
 
+    def has_named(self, name: str):
+        return name in self.named_arguments
+
     def single(self, names: Union[List[str], str], default: Any = None, allowed_operators: Optional[Container] = None,
                is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:

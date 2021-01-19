@@ -126,7 +126,8 @@ class Card(commands.Cog):
         characters = {characters_by_name[c].id for c in arguments.words(characters_by_name.keys())}
         units = {units_by_name[unit].id
                  for unit in arguments.tags(names=units_by_name.keys(), aliases=unit_aliases)}
-        rarities = {int(r[0]) for r in arguments.words(['4*', '3*', '2*', '1*', r'4\*', r'3\*', r'2\*', r'1\*'])}
+        rarity_names = ['4*', '3*', '2*', '1*', r'4\*', r'3\*', r'2\*', r'1\*']
+        rarities = {int(r[0]) for r in arguments.words(rarity_names) | arguments.tags(rarity_names)}
         attributes = {attributes_by_name[a].id for a in arguments.tags(attributes_by_name.keys())}
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))

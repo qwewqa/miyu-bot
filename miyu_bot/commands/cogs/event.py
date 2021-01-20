@@ -11,6 +11,7 @@ from discord.ext import commands
 from pytz import UnknownTimeZoneError
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
@@ -18,6 +19,7 @@ from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message
+from miyu_bot.commands.common.timezone import get_timezone
 
 
 class Event(commands.Cog):
@@ -35,18 +37,12 @@ class Event(commands.Cog):
         self.logger.info(f'Searching for event "{arg}".')
 
         event: EventMaster
-        if arg:
-            # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
-            if arg[0] in ['-', '+']:
-                try:
-                    latest = self.bot.asset_filters.events.get_latest_event(ctx)
-                    event = self.bot.asset_filters.events.get(str(latest.id + int(arg)), ctx)
-                except ValueError:
-                    event = self.bot.asset_filters.events.get(arg, ctx)
-            else:
-                event = self.bot.asset_filters.events.get(arg, ctx)
-        else:
-            event = self.bot.asset_filters.events.get_latest_event(ctx)
+
+        try:
+            event, timezone = self.parse_event_argument(ctx, arg)
+        except ArgumentError as e:
+            await ctx.send(str(e))
+            return
 
         if not event:
             msg = f'Failed to find event "{arg}".'
@@ -62,11 +58,31 @@ class Event(commands.Cog):
             new_event = self.bot.asset_filters.events.get(current_id + n, ctx)
             if new_event:
                 current_id = new_event.id
-                return self.get_event_embed(new_event)
+                return self.get_event_embed(new_event, timezone)
 
         asyncio.ensure_future(run_dynamically_paged_message(ctx, generator))
 
-    def get_event_embed(self, event):
+    def parse_event_argument(self, ctx, arg):
+        arguments = parse_arguments(arg)
+        timezone = get_timezone(arguments)
+        text = arguments.text()
+        arguments.require_all_arguments_used()
+
+        if text:
+            # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
+            if text[0] in ['-', '+']:
+                try:
+                    latest = self.bot.asset_filters.events.get_latest_event(ctx)
+                    event = self.bot.asset_filters.events.get(str(latest.id + int(text)), ctx)
+                except ValueError:
+                    event = self.bot.asset_filters.events.get(text, ctx)
+            else:
+                event = self.bot.asset_filters.events.get(text, ctx)
+        else:
+            event = self.bot.asset_filters.events.get_latest_event(ctx)
+        return event, timezone
+
+    def get_event_embed(self, event, timezone):
         embed = discord.Embed(title=event.name)
 
         event_hash = hash_master(event)
@@ -83,12 +99,12 @@ class Event(commands.Cog):
                         value=format_info({
                             'Duration': f'{event.duration.days} days, {duration_hour_part} hours '
                                         f'({duration_hours} hours)',
-                            'Start': event.start_datetime,
-                            'Close': event.reception_close_datetime,
-                            'Rank Fix': event.rank_fix_start_datetime,
-                            'Results': event.result_announcement_datetime,
-                            'End': event.end_datetime,
-                            'Story Unlock': event.story_unlock_datetime,
+                            'Start': event.start_datetime.astimezone(timezone),
+                            'Close': event.reception_close_datetime.astimezone(timezone),
+                            'Rank Fix': event.rank_fix_start_datetime.astimezone(timezone),
+                            'Results': event.result_announcement_datetime.astimezone(timezone),
+                            'End': event.end_datetime.astimezone(timezone),
+                            'Story Unlock': event.story_unlock_datetime.astimezone(timezone),
                             'Status': event.state().name,
                         }),
                         inline=False)
@@ -151,44 +167,52 @@ class Event(commands.Cog):
                       aliases=['tl', 'time_left'],
                       description='Displays the time left in the current event',
                       help='!timeleft')
-    async def time_left(self, ctx: commands.Context):
-        latest = self.bot.asset_filters.events.get_latest_event(ctx)
+    async def time_left(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
+        try:
+            event, timezone = self.parse_event_argument(ctx, arg)
+        except ArgumentError as e:
+            await ctx.send(str(e))
+            return
 
-        state = latest.state()
+        state = event.state()
 
-        logo = discord.File(latest.logo_path, filename='logo.png')
+        embed = discord.Embed(title=event.name)
 
-        embed = discord.Embed(title=latest.name)
-        embed.set_thumbnail(url=f'attachment://logo.png')
+        event_hash = hash_master(event)
+        event_logo_path = event.logo_path
+        embed.set_thumbnail(
+            url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
 
         progress = None
 
         if state == EventState.Upcoming:
             time_delta_heading = 'Time Until Start'
-            time_delta = latest.start_datetime - dt.datetime.now(dt.timezone.utc)
+            time_delta = event.start_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'Start Date'
-            date_value = latest.start_datetime
+            date_value = event.start_datetime
         elif state == EventState.Open:
             time_delta_heading = 'Time Until Close'
-            time_delta = latest.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
-            progress = 1 - (time_delta / (latest.reception_close_datetime - latest.start_datetime))
+            time_delta = event.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
+            progress = 1 - (time_delta / (event.reception_close_datetime - event.start_datetime))
             date_heading = 'Close Date'
-            date_value = latest.reception_close_datetime
+            date_value = event.reception_close_datetime
         elif state in (EventState.Closing, EventState.Ranks_Fixed):
             time_delta_heading = 'Time Until Results'
-            time_delta = latest.result_announcement_datetime - dt.datetime.now(dt.timezone.utc)
+            time_delta = event.result_announcement_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'Results Date'
-            date_value = latest.result_announcement_datetime
+            date_value = event.result_announcement_datetime
         elif state == EventState.Results:
             time_delta_heading = 'Time Until End'
-            time_delta = latest.end_datetime - dt.datetime.now(dt.timezone.utc)
+            time_delta = event.end_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'End Date'
-            date_value = latest.end_datetime
+            date_value = event.end_datetime
         else:
             time_delta_heading = 'Time Since End'
-            time_delta = dt.datetime.now(dt.timezone.utc) - latest.end_datetime
+            time_delta = dt.datetime.now(dt.timezone.utc) - event.end_datetime
             date_heading = 'End Date'
-            date_value = latest.end_datetime
+            date_value = event.end_datetime
+
+        date_value = date_value.astimezone(timezone)
 
         days = time_delta.days
         hours, rem = divmod(time_delta.seconds, 3600)
@@ -204,7 +228,7 @@ class Event(commands.Cog):
                         value=str(date_value),
                         inline=True)
 
-        await ctx.send(files=[logo], embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(name='t20',
                       aliases=['top20', 'top_20'],
@@ -215,9 +239,11 @@ class Event(commands.Cog):
             async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
                 leaderboard = await resp.json(encoding='utf-8')
 
-        latest = self.bot.asset_filters.events.get_latest_event(ctx)
-        logo = discord.File(latest.logo_path, filename='logo.png')
-        embed = discord.Embed(title=f'{latest.name} t20').set_thumbnail(url=f'attachment://logo.png')
+        event = self.bot.asset_filters.events.get_latest_event(ctx)
+        event_hash = hash_master(event)
+        event_logo_path = event.logo_path
+        embed = discord.Embed(title=f'{event.name} t20').set_thumbnail(
+            url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
         max_points_digits = len(str(leaderboard[0]['points']))
         nl = "\n"
         update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)
@@ -226,7 +252,7 @@ class Event(commands.Cog):
         listing = [
             f'{str(player["rank"]).ljust(4)}  {str(player["points"]).ljust(max_points_digits)}  {player["name"].replace(nl, "")}'
             for player in leaderboard]
-        paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, files=[logo], numbered=False)
+        paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, numbered=False)
         asyncio.ensure_future(paged)
 
 

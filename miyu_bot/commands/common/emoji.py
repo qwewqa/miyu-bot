@@ -7,7 +7,6 @@ difficulty_emoji_ids = {
     ChartDifficulty.Expert: 790050636225052694,
 }
 
-# \:buff_power: \:buff_heart: \:buff_technique: \:buff_physical:
 parameter_bonus_emoji_ids = {
     'all': 792930826735583293,
     'heart': 792096971040620564,

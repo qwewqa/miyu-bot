@@ -3,20 +3,19 @@ import logging
 
 import discord
 from d4dj_utils.manager.asset_manager import AssetManager
-from discord.ext import commands
 
-from miyu_bot.commands.common.master_asset_manager import MasterFilterManager
+from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.master_asset_manager import MasterFilterManager
 
 logging.basicConfig(level=logging.INFO)
 
 with open('config.json') as f:
     bot_token = json.load(f)['token']
 
-bot = commands.Bot(command_prefix='!', case_insensitive=True)
 
 asset_manager = AssetManager('assets')
+bot = D4DJBot(asset_manager, MasterFilterManager(asset_manager), command_prefix='!', case_insensitive=True)
 
-masters = MasterFilterManager(asset_manager)
 
 bot.load_extension('miyu_bot.commands.cogs.card')
 bot.load_extension('miyu_bot.commands.cogs.event')

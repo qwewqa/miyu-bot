@@ -1,13 +1,12 @@
 import hashlib
-from functools import lru_cache
-from timeit import default_timer
 from typing import Callable, Any, Optional, Union
 
 from d4dj_utils.manager.asset_manager import AssetManager
+from d4dj_utils.master.event_master import EventMaster, EventState
 from d4dj_utils.master.master_asset import MasterDict, MasterAsset
 from discord.ext import commands
 
-from miyu_bot.commands.common.aliases.event import event_aliases
+from miyu_bot.bot.aliases.event import event_aliases
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 
 import datetime as dt
@@ -22,7 +21,7 @@ class MasterFilterManager:
             filter_function=lambda m: m.is_released,
             fallback_naming_function=lambda m: m.id,
         )
-        self.events = MasterFilter(
+        self.events = EventFilter(
             self.manager.event_master,
             aliases=event_aliases,
             naming_function=lambda e: e.name,
@@ -97,6 +96,21 @@ class MasterFilter:
             return self.unrestricted_filter.values()
         else:
             return self.default_filter.values()
+
+
+class EventFilter(MasterFilter):
+    def get_latest_event(self, ctx: commands.Context) -> EventMaster:
+        """Returns the oldest event that has not ended or the newest event otherwise."""
+        try:
+            # NY event overlapped with previous event
+            return min((v for v in self.values(ctx) if v.state() == EventState.Open),
+                       key=lambda e: e.start_datetime)
+        except ValueError:
+            try:
+                return min((v for v in self.values(ctx) if v.state() < EventState.Ended),
+                           key=lambda e: e.start_datetime)
+            except ValueError:
+                return max(self.values(ctx), key=lambda v: v.start_datetime)
 
 
 def hash_master(master: MasterAsset):

@@ -2,11 +2,14 @@ import logging
 
 from discord.ext import commands
 
+from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
 
 
 class Utility(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    bot: D4DJBot
+
+    def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
 

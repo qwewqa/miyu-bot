@@ -3,7 +3,6 @@ import contextlib
 import enum
 import logging
 import wave
-from functools import lru_cache
 from inspect import cleandoc
 from typing import Tuple
 
@@ -13,18 +12,19 @@ from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
-from main import asset_manager, masters
+from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError, list_operator_for
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.master_asset_manager import hash_master
-from miyu_bot.commands.common.name_aliases import units_by_name, unit_aliases
+from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
 class Music(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    bot: D4DJBot
+
+    def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ class Music(commands.Cog):
     async def song(self, ctx: commands.Context, *, arg: commands.clean_content):
         self.logger.info(f'Searching for song "{arg}".')
 
-        song = masters.music.get(arg, ctx)
+        song = self.bot.asset_filters.music.get(arg, ctx)
 
         if not song:
             msg = f'No results for song "{arg}".'
@@ -67,7 +67,7 @@ class Music(commands.Cog):
             thumb = discord.File(song.jacket_path, filename='jacket.png')
         except FileNotFoundError:
             # Just a fallback
-            thumb = discord.File(asset_manager.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
+            thumb = discord.File(self.bot.assets.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
 
         embed = discord.Embed(title=song.name)
         embed.set_thumbnail(url=f'attachment://jacket.png')
@@ -107,7 +107,7 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for chart "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
-        song = masters.music.get(name, ctx)
+        song = self.bot.asset_filters.music.get(name, ctx)
 
         if not song:
             msg = f'Failed to find chart "{name}".'
@@ -129,7 +129,7 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for chart sections "{arg}".')
 
         name, difficulty = self.parse_chart_args(arg)
-        song = masters.music.get(name, ctx)
+        song = self.bot.asset_filters.music.get(name, ctx)
 
         if not song:
             msg = f'Failed to find chart "{name}".'
@@ -179,8 +179,9 @@ class Music(commands.Cog):
             reverse_sort = sort_op == '<' or arguments.tag('reverse')
             display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                           converter=music_attribute_aliases)
-            units = {units_by_name[unit].id
-                     for unit in arguments.tags(names=units_by_name.keys(), aliases=unit_aliases)}
+            units = {self.bot.aliases.units_by_name[unit].id
+                     for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
+                                                aliases=self.bot.aliases.unit_aliases)}
 
             def difficulty_converter(d):
                 return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
@@ -188,7 +189,7 @@ class Music(commands.Cog):
             difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True,
                                               converter=difficulty_converter)
 
-            songs = masters.music.get_sorted(arguments.text(), ctx)
+            songs = self.bot.asset_filters.music.get_sorted(arguments.text(), ctx)
 
             arguments.require_all_arguments_used()
         except ArgumentError as e:
@@ -230,7 +231,7 @@ class Music(commands.Cog):
             thumb = discord.File(song.jacket_path, filename='jacket.png')
         except FileNotFoundError:
             # fallback
-            thumb = discord.File(asset_manager.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
+            thumb = discord.File(self.bot.assets.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
 
         files = [thumb]
 

@@ -4,24 +4,23 @@ import logging
 
 import discord
 from d4dj_utils.master.card_master import CardMaster
-from d4dj_utils.master.event_master import EventMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
 from d4dj_utils.master.skill_master import SkillMaster
 from discord.ext import commands
 
-from main import masters, asset_manager
+from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
     unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id
-from miyu_bot.commands.common.event import get_latest_event
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.master_asset_manager import hash_master
-from miyu_bot.commands.common.name_aliases import characters_by_name, attributes_by_name, units_by_name, unit_aliases
+from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message
 
 
 class Card(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    bot: D4DJBot
+
+    def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
 
@@ -123,17 +122,20 @@ class Card(commands.Cog):
         # Not used, but here because it's a valid argument before running require_all_arguments_used.
         display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                       converter=card_attribute_aliases)
-        characters = {characters_by_name[c].id for c in arguments.words(characters_by_name.keys())}
-        units = {units_by_name[unit].id
-                 for unit in arguments.tags(names=units_by_name.keys(), aliases=unit_aliases)}
+        characters = {self.bot.aliases.characters_by_name[c].id
+                      for c in arguments.words(self.bot.aliases.characters_by_name.keys())}
+        units = {self.bot.aliases.units_by_name[unit].id
+                 for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
+                                            aliases=self.bot.aliases.unit_aliases)}
         rarity_names = ['4*', '3*', '2*', '1*', r'4\*', r'3\*', r'2\*', r'1\*']
         rarities = {int(r[0]) for r in arguments.words(rarity_names) | arguments.tags(rarity_names)}
-        attributes = {attributes_by_name[a].id for a in arguments.tags(attributes_by_name.keys())}
+        attributes = {self.bot.aliases.attributes_by_name[a].id
+                      for a in arguments.tags(self.bot.aliases.attributes_by_name.keys())}
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 
         if event_bonus:
-            latest_event = get_latest_event(ctx)
+            latest_event = self.bot.asset_filters.events.get_latest_event(ctx)
             bonus: EventSpecificBonusMaster = latest_event.bonus
 
             if not characters:
@@ -149,7 +151,7 @@ class Card(commands.Cog):
 
         arguments.require_all_arguments_used()
 
-        cards = masters.cards.get_sorted(arguments.text(), ctx)
+        cards = self.bot.asset_filters.cards.get_sorted(arguments.text(), ctx)
         if not (arguments.text() and sort is None):
             sort = sort or CardAttribute.Power
             cards = sorted(cards, key=lambda c: (sort.get_sort_key_from_card(c), c.max_power_with_limit_break))

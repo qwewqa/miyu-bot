@@ -10,19 +10,20 @@ from d4dj_utils.master.event_master import EventMaster, EventState
 from discord.ext import commands
 from pytz import UnknownTimeZoneError
 
-from main import asset_manager, masters
+from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
-from miyu_bot.commands.common.event import get_latest_event
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.master_asset_manager import MasterFilter, hash_master
+from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message
 
 
 class Event(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    bot: D4DJBot
+
+    def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
 
@@ -38,14 +39,14 @@ class Event(commands.Cog):
             # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
             if arg[0] in ['-', '+']:
                 try:
-                    latest = get_latest_event(ctx)
-                    event = masters.events.get(str(latest.id + int(arg)), ctx)
+                    latest = self.bot.asset_filters.events.get_latest_event(ctx)
+                    event = self.bot.asset_filters.events.get(str(latest.id + int(arg)), ctx)
                 except ValueError:
-                    event = masters.events.get(arg, ctx)
+                    event = self.bot.asset_filters.events.get(arg, ctx)
             else:
-                event = masters.events.get(arg, ctx)
+                event = self.bot.asset_filters.events.get(arg, ctx)
         else:
-            event = get_latest_event(ctx)
+            event = self.bot.asset_filters.events.get_latest_event(ctx)
 
         if not event:
             msg = f'Failed to find event "{arg}".'
@@ -58,7 +59,7 @@ class Event(commands.Cog):
 
         def generator(n):
             nonlocal current_id
-            new_event = masters.events.get(current_id + n, ctx)
+            new_event = self.bot.asset_filters.events.get(current_id + n, ctx)
             if new_event:
                 current_id = new_event.id
                 return self.get_event_embed(new_event)
@@ -151,7 +152,7 @@ class Event(commands.Cog):
                       description='Displays the time left in the current event',
                       help='!timeleft')
     async def time_left(self, ctx: commands.Context):
-        latest = get_latest_event(ctx)
+        latest = self.bot.asset_filters.events.get_latest_event(ctx)
 
         state = latest.state()
 
@@ -214,7 +215,7 @@ class Event(commands.Cog):
             async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
                 leaderboard = await resp.json(encoding='utf-8')
 
-        latest = get_latest_event(ctx)
+        latest = self.bot.asset_filters.events.get_latest_event(ctx)
         logo = discord.File(latest.logo_path, filename='logo.png')
         embed = discord.Embed(title=f'{latest.name} t20').set_thumbnail(url=f'attachment://logo.png')
         max_points_digits = len(str(leaderboard[0]['points']))

@@ -1,11 +1,9 @@
-import hashlib
 import shutil
 from pathlib import Path
 
 from d4dj_utils.manager.asset_manager import AssetManager
-from d4dj_utils.master.master_asset import MasterAsset
 
-from miyu_bot.commands.common.master_asset_manager import MasterFilterManager, hash_master
+from miyu_bot.bot.master_asset_manager import hash_master
 
 
 def main():

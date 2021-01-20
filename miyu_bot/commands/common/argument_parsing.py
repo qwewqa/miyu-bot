@@ -1,10 +1,10 @@
 import re
 
-# https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
-# https://stackoverflow.com/questions/21105360/regex-find-comma-not-inside-quotes
 from collections import namedtuple
 from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, Iterable
 
+# https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
+# https://stackoverflow.com/questions/21105360/regex-find-comma-not-inside-quotes
 # The ` ?` is just so it matches the space after during the replace with blank so there's no double spaces
 _param_re = re.compile(
     r'(([a-zA-Z]+)(!=|>=|<=|>|<|==|=)(("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+)(,("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+))*)) ?')

@@ -44,21 +44,21 @@ class MasterFilter:
         self.default_filter = FuzzyFilteredMap(filter_function)
         self.unrestricted_filter = FuzzyFilteredMap()
         for master in masters.values():
-            name = romanize(naming_function(master))
-            if fallback_naming_function and self.default_filter.has_exact_unprocessed(name):
+            name = naming_function(master)
+            if fallback_naming_function and self.default_filter.has_exact(name):
                 name = romanize(fallback_naming_function(master))
-                if self.default_filter.has_exact_unprocessed(name):
+                if self.default_filter.has_exact(name):
                     continue
-            elif self.default_filter.has_exact_unprocessed(name):
+            elif self.default_filter.has_exact(name):
                 continue
-            self.default_filter.set_unprocessed(name, master)
-            self.unrestricted_filter.set_unprocessed(name, master)
+            self.default_filter[name] = master
+            self.unrestricted_filter[name] = master
         if aliases:
             for alias, mid in aliases.items():
                 master = masters[mid]
                 alias = romanize(alias)
-                self.default_filter.set_unprocessed(alias, master)
-                self.unrestricted_filter.set_unprocessed(alias, master)
+                self.default_filter.alias(alias, master)
+                self.unrestricted_filter.alias(alias, master)
 
     def get(self, name_or_id: Union[str, int], ctx: Optional[commands.Context]):
         if ctx and ctx.channel.id in no_filter_channels:

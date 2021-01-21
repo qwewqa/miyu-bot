@@ -42,24 +42,22 @@ class FuzzyFilteredMap:
     def has_exact(self, key):
         return romanize(key) in self._values
 
-    def has_exact_unprocessed(self, key):
-        return key in self._values
-
     def __delitem__(self, key):
         k = romanize(key)
         self._values.__delitem__(k)
         self._stale = True
 
     def __setitem__(self, key, value):
-        self.set_unprocessed(romanize(key), value)
-
-    def set_unprocessed(self, key, value):
+        key = romanize(key)
         self._values[key] = value
         new_cutoff = math.ceil(len(key) * 1.1)
         if new_cutoff > self.length_cutoff:
             self.length_cutoff = new_cutoff
             self.matcher.set_max_length(new_cutoff)
         self._stale = True
+
+    def alias(self, key, value):
+        self[key] = _Alias(value)
 
     def __getitem__(self, key):
         start_time = timeit.default_timer()
@@ -73,6 +71,8 @@ class FuzzyFilteredMap:
                          ((matcher.score(key, item[0]), item) for item in self.filtered_items)
                          if score <= 0)[1][1]
             self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
+            if isinstance(result, _Alias):
+                return result.value
             return result
         except ValueError:
             self.logger.info(f'Found no results for key "{key}" in time {timeit.default_timer() - start_time}.')
@@ -84,12 +84,24 @@ class FuzzyFilteredMap:
             self.logger.debug(f'Rejected key "{key}" due to length.')
             return []
         key = romanize(key)
-        values = [item[1] for score, item in
+        values = [item[1].value if isinstance(item[1], _Alias) else item[1] for score, item in
                   sorted(
                       (self.matcher.score(key, item[0]), item) for item in self.filtered_items)
                   if score <= 0]
+        seen = set()
+        unique = []
+        for value in values:
+            if id(value) in seen:
+                continue
+            unique.append(value)
+            seen.add(id(value))
         self.logger.info(f'Searched key "{key}" in time {timeit.default_timer() - start_time}.')
-        return values
+        return unique
+
+
+class _Alias:
+    def __init__(self, value):
+        self.value = value
 
 
 class FuzzyDictValuesView:
@@ -100,7 +112,7 @@ class FuzzyDictValuesView:
         return item in self._map._values.values() and self._map.filter(item)
 
     def __iter__(self):
-        yield from (v for _, v in self._map.filtered_items)
+        yield from (v for _, v in self._map.filtered_items if not isinstance(v, _Alias))
 
 
 @dataclass

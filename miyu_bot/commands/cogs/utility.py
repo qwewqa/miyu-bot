@@ -23,6 +23,11 @@ class Utility(commands.Cog):
     async def similarity_score(self, ctx: commands.Context, source: str, target: str):
         await ctx.send(str(FuzzyMatcher().score(romanize(source), romanize(target))))
 
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def shutdown(self, ctx: commands.Context):
+        await self.bot.logout()
+
     @commands.command(name='invite',
                       aliases=[],
                       description='Sends the bot invite.',

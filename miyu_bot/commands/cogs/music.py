@@ -336,7 +336,7 @@ class Music(commands.Cog):
 
         difficulty = ChartDifficulty.Expert
         if len(split_args) >= 2:
-            final_word = split_args[-1]
+            final_word = split_args[-1].lower()
             if final_word in self.difficulty_names:
                 difficulty = self.difficulty_names[final_word]
                 arg = ''.join(split_args[:-1])

@@ -9,7 +9,7 @@ from miyu_bot.bot.master_asset_manager import hash_master
 
 
 def _get_asset_path(master, parent, path):
-    return Path(parent) / f'{path.stem}_{hash_master(master)}{path.suffix}'
+    return str((Path(parent) / f'{path.stem}_{hash_master(master)}{path.suffix}').as_posix())
 
 
 music_dir = Path('.') / 'music'

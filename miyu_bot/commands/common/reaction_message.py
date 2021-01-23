@@ -10,8 +10,6 @@ AnyEmoji = Union[str, Emoji]
 
 async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[Embed], files=None, starting_index=0,
                              timeout=300):
-    if not files:
-        files = []
     if len(emojis) != len(embeds):
         raise ValueError('Emojis and embeds must have the same number of elements.')
 

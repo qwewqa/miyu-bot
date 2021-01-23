@@ -12,6 +12,7 @@ from pytz import UnknownTimeZoneError
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError
+from miyu_bot.commands.common.asset_paths import get_event_logo_path
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
@@ -85,10 +86,7 @@ class Event(commands.Cog):
     def get_event_embed(self, event, timezone):
         embed = discord.Embed(title=event.name)
 
-        event_hash = hash_master(event)
-        event_logo_path = event.logo_path
-        embed.set_thumbnail(
-            url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
+        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
 
         duration_hour_part = round((event.duration.seconds / 3600), 2)
         duration_hour_part = duration_hour_part if not duration_hour_part.is_integer() else int(duration_hour_part)
@@ -178,10 +176,7 @@ class Event(commands.Cog):
 
         embed = discord.Embed(title=event.name)
 
-        event_hash = hash_master(event)
-        event_logo_path = event.logo_path
-        embed.set_thumbnail(
-            url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
+        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
 
         progress = None
 
@@ -238,12 +233,9 @@ class Event(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
                 leaderboard = await resp.json(encoding='utf-8')
-
         event = self.bot.asset_filters.events.get_latest_event(ctx)
-        event_hash = hash_master(event)
-        event_logo_path = event.logo_path
-        embed = discord.Embed(title=f'{event.name} t20').set_thumbnail(
-            url=f'https://qwewqa.github.io/d4dj-dumps/events/logos/{event_logo_path.stem}_{event_hash}{event_logo_path.suffix}')
+        embed = discord.Embed(title=f'{event.name} t20')
+        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
         max_points_digits = len(str(leaderboard[0]['points']))
         nl = "\n"
         update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)

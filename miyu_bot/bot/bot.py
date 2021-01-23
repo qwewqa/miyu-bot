@@ -10,6 +10,8 @@ class D4DJBot(commands.Bot):
     asset_filters: MasterFilterManager
     aliases: NameAliases
 
+    asset_url = 'https://qwewqa.github.io/d4dj-dumps/'
+
     def __init__(self, assets, asset_filters, *args, **kwargs):
         self.assets = assets
         self.asset_filters = asset_filters

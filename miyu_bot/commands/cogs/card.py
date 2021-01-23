@@ -10,6 +10,7 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError
+from miyu_bot.commands.common.asset_paths import get_card_icon_path, get_card_art_path
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
     unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id
 from miyu_bot.commands.common.formatting import format_info
@@ -173,11 +174,8 @@ class Card(commands.Cog):
     def get_card_embed(self, card: CardMaster, limit_break):
         embed = discord.Embed(title=self.format_card_name(card))
 
-        card_hash = hash_master(card)
-        icon_path = card.icon_path(limit_break)
-        thumb_url = f'https://qwewqa.github.io/d4dj-dumps/cards/icons/{icon_path.stem}_{card_hash}{icon_path.suffix}'
-        art_path = card.art_path(limit_break)
-        art_url = f'https://qwewqa.github.io/d4dj-dumps/cards/art/{art_path.stem}_{card_hash}{art_path.suffix}'
+        thumb_url = self.bot.asset_url + get_card_icon_path(card, limit_break)
+        art_url = self.bot.asset_url + get_card_art_path(card, limit_break)
 
         embed.set_thumbnail(url=thumb_url)
         embed.set_image(url=art_url)

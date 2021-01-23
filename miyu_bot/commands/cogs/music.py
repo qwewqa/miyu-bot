@@ -14,10 +14,10 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError, list_operator_for
+from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
 
 
@@ -63,14 +63,8 @@ class Music(commands.Cog):
             return
         self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
-        try:
-            thumb = discord.File(song.jacket_path, filename='jacket.png')
-        except FileNotFoundError:
-            # Just a fallback
-            thumb = discord.File(self.bot.assets.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
-
         embed = discord.Embed(title=song.name)
-        embed.set_thumbnail(url=f'attachment://jacket.png')
+        embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
 
         artist_info = {
             'Lyricist': song.lyricist,
@@ -97,7 +91,7 @@ class Music(commands.Cog):
                         value=format_info(music_info),
                         inline=False)
 
-        await ctx.send(files=[thumb], embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(name='chart',
                       aliases=[],
@@ -116,10 +110,10 @@ class Music(commands.Cog):
             return
         self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
-        embeds, files = self.get_chart_embed_info(song)
+        embeds = self.get_chart_embeds(song)
 
         # Difficulty enum easy-expert are 1-4, one more than the embed index
-        asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, files, difficulty - 1))
+        asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, None, difficulty - 1))
 
     @commands.command(name='sections',
                       aliases=['mixes'],
@@ -143,9 +137,9 @@ class Music(commands.Cog):
             return
         self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
-        embeds, files = self.get_mix_embed_info(song)
+        embeds = self.get_mix_embeds(song)
 
-        asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, files, difficulty - 1))
+        asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, None, difficulty - 1))
 
     @commands.command(name='songs',
                       aliases=['songsearch', 'song_search'],
@@ -224,27 +218,14 @@ class Music(commands.Cog):
         embed = discord.Embed(title=f'Song Search "{arg}"' if arg else 'Songs')
         asyncio.ensure_future(run_paged_message(ctx, embed, listing))
 
-    def get_chart_embed_info(self, song):
+    def get_chart_embeds(self, song):
         embeds = []
-
-        try:
-            thumb = discord.File(song.jacket_path, filename='jacket.png')
-        except FileNotFoundError:
-            # fallback
-            thumb = discord.File(self.bot.assets.path / 'ondemand/stamp/stamp_10006.png', filename='jacket.png')
-
-        files = [thumb]
 
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart = song.charts[difficulty]
-            chart_hash = hash_master(chart)
-            chart_path = chart.image_path
             embed = discord.Embed(title=f'{song.name} [{chart.difficulty.name}]')
-            embed.set_thumbnail(url=f'attachment://jacket.png')
-            embed.set_image(
-                url=f'https://qwewqa.github.io/d4dj-dumps/music/charts/{chart_path.stem}_{chart_hash}{chart_path.suffix}'
-            )
-
+            embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
+            embed.set_image(url=self.bot.asset_url + get_chart_image_path(chart))
             chart_data = chart.load_chart_data()
             note_counts = chart_data.get_note_counts()
 
@@ -274,21 +255,16 @@ class Music(commands.Cog):
 
             embeds.append(embed)
 
-        return embeds, files
+        return embeds
 
-    def get_mix_embed_info(self, song):
+    def get_mix_embeds(self, song):
         embeds = []
-        files = [discord.File(song.jacket_path, filename=f'jacket.png')]
 
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart: ChartMaster = song.charts[difficulty]
-            chart_hash = hash_master(chart)
-            mix_path = chart.mix_path
             embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]')
-            embed.set_thumbnail(url=f'attachment://jacket.png')
-            embed.set_image(
-                url=f'https://qwewqa.github.io/d4dj-dumps/music/charts/{mix_path.stem}_{chart_hash}{mix_path.suffix}'
-            )
+            embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
+            embed.set_image(url=self.bot.asset_url + get_chart_image_path(chart))
 
             note_counts = chart.note_counts
             mix_info = chart.mix_info
@@ -329,7 +305,7 @@ class Music(commands.Cog):
 
             embeds.append(embed)
 
-        return embeds, files
+        return embeds
 
     def parse_chart_args(self, arg: str) -> Tuple[str, ChartDifficulty]:
         split_args = arg.split()

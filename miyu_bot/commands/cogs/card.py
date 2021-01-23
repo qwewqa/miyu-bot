@@ -124,7 +124,8 @@ class Card(commands.Cog):
         display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                       converter=card_attribute_aliases)
         characters = {self.bot.aliases.characters_by_name[c].id
-                      for c in arguments.words(self.bot.aliases.characters_by_name.keys())}
+                      for c in arguments.words(self.bot.aliases.characters_by_name.keys()) |
+                      arguments.tags(self.bot.aliases.characters_by_name.keys())}
         units = {self.bot.aliases.units_by_name[unit].id
                  for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
                                             aliases=self.bot.aliases.unit_aliases)}

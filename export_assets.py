@@ -4,6 +4,7 @@ from pathlib import Path
 from d4dj_utils.manager.asset_manager import AssetManager
 
 from miyu_bot.bot.master_asset_manager import hash_master
+from miyu_bot.commands.common.asset_paths import *
 
 
 def main():
@@ -12,54 +13,38 @@ def main():
 
     asset_manager = AssetManager('assets')
 
-    music_dir = target_dir / 'music'
-    chart_dir = music_dir / 'charts'
-    card_dir = target_dir / 'cards'
-    card_icon_dir = card_dir / 'icons'
-    card_art_dir = card_dir / 'art'
-    event_dir = target_dir / 'events'
-    event_logo_dir = event_dir / 'logos'
-
-    music_dir.mkdir(exist_ok=True)
-    chart_dir.mkdir(exist_ok=True)
-    card_dir.mkdir(exist_ok=True)
-    card_icon_dir.mkdir(exist_ok=True)
-    card_art_dir.mkdir(exist_ok=True)
-    event_dir.mkdir(exist_ok=True)
-    event_logo_dir.mkdir(exist_ok=True)
+    (target_dir / music_dir).mkdir(exist_ok=True)
+    (target_dir / chart_dir).mkdir(exist_ok=True)
+    (target_dir / jacket_dir).mkdir(exist_ok=True)
+    (target_dir / card_dir).mkdir(exist_ok=True)
+    (target_dir / card_icon_dir).mkdir(exist_ok=True)
+    (target_dir / card_art_dir).mkdir(exist_ok=True)
+    (target_dir / event_dir).mkdir(exist_ok=True)
+    (target_dir / event_logo_dir).mkdir(exist_ok=True)
 
     for music in asset_manager.music_master.values():
+        try:
+            shutil.copy(music.jacket_path, target_dir / get_music_jacket_path(music))
+        except FileNotFoundError:
+            pass
         for chart in music.charts.values():
             try:
-                chart_hash = hash_master(chart)
-                chart_path = chart.image_path
-                target_path = chart_dir / f'{chart_path.stem}_{chart_hash}{chart_path.suffix}'
-                shutil.copy(chart_path, target_path)
-                mix_path = chart.mix_path
-                target_path = chart_dir / f'{mix_path.stem}_{chart_hash}{mix_path.suffix}'
-                shutil.copy(mix_path, target_path)
+                shutil.copy(chart.image_path, target_dir / get_chart_image_path(chart))
+                shutil.copy(chart.image_path, target_dir / get_chart_mix_path(chart))
             except FileNotFoundError:
                 pass
 
     for card in asset_manager.card_master.values():
-        card_hash = hash_master(card)
         try:
             for lb in range(2):
-                art_path = card.art_path(lb)
-                art_target = card_art_dir / f'{art_path.stem}_{card_hash}{art_path.suffix}'
-                icon_path = card.icon_path(lb)
-                icon_target = card_icon_dir / f'{icon_path.stem}_{card_hash}{icon_path.suffix}'
-                shutil.copy(art_path, art_target)
-                shutil.copy(icon_path, icon_target)
+                shutil.copy(card.art_path(lb), target_dir / get_card_art_path(card, lb))
+                shutil.copy(card.icon_path(lb), target_dir / get_card_icon_path(card, lb))
         except FileNotFoundError:
             pass
 
     for event in asset_manager.event_master.values():
         try:
-            event_hash = hash_master(event)
-            logo_path = event.logo_path
-            logo_target = event_logo_dir / f'{logo_path.stem}_{event_hash}{logo_path.suffix}'
-            shutil.copy(logo_path, logo_target)
+            shutil.copy(event.logo_path, target_dir / get_event_logo_path(event))
         except FileNotFoundError:
             pass
 

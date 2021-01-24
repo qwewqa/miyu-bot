@@ -15,7 +15,7 @@ async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[
 
     message = await ctx.send(files=files, embed=embeds[starting_index])
 
-    async def callback(emoji, _ctx, _message):
+    async def callback(emoji):
         await message.edit(embed=embeds[emojis.index(emoji)])
 
     await run_reaction_message(ctx, message, emojis, callback, timeout)
@@ -28,7 +28,7 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
 
     message = await ctx.send(embed=embed_generator(0))
 
-    async def callback(emoji, _ctx, _message):
+    async def callback(emoji):
         if emoji == left_arrow:
             new_embed = embed_generator(-1)
         elif emoji == right_arrow:
@@ -94,7 +94,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
         index = 0
 
-        async def callback(emoji, _ctx, _message):
+        async def callback(emoji):
             nonlocal index
             start_index = index
             if emoji == double_left_arrow:
@@ -114,7 +114,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
 
 async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyEmoji],
-                               callback: Callable[[AnyEmoji, Context, Message], Awaitable[None]], timeout=300):
+                               callback: Callable[[AnyEmoji], Awaitable[None]], timeout=300):
     for emoji in emojis:
         await message.add_reaction(emoji)
 
@@ -124,7 +124,7 @@ async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyE
     while True:
         try:
             reaction, user = await ctx.bot.wait_for('reaction_add', timeout=timeout, check=check)
-            await callback(reaction.emoji, ctx, message)
+            await callback(reaction.emoji)
             await message.remove_reaction(reaction, user)
         except asyncio.TimeoutError:
             for emoji in emojis:

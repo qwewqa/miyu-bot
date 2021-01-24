@@ -58,7 +58,7 @@ class Card(commands.Cog):
             index = 0
             limit_break = 1
 
-            async def callback(emoji, _ctx, _message):
+            async def callback(emoji):
                 nonlocal index
                 nonlocal limit_break
                 try:

@@ -9,12 +9,11 @@ from d4dj_utils.master.skill_master import SkillMaster
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError
+from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError, list_operator_for
 from miyu_bot.commands.common.asset_paths import get_card_icon_path, get_card_art_path
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
     unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message
 
 
@@ -134,6 +133,8 @@ class Card(commands.Cog):
         attributes = {self.bot.aliases.attributes_by_name[a].id
                       for a in arguments.tags(self.bot.aliases.attributes_by_name.keys())}
         birthday = arguments.tag('birthday') | arguments.word('birthday')
+        score_up_filters = arguments.repeatable(['skill', 'score_up', 'score'], is_list=True, numeric=True)
+        heal_filters = arguments.repeatable(['heal', 'recovery'], is_list=True, numeric=True)
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 
@@ -158,7 +159,7 @@ class Card(commands.Cog):
         if not (arguments.text() and sort is None):
             sort = sort or CardAttribute.Power
             cards = sorted(cards, key=lambda c: (sort.get_sort_key_from_card(c), c.max_power_with_limit_break))
-            if sort in [CardAttribute.Power, CardAttribute.Date, CardAttribute.ScoreUp]:
+            if sort in [CardAttribute.Power, CardAttribute.Date, CardAttribute.ScoreUp, CardAttribute.Heal]:
                 cards = cards[::-1]
             if reverse_sort:
                 cards = cards[::-1]
@@ -173,6 +174,13 @@ class Card(commands.Cog):
             cards = [card for card in cards if card.attribute.id in attributes]
         if birthday:
             cards = [card for card in cards if card.name == 'Birthday']
+
+        for value, operation in score_up_filters:
+            operator = list_operator_for(operation)
+            cards = [card for card in cards if operator(card.skill.score_up_rate, value)]
+        for value, operation in heal_filters:
+            operator = list_operator_for(operation)
+            cards = [card for card in cards if operator(card.skill.max_recovery_value, value)]
 
         return cards
 
@@ -231,6 +239,7 @@ class CardAttribute(enum.Enum):
     Power = enum.auto()
     Date = enum.auto()
     ScoreUp = enum.auto()
+    Heal = enum.auto()
 
     def get_sort_key_from_card(self, card: CardMaster):
         return {
@@ -239,6 +248,7 @@ class CardAttribute(enum.Enum):
             self.Power: card.max_power_with_limit_break,
             self.Date: card.start_datetime,
             self.ScoreUp: card.skill.score_up_rate,
+            self.Heal: card.skill.max_recovery_value,
         }[self]
 
     def get_formatted_from_card(self, card: CardMaster):
@@ -247,8 +257,13 @@ class CardAttribute(enum.Enum):
             self.Id: str(card.id).zfill(9),
             self.Power: str(card.max_power_with_limit_break).rjust(5),
             self.Date: str(card.start_datetime.date()),
-            self.ScoreUp: f'{card.skill.score_up_rate}%',
+            self.ScoreUp: self.format_skill(card.skill),
+            self.Heal: self.format_skill(card.skill),
         }[self]
+
+    @staticmethod
+    def format_skill(skill):
+        return f'{str(skill.score_up_rate).rjust(2)}%,{str(skill.max_recovery_value).rjust(3)}hp'
 
 
 card_attribute_aliases = {
@@ -259,6 +274,9 @@ card_attribute_aliases = {
     'date': CardAttribute.Date,
     'skill': CardAttribute.ScoreUp,
     'score_up': CardAttribute.ScoreUp,
+    'scoreup': CardAttribute.ScoreUp,
+    'heal': CardAttribute.Heal,
+    'recovery': CardAttribute.Heal,
 }
 
 

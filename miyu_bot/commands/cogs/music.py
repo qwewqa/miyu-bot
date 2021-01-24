@@ -18,7 +18,7 @@ from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message
+from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message, run_deletable_message
 
 
 class Music(commands.Cog):
@@ -91,7 +91,8 @@ class Music(commands.Cog):
                         value=format_info(music_info),
                         inline=False)
 
-        await ctx.send(embed=embed)
+        message = await ctx.send(embed=embed)
+        await run_deletable_message(ctx, message)
 
     @commands.command(name='chart',
                       aliases=[],

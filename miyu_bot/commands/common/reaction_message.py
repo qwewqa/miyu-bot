@@ -113,8 +113,17 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         await run_reaction_message(ctx, message, arrows, callback, timeout)
 
 
+async def run_deletable_message(ctx: Context, message: Message, timeout=300):
+    await run_reaction_message(ctx, message, [], _noop, timeout=timeout)
+
+
+async def _noop(n):
+    return None
+
+
 async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyEmoji],
                                callback: Callable[[AnyEmoji], Awaitable[None]], timeout=300):
+    emojis.append('❎')
     for emoji in emojis:
         await message.add_reaction(emoji)
 
@@ -124,6 +133,9 @@ async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyE
     while True:
         try:
             reaction, user = await ctx.bot.wait_for('reaction_add', timeout=timeout, check=check)
+            if reaction.emoji == '❎':
+                await message.delete()
+                return
             await callback(reaction.emoji)
             await message.remove_reaction(reaction, user)
         except asyncio.TimeoutError:

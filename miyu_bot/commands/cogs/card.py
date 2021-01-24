@@ -157,7 +157,7 @@ class Card(commands.Cog):
         if not (arguments.text() and sort is None):
             sort = sort or CardAttribute.Power
             cards = sorted(cards, key=lambda c: (sort.get_sort_key_from_card(c), c.max_power_with_limit_break))
-            if sort in [CardAttribute.Power, CardAttribute.Date]:
+            if sort in [CardAttribute.Power, CardAttribute.Date, CardAttribute.ScoreUp]:
                 cards = cards[::-1]
             if reverse_sort:
                 cards = cards[::-1]
@@ -226,6 +226,7 @@ class CardAttribute(enum.Enum):
     Id = enum.auto()
     Power = enum.auto()
     Date = enum.auto()
+    ScoreUp = enum.auto()
 
     def get_sort_key_from_card(self, card: CardMaster):
         return {
@@ -233,6 +234,7 @@ class CardAttribute(enum.Enum):
             self.Id: card.id,
             self.Power: card.max_power_with_limit_break,
             self.Date: card.start_datetime,
+            self.ScoreUp: card.skill.score_up_rate,
         }[self]
 
     def get_formatted_from_card(self, card: CardMaster):
@@ -241,6 +243,7 @@ class CardAttribute(enum.Enum):
             self.Id: str(card.id).zfill(9),
             self.Power: str(card.max_power_with_limit_break).rjust(5),
             self.Date: str(card.start_datetime.date()),
+            self.ScoreUp: f'{card.skill.score_up_rate}%',
         }[self]
 
 
@@ -250,6 +253,8 @@ card_attribute_aliases = {
     'power': CardAttribute.Power,
     'stats': CardAttribute.Power,
     'date': CardAttribute.Date,
+    'skill': CardAttribute.ScoreUp,
+    'score_up': CardAttribute.ScoreUp,
 }
 
 

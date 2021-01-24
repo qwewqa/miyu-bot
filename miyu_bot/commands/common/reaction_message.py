@@ -52,7 +52,8 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
     if not content:
         embed = base_embed.copy().set_footer(text='Page 0/0')
-        await ctx.send(embed=embed)
+        message = await ctx.send(embed=embed)
+        await run_deletable_message(ctx, message, timeout)
         return
 
     page_contents = [content[i:i + page_size] for i in range(0, len(content), page_size)]
@@ -76,7 +77,8 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         for i, page in enumerate(page_contents)]
 
     if len(embeds) == 1:
-        await ctx.send(embed=embeds[0])
+        message = await ctx.send(embed=embeds[0])
+        await run_deletable_message(ctx, message, timeout)
         return
 
     if len(embeds) <= max_tabbed_pages:

@@ -133,6 +133,7 @@ class Card(commands.Cog):
         rarities = {int(r[0]) for r in arguments.words(rarity_names) | arguments.tags(rarity_names)}
         attributes = {self.bot.aliases.attributes_by_name[a].id
                       for a in arguments.tags(self.bot.aliases.attributes_by_name.keys())}
+        birthday = arguments.tag('birthday') | arguments.word('birthday')
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 
@@ -161,6 +162,7 @@ class Card(commands.Cog):
                 cards = cards[::-1]
             if reverse_sort:
                 cards = cards[::-1]
+
         if characters:
             cards = [card for card in cards if card.character.id in characters]
         if units:
@@ -169,6 +171,8 @@ class Card(commands.Cog):
             cards = [card for card in cards if card.rarity_id in rarities]
         if attributes:
             cards = [card for card in cards if card.attribute.id in attributes]
+        if birthday:
+            cards = [card for card in cards if card.name == 'Birthday']
 
         return cards
 

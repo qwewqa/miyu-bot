@@ -9,7 +9,7 @@ AnyEmoji = Union[str, Emoji]
 
 
 async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[Embed], files=None, starting_index=0,
-                             timeout=300):
+                             timeout=600):
     if len(emojis) != len(embeds):
         raise ValueError('Emojis and embeds must have the same number of elements.')
 
@@ -21,7 +21,7 @@ async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[
     await run_reaction_message(ctx, message, emojis, callback, timeout)
 
 
-async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[[int], discord.Embed], timeout=300):
+async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[[int], discord.Embed], timeout=600):
     left_arrow = '◀'
     right_arrow = '▶'
     arrows = [left_arrow, right_arrow]
@@ -43,7 +43,7 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
 
 
 async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
-                            header='', numbered: bool = True, timeout=300, max_tabbed_pages=4, files=None):
+                            header='', numbered: bool = True, timeout=600, max_tabbed_pages=4, files=None):
     if header:
         header = f'`{header}`\n'
 
@@ -115,7 +115,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         await run_reaction_message(ctx, message, arrows, callback, timeout)
 
 
-async def run_deletable_message(ctx: Context, message: Message, timeout=300):
+async def run_deletable_message(ctx: Context, message: Message, timeout=600):
     await run_reaction_message(ctx, message, [], _noop, timeout=timeout)
 
 
@@ -124,7 +124,7 @@ async def _noop(n):
 
 
 async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyEmoji],
-                               callback: Callable[[AnyEmoji], Awaitable[None]], timeout=300):
+                               callback: Callable[[AnyEmoji], Awaitable[None]], timeout=600):
     emojis.append('❎')
     for emoji in emojis:
         await message.add_reaction(emoji)

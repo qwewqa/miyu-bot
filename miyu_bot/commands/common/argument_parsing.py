@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, I
 # The ` ?` is just so it matches the space after during the replace with blank so there's no double spaces
 
 _param_re = re.compile(
-    r'(([a-zA-Z]+)(!=|>=|<=|>|<|==|=)(("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+)(,("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+))*)) ?')
+    r'(([a-zA-Z_+/.\-]+)(!=|>=|<=|>|<|==|=)(("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+)(,("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+))*)) ?')
 # The intention of having both = and == is that they might have different behavior.
 # What that means depends on the usage.
 _param_operator_re = re.compile(r'!=|==|=|>|<|>=|<=')
@@ -235,10 +235,3 @@ def operator_for(operator: str):
 
 def list_operator_for(operator: str):
     return _list_operators[operator]
-
-
-if __name__ == '__main__':
-    a = (
-        parse_arguments(
-            r'sort=default dff f word1 word2 word3 rating>=13.5,$asd a fds $foo $bar name="a",b," asf,ds ",\'sdf\',dsf $foobar'))
-    print(a)

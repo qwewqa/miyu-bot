@@ -1,4 +1,5 @@
 import logging
+import textwrap
 
 from discord.ext import commands
 
@@ -30,7 +31,7 @@ class Utility(commands.Cog):
 
     @commands.command(name='eval', hidden=True)
     @commands.is_owner()
-    async def eval_cmd(self, ctx, *, body: str):
+    async def eval_cmd(self, ctx: commands.Context, *, body: str):
         env = {
             'bot': self.bot,
             'ctx': ctx,
@@ -44,6 +45,38 @@ class Utility(commands.Cog):
 
         try:
             value = eval(body, env)
+            if value:
+                await ctx.send(str(value))
+            else:
+                await ctx.send('Done')
+        except Exception as e:
+            await ctx.send(f'```{e.__class__.__name__}: {e}\n```')
+
+    @commands.command(name='exec', hidden=True)
+    @commands.is_owner()
+    async def exec_cmd(self, ctx: commands.Context, *, body: str):
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'assets': self.bot.assets,
+            'asset_filters': self.bot.asset_filters,
+            **globals(),
+        }
+
+        if body and body[:9] == '```python' and body[-3:] == '```':
+            body = body[9:-3]
+        if body and body[:3] == '```' and body[-3:] == '```':
+            body = body[3:-3]
+        if body and body[:1] == '`' and body[-1:] == '`':
+            body = body[1:-1]
+
+        body = 'async def f():\n' + textwrap.indent(body, '  ')
+        l = locals()
+        exec(body, env, l)
+        f = l['f']
+
+        try:
+            value = await f()
             if value:
                 await ctx.send(str(value))
             else:

@@ -55,10 +55,13 @@ class MasterFilter:
             self.unrestricted_filter[name] = master
         if aliases:
             for alias, mid in aliases.items():
-                master = masters[mid]
-                alias = romanize(alias)
-                self.default_filter[alias] = master
-                self.unrestricted_filter[alias] = master
+                self.add_alias(alias, mid)
+
+    def add_alias(self, alias, master_id):
+        master = self.masters[master_id]
+        alias = romanize(alias)
+        self.default_filter[alias] = master
+        self.unrestricted_filter[alias] = master
 
     def get(self, name_or_id: Union[str, int], ctx: Optional[commands.Context]):
         if ctx and ctx.channel.id in no_filter_channels:

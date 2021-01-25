@@ -28,12 +28,36 @@ class Utility(commands.Cog):
     async def shutdown(self, ctx: commands.Context):
         await self.bot.logout()
 
+    @commands.command(name='eval', hidden=True)
+    @commands.is_owner()
+    async def eval_cmd(self, ctx, *, body: str):
+        env = {
+            'bot': self.bot,
+            'ctx': ctx,
+            'assets': self.bot.assets,
+            'asset_filters': self.bot.asset_filters,
+            **globals(),
+        }
+
+        if body and body[0] == '`' and body[-1] == '`':
+            body = body[1:-1]
+
+        try:
+            value = eval(body, env)
+            if value:
+                await ctx.send(str(value))
+            else:
+                await ctx.send('Done')
+        except Exception as e:
+            await ctx.send(f'```{e.__class__.__name__}: {e}\n```')
+
     @commands.command(name='invite',
                       aliases=[],
                       description='Sends the bot invite.',
                       help='!invite')
     async def invite(self, ctx: commands.Context):
-        await ctx.send('https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=388160&scope=bot')
+        await ctx.send(
+            'https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=388160&scope=bot')
 
 
 def setup(bot):

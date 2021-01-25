@@ -235,6 +235,7 @@ class Card(commands.Cog):
 
 class CardAttribute(enum.Enum):
     Name = enum.auto()
+    Character = enum.auto()
     Id = enum.auto()
     Power = enum.auto()
     Date = enum.auto()
@@ -243,7 +244,8 @@ class CardAttribute(enum.Enum):
 
     def get_sort_key_from_card(self, card: CardMaster):
         return {
-            self.Name: card.name,
+            self.Name: None,
+            self.Character: card.character_id,
             self.Id: card.id,
             self.Power: card.max_power_with_limit_break,
             self.Date: card.start_datetime,
@@ -254,6 +256,7 @@ class CardAttribute(enum.Enum):
     def get_formatted_from_card(self, card: CardMaster):
         return {
             self.Name: None,
+            self.Character: None,
             self.Id: str(card.id).zfill(9),
             self.Power: str(card.max_power_with_limit_break).rjust(5),
             self.Date: str(card.start_datetime.date()),
@@ -268,6 +271,8 @@ class CardAttribute(enum.Enum):
 
 card_attribute_aliases = {
     'name': CardAttribute.Name,
+    'character': CardAttribute.Character,
+    'char': CardAttribute.Character,
     'id': CardAttribute.Id,
     'power': CardAttribute.Power,
     'stats': CardAttribute.Power,

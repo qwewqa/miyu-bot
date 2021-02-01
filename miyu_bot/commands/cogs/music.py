@@ -14,7 +14,7 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError, list_operator_for
-from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path
+from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path, get_chart_mix_path
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
@@ -265,7 +265,7 @@ class Music(commands.Cog):
             chart: ChartMaster = song.charts[difficulty]
             embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]')
             embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
-            embed.set_image(url=self.bot.asset_url + get_chart_image_path(chart))
+            embed.set_image(url=self.bot.asset_url + get_chart_mix_path(chart))
 
             note_counts = chart.note_counts
             mix_info = chart.mix_info

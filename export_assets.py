@@ -30,7 +30,7 @@ def main():
         for chart in music.charts.values():
             try:
                 shutil.copy(chart.image_path, target_dir / get_chart_image_path(chart))
-                shutil.copy(chart.image_path, target_dir / get_chart_mix_path(chart))
+                shutil.copy(chart.mix_path, target_dir / get_chart_mix_path(chart))
             except FileNotFoundError:
                 pass
 

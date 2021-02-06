@@ -1,6 +1,6 @@
 from functools import cached_property
 
-from d4dj_utils.manager.asset_manager import AssetManager
+from d4dj_utils.master.asset_manager import AssetManager
 
 
 class NameAliases:

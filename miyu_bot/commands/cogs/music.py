@@ -235,7 +235,8 @@ class Music(commands.Cog):
                                   f'Duration: {self.format_duration(self.get_music_duration(song))}\n'
                                   f'Unit: {song.special_unit_name or song.unit.name}\n'
                                   f'Category: {song.category.name}\n'
-                                  f'BPM: {song.bpm}',
+                                  f'BPM: {song.bpm}\n'
+                                  f'Designer: {chart.designer.name}',
                             inline=False)
             embed.add_field(name='Combo',
                             value=f'Max Combo: {chart.note_counts[ChartSectionType.Full].count}\n'

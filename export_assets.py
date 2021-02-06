@@ -1,9 +1,7 @@
 import shutil
-from pathlib import Path
 
-from d4dj_utils.manager.asset_manager import AssetManager
+from d4dj_utils.master.asset_manager import AssetManager
 
-from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.asset_paths import *
 
 

@@ -40,6 +40,8 @@ class Utility(commands.Cog):
             **globals(),
         }
 
+        self.bot.asset_filters.cards.default_filter
+
         if body and body[0] == '`' and body[-1] == '`':
             body = body[1:-1]
 

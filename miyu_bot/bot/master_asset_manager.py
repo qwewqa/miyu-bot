@@ -1,7 +1,7 @@
 import hashlib
 from typing import Callable, Any, Optional, Union
 
-from d4dj_utils.manager.asset_manager import AssetManager
+from d4dj_utils.master.asset_manager import AssetManager
 from d4dj_utils.master.event_master import EventMaster, EventState
 from d4dj_utils.master.master_asset import MasterDict, MasterAsset
 from discord.ext import commands

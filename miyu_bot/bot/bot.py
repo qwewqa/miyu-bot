@@ -1,4 +1,4 @@
-from d4dj_utils.manager.asset_manager import AssetManager
+from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
 
 from miyu_bot.bot.master_asset_manager import MasterFilterManager

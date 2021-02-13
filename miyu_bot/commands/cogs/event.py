@@ -246,6 +246,55 @@ class Event(commands.Cog):
             for player in leaderboard]
         paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, numbered=False)
         asyncio.ensure_future(paged)
+    validtiers = [50,100,500,1000,2000,5000,10000,20000,30000,50000]
+    async def get_tier_data(self, ctx: commands.Context):
+        async with aiohttp.ClientSession() as session:
+            async with session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+                leaderboard = await resp.json(encoding='utf-8')
+        def parse_tier_arg(tier_arg):
+            if tier_arg[0] == 't':
+                tier_arg = tier_arg[1:]
+            if tier_arg[-1] == 'k':
+                return str(round(1000 * float(tier_arg[:-1])))
+            return tier_arg
+        arg = parse_tier_arg(ctx.invoked_with)
+        event = self.bot.asset_filters.events.get_latest_event(ctx)
+        embed = discord.Embed(title=f'{event.name} t'+arg)
+        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        #max_points_digits = len(str(leaderboard[statistics]))
+        nl = "\n"
+        # update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)
+        # update_date = update_date.astimezone(pytz.timezone('Asia/Tokyo'))
+        # Muni-chan AWESOME!
+        header = f'------------'
+        if arg in leaderboard["statistics"]:
+            data = leaderboard["statistics"][arg]
+        else:
+            await ctx.send("No data available for top "+arg)
+            return
+        embed.add_field(name="Points",
+                        value=f'{data["points"]}',
+                        inline=True)
+        embed.add_field(name="Last Update",
+                        value=f'{data["lastUpdate"]}',
+                        inline=True)
+        embed.add_field(name="Current Estimate",
+                        value=f'{data["estimate"]}',
+                        inline=True)
+        embed.add_field(name="Final Prediction",
+                        value=f'{data["prediction"]}',
+                        inline=True)
+        embed.add_field(name="Rate",
+                        value=f'{data["rate"]} pts/hr',
+                        inline=True)
+        await ctx.send(embed=embed)
+    @commands.command(name='t50',
+                      aliases=['t100', 't500', 't1000', 't2000', 't5000', 't10000', 't20000', 't30000', 't50000',
+                      't1k','t2k','t5k','t10k','t20k','t30k','t50k'],
+                      description='Displays the cutoffs at different tiers. Valid tiers: '+str(validtiers),
+                      help='!t50   Valid tiers are: '+str(validtiers))
+    async def t(self, ctx: commands.Context):
+        await self.get_tier_data(ctx)
 
 
 def setup(bot):

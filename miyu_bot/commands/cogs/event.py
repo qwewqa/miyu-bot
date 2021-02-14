@@ -305,7 +305,7 @@ class Event(commands.Cog):
                         value=data['points'],
                         inline=True)
         embed.add_field(name='Last Update',
-                        value=data['lastUpdate'],
+                        value=data['lastUpdate'] or 'None',
                         inline=True)
         embed.add_field(name='Rate',
                         value=f'{data["rate"]} pts/hr',

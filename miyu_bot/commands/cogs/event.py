@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import datetime as dt
 import logging
 
@@ -182,39 +183,35 @@ class Event(commands.Cog):
 
         if state == EventState.Upcoming:
             time_delta_heading = 'Time Until Start'
-            time_delta = event.start_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.start_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'Start Date'
             date_value = event.start_datetime
         elif state == EventState.Open:
             time_delta_heading = 'Time Until Close'
-            time_delta = event.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
-            progress = 1 - (time_delta / (event.reception_close_datetime - event.start_datetime))
+            delta = event.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
+            progress = 1 - (delta / (event.reception_close_datetime - event.start_datetime))
             date_heading = 'Close Date'
             date_value = event.reception_close_datetime
         elif state in (EventState.Closing, EventState.Ranks_Fixed):
             time_delta_heading = 'Time Until Results'
-            time_delta = event.result_announcement_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.result_announcement_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'Results Date'
             date_value = event.result_announcement_datetime
         elif state == EventState.Results:
             time_delta_heading = 'Time Until End'
-            time_delta = event.end_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.end_datetime - dt.datetime.now(dt.timezone.utc)
             date_heading = 'End Date'
             date_value = event.end_datetime
         else:
             time_delta_heading = 'Time Since End'
-            time_delta = dt.datetime.now(dt.timezone.utc) - event.end_datetime
+            delta = dt.datetime.now(dt.timezone.utc) - event.end_datetime
             date_heading = 'End Date'
             date_value = event.end_datetime
 
         date_value = date_value.astimezone(timezone)
 
-        days = time_delta.days
-        hours, rem = divmod(time_delta.seconds, 3600)
-        minutes, seconds = divmod(rem, 60)
-
         embed.add_field(name=time_delta_heading,
-                        value=f'{days}d {hours}h {minutes}m',
+                        value=self.format_timedelta(delta),
                         inline=True)
         embed.add_field(name='Progress',
                         value=f'{round(progress * 100, 2)}%' if progress is not None else 'N/A',
@@ -224,6 +221,13 @@ class Event(commands.Cog):
                         inline=True)
 
         await ctx.send(embed=embed)
+
+    @staticmethod
+    def format_timedelta(delta: datetime.timedelta):
+        days = delta.days
+        hours, rem = divmod(delta.seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
+        return f'{days}d {hours}h {minutes}m'
 
     @commands.command(name='t20',
                       aliases=['top20', 'top_20'],
@@ -240,12 +244,88 @@ class Event(commands.Cog):
         nl = "\n"
         update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)
         update_date = update_date.astimezone(pytz.timezone('Asia/Tokyo'))
-        header = f'Updated {update_date}\n\nRank  {"Points".ljust(max_points_digits)}  Name'
+        header = f'Updated {update_date}\n\nRank  {"Points":<{max_points_digits}}  Name'
         listing = [
-            f'{str(player["rank"]).ljust(4)}  {str(player["points"]).ljust(max_points_digits)}  {player["name"].replace(nl, "")}'
+            f'{player["rank"]:<4}  {player["points"]:<{max_points_digits}}  {player["name"].replace(nl, "")}'
             for player in leaderboard]
         paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, numbered=False)
         asyncio.ensure_future(paged)
+
+    valid_tiers = {50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000}
+
+    @commands.command(name='cutoff',
+                      aliases=['co', 't50', 't100', 't500', 't1000', 't2000', 't5000',
+                               't10000', 't20000', 't30000', 't50000',
+                               't1k', 't2k', 't5k', 't10k', 't20k', 't30k', 't50k'],
+                      description=f'Displays the cutoffs at different tiers. Valid tiers: {str(valid_tiers)}',
+                      help='!cutoff 50')
+    async def cutoff(self, ctx: commands.Context, tier: str = ''):
+        def process_tier_arg(tier_arg):
+            if tier_arg[0] == 't':
+                tier_arg = tier_arg[1:]
+            if tier_arg[-1] == 'k':
+                return str(round(1000 * float(tier_arg[:-1])))
+            return tier_arg
+
+        if ctx.invoked_with in ['cutoff', 'co']:
+            tier = process_tier_arg(tier)
+            if not tier.isnumeric():
+                await ctx.send(f'Invalid tier: {tier}.')
+                return
+        else:
+            tier = process_tier_arg(ctx.invoked_with)
+
+        embed = await self.get_tier_embed(tier, self.bot.asset_filters.events.get_latest_event(ctx))
+
+        if embed:
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f'No data available for tier {tier}.')
+
+    async def get_tier_embed(self, tier: str, event: EventMaster):
+        async with aiohttp.ClientSession() as session:
+            async with session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+                leaderboard = await resp.json(encoding='utf-8')
+
+        data = leaderboard['statistics'].get(tier)
+        if not data:
+            return None
+
+        if event.state() == EventState.Open:
+            delta = event.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
+            time_left = self.format_timedelta(delta)
+            progress = f'{round(100 * (1 - (delta / (event.reception_close_datetime - event.start_datetime))), 2)}%'
+        else:
+            time_left = 'N/A'
+            progress = 'N/A'
+
+        embed = discord.Embed(title=f'{event.name} [t{tier}]', timestamp=dt.datetime.now(dt.timezone.utc))
+        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        embed.add_field(name='Points',
+                        value=data['points'],
+                        inline=True)
+        embed.add_field(name='Last Update',
+                        value=data['lastUpdate'],
+                        inline=True)
+        embed.add_field(name='Rate',
+                        value=f'{data["rate"]} pts/hr',
+                        inline=True)
+        embed.add_field(name='Current Estimate',
+                        value=data['estimate'],
+                        inline=True)
+        embed.add_field(name='Final Prediction',
+                        value=data['prediction'],
+                        inline=True)
+        embed.add_field(name='\u200b',
+                        value='\u200b',
+                        inline=True)
+        embed.add_field(name='Time Left',
+                        value=time_left,
+                        inline=True)
+        embed.add_field(name='Progress',
+                        value=progress,
+                        inline=True)
+        return embed
 
 
 def setup(bot):

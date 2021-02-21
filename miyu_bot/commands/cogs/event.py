@@ -3,6 +3,7 @@ import datetime
 import datetime as dt
 import logging
 
+import math
 import aiohttp
 import dateutil.parser
 import discord
@@ -30,6 +31,7 @@ class Event(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+        self.EPRATE_RESOLUTION = 2 #Resolution of the Rate/hr reported by endpoint in hours.
 
     @commands.command(name='event',
                       aliases=['ev'],
@@ -302,8 +304,13 @@ class Event(commands.Cog):
 
         embed = discord.Embed(title=f'{event.name} [t{tier}]', timestamp=dt.datetime.now(dt.timezone.utc))
         embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        
+        
+        
+        average_rate="\n( +"+str(math.ceil((data['rate']*self.EPRATE_RESOLUTION)/data['count']))+" avg )" if int(tier)<=20 else "" #Only T20 is tracked in real-time, we can't guarantee <2hr intervals for other points so the rate returned is just overall rate.
+        
         embed.add_field(name='Points',
-                        value=data['points'],
+                        value=str(data['points'])+average_rate,
                         inline=True)
         embed.add_field(name='Last Update',
                         value=data['lastUpdate'] or 'None',

@@ -213,8 +213,9 @@ class ParsedArguments:
         for name in preference_names:
             override, _op = self.single(name)
             if override:
+
                 if not preference_validators[name](override):
-                    raise ArgumentError(f'Invalid value for preference "{name}".')
+                    raise ArgumentError(f'Invalid value "{override}" for preference "{name}".')
                 prefs[name] = override
         return prefs
 

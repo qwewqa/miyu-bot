@@ -1,5 +1,6 @@
 import enum
 import logging
+from collections import defaultdict
 from typing import Dict, Type
 
 import pytz
@@ -30,6 +31,7 @@ class Preferences(commands.Cog):
         if name not in scope.preference_names:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
             return
+        value = preference_transformers[name](value)
         if not preference_validators[name](value):
             await ctx.send(f'Invalid value "{value}" for preference "{name}".')
             return
@@ -74,16 +76,22 @@ preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
 }
 
 default_preferences = {
-    'timezone': 'Etc/UTC',
+    'timezone': 'etc/utc',
     'language': 'en',
     'prefix': '!',
 }
 
+lowercase_timezones = {tz.lower() for tz in pytz.all_timezones_set}
+
 preference_validators = {
-    'timezone': lambda v: v in pytz.all_timezones_set,
+    'timezone': lambda v: v in lowercase_timezones,
     'language': lambda v: False,
     'prefix': lambda v: len(v) <= 15,
 }
+
+preference_transformers = defaultdict(**{
+    'timezone': lambda v: v.lower(),
+}, default_factory=lambda: lambda v: v)
 
 preference_names = default_preferences.keys()
 
@@ -99,8 +107,9 @@ async def get_preferences(ctx: commands.Context, use_user: bool):
 
     preferences = {}
     for name in preference_names:
-        preferences[name] = next((v for v in (getattr(s, f'{name}_preference') for s in sources) if v),
-                                 default_preferences[name])
+        preferences[name] = next(
+            (v for v in (getattr(s, f'{name}_preference') for s in sources if name in s.preference_names) if v),
+            default_preferences[name])
     return preferences
 
 

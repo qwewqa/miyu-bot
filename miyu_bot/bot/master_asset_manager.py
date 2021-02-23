@@ -17,7 +17,7 @@ class MasterFilterManager:
         self.manager = manager
         self.music = MasterFilter(
             self.manager.music_master,
-            naming_function=lambda m: f'{m.name} {m.special_unit_name}',
+            naming_function=lambda m: f'{m.name} {m.special_unit_name}{" (Hidden)" if m.is_hidden else ""}',
             filter_function=lambda m: m.is_released,
             fallback_naming_function=lambda m: m.id,
         )
@@ -39,20 +39,22 @@ class MasterFilter:
                  naming_function: Callable[[Any], str],
                  aliases: Optional[dict] = None,
                  filter_function=lambda _: True,
+                 prefilter_function=lambda _: True,
                  fallback_naming_function: Optional[Callable[[Any], str]] = None):
         self.masters = masters
         self.default_filter = FuzzyFilteredMap(filter_function)
         self.unrestricted_filter = FuzzyFilteredMap()
         for master in masters.values():
-            name = naming_function(master)
-            if fallback_naming_function and self.default_filter.has_exact(name):
-                name = romanize(fallback_naming_function(master))
-                if self.default_filter.has_exact(name):
+            if prefilter_function(master):
+                name = naming_function(master)
+                if fallback_naming_function and self.default_filter.has_exact(name):
+                    name = romanize(fallback_naming_function(master))
+                    if self.default_filter.has_exact(name):
+                        continue
+                elif self.default_filter.has_exact(name):
                     continue
-            elif self.default_filter.has_exact(name):
-                continue
-            self.default_filter[name] = master
-            self.unrestricted_filter[name] = master
+                self.default_filter[name] = master
+                self.unrestricted_filter[name] = master
         if aliases:
             for alias, mid in aliases.items():
                 self.add_alias(alias, mid)

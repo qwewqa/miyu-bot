@@ -25,7 +25,7 @@ async def get_prefix(bot: D4DJBot, message: discord.Message):
     if prefs and prefs.prefix_preference:
         return '!miyu ', prefs.prefix_preference
     else:
-        return '!miyu', '!'
+        return '!miyu ', '!'
 
 
 asset_manager = AssetManager('assets')

@@ -345,6 +345,7 @@ class MusicAttribute(enum.Enum):
     Level = enum.auto()
     Duration = enum.auto()
     Date = enum.auto()
+    BPM = enum.auto()
 
     def get_sort_key_from_music(self, music: MusicMaster):
         return {
@@ -354,7 +355,8 @@ class MusicAttribute(enum.Enum):
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
             self.Level: music.charts[4].display_level if len(music.charts) == 4 else 0,
             self.Duration: Music.get_music_duration(music),
-            self.Date: music.start_datetime
+            self.Date: music.start_datetime,
+            self.BPM: music.bpm,
         }[self]
 
     def get_formatted_from_music(self, music: MusicMaster):
@@ -366,6 +368,7 @@ class MusicAttribute(enum.Enum):
             self.Level: (music.charts[4].display_level if len(music.charts) == 4 else '?').ljust(3),
             self.Duration: Music.format_duration(Music.get_music_duration(music)),
             self.Date: str(music.start_datetime.date()),
+            self.BPM: f'{music.bpm:>5.2f}',
         }[self]
 
 
@@ -381,6 +384,7 @@ music_attribute_aliases = {
     'duration': MusicAttribute.Duration,
     'length': MusicAttribute.Duration,
     'date': MusicAttribute.Date,
+    'bpm': MusicAttribute.BPM,
 }
 
 

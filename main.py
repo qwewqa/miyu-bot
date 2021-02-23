@@ -16,8 +16,17 @@ logging.basicConfig(level=logging.INFO)
 with open('config.json') as f:
     bot_token = json.load(f)['token']
 
+
+async def get_prefix(bot: D4DJBot, message: discord.Message):
+    prefs = await models.Guild.get_or_none(id=message.guild.id)
+    if prefs and prefs.prefix_preference:
+        return '!miyu ', prefs.prefix_preference
+    else:
+        return '!miyu', '!'
+
+
 asset_manager = AssetManager('assets')
-bot = D4DJBot(asset_manager, MasterFilterManager(asset_manager), command_prefix='?', case_insensitive=True,
+bot = D4DJBot(asset_manager, MasterFilterManager(asset_manager), command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
 
 bot.load_extension('miyu_bot.commands.cogs.card')

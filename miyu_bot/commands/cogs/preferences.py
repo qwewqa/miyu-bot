@@ -4,7 +4,6 @@ from typing import Dict, Type
 
 import pytz
 from discord.ext import commands
-from tortoise import Model
 
 from miyu_bot.bot import models
 from miyu_bot.bot.bot import D4DJBot
@@ -24,23 +23,25 @@ class Preferences(commands.Cog):
     async def setpref(self, ctx: commands.Context, scope: str, name: str, value: str):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope.__name__}".')
+            await ctx.send(f'Invalid scope "{scope.scope_name}".')
             return
         if scope != models.User and not (ctx.author == self.bot.owner_id or ctx.author.guild_permissions.administrator):
-            await ctx.send(f'Altering preferences for scope "{scope.__name__}" requires administrator permissions.')
-        if name not in preferences_sets_by_scope[scope]:
-            await ctx.send(f'Invalid preference "{name}" for scope "{scope.__name__}".')
+            await ctx.send(f'Altering preferences for scope "{scope.scope_name}" requires administrator permissions.')
+        if name not in scope.preference_names:
+            await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
             return
         if not preference_validators[name](value):
             await ctx.send(f'Invalid value "{value}" for preference "{name}".')
             return
-        entry: PreferenceScope = await scope.get_from_context(ctx)
+        entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope "{scope.__name__}" not available in current channel.')
+            await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
             return
+        original = getattr(entry, f'{name}_preference')
         setattr(entry, f'{name}_preference', value)
         await entry.save()
-        await ctx.send(f'Successfully updated preference.')
+        await ctx.send(f'Successfully changed preference "{name}" '
+                       f'for scope "{scope.scope_name}" from "{original}" to "{value}".')
 
     @commands.command(name='getpref',
                       description='',
@@ -48,19 +49,19 @@ class Preferences(commands.Cog):
     async def getpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope.__name__}".')
+            await ctx.send(f'Invalid scope "{scope.scope_name}".')
             return
-        entry: PreferenceScope = await scope.get_from_context(ctx)
+        entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope "{scope.__name__}" not available in current channel.')
+            await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
             return
         if name:
-            if name not in preferences_sets_by_scope[scope]:
-                await ctx.send(f'Invalid preference "{name}" for scope "{scope.__name__}".')
+            if name not in scope.preference_names:
+                await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
                 return
             await ctx.send(str(getattr(entry, f'{name}_preference') or None))
         else:
-            names = preferences_by_scope[scope]
+            names = scope.preference_names
             await ctx.send('\n'.join(f'{name}: {getattr(entry, f"{name}_preference")}' for name in names))
 
 
@@ -74,26 +75,17 @@ preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
 
 default_preferences = {
     'timezone': 'Etc/UTC',
-    'language': 'en'
+    'language': 'en',
+    'prefix': '!',
 }
 
 preference_validators = {
     'timezone': lambda v: v in pytz.all_timezones_set,
-    'language': lambda v: False
+    'language': lambda v: False,
+    'prefix': lambda v: len(v) <= 15,
 }
 
 preference_names = default_preferences.keys()
-
-preference_scopes = {
-    'timezone': {models.User, models.Channel, models.Guild},
-    'language': {models.User, models.Channel, models.Guild}
-}
-
-preferences_sets_by_scope = {scope: {pref for pref, scopes in preference_scopes.items() if scope in scopes}
-                             for scope in [models.User, models.Channel, models.Guild]}
-
-preferences_by_scope = {scope: [pref for pref, scopes in preference_scopes.items() if scope in scopes]
-                        for scope in [models.User, models.Channel, models.Guild]}
 
 
 async def get_preferences(ctx: commands.Context, use_user: bool):

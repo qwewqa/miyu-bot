@@ -1,10 +1,20 @@
+from abc import abstractmethod
+from typing import ClassVar, List
+
 import discord
 from discord.ext import commands
 from tortoise import Model, fields
 
 
 class PreferenceScope(Model):
+    scope_name: ClassVar[str] = 'Unnamed'
+    preference_names: ClassVar[List[str]] = []
+
+    class Meta:
+        abstract = True
+
     @classmethod
+    @abstractmethod
     async def get_from_context(cls, ctx: commands.Context):
         raise NotImplementedError
 
@@ -12,8 +22,12 @@ class PreferenceScope(Model):
 class Guild(PreferenceScope):
     id = fields.BigIntField(pk=True)
     name = fields.CharField(max_length=255)  # Doesn't need to stay up to date. Just for reference.
-    timezone_preference = fields.CharField(max_length=32, default='')
-    language_preference = fields.CharField(max_length=16, default='')
+    timezone_preference = fields.CharField(max_length=31, default='')
+    language_preference = fields.CharField(max_length=15, default='')
+    prefix_preference = fields.CharField(max_length=15, default='')
+
+    scope_name = 'Guild'
+    preference_names = ['timezone', 'language', 'prefix']
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
@@ -28,8 +42,11 @@ class Guild(PreferenceScope):
 class Channel(PreferenceScope):
     id = fields.BigIntField(pk=True)
     name = fields.CharField(max_length=255)  # Doesn't need to stay up to date. Just for reference.
-    timezone_preference = fields.CharField(max_length=32, default='')
-    language_preference = fields.CharField(max_length=16, default='')
+    timezone_preference = fields.CharField(max_length=31, default='')
+    language_preference = fields.CharField(max_length=15, default='')
+
+    scope_name = 'Channel'
+    preference_names = ['timezone', 'language']
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
@@ -39,11 +56,14 @@ class Channel(PreferenceScope):
         return f'{self.name} ({self.id})'
 
 
-class User(Model):
+class User(PreferenceScope):
     id = fields.BigIntField(pk=True)
     name = fields.CharField(max_length=255)  # Doesn't need to stay up to date. Just for reference.
-    timezone_preference = fields.CharField(max_length=32, default='')
-    language_preference = fields.CharField(max_length=16, default='')
+    timezone_preference = fields.CharField(max_length=31, default='')
+    language_preference = fields.CharField(max_length=15, default='')
+
+    scope_name = 'User'
+    preference_names = ['timezone', 'language']
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):

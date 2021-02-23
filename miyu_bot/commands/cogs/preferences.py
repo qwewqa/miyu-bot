@@ -26,7 +26,8 @@ class Preferences(commands.Cog):
         if not scope:
             await ctx.send(f'Invalid scope "{scope.scope_name}".')
             return
-        if scope != models.User and not ((ctx.author.id == self.bot.owner_id) or ctx.author.guild_permissions.administrator):
+        if scope != models.User and not (await ctx.bot.is_owner(ctx.author) or
+                                         ctx.author.guild_permissions.administrator):
             await ctx.send(f'Altering preferences for scope "{scope.scope_name}" requires administrator permissions.')
             return
         if name not in scope.preference_names:

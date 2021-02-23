@@ -10,7 +10,8 @@ from d4dj_utils.master.skill_master import SkillMaster
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError, list_operator_for
+from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError, \
+    list_operator_for, full_operators
 from miyu_bot.commands.common.asset_paths import get_card_icon_path, get_card_art_path
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
     unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id
@@ -36,12 +37,8 @@ class Card(commands.Cog):
     async def card(self, ctx: commands.Context, *, arg: commands.clean_content):
         self.logger.info(f'Searching for card "{arg}".')
 
-        try:
-            arguments = parse_arguments(arg)
-            cards = self.get_cards(ctx, arguments)
-        except ArgumentError as e:
-            await ctx.send(str(e))
-            return
+        arguments = parse_arguments(arg)
+        cards = self.get_cards(ctx, arguments)
 
         if not cards:
             await ctx.send(f'No results for card "{arg}"')
@@ -93,16 +90,12 @@ class Card(commands.Cog):
     async def cards(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for cards "{arg}".')
 
-        try:
-            arguments = parse_arguments(arg)
-            cards = self.get_cards(ctx, arguments)
-            sort, sort_op = arguments.single('sort', None,
-                                             allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
-            display, _ = arguments.single(['display', 'disp'], sort or CardAttribute.Power, allowed_operators=['='],
-                                          converter=card_attribute_aliases)
-        except ArgumentError as e:
-            await ctx.send(str(e))
-            return
+        arguments = parse_arguments(arg)
+        cards = self.get_cards(ctx, arguments)
+        sort, sort_op = arguments.single('sort', None,
+                                         allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
+        display, _op = arguments.single(['display', 'disp'], sort or CardAttribute.Power, allowed_operators=['='],
+                                      converter=card_attribute_aliases)
 
         listing = []
         for card in cards:
@@ -173,7 +166,7 @@ class Card(commands.Cog):
                                          allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
         reverse_sort = sort_op == '<' or arguments.tag('reverse')
         # Not used, but here because it's a valid argument before running require_all_arguments_used.
-        display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
+        display, _op = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
                                       converter=card_attribute_aliases)
         characters = {self.bot.aliases.characters_by_name[c].id
                       for c in arguments.words(self.bot.aliases.characters_by_name.keys()) |
@@ -186,8 +179,8 @@ class Card(commands.Cog):
         attributes = {self.bot.aliases.attributes_by_name[a].id
                       for a in arguments.tags(self.bot.aliases.attributes_by_name.keys())}
         birthday = arguments.tag('birthday') | arguments.word('birthday')
-        score_up_filters = arguments.repeatable(['skill', 'score_up', 'score'], is_list=True, numeric=True)
-        heal_filters = arguments.repeatable(['heal', 'recovery'], is_list=True, numeric=True)
+        score_up_filters = arguments.repeatable(['skill', 'score_up', 'score'], allowed_operators=full_operators, is_list=True, numeric=True)
+        heal_filters = arguments.repeatable(['heal', 'recovery'], allowed_operators=full_operators, is_list=True, numeric=True)
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 

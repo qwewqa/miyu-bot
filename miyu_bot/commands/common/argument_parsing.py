@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, I
 # https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
 # https://stackoverflow.com/questions/21105360/regex-find-comma-not-inside-quotes
 # The ` ?` is just so it matches the space after during the replace with blank so there's no double spaces
+from miyu_bot.commands.cogs.preferences import get_preferences, preference_names, preference_validators
 
 _param_re = re.compile(
     r'(([a-zA-Z_+/.\-]+)(!=|>=|<=|>|<|==|=)(("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+)(,("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+))*)) ?')
@@ -114,7 +115,7 @@ class ParsedArguments:
     def single(self, names: Union[List[str], str], default: Any = None, allowed_operators: Optional[Container] = None,
                is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:
-            allowed_operators = {'>', '<', '>=', '<=', '!=', '==', '='}
+            allowed_operators = ['=']
         if not isinstance(default, tuple):
             default = ArgumentValue(default, '=')
         if not isinstance(names, list):
@@ -153,7 +154,7 @@ class ParsedArguments:
                    allowed_operators: Optional[Container] = None,
                    is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:
-            allowed_operators = {'>', '<', '>=', '<=', '!=', '==', '='}
+            allowed_operators = ['=']
         if not isinstance(default, tuple) and default is not None:
             default = [ArgumentValue(default, '=')]
         if default is None:
@@ -207,6 +208,16 @@ class ParsedArguments:
             raise ArgumentError(
                 f'Unknown tags {", ".join(quote(v) for v in self.tag_arguments if v not in self.used_tags)}.')
 
+    async def preferences(self, ctx):
+        prefs = await get_preferences(ctx, self.tag('p'))
+        for name in preference_names:
+            override, _op = self.single(name)
+            if override:
+                if not preference_validators[name](override):
+                    raise ArgumentError(f'Invalid value for preference "{name}".')
+                prefs[name] = override
+        return prefs
+
 
 _operators = {
     '=': lambda a, b: a == b,
@@ -227,6 +238,8 @@ _list_operators = {
     '>=': lambda a, b: all(a >= v for v in b),
     '<=': lambda a, b: all(a <= v for v in b),
 }
+
+full_operators = {'>', '<', '>=', '<=', '!=', '==', '='}
 
 
 def operator_for(operator: str):

@@ -168,28 +168,24 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
         arguments = parse_arguments(arg)
 
-        try:
-            sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
-                                             allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
-            reverse_sort = sort_op == '<' or arguments.tag('reverse')
-            display, _ = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
-                                          converter=music_attribute_aliases)
-            units = {self.bot.aliases.units_by_name[unit].id
-                     for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
-                                                aliases=self.bot.aliases.unit_aliases)}
+        sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
+                                         allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
+        reverse_sort = sort_op == '<' or arguments.tag('reverse')
+        display, _op = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
+                                      converter=music_attribute_aliases)
+        units = {self.bot.aliases.units_by_name[unit].id
+                 for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
+                                            aliases=self.bot.aliases.unit_aliases)}
 
-            def difficulty_converter(d):
-                return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
+        def difficulty_converter(d):
+            return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
 
-            difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True,
-                                              converter=difficulty_converter)
+        difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True,
+                                          converter=difficulty_converter)
 
-            songs = self.bot.asset_filters.music.get_sorted(arguments.text(), ctx)
+        songs = self.bot.asset_filters.music.get_sorted(arguments.text(), ctx)
 
-            arguments.require_all_arguments_used()
-        except ArgumentError as e:
-            await ctx.send(str(e))
-            return
+        arguments.require_all_arguments_used()
 
         for value, op in difficulty:
             operator = list_operator_for(op)

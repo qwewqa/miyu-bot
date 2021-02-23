@@ -2,6 +2,7 @@ import logging
 import textwrap
 
 from discord.ext import commands
+from tortoise import Tortoise
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher

@@ -22,7 +22,6 @@ from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message
-from miyu_bot.commands.common.timezone import get_timezone
 
 
 class Event(commands.Cog):
@@ -42,11 +41,7 @@ class Event(commands.Cog):
 
         event: EventMaster
 
-        try:
-            event, timezone = self.parse_event_argument(ctx, arg)
-        except ArgumentError as e:
-            await ctx.send(str(e))
-            return
+        event, timezone = await self.parse_event_argument(ctx, arg)
 
         if not event:
             msg = f'Failed to find event "{arg}".'
@@ -66,9 +61,9 @@ class Event(commands.Cog):
 
         asyncio.ensure_future(run_dynamically_paged_message(ctx, generator))
 
-    def parse_event_argument(self, ctx, arg):
+    async def parse_event_argument(self, ctx, arg):
         arguments = parse_arguments(arg)
-        timezone = get_timezone(arguments)
+        preferences = await arguments.preferences(ctx)
         text = arguments.text()
         arguments.require_all_arguments_used()
 
@@ -84,7 +79,7 @@ class Event(commands.Cog):
                 event = self.bot.asset_filters.events.get(text, ctx)
         else:
             event = self.bot.asset_filters.events.get_latest_event(ctx)
-        return event, timezone
+        return event, pytz.timezone(preferences['timezone'])
 
     def get_event_embed(self, event, timezone):
         embed = discord.Embed(title=event.name)
@@ -96,7 +91,7 @@ class Event(commands.Cog):
         duration_hours = round((event.duration.days * 24 + event.duration.seconds / 3600), 2)
         duration_hours = duration_hours if not duration_hours.is_integer() else int(duration_hours)
 
-        embed.add_field(name='Dates',
+        embed.add_field(name='Information',
                         value=format_info({
                             'Duration': f'{event.duration.days} days, {duration_hour_part} hours '
                                         f'({duration_hours} hours)',
@@ -169,11 +164,7 @@ class Event(commands.Cog):
                       description='Displays the time left in the current event',
                       help='!timeleft')
     async def time_left(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
-        try:
-            event, timezone = self.parse_event_argument(ctx, arg)
-        except ArgumentError as e:
-            await ctx.send(str(e))
-            return
+        event, timezone = await self.parse_event_argument(ctx, arg)
 
         state = event.state()
 

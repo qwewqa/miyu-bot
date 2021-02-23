@@ -355,7 +355,7 @@ class MusicAttribute(enum.Enum):
             self.Name: music.name,
             self.Id: music.id,
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
-            self.Level: music.charts[4].display_level,
+            self.Level: music.charts[4].display_level if len(music.charts) == 4 else 0,
             self.Duration: Music.get_music_duration(music),
             self.Date: music.start_datetime
         }[self]
@@ -366,7 +366,7 @@ class MusicAttribute(enum.Enum):
             self.Name: None,
             self.Id: str(music.id).zfill(7),
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
-            self.Level: music.charts[4].display_level.ljust(3),
+            self.Level: (music.charts[4].display_level if len(music.charts) == 4 else '?').ljust(3),
             self.Duration: Music.format_duration(Music.get_music_duration(music)),
             self.Date: str(music.start_datetime.date()),
         }[self]

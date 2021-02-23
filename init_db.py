@@ -1,6 +1,6 @@
 from tortoise import Tortoise, run_async
 
-from miyu_bot.bot.models import TORTOISE_ORM
+from miyu_bot.bot.tortoise_config import TORTOISE_ORM
 
 
 async def init():

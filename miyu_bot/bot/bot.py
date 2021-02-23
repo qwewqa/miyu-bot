@@ -3,7 +3,7 @@ from discord.ext import commands
 from tortoise import Tortoise
 
 from miyu_bot.bot.master_asset_manager import MasterFilterManager
-from miyu_bot.bot.models import TORTOISE_ORM
+from miyu_bot.bot.tortoise_config import TORTOISE_ORM
 from miyu_bot.bot.name_aliases import NameAliases
 
 

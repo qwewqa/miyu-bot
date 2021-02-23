@@ -71,14 +71,3 @@ class User(PreferenceScope):
 
     def __str__(self):
         return f'{self.name} ({self.id})'
-
-
-TORTOISE_ORM = {
-    'connections': {'default': 'sqlite://db.sqlite3'},
-    'apps': {
-        'models': {
-            'models': ['miyu_bot.bot.models', 'aerich.models'],
-            'default_connection': 'default',
-        },
-    },
-}

@@ -1,9 +1,12 @@
 import json
 import logging
+import sys
+import traceback
 
 import discord
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
+from discord.ext.commands import Cog
 from tortoise import Tortoise
 
 from miyu_bot.bot import models
@@ -59,10 +62,21 @@ async def on_guild_update(guild):
 
 
 @bot.listen()
-async def on_command_error(ctx: commands.Context, error):
-    error = getattr(error, 'original', error)
+async def on_command_error(context: commands.Context, exception):
+    error = getattr(exception, 'original', exception)
     if isinstance(error, ArgumentError):
-        await ctx.send(str(error))
+        await context.send(str(error))
+
+    if hasattr(context.command, 'on_error'):
+        return
+
+    cog = context.cog
+    if cog:
+        if Cog._get_overridden_method(cog.cog_command_error) is not None:
+            return
+
+    print('Ignoring exception in command {}:'.format(context.command), file=sys.stderr)
+    traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
 
 
 bot.run(bot_token)

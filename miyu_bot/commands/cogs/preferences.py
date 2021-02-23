@@ -26,8 +26,9 @@ class Preferences(commands.Cog):
         if not scope:
             await ctx.send(f'Invalid scope "{scope.scope_name}".')
             return
-        if scope != models.User and not (ctx.author == self.bot.owner_id or ctx.author.guild_permissions.administrator):
+        if scope != models.User and not (ctx.author.id == self.bot.owner_id or ctx.author.guild_permissions.administrator):
             await ctx.send(f'Altering preferences for scope "{scope.scope_name}" requires administrator permissions.')
+            return
         if name not in scope.preference_names:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
             return
@@ -84,9 +85,9 @@ default_preferences = {
 lowercase_timezones = {tz.lower() for tz in pytz.all_timezones_set}
 
 preference_validators = {
-    'timezone': lambda v: v in lowercase_timezones,
+    'timezone': lambda v: v in lowercase_timezones or not v,
     'language': lambda v: False,
-    'prefix': lambda v: len(v) <= 15,
+    'prefix': lambda v: len(v) <= 15 or not v,
 }
 
 preference_transformers = defaultdict(**{

@@ -91,9 +91,10 @@ preference_validators = {
     'prefix': lambda v: len(v) <= 15 or not v,
 }
 
-preference_transformers = defaultdict(**{
+preference_transformers = defaultdict(lambda: (lambda v: v))
+preference_transformers.update({
     'timezone': lambda v: v.lower(),
-}, default_factory=lambda: lambda v: v)
+})
 
 preference_names = default_preferences.keys()
 

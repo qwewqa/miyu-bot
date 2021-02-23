@@ -17,9 +17,8 @@ class MasterFilterManager:
         self.manager = manager
         self.music = MasterFilter(
             self.manager.music_master,
-            naming_function=lambda m: f'{m.name} {m.special_unit_name}',
+            naming_function=lambda m: f'{m.name} {m.special_unit_name}{" (Hidden)" if m.is_hidden else ""}',
             filter_function=lambda m: m.is_released,
-            prefilter_function=lambda m: not m.is_hidden,
             fallback_naming_function=lambda m: m.id,
         )
         self.events = EventFilter(

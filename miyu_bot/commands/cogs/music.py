@@ -82,6 +82,7 @@ class Music(commands.Cog):
             'Sort Order': song.default_order,
             'Levels': ', '.join(c.display_level for c in song.charts.values()),
             'Release Date': song.start_datetime,
+            'Hidden': song.is_hidden,
         }
 
         embed.add_field(name='Artist',
@@ -212,9 +213,9 @@ class Music(commands.Cog):
             display_prefix = display.get_formatted_from_music(song)
             if display_prefix:
                 listing.append(
-                    f'{display_prefix} : {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
+                    f'{display_prefix} : {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}')
             else:
-                listing.append(f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}')
+                listing.append(f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}')
 
         embed = discord.Embed(title=f'Song Search "{arg}"' if arg else 'Songs')
         asyncio.ensure_future(run_paged_message(ctx, embed, listing))

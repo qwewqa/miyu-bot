@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import enum
+import itertools
 import logging
 import wave
 from inspect import cleandoc
@@ -13,12 +14,13 @@ from d4dj_utils.master.music_master import MusicMaster
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError, list_operator_for
+from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for
 from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path, get_chart_mix_path
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message, run_deletable_message
+from miyu_bot.commands.common.song_list_generator import calculate_mix_rating, get_best_mix
 
 
 class Music(commands.Cog):
@@ -117,6 +119,25 @@ class Music(commands.Cog):
         # Difficulty enum easy-expert are 1-4, one more than the embed index
         asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, None, difficulty - 1))
 
+    @commands.command(name='mixorder',
+                      aliases=['ordermix', 'mix_order', 'order_mix'],
+                      description='Finds order of songs when mixed.',
+                      help='!mixorder grgr grgr grgr "cyber cyber"')
+    async def mix_order(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
+        songs = []
+        for name in [a, b, c, d]:
+            song = self.bot.asset_filters.music.get(name, ctx)
+            if not song:
+                await ctx.send(f'Unknown song "{name}".')
+                return
+            songs.append(song)
+
+        mix = get_best_mix(songs)
+        nl = '\n'
+        embed = discord.Embed(title='Mix Order',
+                              description=f'```{nl.join(f"{i}. {self.format_song_title(song)}" for i, song in enumerate(mix, 1))}```')
+        await ctx.send(embed=embed)
+
     @commands.command(name='sections',
                       aliases=['mixes'],
                       description='Finds the sections of the chart with the given name.',
@@ -173,7 +194,7 @@ class Music(commands.Cog):
                                          allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
         reverse_sort = sort_op == '<' or arguments.tag('reverse')
         display, _op = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
-                                      converter=music_attribute_aliases)
+                                        converter=music_attribute_aliases)
         units = {self.bot.aliases.units_by_name[unit].id
                  for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
                                             aliases=self.bot.aliases.unit_aliases)}
@@ -211,7 +232,8 @@ class Music(commands.Cog):
                 listing.append(
                     f'{display_prefix} : {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}')
             else:
-                listing.append(f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}')
+                listing.append(
+                    f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}')
 
         embed = discord.Embed(title=f'Song Search "{arg}"' if arg else 'Songs')
         asyncio.ensure_future(run_paged_message(ctx, embed, listing))
@@ -318,6 +340,10 @@ class Music(commands.Cog):
         return arg, difficulty
 
     _music_durations = {}
+
+    @staticmethod
+    def format_song_title(song):
+        return f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'
 
     @staticmethod
     def get_music_duration(music: MusicMaster):

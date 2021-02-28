@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from d4dj_utils.master.chart_master import ChartDifficulty
 
 difficulty_emoji_ids = {
@@ -16,16 +18,19 @@ parameter_bonus_emoji_ids = {
 
 parameter_bonus_emoji_ids_by_parameter_id = {i: v for i, v in enumerate(parameter_bonus_emoji_ids.values())}
 
-unit_emoji_ids = {
+unit_emoji_ids = defaultdict(lambda: common_unit_emoji_id, {
     'happy_around': 792069679442821121,
     'peaky_pkey': 792076165916524544,
     'photon_maiden': 792069679455535136,
     'merm4id': 792069679874310184,
     'rondo': 792069679770238976,
     'lyrical_lily': 792069679673114644,
-}
+})
 
-unit_emoji_ids_by_unit_id = {i + 1: v for i, v in enumerate(unit_emoji_ids.values())}
+common_unit_emoji_id = 815670436544118785
+
+unit_emoji_ids_by_unit_id = defaultdict(lambda: common_unit_emoji_id,
+                                        {i + 1: v for i, v in enumerate(unit_emoji_ids.values())})
 
 attribute_emoji_ids = {
     'street': 791903477986361345,

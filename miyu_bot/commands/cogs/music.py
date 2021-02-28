@@ -20,7 +20,7 @@ from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message, run_deletable_message
-from miyu_bot.commands.common.song_list_generator import calculate_mix_rating, get_best_mix
+from miyu_bot.commands.common.song_list_generator import calculate_mix_rating, get_best_mix, get_mix_data
 
 
 class Music(commands.Cog):
@@ -133,9 +133,11 @@ class Music(commands.Cog):
             songs.append(song)
 
         mix = get_best_mix(songs)
+        mix_data = get_mix_data(mix)
         nl = '\n'
         embed = discord.Embed(title='Mix Order',
-                              description=f'```{nl.join(f"{i}. {self.format_song_title(song)}" for i, song in enumerate(mix, 1))}```')
+                              description=f'```{nl.join(f"{i}. {self.format_song_title(song)}" for i, song in enumerate(mix, 1))}\n\n'
+                                          f'Total Duration: {sum(md.duration for md in mix_data):.2f}s```')
         await ctx.send(embed=embed)
 
     @commands.command(name='sections',

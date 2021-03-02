@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, I
 # https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
 # https://stackoverflow.com/questions/21105360/regex-find-comma-not-inside-quotes
 # The ` ?` is just so it matches the space after during the replace with blank so there's no double spaces
-from miyu_bot.commands.cogs.preferences import get_preferences, preference_names, preference_validators
+from miyu_bot.commands.cogs.preferences import get_preferences
 
 _param_re = re.compile(
     r'(([a-zA-Z_+/.\-]+)(!=|>=|<=|>|<|==|=)(("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+)(,("(?:[^"\\]|\\.)*"|\'(?:[^\'\\]|\\.)*\'|[^,\s]+))*)) ?')
@@ -209,14 +209,14 @@ class ParsedArguments:
                 f'Unknown tags {", ".join(quote(v) for v in self.tag_arguments if v not in self.used_tags)}.')
 
     async def preferences(self, ctx):
-        prefs = await get_preferences(ctx, self.tag('p'))
-        for name in preference_names:
+        prefs, pref_types = await get_preferences(ctx, self.tag('p'))
+        for name in prefs.keys():
+            pref_type = pref_types[name]
             override, _op = self.single(name)
             if override:
-
-                if not preference_validators[name](override):
-                    raise ArgumentError(f'Invalid value "{override}" for preference "{name}".')
-                prefs[name] = override
+                if error_message := pref_type.validate(override):
+                    raise ArgumentError(f'Invalid value "{override}" for preference "{name}": {error_message}')
+                prefs[name] = pref_type.transform(override)
         return prefs
 
 

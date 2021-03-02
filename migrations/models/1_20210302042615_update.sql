@@ -1,0 +1,30 @@
+-- upgrade --
+ALTER TABLE "channel" RENAME COLUMN "timezone_preference" TO "timezone";
+ALTER TABLE "channel" RENAME COLUMN "language_preference" TO "language";
+ALTER TABLE "guild" RENAME COLUMN "timezone_preference" TO "timezone";
+ALTER TABLE "guild" RENAME COLUMN "prefix_preference" TO "prefix";
+ALTER TABLE "guild" RENAME COLUMN "language_preference" TO "language";
+ALTER TABLE "user" RENAME COLUMN "timezone_preference" TO "timezone";
+ALTER TABLE "user" RENAME COLUMN "language_preference" TO "language";
+ALTER TABLE "channel" ALTER COLUMN "timezone" SET DEFAULT  'etc/utc';
+ALTER TABLE "channel" ALTER COLUMN "language" SET DEFAULT  'en';
+ALTER TABLE "guild" ALTER COLUMN "timezone" SET DEFAULT  'etc/utc';
+ALTER TABLE "guild" ALTER COLUMN "language" SET DEFAULT  'en';
+ALTER TABLE "guild" ALTER COLUMN "prefix" SET DEFAULT  '!';
+ALTER TABLE "user" ALTER COLUMN "timezone" SET DEFAULT  'etc/utc';
+ALTER TABLE "user" ALTER COLUMN "language" SET DEFAULT  'en';
+-- downgrade --
+ALTER TABLE "user" ADD "timezone_preference" VARCHAR(31) NOT NULL  DEFAULT '';
+ALTER TABLE "user" ADD "language_preference" VARCHAR(15) NOT NULL  DEFAULT '';
+ALTER TABLE "user" DROP COLUMN "timezone";
+ALTER TABLE "user" DROP COLUMN "language";
+ALTER TABLE "guild" ADD "timezone_preference" VARCHAR(31) NOT NULL  DEFAULT '';
+ALTER TABLE "guild" ADD "language_preference" VARCHAR(15) NOT NULL  DEFAULT '';
+ALTER TABLE "guild" ADD "prefix_preference" VARCHAR(15) NOT NULL  DEFAULT '';
+ALTER TABLE "guild" DROP COLUMN "timezone";
+ALTER TABLE "guild" DROP COLUMN "prefix";
+ALTER TABLE "guild" DROP COLUMN "language";
+ALTER TABLE "channel" ADD "timezone_preference" VARCHAR(31) NOT NULL  DEFAULT '';
+ALTER TABLE "channel" ADD "language_preference" VARCHAR(15) NOT NULL  DEFAULT '';
+ALTER TABLE "channel" DROP COLUMN "timezone";
+ALTER TABLE "channel" DROP COLUMN "language";

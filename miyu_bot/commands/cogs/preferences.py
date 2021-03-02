@@ -30,19 +30,18 @@ class Preferences(commands.Cog):
                                          ctx.author.guild_permissions.administrator):
             await ctx.send(f'Altering preferences for scope "{scope.scope_name}" requires administrator permissions.')
             return
-        if name not in scope.preference_names:
+        if name not in scope.preferences:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
             return
-        value = preference_transformers[name](value)
-        if not preference_validators[name](value):
-            await ctx.send(f'Invalid value "{value}" for preference "{name}".')
-            return
+        preference = scope.preferences[name]
+        if validation_error_message := preference.validate(value):
+            await ctx.send(f'Invalid value "{value}" for preference "{name}": {validation_error_message}')
         entry = await scope.get_from_context(ctx)
         if not entry:
             await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
             return
-        original = getattr(entry, f'{name}_preference')
-        setattr(entry, f'{name}_preference', value)
+        original = entry.get_preference(name)
+        entry.set_preference(name, value)
         await entry.save()
         await ctx.send(f'Successfully changed preference "{name}" '
                        f'for scope "{scope.scope_name}" from "{original}" to "{value}".')
@@ -60,13 +59,32 @@ class Preferences(commands.Cog):
             await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
             return
         if name:
-            if name not in scope.preference_names:
+            if name not in scope.preferences:
                 await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
                 return
-            await ctx.send(str(getattr(entry, f'{name}_preference') or None))
+            await ctx.send(str(getattr(entry, scope.preferences[name].attribute_name) or None))
         else:
-            names = scope.preference_names
-            await ctx.send('\n'.join(f'{name}: {getattr(entry, f"{name}_preference")}' for name in names))
+            await ctx.send(
+                '\n'.join(f'{name}: {getattr(entry, pref.attribute_name)}' for name, pref in scope.preferences.items()))
+
+    @commands.command(name='clearpref',
+                      description='',
+                      help='')
+    async def clearpref(self, ctx: commands.Context, scope: str, name: str = ''):
+        scope = preference_scope_aliases.get(scope)
+        if not scope:
+            await ctx.send(f'Invalid scope "{scope.scope_name}".')
+            return
+        if name not in scope.preferences:
+            await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
+            return
+        entry = await scope.get_from_context(ctx)
+        if not entry:
+            await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
+            return
+        entry.clear_preference(name)
+        await entry.save()
+        await ctx.send(f'Successfully cleared preference "{name}" for scope "{scope.scope_name}".')
 
 
 preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
@@ -77,43 +95,25 @@ preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
     'guild': models.Guild,
 }
 
-default_preferences = {
-    'timezone': 'etc/utc',
-    'language': 'en',
-    'prefix': '!',
-}
 
-lowercase_timezones = {tz.lower() for tz in pytz.all_timezones_set}
-
-preference_validators = {
-    'timezone': lambda v: v in lowercase_timezones or not v,
-    'language': lambda v: False,
-    'prefix': lambda v: len(v) <= 15 or not v,
-}
-
-preference_transformers = defaultdict(lambda: (lambda v: v))
-preference_transformers.update({
-    'timezone': lambda v: v.lower(),
-})
-
-preference_names = default_preferences.keys()
-
-
-async def get_preferences(ctx: commands.Context, use_user: bool):
+async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool):
     sources = []
-    if user := use_user and await models.User.get_or_none(id=ctx.author.id):
-        sources.append(user)
+    if user := await models.User.get_or_none(id=ctx.author.id):
+        if not toggle_user_prefs:
+            sources.append(user)
     if channel := await models.Channel.get_or_none(id=ctx.channel.id):
         sources.append(channel)
     if guild := ctx.guild and await models.Guild.get_or_none(id=ctx.guild.id):
         sources.append(guild)
 
     preferences = {}
-    for name in preference_names:
-        preferences[name] = next(
-            (v for v in (getattr(s, f'{name}_preference') for s in sources if name in s.preference_names) if v),
-            default_preferences[name])
-    return preferences
+    preference_types = {}
+    for source in sources:
+        for k, v in source.preferences.items():
+            if v.name not in preferences:
+                preferences[v.name] = source.get_preference(k)
+                preference_types[v.name] = v
+    return preferences, preference_types
 
 
 def setup(bot):

@@ -21,9 +21,9 @@ with open('config.json') as f:
 
 
 async def get_prefix(bot: D4DJBot, message: discord.Message):
-    prefs = await models.Guild.get_or_none(id=message.guild.id)
-    if prefs and prefs.prefix_preference:
-        return '!miyu ', prefs.prefix_preference
+    guild = await models.Guild.get_or_none(id=message.guild.id)
+    if guild and guild.prefix:
+        return '!miyu ', guild.prefix
     else:
         return '!miyu ', '!'
 

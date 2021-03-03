@@ -110,7 +110,7 @@ language_pref = Preference('language',
                            unset_value='',
                            validator=lambda lang: 'Translations are not supported yet.')
 prefix_pref = Preference('prefix',
-                         fields.CharField(max_length=15, default=''),
+                         fields.CharField(max_length=63, default=''),
                          default_value='!',
                          unset_value='',
                          validator=lambda prefix: None if len(prefix) <= 15 else 'Prefix is too long.')

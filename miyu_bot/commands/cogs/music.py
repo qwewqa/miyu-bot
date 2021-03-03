@@ -381,7 +381,7 @@ class MusicAttribute(enum.Enum):
             self.Name: music.name,
             self.Id: music.id,
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
-            self.Level: music.charts[4].display_level if len(music.charts) == 4 else 0,
+            self.Level: music.charts[4].display_level if len(music.charts) == 4 else '0',
             self.Duration: Music.get_music_duration(music),
             self.Date: music.start_datetime,
             self.BPM: music.bpm,

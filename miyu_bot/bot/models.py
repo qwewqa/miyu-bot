@@ -113,7 +113,7 @@ prefix_pref = Preference('prefix',
                          fields.CharField(max_length=63, default=''),
                          default_value='!',
                          unset_value='',
-                         validator=lambda prefix: None if len(prefix) <= 15 else 'Prefix is too long.')
+                         validator=lambda prefix: None if len(prefix) <= 63 else 'Prefix is too long.')
 
 
 class Guild(PreferenceScope):
@@ -158,6 +158,7 @@ class User(PreferenceScope):
     scope_name = 'User'
     timezone = timezone_pref
     language = language_pref
+    prefix = prefix_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):

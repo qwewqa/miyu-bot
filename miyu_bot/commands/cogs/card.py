@@ -246,6 +246,9 @@ class Card(commands.Cog):
                             'Attribute': f'{self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
                             'Unit': f'{self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
                             'Release Date': f'{card.start_datetime}',
+                            'Event': f'{card.event.name if card.event else "None"}',
+                            'Gacha': f'{card.gacha.name if card.gacha else "None"}',
+                            'Availability': f'{card.availability.name}',
                         }),
                         inline=False)
         embed.add_field(name='Parameters',

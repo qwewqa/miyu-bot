@@ -48,3 +48,5 @@ rarity_emoji_ids = {
     'base': 799650003659915294,
     'limit_break': 799650003303268393
 }
+
+grey_emoji_id = 816549259541348372

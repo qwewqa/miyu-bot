@@ -6,17 +6,21 @@ import re
 import discord
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
+from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
+from d4dj_utils.master.gacha_master import GachaMaster
 from d4dj_utils.master.skill_master import SkillMaster
+from d4dj_utils.master.stock_master import StockCategory
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError, \
     list_operator_for, full_operators
-from miyu_bot.commands.common.asset_paths import get_card_icon_path, get_card_art_path
+from miyu_bot.commands.common.asset_paths import get_card_icon_path, get_card_art_path, get_gacha_banner_path
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
-    unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id
+    unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, common_unit_emoji_id, grey_emoji_id
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message
+from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message, \
+    run_deletable_message, run_dynamically_paged_message
 
 
 class Card(commands.Cog):
@@ -95,7 +99,7 @@ class Card(commands.Cog):
         sort, sort_op = arguments.single('sort', None,
                                          allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
         display, _op = arguments.single(['display', 'disp'], sort or CardAttribute.Power, allowed_operators=['='],
-                                      converter=card_attribute_aliases)
+                                        converter=card_attribute_aliases)
 
         listing = []
         for card in cards:
@@ -167,7 +171,7 @@ class Card(commands.Cog):
         reverse_sort = sort_op == '<' or arguments.tag('reverse')
         # Not used, but here because it's a valid argument before running require_all_arguments_used.
         display, _op = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
-                                      converter=card_attribute_aliases)
+                                        converter=card_attribute_aliases)
         characters = {self.bot.aliases.characters_by_name[c].id
                       for c in arguments.words(self.bot.aliases.characters_by_name.keys()) |
                       arguments.tags(self.bot.aliases.characters_by_name.keys())}
@@ -179,8 +183,10 @@ class Card(commands.Cog):
         attributes = {self.bot.aliases.attributes_by_name[a].id
                       for a in arguments.tags(self.bot.aliases.attributes_by_name.keys())}
         birthday = arguments.tag('birthday') | arguments.word('birthday')
-        score_up_filters = arguments.repeatable(['skill', 'score_up', 'score'], allowed_operators=full_operators, is_list=True, numeric=True)
-        heal_filters = arguments.repeatable(['heal', 'recovery'], allowed_operators=full_operators, is_list=True, numeric=True)
+        score_up_filters = arguments.repeatable(['skill', 'score_up', 'score'], allowed_operators=full_operators,
+                                                is_list=True, numeric=True)
+        heal_filters = arguments.repeatable(['heal', 'recovery'], allowed_operators=full_operators, is_list=True,
+                                            numeric=True)
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 
@@ -273,6 +279,103 @@ class Card(commands.Cog):
 
         return embed
 
+    @commands.command(name='gacha',
+                      aliases=['banner'],
+                      description='Displays gacha info.',
+                      help='!gacha Shiny Smily Scratch')
+    async def gacha(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
+        self.logger.info(f'Searching for gacha "{arg}".')
+
+        arguments = parse_arguments(arg)
+        gachas = self.get_gachas(ctx, arguments)
+
+        if not gachas:
+            await ctx.send(f'No results for gacha "{arg}"')
+            return
+
+        if len(gachas) == 1 or arguments.text():
+            embed = self.get_gacha_embed(gachas[0])
+            asyncio.ensure_future(run_deletable_message(ctx, await ctx.send(embed=embed)))
+        else:
+            idx = 0
+
+            def generator(n):
+                nonlocal idx
+                idx += n
+                idx = max(0, min(idx, len(gachas)))
+                return self.get_gacha_embed(gachas[idx])
+
+            asyncio.ensure_future(run_dynamically_paged_message(ctx, generator))
+
+    @commands.command(name='gachas',
+                      aliases=['banners'],
+                      description='Lists gacha.',
+                      help='!gachas')
+    async def gachas(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
+        self.logger.info(f'Searching for gacha "{arg}".')
+
+        arguments = parse_arguments(arg)
+        gachas = self.get_gachas(ctx, arguments)
+        embed = discord.Embed(title=f'Gacha List "{arg}"' if arg else 'Gacha List')
+        asyncio.ensure_future(
+            run_paged_message(ctx, embed, [self.format_gacha_name_for_list(gacha) for gacha in gachas]))
+
+    def get_gachas(self, ctx, arguments: ParsedArguments):
+        text = arguments.text()
+        arguments.require_all_arguments_used()
+
+        gacha = self.bot.asset_filters.gacha.get_sorted(text, ctx)
+
+        if not text:
+            gacha.sort(key=lambda g: (g.start_datetime, -g.ascending_sort_id))
+            gacha.reverse()
+
+        return gacha
+
+    def get_gacha_embed(self, gacha: GachaMaster):
+        embed = discord.Embed(title=gacha.name)
+
+        thumb_url = self.bot.asset_url + get_gacha_banner_path(gacha)
+
+        embed.set_thumbnail(url=thumb_url)
+
+        embed.add_field(name='Info',
+                        value=format_info({
+                            'Start Date': f'{gacha.start_datetime}',
+                            'End Date': f'{gacha.end_datetime}',
+                            'Event': f'{gacha.event.name if gacha.event else "None"}',
+                            'Pity Requirement': gacha.bonus_max_value or 'None',
+                            'Type': gacha.gacha_type.name,
+                        }),
+                        inline=False)
+        embed.add_field(name='Summary',
+                        value=gacha.summary,
+                        inline=False)
+        embed.add_field(name='Rateups',
+                        value='\n'.join(
+                            self.format_card_name_with_emoji(card) for card in gacha.pick_up_cards) or 'None',
+                        inline=False)
+        embed.add_field(name='Costs',
+                        value='\n'.join(self.format_draw_data(draw) for draw in gacha.draw_data))
+
+        return embed
+
+    stock_names = {
+        1: 'Diamond',
+        2: 'Paid Diamond',
+        901: 'Single Ticket',
+        902: 'Ten Pull Ticket',
+        903: '4★ Ticket'
+    }
+
+    def format_draw_data(self, draw: GachaDrawMaster):
+        name = self.stock_names.get(draw.stock_id, draw.stock.name)
+        pull_count = sum(draw.draw_amounts)
+        if draw.draw_limit:
+            return f'{pull_count} Pull: {draw.stock_amount}x {name}, Limit: {draw.draw_limit}, Refresh: {draw.is_reset_limit_every_day}'
+        else:
+            return f'{pull_count} Pull: {draw.stock_amount}x {name}'
+
     def format_card_name(self, card):
         return f'{card.rarity_id}★ {card.name} {card.character.full_name_english}'
 
@@ -280,6 +383,25 @@ class Card(commands.Cog):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
         attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
+
+    def format_card_name_with_emoji(self, card):
+        unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
+        attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
+        return f'{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}'
+
+    def format_gacha_name_for_list(self, gacha):
+        pick_ups = gacha.pick_up_cards
+        units = {card.character.unit.id for card in pick_ups}
+        attributes = {card.attribute.id for card in pick_ups}
+        if len(units) == 1:
+            unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[next(iter(units))])
+        else:
+            unit_emoji = self.bot.get_emoji(grey_emoji_id)
+        if len(attributes) == 1:
+            attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[next(iter(attributes))])
+        else:
+            attribute_emoji = self.bot.get_emoji(grey_emoji_id)
+        return f'`{unit_emoji}`+`{attribute_emoji}` {gacha.name}'
 
 
 class CardAttribute(enum.Enum):

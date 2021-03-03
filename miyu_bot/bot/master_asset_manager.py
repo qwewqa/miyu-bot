@@ -32,6 +32,11 @@ class MasterFilterManager:
             naming_function=lambda c: f'{c.name} {c.character.first_name_english}',
             filter_function=lambda c: c.is_released,
         )
+        self.gacha = MasterFilter(
+            self.manager.gacha_master,
+            naming_function=lambda g: f'{g.name}',
+            filter_function=lambda g: g.is_released,
+        )
 
 
 class MasterFilter:

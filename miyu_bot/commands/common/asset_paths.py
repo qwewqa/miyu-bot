@@ -3,6 +3,7 @@ from pathlib import Path
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.chart_master import ChartMaster
 from d4dj_utils.master.event_master import EventMaster
+from d4dj_utils.master.gacha_master import GachaMaster
 from d4dj_utils.master.music_master import MusicMaster
 
 from miyu_bot.bot.master_asset_manager import hash_master
@@ -20,6 +21,8 @@ card_icon_dir = card_dir / 'icons'
 card_art_dir = card_dir / 'art'
 event_dir = Path('.') / 'events'
 event_logo_dir = event_dir / 'logos'
+gacha_dir = Path('.') / 'gacha'
+gacha_banner_dir = gacha_dir / 'banners'
 
 
 def get_music_jacket_path(music: MusicMaster):
@@ -44,3 +47,7 @@ def get_card_icon_path(card: CardMaster, lb):
 
 def get_event_logo_path(event: EventMaster):
     return _get_asset_path(event, event_logo_dir, event.logo_path)
+
+
+def get_gacha_banner_path(gacha: GachaMaster):
+    return _get_asset_path(gacha, gacha_banner_dir, gacha.banner_path)

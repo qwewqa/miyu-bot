@@ -19,6 +19,8 @@ def main():
     (target_dir / card_art_dir).mkdir(exist_ok=True)
     (target_dir / event_dir).mkdir(exist_ok=True)
     (target_dir / event_logo_dir).mkdir(exist_ok=True)
+    (target_dir / gacha_dir).mkdir(exist_ok=True)
+    (target_dir / gacha_banner_dir).mkdir(exist_ok=True)
 
     for music in asset_manager.music_master.values():
         try:
@@ -43,6 +45,12 @@ def main():
     for event in asset_manager.event_master.values():
         try:
             shutil.copy(event.logo_path, target_dir / get_event_logo_path(event))
+        except FileNotFoundError:
+            pass
+
+    for gacha in asset_manager.gacha_master.values():
+        try:
+            shutil.copy(gacha.banner_path, target_dir / get_gacha_banner_path(gacha))
         except FileNotFoundError:
             pass
 

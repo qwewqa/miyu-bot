@@ -23,7 +23,7 @@ with open('config.json') as f:
 async def get_prefix(bot: D4DJBot, message: discord.Message):
     if message.guild:
         guild = await models.Guild.get_or_none(id=message.guild.id)
-        guild_prefix = guild.prefix if guild else None
+        guild_prefix = (guild.prefix or '!') if guild else '!'
     else:
         guild_prefix = '!'
     author = await models.User.get_or_none(id=message.author.id)

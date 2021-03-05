@@ -255,11 +255,11 @@ class Event(commands.Cog):
             minutes = now.minute
             embed = await self.get_leaderboard_embed(event)
             for interval in valid_loop_intervals:
-                if (self.last_leaderboard_loop_embeds.get(interval) and
-                        self.last_leaderboard_loop_embeds[interval].description == embed.description):
-                    continue
-                self.last_leaderboard_loop_embeds[interval] = embed
                 if minutes % interval == 0:
+                    if (interval in self.last_leaderboard_loop_embeds and
+                            self.last_leaderboard_loop_embeds[interval].description == embed.description):
+                        continue
+                    self.last_leaderboard_loop_embeds[interval] = embed
                     channels = await models.Channel.filter(loop=interval)
                     for channel_data in channels:
                         channel = self.bot.get_channel(channel_data.id)

@@ -1,3 +1,4 @@
+import aiohttp
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
 from tortoise import Tortoise
@@ -18,6 +19,7 @@ class D4DJBot(commands.Bot):
         self.assets = assets
         self.asset_filters = asset_filters
         self.aliases = NameAliases(assets)
+        self.session = aiohttp.ClientSession()
         super().__init__(*args, **kwargs)
 
     async def login(self, token, *, bot=True):
@@ -25,5 +27,6 @@ class D4DJBot(commands.Bot):
         await super(D4DJBot, self).login(token, bot=bot)
 
     async def close(self):
+        await self.session.close()
         await Tortoise.close_connections()
         await super(D4DJBot, self).close()

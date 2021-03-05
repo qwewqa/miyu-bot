@@ -98,6 +98,21 @@ class PreferenceScope(Model, metaclass=PreferenceScopeMeta):
 
 lowercase_tzs = {tz.lower() for tz in pytz.all_timezones_set}
 
+# In minutes. Should be evenly divisible with respect to 24 hours.
+valid_loop_intervals = [1, 2, 5, 10, 20, 30, 60, 120]
+
+
+def validate_loop_interval(v: str):
+    if not v.isnumeric():
+        return 'Not an integer.'
+    v = float(v)
+    if not v.is_integer():
+        return 'Not an integer.'
+    v = int(v)
+    if v not in valid_loop_intervals:
+        return 'Must be 1, 2, 5, 10, 20, 30, 60, or 120. Use clearpref to remove.'
+
+
 timezone_pref = Preference('timezone',
                            fields.CharField(max_length=31, default=''),
                            default_value='etc/utc',
@@ -114,6 +129,12 @@ prefix_pref = Preference('prefix',
                          default_value='!',
                          unset_value='',
                          validator=lambda prefix: None if len(prefix) <= 63 else 'Prefix is too long.')
+loop_pref = Preference('loop',
+                       fields.IntField(default=None, null=True, index=True),
+                       default_value=None,
+                       unset_value=None,
+                       validator=validate_loop_interval,
+                       transformer=lambda v: int(v))
 
 
 class Guild(PreferenceScope):
@@ -142,6 +163,7 @@ class Channel(PreferenceScope):
     scope_name = 'Channel'
     timezone = timezone_pref
     language = language_pref
+    loop = loop_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):

@@ -72,6 +72,7 @@ async def on_command_error(context: commands.Context, exception):
     error = getattr(exception, 'original', exception)
     if isinstance(error, ArgumentError):
         await context.send(str(error))
+        return
 
     if hasattr(context.command, 'on_error'):
         return

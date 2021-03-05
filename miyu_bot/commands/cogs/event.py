@@ -2,35 +2,37 @@ import asyncio
 import datetime
 import datetime as dt
 import logging
-
 import math
-import aiohttp
+
 import dateutil.parser
 import discord
 import pytz
 from d4dj_utils.master.event_master import EventMaster, EventState
-from discord.ext import commands
+from discord.ext import commands, tasks
 from pytz import UnknownTimeZoneError
 
+from miyu_bot.bot import models
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import parse_arguments, ArgumentError
+from miyu_bot.bot.models import valid_loop_intervals
+from miyu_bot.commands.common.argument_parsing import parse_arguments
 from miyu_bot.commands.common.asset_paths import get_event_logo_path
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.bot.master_asset_manager import hash_master
 from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message
 
 
 class Event(commands.Cog):
     bot: D4DJBot
+    EPRATE_RESOLUTION = 2  # Resolution of the Rate/hr reported by endpoint in hours.
 
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.EPRATE_RESOLUTION = 2 #Resolution of the Rate/hr reported by endpoint in hours.
+        self.last_leaderboard_loop_embed = None
+        self.leaderboard_loop.start()
 
     @commands.command(name='event',
                       aliases=['ev'],
@@ -227,24 +229,48 @@ class Event(commands.Cog):
                       description='Displays the top 20 in the main leaderboard',
                       help='!t20')
     async def t20(self, ctx: commands.Context):
-        async with aiohttp.ClientSession() as session:
-            async with session.get('http://www.projectdivar.com/eventdata/t20') as resp:
-                leaderboard = await resp.json(encoding='utf-8')
+        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20') as resp:
+            leaderboard = await resp.json(encoding='utf-8')
         event = self.bot.asset_filters.events.get_latest_event(ctx)
         embed = discord.Embed(title=f'{event.name} t20')
         embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
-        max_points_digits = len(str(leaderboard[0]['points']))
+        max_points_digits = len(f'{leaderboard[0]["points"]:,}')
         nl = "\n"
         update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)
         update_date = update_date.astimezone(pytz.timezone('Asia/Tokyo'))
         header = f'Updated {update_date}\n\nRank  {"Points":<{max_points_digits}}  Name'
         listing = [
-            f'{player["rank"]:<4}  {player["points"]:<{max_points_digits}}  {player["name"].replace(nl, "")}'
+            f'{player["rank"]:<4}  {player["points"]:>{max_points_digits},}  {player["name"].replace(nl, "")}'
             for player in leaderboard]
         paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, numbered=False)
         asyncio.ensure_future(paged)
 
-    valid_tiers = {50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000}
+    valid_tiers = [50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000]
+
+    @tasks.loop(minutes=1)
+    async def leaderboard_loop(self):
+        try:
+            event = self.bot.asset_filters.events.get_latest_event(None)
+            now = datetime.datetime.now()
+            minutes = now.minute
+            embed = await self.get_leaderboard_embed(event)
+            if self.last_leaderboard_loop_embed and self.last_leaderboard_loop_embed.description == embed.description:
+                return
+            self.last_leaderboard_loop_embed = embed
+            for interval in valid_loop_intervals:
+                if minutes % interval == 0:
+                    channels = await models.Channel.filter(loop=interval)
+                    for channel_data in channels:
+                        channel = self.bot.get_channel(channel_data.id)
+                        await channel.send(embed=embed)
+        except Exception as e:
+            self.logger.warning(f'Error in leaderboard loop: {getattr(e, "message", repr(e))}')
+
+    @leaderboard_loop.before_loop
+    async def before_leaderboard_loop(self):
+        await self.bot.wait_until_ready()
+        # Sleep until the start of the next minute
+        await asyncio.sleep(61 - datetime.datetime.now().second)
 
     @commands.command(name='cutoff',
                       aliases=['co', 't50', 't100', 't500', 't1000', 't2000', 't5000',
@@ -276,10 +302,25 @@ class Event(commands.Cog):
         else:
             await ctx.send(f'No data available for tier {tier}.')
 
+    async def get_leaderboard_embed(self, event: EventMaster):
+        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20') as resp:
+            leaderboard = {entry['rank']: entry for entry in (await resp.json(encoding='utf-8'))}
+        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+            statistics = {int(k): v for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()}
+        max_points_digits = len(f'{statistics[1]["points"]:,}')
+        nl = "\n"
+        header = f'Rank     {"Points":<{max_points_digits}}  Name'
+        body = '\n'.join(
+            f'{rank:<7,}  {stats["points"]:>{max_points_digits},}  {leaderboard.get(rank, {}).get("name", "").replace(nl, "")}'
+            for rank, stats in statistics.items())
+        embed = discord.Embed(title=f'{event.name} Leaderboard', description=f'```{header}\n{body}```',
+                              timestamp=datetime.datetime.now())
+        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        return embed
+
     async def get_tier_embed(self, tier: str, event: EventMaster):
-        async with aiohttp.ClientSession() as session:
-            async with session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
-                leaderboard = await resp.json(encoding='utf-8')
+        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+            leaderboard = await resp.json(encoding='utf-8')
 
         data = leaderboard['statistics'].get(tier)
         if not data:
@@ -295,13 +336,13 @@ class Event(commands.Cog):
 
         embed = discord.Embed(title=f'{event.name} [t{tier}]', timestamp=dt.datetime.now(dt.timezone.utc))
         embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
-        
-        
-        
-        average_rate="\n( +"+str(math.ceil((data['rate']*self.EPRATE_RESOLUTION)/data['count']))+" avg )" if int(tier)<=20 else "" #Only T20 is tracked in real-time, we can't guarantee <2hr intervals for other points so the rate returned is just overall rate.
-        
+
+        average_rate = "\n( +" + str(
+            math.ceil((data['rate'] * self.EPRATE_RESOLUTION) / data['count'])) + " avg )" if int(
+            tier) <= 20 else ""  # Only T20 is tracked in real-time, we can't guarantee <2hr intervals for other points so the rate returned is just overall rate.
+
         embed.add_field(name='Points',
-                        value=str(data['points'])+average_rate,
+                        value=str(data['points']) + average_rate,
                         inline=True)
         embed.add_field(name='Last Update',
                         value=data['lastUpdate'] or 'None',

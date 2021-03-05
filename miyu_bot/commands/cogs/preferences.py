@@ -1,9 +1,6 @@
-import enum
 import logging
-from collections import defaultdict
 from typing import Dict, Type
 
-import pytz
 from discord.ext import commands
 
 from miyu_bot.bot import models
@@ -52,7 +49,7 @@ class Preferences(commands.Cog):
     async def getpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope.scope_name}".')
+            await ctx.send(f'Invalid scope "{scope}".')
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
@@ -73,7 +70,7 @@ class Preferences(commands.Cog):
     async def clearpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope.scope_name}".')
+            await ctx.send(f'Invalid scope "{scope}".')
             return
         if name not in scope.preferences:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
@@ -98,13 +95,13 @@ preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
 
 async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool):
     sources = []
-    if user := await models.User.get_or_none(id=ctx.author.id):
+    if user_prefs := await models.User.get_or_none(id=ctx.author.id):
         if not toggle_user_prefs:
-            sources.append(user)
-    if channel := await models.Channel.get_or_none(id=ctx.channel.id):
-        sources.append(channel)
-    if guild := ctx.guild and await models.Guild.get_or_none(id=ctx.guild.id):
-        sources.append(guild)
+            sources.append(user_prefs)
+    if channel_prefs := await models.Channel.get_or_none(id=ctx.channel.id):
+        sources.append(channel_prefs)
+    if guild_prefs := ctx.guild and await models.Guild.get_or_none(id=ctx.guild.id):
+        sources.append(guild_prefs)
 
     preferences = {}
     preference_types = {}

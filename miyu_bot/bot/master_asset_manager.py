@@ -101,15 +101,15 @@ class MasterFilter:
             else:
                 return list(self.default_filter.values())
 
-    def values(self, ctx: commands.Context):
-        if ctx.channel.id in no_filter_channels:
+    def values(self, ctx: Optional[commands.Context]):
+        if ctx is not None and ctx.channel.id in no_filter_channels:
             return self.unrestricted_filter.values()
         else:
             return self.default_filter.values()
 
 
 class EventFilter(MasterFilter):
-    def get_latest_event(self, ctx: commands.Context) -> EventMaster:
+    def get_latest_event(self, ctx: Optional[commands.Context]) -> EventMaster:
         """Returns the oldest event that has not ended or the newest event otherwise."""
         try:
             # NY event overlapped with previous event

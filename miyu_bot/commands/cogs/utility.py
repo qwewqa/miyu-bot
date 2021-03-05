@@ -28,6 +28,7 @@ class Utility(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def shutdown(self, ctx: commands.Context):
+        await ctx.send('Shutting down.')
         await self.bot.logout()
 
     @commands.command(name='eval', hidden=True)

@@ -31,7 +31,7 @@ class Event(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.last_leaderboard_loop_embed = None
+        self.last_leaderboard_loop_embeds = {}
         self.leaderboard_loop.start()
 
     @commands.command(name='event',
@@ -254,10 +254,11 @@ class Event(commands.Cog):
             now = datetime.datetime.now()
             minutes = now.minute
             embed = await self.get_leaderboard_embed(event)
-            if self.last_leaderboard_loop_embed and self.last_leaderboard_loop_embed.description == embed.description:
-                return
-            self.last_leaderboard_loop_embed = embed
             for interval in valid_loop_intervals:
+                if (self.last_leaderboard_loop_embeds.get(interval) and
+                        self.last_leaderboard_loop_embeds[interval].description == embed.description):
+                    continue
+                self.last_leaderboard_loop_embeds[interval] = embed
                 if minutes % interval == 0:
                     channels = await models.Channel.filter(loop=interval)
                     for channel_data in channels:

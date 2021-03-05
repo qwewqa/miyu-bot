@@ -252,7 +252,7 @@ class Event(commands.Cog):
         try:
             event = self.bot.asset_filters.events.get_latest_event(None)
             now = datetime.datetime.now()
-            minutes = now.minute
+            minutes = now.minute + 60 * now.hour
             embed = await self.get_leaderboard_embed(event)
             for interval in valid_loop_intervals:
                 if minutes % interval == 0:

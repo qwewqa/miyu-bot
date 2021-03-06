@@ -31,8 +31,10 @@ class Event(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        self.last_leaderboard_loop_embeds = {}
         self.leaderboard_loop.start()
+
+    def cog_unload(self):
+        self.leaderboard_loop.cancel()
 
     @commands.command(name='event',
                       aliases=['ev'],
@@ -249,6 +251,9 @@ class Event(commands.Cog):
 
     @tasks.loop(minutes=1)
     async def leaderboard_loop(self):
+        # Storing this on the bot object allows it to persist past bot reloads
+        if not hasattr(self.bot, 'last_leaderboard_loop_embeds'):
+            self.bot.last_leaderboard_loop_embeds = {}
         try:
             event = self.bot.asset_filters.events.get_latest_event(None)
             now = datetime.datetime.now()
@@ -256,10 +261,10 @@ class Event(commands.Cog):
             embed = await self.get_leaderboard_embed(event)
             for interval in valid_loop_intervals:
                 if minutes % interval == 0:
-                    if (interval in self.last_leaderboard_loop_embeds and
-                            self.last_leaderboard_loop_embeds[interval].description == embed.description):
+                    if (interval in self.bot.last_leaderboard_loop_embeds and
+                            self.bot.last_leaderboard_loop_embeds[interval].description == embed.description):
                         continue
-                    self.last_leaderboard_loop_embeds[interval] = embed
+                    self.bot.last_leaderboard_loop_embeds[interval] = embed
                     channels = await models.Channel.filter(loop=interval)
                     for channel_data in channels:
                         channel = self.bot.get_channel(channel_data.id)

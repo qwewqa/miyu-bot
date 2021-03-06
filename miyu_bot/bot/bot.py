@@ -17,7 +17,7 @@ class D4DJBot(commands.Bot):
 
     def __init__(self, asset_path, *args, **kwargs):
         self.asset_path = asset_path
-        self.assets = AssetManager(self.asset_path)
+        self.assets = AssetManager(self.asset_path, drop_extra_fields=True)
         self.asset_filters = MasterFilterManager(self.assets)
         self.aliases = NameAliases(self.assets)
         self.session = aiohttp.ClientSession()
@@ -26,7 +26,7 @@ class D4DJBot(commands.Bot):
 
     def try_reload_assets(self):
         try:
-            assets = AssetManager(self.asset_path)
+            assets = AssetManager(self.asset_path, drop_extra_fields=True)
             asset_filters = MasterFilterManager(assets)
             aliases = NameAliases(assets)
         except:

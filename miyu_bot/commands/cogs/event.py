@@ -308,7 +308,7 @@ class Event(commands.Cog):
             leaderboard = {entry['rank']: entry for entry in (await resp.json(encoding='utf-8'))}
         async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
             statistics = {int(k): v for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()}
-        max_points_digits = len(f'{statistics[1]["points"]:,}')
+        max_points_digits = len(f'{statistics.get(1, {}).get("points", 1):,}')
         nl = "\n"
         header = f'Rank     {"Points":<{max_points_digits}}  Name'
         body = '\n'.join(

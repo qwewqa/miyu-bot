@@ -15,12 +15,26 @@ class D4DJBot(commands.Bot):
 
     asset_url = 'https://qwewqa.github.io/d4dj-dumps/'
 
-    def __init__(self, assets, asset_filters, *args, **kwargs):
+    def __init__(self, asset_path, *args, **kwargs):
+        self.asset_path = asset_path
+        self.assets = AssetManager(self.asset_path)
+        self.asset_filters = MasterFilterManager(self.assets)
+        self.aliases = NameAliases(self.assets)
+        self.session = aiohttp.ClientSession()
+        self.extension_names = set()
+        super().__init__(*args, **kwargs)
+
+    def try_reload_assets(self):
+        try:
+            assets = AssetManager(self.asset_path)
+            asset_filters = MasterFilterManager(assets)
+            aliases = NameAliases(assets)
+        except:
+            return False
         self.assets = assets
         self.asset_filters = asset_filters
-        self.aliases = NameAliases(assets)
-        self.session = aiohttp.ClientSession()
-        super().__init__(*args, **kwargs)
+        self.aliases = aliases
+        return True
 
     async def login(self, token, *, bot=True):
         await Tortoise.init(TORTOISE_ORM)
@@ -30,3 +44,15 @@ class D4DJBot(commands.Bot):
         await self.session.close()
         await Tortoise.close_connections()
         await super(D4DJBot, self).close()
+
+    def load_extension(self, name):
+        self.extension_names.add(name)
+        super(D4DJBot, self).load_extension(name)
+
+    def unload_extension(self, name):
+        self.extension_names.remove(name)
+        super(D4DJBot, self).unload_extension(name)
+
+    def reload_all_extensions(self):
+        for name in self.extension_names:
+            self.reload_extension(name)

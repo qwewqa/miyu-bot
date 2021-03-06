@@ -34,8 +34,7 @@ async def get_prefix(bot: D4DJBot, message: discord.Message):
         return '!miyu ', '!'
 
 
-asset_manager = AssetManager('assets')
-bot = D4DJBot(asset_manager, MasterFilterManager(asset_manager), command_prefix=get_prefix, case_insensitive=True,
+bot = D4DJBot('assets', command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
 
 bot.load_extension('miyu_bot.commands.cogs.card')

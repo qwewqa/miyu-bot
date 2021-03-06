@@ -31,6 +31,26 @@ class Utility(commands.Cog):
         await ctx.send('Shutting down.')
         await self.bot.logout()
 
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def reload_extension(self, ctx: commands.Context, *, name: str = ''):
+        try:
+            if name:
+                self.bot.reload_extension(name)
+            else:
+                self.bot.reload_all_extensions()
+            await ctx.send('Successfully reloaded extension.')
+        except:
+            await ctx.send('Failed to reload extension.')
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def reload_assets(self, ctx: commands.Context):
+        if self.bot.try_reload_assets():
+            await ctx.send('Assets Reloaded.')
+        else:
+            await ctx.send('Failed to reload assets.')
+
     @commands.command(name='eval', hidden=True)
     @commands.is_owner()
     async def eval_cmd(self, ctx: commands.Context, *, body: str):

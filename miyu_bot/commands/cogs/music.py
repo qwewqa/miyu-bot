@@ -222,7 +222,7 @@ class Music(commands.Cog):
             songs = sorted(songs, key=lambda s: sort.get_sort_key_from_music(s))
             if sort == MusicAttribute.DefaultOrder and songs and songs[0].id == 1:
                 songs = [*songs[1:], songs[0]]
-            if sort in [MusicAttribute.Level, MusicAttribute.Date]:
+            if sort in [MusicAttribute.Level, MusicAttribute.Date, MusicAttribute.Combo]:
                 songs = songs[::-1]
             if reverse_sort:
                 songs = songs[::-1]
@@ -374,6 +374,7 @@ class MusicAttribute(enum.Enum):
     Duration = enum.auto()
     Date = enum.auto()
     BPM = enum.auto()
+    Combo = enum.auto()
 
     def get_sort_key_from_music(self, music: MusicMaster):
         return {
@@ -385,6 +386,7 @@ class MusicAttribute(enum.Enum):
             self.Duration: Music.get_music_duration(music),
             self.Date: music.start_datetime,
             self.BPM: music.bpm,
+            self.Combo: music.charts[4].note_counts[0].count if 4 in music.charts else 0,
         }[self]
 
     def get_formatted_from_music(self, music: MusicMaster):
@@ -397,6 +399,7 @@ class MusicAttribute(enum.Enum):
             self.Duration: Music.format_duration(Music.get_music_duration(music)),
             self.Date: str(music.start_datetime.date()),
             self.BPM: f'{music.bpm:>5.2f}',
+            self.Combo: str(music.charts[4].note_counts[0].count) if 4 in music.charts else '?',
         }[self]
 
 
@@ -413,6 +416,7 @@ music_attribute_aliases = {
     'length': MusicAttribute.Duration,
     'date': MusicAttribute.Date,
     'bpm': MusicAttribute.BPM,
+    'combo': MusicAttribute.Combo,
 }
 
 

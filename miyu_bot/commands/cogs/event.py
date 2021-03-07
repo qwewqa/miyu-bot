@@ -323,7 +323,7 @@ class Event(commands.Cog):
         nl = "\n"
         header = f'Rank     {"Points":<{max_points_digits}}  Name'
         body = '\n'.join(
-            f'{rank:<7,}  {stats["points"]:>{max_points_digits},}  {leaderboard.get(rank, {}).get("name", "").replace(nl, "")}'
+            f'{rank:<7,}  {stats["points"] if isinstance(stats["points"], int) else 0:>{max_points_digits},}  {leaderboard.get(rank, {}).get("name", "").replace(nl, "")}'
             for rank, stats in statistics.items())
         embed = discord.Embed(title=f'{event.name} Leaderboard', description=f'```{header}\n{body}```',
                               timestamp=datetime.datetime.now())

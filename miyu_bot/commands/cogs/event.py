@@ -271,7 +271,7 @@ class Event(commands.Cog):
                         if not channel:
                             try:
                                 channel = await self.bot.fetch_channel(channel_data.id)
-                            except discord.ClientException as e:
+                            except Exception as e:
                                 self.logger.warning(f'Failed to get channel {channel_data.id}: {e}.')
                                 continue
                         await channel.send(embed=embed)

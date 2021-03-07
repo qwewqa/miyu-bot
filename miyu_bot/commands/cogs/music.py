@@ -140,6 +140,27 @@ class Music(commands.Cog):
                                           f'Total Duration: {sum(md.duration for md in mix_data):.2f}s```')
         await ctx.send(embed=embed)
 
+    @commands.command(name='mixrating',
+                      aliases=['mix_rating'],
+                      description='Returns the rating of a mix.',
+                      help='!mixrating grgr grgr grgr "cyber cyber"')
+    async def mixrating(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
+        songs = []
+        for name in [a, b, c, d]:
+            song = self.bot.asset_filters.music.get(name, ctx)
+            if not song:
+                await ctx.send(f'Unknown song "{name}".')
+                return
+            songs.append(song)
+
+        rating = calculate_mix_rating(songs)
+
+        nl = '\n'
+        embed = discord.Embed(title='Mix Rating',
+                              description=f'```{nl.join(f"{i}. {self.format_song_title(song)}" for i, song in enumerate(songs, 1))}\n\n'
+                                          f'Rating: {rating}```')
+        await ctx.send(embed=embed)
+
     @commands.command(name='sections',
                       aliases=['mixes'],
                       description='Finds the sections of the chart with the given name.',

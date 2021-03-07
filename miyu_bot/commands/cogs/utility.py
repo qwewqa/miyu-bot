@@ -37,9 +37,10 @@ class Utility(commands.Cog):
         try:
             if name:
                 self.bot.reload_extension(name)
+                await ctx.send('Successfully reloaded extension.')
             else:
                 self.bot.reload_all_extensions()
-            await ctx.send('Successfully reloaded extension.')
+                await ctx.send('Successfully all reloaded extensions.')
         except:
             await ctx.send('Failed to reload extension.')
 

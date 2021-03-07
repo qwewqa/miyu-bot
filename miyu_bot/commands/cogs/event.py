@@ -247,6 +247,13 @@ class Event(commands.Cog):
         paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, numbered=False)
         asyncio.ensure_future(paged)
 
+    @commands.command(name='leaderboard',
+                      aliases=['lb'],
+                      description='Displays the full leaderboard',
+                      help='!leaderboard')
+    async def t20(self, ctx: commands.Context):
+        await ctx.send(embed=await self.get_leaderboard_embed(self.bot.asset_filters.events.get_latest_event(ctx)))
+
     valid_tiers = [50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000]
 
     @tasks.loop(minutes=1)

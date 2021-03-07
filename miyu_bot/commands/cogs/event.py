@@ -267,7 +267,10 @@ class Event(commands.Cog):
                     self.bot.last_leaderboard_loop_embeds[interval] = embed
                     channels = await models.Channel.filter(loop=interval)
                     for channel_data in channels:
-                        channel = self.bot.get_channel(channel_data.id)
+                        channel = self.bot.get_channel(channel_data.id) or await self.bot.fetch_channel(channel_data.id)
+                        if not channel:
+                            self.logger.info(f'Failed to get channel with id {channel_data.id} for leaderboard loop.')
+                            continue
                         await channel.send(embed=embed)
         except Exception as e:
             self.logger.warning(f'Error in leaderboard loop: {getattr(e, "message", repr(e))}')

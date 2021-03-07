@@ -214,7 +214,7 @@ class ParsedArguments:
             pref_type = pref_types[name]
             override, _op = self.single(name)
             if override:
-                if error_message := pref_type.validate(override):
+                if error_message := pref_type.validate_or_get_error_message(override):
                     raise ArgumentError(f'Invalid value "{override}" for preference "{name}": {error_message}')
                 prefs[name] = pref_type.transform(override)
         return prefs

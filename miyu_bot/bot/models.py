@@ -1,6 +1,6 @@
 import copy
 from abc import abstractmethod
-from typing import ClassVar, Callable, Any, Optional, Dict, Type, Tuple
+from typing import ClassVar, Callable, Any, Optional, Dict, Type, Tuple, Union
 
 import pytz
 from discord.ext import commands
@@ -18,17 +18,25 @@ class Preference:
                  field: fields.Field,
                  default_value: Any,
                  unset_value: Any,
-                 validator: Callable[[str], Optional[str]] = lambda _: None,
-                 transformer: Callable[[str], Any] = lambda v: v):
+                 *,
+                 validator: Callable[[str], Union[bool, str, None]] = lambda _v: None,
+                 transformer: Callable[[str], Any] = lambda v: v,
+                 is_privileged: bool = False):
         self.name = name
         self.field = field
         self.default_value = default_value
         self.unset_value = unset_value
         self._validator = validator
         self._transformer = transformer
+        self.is_privileged = is_privileged
 
-    def validate(self, value: str) -> Optional[str]:
-        return self._validator(value)
+    def validate_or_get_error_message(self, value: str) -> Optional[str]:
+        value = self._validator(value)
+        if isinstance(value, bool) and value:
+            return 'Validation error.'
+        elif isinstance(value, str):
+            return value
+        return None
 
     def transform(self, value: str) -> Any:
         return self._transformer(value)
@@ -85,8 +93,6 @@ class PreferenceScope(Model, metaclass=PreferenceScopeMeta):
         if name not in self.preferences:
             raise KeyError(f'Unknown preference "{name}".')
         preference = self.preferences[name]
-        if error_message := preference.validate(value):
-            raise ValueError(error_message)
         setattr(self, preference.attribute_name, preference.transform(value))
 
     def clear_preference(self, name):
@@ -95,8 +101,25 @@ class PreferenceScope(Model, metaclass=PreferenceScopeMeta):
         preference = self.preferences[name]
         setattr(self, preference.attribute_name, preference.unset_value)
 
+    @staticmethod
+    def has_permissions(ctx: commands.Context) -> bool:
+        return True
+
 
 lowercase_tzs = {tz.lower() for tz in pytz.all_timezones_set}
+
+bool_true_strings = {'True', 'true', 'T', 't', '1', 'Yes', 'yes'}
+bool_false_strings = {'False', 'false', 'F', 'f', '0', 'No', 'no'}
+bool_strings = bool_true_strings | bool_false_strings
+
+
+def validate_boolean(v: str):
+    return v in bool_strings
+
+
+def transform_boolean(v: str):
+    return v in bool_true_strings  # Assumes already validated
+
 
 # In minutes. Should be evenly divisible with respect to 24 hours.
 valid_loop_intervals = [1, 2, 5, 10, 20, 30, 60, 120]
@@ -155,6 +178,10 @@ class Guild(PreferenceScope):
     def __str__(self):
         return f'{self.name} ({self.id})'
 
+    @staticmethod
+    def has_permissions(ctx: commands.Context) -> bool:
+        return ctx.author.guild_permissions.manage_channels
+
 
 class Channel(PreferenceScope):
     id = fields.BigIntField(pk=True)
@@ -171,6 +198,10 @@ class Channel(PreferenceScope):
 
     def __str__(self):
         return f'{self.name} ({self.id})'
+
+    @staticmethod
+    def has_permissions(ctx: commands.Context) -> bool:
+        return ctx.author.guild_permissions.manage_channels
 
 
 class User(PreferenceScope):

@@ -23,16 +23,15 @@ class Preferences(commands.Cog):
         if not scope:
             await ctx.send(f'Invalid scope "{scope.scope_name}".')
             return
-        if scope != models.User and not (await ctx.bot.is_owner(ctx.author) or
-                                         ctx.author.guild_permissions.manage_channels):
-            await ctx.send(f'Altering preferences for scope "{scope.scope_name}" requires administrator permissions.')
-            return
         if name not in scope.preferences:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
             return
         preference = scope.preferences[name]
-        if validation_error_message := preference.validate(value):
-            await ctx.send(f'Invalid value "{value}" for preference "{name}": {validation_error_message}')
+        if not (await ctx.bot.is_owner(ctx.author) or (scope.has_permissions(ctx) and not preference.is_privileged)):
+            await ctx.send(f'Insufficient permissions.')
+            return
+        if error_message := preference.validate_or_get_error_message(value):
+            await ctx.send(f'Invalid value "{value}" for preference "{name}": {error_message}')
         entry = await scope.get_from_context(ctx)
         if not entry:
             await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
@@ -74,6 +73,10 @@ class Preferences(commands.Cog):
             return
         if name not in scope.preferences:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
+            return
+        preference = scope.preferences[name]
+        if not (await ctx.bot.is_owner(ctx.author) or (scope.has_permissions(ctx) and not preference.is_privileged)):
+            await ctx.send(f'Insufficient permissions.')
             return
         entry = await scope.get_from_context(ctx)
         if not entry:

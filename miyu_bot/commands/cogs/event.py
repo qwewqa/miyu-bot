@@ -298,6 +298,10 @@ class Event(commands.Cog):
                       description=f'Displays the cutoffs at different tiers. Valid tiers: {str(valid_tiers)}',
                       help='!cutoff 50')
     async def cutoff(self, ctx: commands.Context, tier: str = ''):
+        if ctx.invoked_with.endswith('co') and tier == 'conut':
+            await ctx.send('🥥')
+            return
+
         def process_tier_arg(tier_arg):
             tier_arg = tier_arg.lower()
             if tier_arg[0] == 't':

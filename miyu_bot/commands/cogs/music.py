@@ -269,23 +269,13 @@ class Music(commands.Cog):
             chart_data = chart.load_chart_data()
             note_counts = chart_data.get_note_counts()
 
-            chart_data = chart.load_chart_data()
-            skill_bars = chart_data.common_data.get_skill_times(song.duration)
-            start_notes = [next(i + 1 for i, note in enumerate(chart_data.notes) if note.time >= skill_time)
-                           for skill_time in skill_bars]
-            end_notes = [next(i for i, note in enumerate(chart_data.notes) if note.time >= skill_time + 9)
-                         for skill_time in skill_bars]
-
             embed.add_field(name='Info',
                             value=f'Level: {chart.display_level}\n'
                                   f'Duration: {self.format_duration(song.duration)}\n'
                                   f'Unit: {song.special_unit_name or song.unit.name}\n'
                                   f'Category: {song.category.name}\n'
                                   f'BPM: {song.bpm}\n'
-                                  f'Designer: {chart.designer.name}\n'
-                                  f'Raw Skill Times: {chart_data.common_data.skill_times}\n'
-                                  f'Start Notes: {start_notes}\n'
-                                  f'End Notes: {end_notes}',
+                                  f'Designer: {chart.designer.name}\n',
                             inline=False)
             embed.add_field(name='Combo',
                             value=f'Max Combo: {chart.note_counts[ChartSectionType.Full].count}\n'

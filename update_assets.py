@@ -15,11 +15,6 @@ async def main():
     manager = AssetManager('assets')
     manager.render_charts_by_master()
 
-    for music in manager.music_master.values():
-        if not music.audio_path.with_name(music.audio_path.name + '.wav').exists():
-            music.decode_audio()
-            logger.info(f'Decoded audio for {music.name}.')
-
 
 if __name__ == '__main__':
     asyncio.run(main())

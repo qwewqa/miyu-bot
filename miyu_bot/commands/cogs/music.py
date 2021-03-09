@@ -1,9 +1,6 @@
 import asyncio
-import contextlib
 import enum
-import itertools
 import logging
-import wave
 from inspect import cleandoc
 from typing import Tuple
 
@@ -78,7 +75,7 @@ class Music(commands.Cog):
 
         music_info = {
             'Category': song.category.name,
-            'Duration': self.format_duration(self.get_music_duration(song)),
+            'Duration': self.format_duration(song.duration),
             'BPM': song.bpm,
             'Section Trend': song.section_trend.name,
             'Sort Order': song.default_order,
@@ -272,13 +269,23 @@ class Music(commands.Cog):
             chart_data = chart.load_chart_data()
             note_counts = chart_data.get_note_counts()
 
+            chart_data = chart.load_chart_data()
+            skill_bars = chart_data.common_data.get_skill_times(song.duration)
+            start_notes = [next(i + 1 for i, note in enumerate(chart_data.notes) if note.time >= skill_time)
+                           for skill_time in skill_bars]
+            end_notes = [next(i for i, note in enumerate(chart_data.notes) if note.time >= skill_time + 9)
+                         for skill_time in skill_bars]
+
             embed.add_field(name='Info',
                             value=f'Level: {chart.display_level}\n'
-                                  f'Duration: {self.format_duration(self.get_music_duration(song))}\n'
+                                  f'Duration: {self.format_duration(song.duration)}\n'
                                   f'Unit: {song.special_unit_name or song.unit.name}\n'
                                   f'Category: {song.category.name}\n'
                                   f'BPM: {song.bpm}\n'
-                                  f'Designer: {chart.designer.name}',
+                                  f'Designer: {chart.designer.name}\n'
+                                  f'Raw Skill Times: {chart_data.common_data.skill_times}\n'
+                                  f'Start Notes: {start_notes}\n'
+                                  f'End Notes: {end_notes}',
                             inline=False)
             embed.add_field(name='Combo',
                             value=f'Max Combo: {chart.note_counts[ChartSectionType.Full].count}\n'
@@ -295,7 +302,7 @@ class Music(commands.Cog):
                                   f'EFT: {round(chart.trends[3] * 100, 2)}%\n'
                                   f'TEC: {round(chart.trends[4] * 100, 2)}%\n',
                             inline=True)
-            embed.set_footer(text='1 column = 10 seconds')
+            embed.set_footer(text='1 column = 10 seconds, 9 second skills')
 
             embeds.append(embed)
 
@@ -369,17 +376,6 @@ class Music(commands.Cog):
         return f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'
 
     @staticmethod
-    def get_music_duration(music: MusicMaster):
-        if music.id in Music._music_durations:
-            return Music._music_durations[music.id]
-        with contextlib.closing(wave.open(str(music.audio_path.with_name(music.audio_path.name + '.wav')), 'r')) as f:
-            frames = f.getnframes()
-            rate = f.getframerate()
-            duration = frames / float(rate)
-            Music._music_durations[music.id] = duration
-            return duration
-
-    @staticmethod
     def format_duration(seconds):
         minutes = int(seconds // 60)
         seconds = round(seconds % 60, 2)
@@ -404,7 +400,7 @@ class MusicAttribute(enum.Enum):
             self.Id: music.id,
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
             self.Level: music.charts[4].display_level if len(music.charts) == 4 else '0',
-            self.Duration: Music.get_music_duration(music),
+            self.Duration: music.duration,
             self.Date: music.start_datetime,
             self.BPM: music.bpm,
             self.Combo: music.charts[4].note_counts[0].count if 4 in music.charts else 0,
@@ -417,7 +413,7 @@ class MusicAttribute(enum.Enum):
             self.Id: str(music.id).zfill(7),
             self.Unit: music.unit.name if not music.special_unit_name else f'{music.unit.name} ({music.special_unit_name})',
             self.Level: (music.charts[4].display_level if len(music.charts) == 4 else '?').ljust(3),
-            self.Duration: Music.format_duration(Music.get_music_duration(music)),
+            self.Duration: Music.format_duration(music.duration),
             self.Date: str(music.start_datetime.date()),
             self.BPM: f'{music.bpm:>5.2f}',
             self.Combo: str(music.charts[4].note_counts[0].count) if 4 in music.charts else '?',

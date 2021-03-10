@@ -140,7 +140,7 @@ class Music(commands.Cog):
                                       converter=self.difficulty_names)
         power = arguments.single('power', default=150000, converter=lambda p: int(p))
         accuracy = arguments.single(['acc', 'accuracy'], default=100, converter=lambda a: float(a))
-        skill = arguments.single(['skill'], default=['40'], is_list=True)
+        skill = arguments.single(['skill', 'skills'], default=['40'], is_list=True)
         assist = arguments.tag('assist')
         song_name = arguments.text()
         arguments.require_all_arguments_used()

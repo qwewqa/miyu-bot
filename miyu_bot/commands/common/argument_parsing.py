@@ -112,8 +112,12 @@ class ParsedArguments:
     def has_named(self, name: str):
         return name in self.named_arguments
 
-    def single(self, names: Union[List[str], str], default: Any = None, allowed_operators: Optional[Container] = None,
-               is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
+    def single(self, names: Union[List[str], str], default: Any = None,
+                  is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
+        return self.single_op(names, default, ['='], is_list, numeric, converter)[0]
+
+    def single_op(self, names: Union[List[str], str], default: Any = None, allowed_operators: Optional[Container] = None,
+                  is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:
             allowed_operators = ['=']
         if not isinstance(default, tuple):
@@ -150,9 +154,9 @@ class ParsedArguments:
             value = ArgumentValue(value.value[0], value.operator)
         return value
 
-    def repeatable(self, names: Union[List[str], str], default: Any = None,
-                   allowed_operators: Optional[Container] = None,
-                   is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
+    def repeatable_op(self, names: Union[List[str], str], default: Any = None,
+                      allowed_operators: Optional[Container] = None,
+                      is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:
             allowed_operators = ['=']
         if not isinstance(default, tuple) and default is not None:
@@ -212,7 +216,7 @@ class ParsedArguments:
         prefs, pref_types = await get_preferences(ctx, self.tag('p'))
         for name in prefs.keys():
             pref_type = pref_types[name]
-            override, _op = self.single(name)
+            override, _op = self.single_op(name)
             if override:
                 if error_message := pref_type.validate_or_get_error_message(override):
                     raise ArgumentError(f'Invalid value "{override}" for preference "{name}": {error_message}')

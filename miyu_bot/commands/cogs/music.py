@@ -1,17 +1,20 @@
 import asyncio
 import enum
 import logging
+import re
 from inspect import cleandoc
 from typing import Tuple
 
 import discord
+from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
 from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
+from d4dj_utils.master.skill_master import SkillMaster
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for
+from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for, ArgumentError
 from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path, get_chart_mix_path
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
@@ -116,6 +119,97 @@ class Music(commands.Cog):
         # Difficulty enum easy-expert are 1-4, one more than the embed index
         asyncio.ensure_future(run_tabbed_message(ctx, self.reaction_emojis, embeds, None, difficulty - 1))
 
+    @commands.command(name='score',
+                      aliases=[],
+                      description='Calculates chart score.',
+                      help='!score Cyber Cyber diff=ex power=150000 acc=100 skill=50 $assist')
+    async def score(self, ctx: commands.Context, *, arg: commands.clean_content):
+        def format_skill(skill):
+            if skill.score_up_rate and skill.perfect_score_up_rate:
+                return f'{skill.score_up_rate}%+{skill.perfect_score_up_rate}%p'
+            elif skill.score_up_rate:
+                return f'{skill.score_up_rate}%'
+            elif skill.perfect_score_up_rate:
+                return f'{skill.perfect_score_up_rate}%p'
+            else:
+                return f'0%'
+
+        arguments = parse_arguments(arg)
+
+        difficulty = arguments.single(['diff', 'difficulty'], default=ChartDifficulty.Expert,
+                                      converter=self.difficulty_names)
+        power = arguments.single('power', default=150000, converter=lambda p: int(p))
+        accuracy = arguments.single(['acc', 'accuracy'], default=100, converter=lambda a: float(a))
+        skill = arguments.single(['skill'], default=['40'], is_list=True)
+        assist = arguments.tag('assist')
+        song_name = arguments.text()
+        arguments.require_all_arguments_used()
+
+        song = self.bot.asset_filters.music.get(song_name, ctx)
+
+        if not song:
+            await ctx.send(f'Failed to find chart {song_name}.')
+            return
+        if not song.charts:
+            await ctx.send('Song does not have charts.')
+            return
+
+        chart = song.charts[difficulty]
+
+        if not (0 <= accuracy <= 100):
+            await ctx.send('Accuracy must be between 0 and 100.')
+        accuracy /= 100
+
+        skill_re = re.compile(r'\d{1,3}%?|\d{1,3}%?\+\d{1,3}%?p|\d{1,3}%?p')
+
+        def create_dummy_skill(score, perfect):
+            return SkillMaster(
+                self.bot.assets,
+                id=0,
+                min_recovery_value=0,
+                max_recovery_value=0,
+                combo_support_count=0,
+                score_up_rate=int(score),
+                min_seconds=5,
+                max_seconds=9,
+                perfect_score_up_rate=int(perfect),
+            )
+
+        skills = []
+        for s in skill:
+            if skill_re.fullmatch(s):
+                effects = [(e[:-1] if e[-1] == '%' else e) for e in s.split('+')]
+                skills.append(create_dummy_skill(next((e for e in effects if not e.endswith('p')), 0),
+                                                 next((e for e in effects if e.endswith('p')), 0)))
+            else:
+                await ctx.send('Invalid skill format.')
+                return
+
+        if len(skills) == 1:
+            skills = skills * 5
+        if len(skills) != 5:
+            await ctx.send('Invalid skill count.')
+            return
+
+        embed = discord.Embed(title=f'Song Score: {song.name} [{chart.difficulty.name}]',
+                              description=f'Power: {power:,}\n'
+                                          f'Accuracy: {accuracy * 100:.1f}%\n'
+                                          f'Skills: {", ".join(format_skill(skill) for skill in skills)}\n'
+                                          f'Assist: {"On" if assist else "Off"}\n'
+                                          f'\u200b')
+
+        baseline = None
+        for autoplay, enable_fever in [[False, True], [False, False], [True, True], [True, False]]:
+            score = int(calculate_score(chart, power, skills, enable_fever, accuracy, assist, autoplay))
+            if not baseline:
+                baseline = score
+
+            embed.add_field(name=f'{"Multi" if enable_fever else "Solo"} Live{" (Autoplay)" if autoplay else ""}',
+                            value=f'Score: {score:,}\n'
+                                  f'Value: {score / baseline * 100:.2f}%',
+                            inline=False)
+        await ctx.send(embed=embed)
+
     @commands.command(name='mixorder',
                       aliases=['ordermix', 'mix_order', 'order_mix'],
                       description='Finds order of songs when mixed.',
@@ -210,11 +304,11 @@ class Music(commands.Cog):
         self.logger.info(f'Searching for songs "{arg}".' if arg else 'Listing songs.')
         arguments = parse_arguments(arg)
 
-        sort, sort_op = arguments.single('sort', MusicAttribute.DefaultOrder,
-                                         allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
+        sort, sort_op = arguments.single_op('sort', MusicAttribute.DefaultOrder,
+                                            allowed_operators=['<', '>', '='], converter=music_attribute_aliases)
         reverse_sort = sort_op == '<' or arguments.tag('reverse')
-        display, _op = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
-                                        converter=music_attribute_aliases)
+        display, _op = arguments.single_op(['display', 'disp'], sort, allowed_operators=['='],
+                                           converter=music_attribute_aliases)
         units = {self.bot.aliases.units_by_name[unit].id
                  for unit in arguments.tags(names=self.bot.aliases.units_by_name.keys(),
                                             aliases=self.bot.aliases.unit_aliases)}
@@ -222,8 +316,8 @@ class Music(commands.Cog):
         def difficulty_converter(d):
             return int(d[:-1]) + 0.5 if d[-1] == '+' else int(d)
 
-        difficulty = arguments.repeatable(['difficulty', 'diff', 'level'], is_list=True,
-                                          converter=difficulty_converter)
+        difficulty = arguments.repeatable_op(['difficulty', 'diff', 'level'], is_list=True,
+                                             converter=difficulty_converter)
 
         songs = self.bot.asset_filters.music.get_sorted(arguments.text(), ctx)
 

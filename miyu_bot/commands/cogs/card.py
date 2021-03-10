@@ -96,10 +96,10 @@ class Card(commands.Cog):
 
         arguments = parse_arguments(arg)
         cards = self.get_cards(ctx, arguments)
-        sort, sort_op = arguments.single('sort', None,
-                                         allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
-        display, _op = arguments.single(['display', 'disp'], sort or CardAttribute.Power, allowed_operators=['='],
-                                        converter=card_attribute_aliases)
+        sort, sort_op = arguments.single_op('sort', None,
+                                            allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
+        display, _op = arguments.single_op(['display', 'disp'], sort or CardAttribute.Power, allowed_operators=['='],
+                                           converter=card_attribute_aliases)
 
         listing = []
         for card in cards:
@@ -166,12 +166,12 @@ class Card(commands.Cog):
                 await ctx.send(f'Invalid card exp {arg}')
 
     def get_cards(self, ctx, arguments: ParsedArguments):
-        sort, sort_op = arguments.single('sort', None,
-                                         allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
+        sort, sort_op = arguments.single_op('sort', None,
+                                            allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
         reverse_sort = sort_op == '<' or arguments.tag('reverse')
         # Not used, but here because it's a valid argument before running require_all_arguments_used.
-        display, _op = arguments.single(['display', 'disp'], sort, allowed_operators=['='],
-                                        converter=card_attribute_aliases)
+        display, _op = arguments.single_op(['display', 'disp'], sort, allowed_operators=['='],
+                                           converter=card_attribute_aliases)
         characters = {self.bot.aliases.characters_by_name[c].id
                       for c in arguments.words(self.bot.aliases.characters_by_name.keys()) |
                       arguments.tags(self.bot.aliases.characters_by_name.keys())}
@@ -183,10 +183,10 @@ class Card(commands.Cog):
         attributes = {self.bot.aliases.attributes_by_name[a].id
                       for a in arguments.tags(self.bot.aliases.attributes_by_name.keys())}
         birthday = arguments.tag('birthday') | arguments.word('birthday')
-        score_up_filters = arguments.repeatable(['skill', 'score_up', 'score'], allowed_operators=full_operators,
-                                                is_list=True, numeric=True)
-        heal_filters = arguments.repeatable(['heal', 'recovery'], allowed_operators=full_operators, is_list=True,
-                                            numeric=True)
+        score_up_filters = arguments.repeatable_op(['skill', 'score_up', 'score'], allowed_operators=full_operators,
+                                                   is_list=True, numeric=True)
+        heal_filters = arguments.repeatable_op(['heal', 'recovery'], allowed_operators=full_operators, is_list=True,
+                                               numeric=True)
 
         event_bonus = bool(arguments.tags(['event', 'eventbonus', 'event_bonus']))
 

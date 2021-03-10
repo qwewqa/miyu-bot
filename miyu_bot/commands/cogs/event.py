@@ -21,7 +21,8 @@ from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, 
     event_point_emoji_id
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message
+from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message, \
+    run_deletable_message
 
 
 class Event(commands.Cog):
@@ -226,33 +227,16 @@ class Event(commands.Cog):
         minutes, seconds = divmod(rem, 60)
         return f'{days}d {hours}h {minutes}m'
 
-    @commands.command(name='t20',
-                      aliases=['top20', 'top_20'],
-                      description='Displays the top 20 in the main leaderboard',
-                      help='!t20')
-    async def t20(self, ctx: commands.Context):
-        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20') as resp:
-            leaderboard = await resp.json(encoding='utf-8')
-        event = self.bot.asset_filters.events.get_latest_event(ctx)
-        embed = discord.Embed(title=f'{event.name} t20')
-        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
-        max_points_digits = len(f'{leaderboard[0]["points"]:,}')
-        nl = "\n"
-        update_date = dateutil.parser.isoparse(leaderboard[0]["date"]).replace(microsecond=0)
-        update_date = update_date.astimezone(pytz.timezone('Asia/Tokyo'))
-        header = f'Updated {update_date}\n\nRank  {"Points":<{max_points_digits}}  Name'
-        listing = [
-            f'{player["rank"]:<4}  {player["points"]:>{max_points_digits},}  {player["name"].replace(nl, "")}'
-            for player in leaderboard]
-        paged = run_paged_message(ctx, embed, listing, header=header, page_size=10, numbered=False)
-        asyncio.ensure_future(paged)
-
     @commands.command(name='leaderboard',
-                      aliases=['lb'],
+                      aliases=['lb', 't20'],
                       description='Displays the full leaderboard',
                       help='!leaderboard')
-    async def t20(self, ctx: commands.Context):
-        await ctx.send(embed=await self.get_leaderboard_embed(self.bot.asset_filters.events.get_latest_event(ctx)))
+    async def leaderboard(self, ctx: commands.Context):
+        embed = await self.get_leaderboard_embed(self.bot.asset_filters.events.get_latest_event(ctx))
+        message = await ctx.send(embed=embed)
+        asyncio.ensure_future(run_deletable_message(ctx, message))
+        if ctx.invoked_with == 't20':
+            await ctx.send('The t20 alias is deprecated. Use lb or leaderboard instead.')
 
     valid_tiers = [50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000]
 
@@ -292,10 +276,10 @@ class Event(commands.Cog):
         await asyncio.sleep(61 - datetime.datetime.now().second)
 
     @commands.command(name='cutoff',
-                      aliases=['co', 't50', 't100', 't500', 't1000', 't2000', 't5000',
+                      aliases=['co', *[f't{i}' for i in range(1, 20)], 't50', 't100', 't500', 't1000', 't2000', 't5000',
                                't10000', 't20000', 't30000', 't50000',
                                't1k', 't2k', 't5k', 't10k', 't20k', 't30k', 't50k'],
-                      description=f'Displays the cutoffs at different tiers. Valid tiers: {str(valid_tiers)}',
+                      description=f'Displays the cutoffs at different tiers.',
                       help='!cutoff 50')
     async def cutoff(self, ctx: commands.Context, tier: str = ''):
         if ctx.invoked_with.endswith('co') and tier == 'conut':

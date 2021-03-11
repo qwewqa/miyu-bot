@@ -265,10 +265,10 @@ class Music(commands.Cog):
                 await ctx.send(f'Song "{song.name}" does not have mix enabled.')
             songs.append(song)
         diffs = []
-        for diff in [a_diff, b_diff, c_diff, d_diff]:
-            diff = self.difficulty_names.get(diff.lower())
+        for diff_name in [a_diff, b_diff, c_diff, d_diff]:
+            diff = self.difficulty_names.get(diff_name.lower())
             if not diff:
-                await ctx.send(f'Unknown difficulty "{diff}".', allowed_mentions=AllowedMentions.none())
+                await ctx.send(f'Unknown difficulty "{diff_name}".', allowed_mentions=AllowedMentions.none())
             diffs.append(diff)
 
         mix = Chart.create_mix(songs, diffs)

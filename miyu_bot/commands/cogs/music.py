@@ -46,6 +46,7 @@ class Music(commands.Cog):
         'hard': ChartDifficulty.Hard,
         'normal': ChartDifficulty.Normal,
         'easy': ChartDifficulty.Easy,
+        'norm': ChartDifficulty.Normal,
         'exp': ChartDifficulty.Expert,
         'hrd': ChartDifficulty.Hard,
         'nrm': ChartDifficulty.Normal,

@@ -228,15 +228,13 @@ class Event(commands.Cog):
         return f'{days}d {hours}h {minutes}m'
 
     @commands.command(name='leaderboard',
-                      aliases=['lb', 't20'],
+                      aliases=['lb'],
                       description='Displays the full leaderboard',
                       help='!leaderboard')
     async def leaderboard(self, ctx: commands.Context):
         embed = await self.get_leaderboard_embed(self.bot.asset_filters.events.get_latest_event(ctx))
         message = await ctx.send(embed=embed)
         asyncio.ensure_future(run_deletable_message(ctx, message))
-        if ctx.invoked_with == 't20':
-            await ctx.send('The t20 alias is deprecated. Use lb or leaderboard instead.')
 
     valid_tiers = [50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000]
 
@@ -276,7 +274,7 @@ class Event(commands.Cog):
         await asyncio.sleep(61 - datetime.datetime.now().second)
 
     @commands.command(name='cutoff',
-                      aliases=['co', *[f't{i}' for i in range(1, 20)], 't50', 't100', 't500', 't1000', 't2000', 't5000',
+                      aliases=['co', *[f't{i}' for i in range(1, 21)], 't50', 't100', 't500', 't1000', 't2000', 't5000',
                                't10000', 't20000', 't30000', 't50000',
                                't1k', 't2k', 't5k', 't10k', 't20k', 't30k', 't50k'],
                       description=f'Displays the cutoffs at different tiers.',

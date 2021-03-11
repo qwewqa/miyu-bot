@@ -154,7 +154,7 @@ class Music(commands.Cog):
         arguments.require_all_arguments_used()
 
         if song_name.lower() == 'mix':
-            data = self.custom_mixes[ctx.author.id]
+            data = self.custom_mixes.get(ctx.author.id)
             if not data:
                 await ctx.send('No recent user mix found. Use the mix command to create one.')
                 return

@@ -239,6 +239,7 @@ class Music(commands.Cog):
                 return
             if not song.mix_info:
                 await ctx.send(f'Song "{song.name}" does not have mix enabled.')
+                return
             songs.append(song)
 
         mix = get_best_mix(songs)
@@ -263,12 +264,14 @@ class Music(commands.Cog):
                 return
             if not song.mix_info:
                 await ctx.send(f'Song "{song.name}" does not have mix enabled.')
+                return
             songs.append(song)
         diffs = []
         for diff_name in [a_diff, b_diff, c_diff, d_diff]:
             diff = self.difficulty_names.get(diff_name.lower())
             if not diff:
                 await ctx.send(f'Unknown difficulty "{diff_name}".', allowed_mentions=AllowedMentions.none())
+                return
             diffs.append(diff)
 
         mix = Chart.create_mix(songs, diffs)

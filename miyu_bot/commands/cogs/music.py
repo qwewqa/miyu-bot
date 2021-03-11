@@ -174,6 +174,7 @@ class Music(commands.Cog):
 
         if not (0 <= accuracy <= 100):
             await ctx.send('Accuracy must be between 0 and 100.')
+            return
         accuracy /= 100
 
         skill_re = re.compile(r'\d{1,3}%?|\d{1,3}%?\+\d{1,3}%?p|\d{1,3}%?p')
@@ -196,7 +197,7 @@ class Music(commands.Cog):
             if skill_re.fullmatch(s):
                 effects = [(e[:-1] if e[-1] == '%' else e) for e in s.split('+')]
                 skills.append(create_dummy_skill(next((e for e in effects if not e.endswith('p')), 0),
-                                                 next((e for e in effects if e.endswith('p')), 0)))
+                                                 next((e[:-1] for e in effects if e.endswith('p')), 0)))
             else:
                 await ctx.send('Invalid skill format.')
                 return

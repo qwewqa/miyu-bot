@@ -1,17 +1,20 @@
+from concurrent.futures.thread import ThreadPoolExecutor
+
 import aiohttp
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
 from tortoise import Tortoise
 
 from miyu_bot.bot.master_asset_manager import MasterFilterManager
-from miyu_bot.bot.tortoise_config import TORTOISE_ORM
 from miyu_bot.bot.name_aliases import NameAliases
+from miyu_bot.bot.tortoise_config import TORTOISE_ORM
 
 
 class D4DJBot(commands.Bot):
     assets: AssetManager
     asset_filters: MasterFilterManager
     aliases: NameAliases
+    thread_pool: ThreadPoolExecutor
 
     asset_url = 'https://qwewqa.github.io/d4dj-dumps/'
 
@@ -22,6 +25,7 @@ class D4DJBot(commands.Bot):
         self.aliases = NameAliases(self.assets)
         self.session = aiohttp.ClientSession()
         self.extension_names = set()
+        self.thread_pool = ThreadPoolExecutor()
         super().__init__(*args, **kwargs)
 
     def try_reload_assets(self):

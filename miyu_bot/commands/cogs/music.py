@@ -1,20 +1,25 @@
 import asyncio
+import datetime
 import enum
 import logging
 import re
+from dataclasses import dataclass
 from inspect import cleandoc
+from io import BytesIO
 from typing import Tuple
 
 import discord
+from d4dj_utils.chart.chart import Chart
 from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
 from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
 from d4dj_utils.master.skill_master import SkillMaster
+from discord import AllowedMentions
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for, ArgumentError
+from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for
 from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path, get_chart_mix_path
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
@@ -25,10 +30,12 @@ from miyu_bot.commands.common.song_list_generator import calculate_mix_rating, g
 
 class Music(commands.Cog):
     bot: D4DJBot
+    CUSTOM_MIX_MIN_LIFETIME = 3600  # Minimum amount of time in seconds before a custom mix is removed
 
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+        self.custom_mixes = {}
 
     @property
     def reaction_emojis(self):
@@ -145,16 +152,25 @@ class Music(commands.Cog):
         song_name = arguments.text()
         arguments.require_all_arguments_used()
 
-        song = self.bot.asset_filters.music.get(song_name, ctx)
+        if song_name.lower() == 'mix':
+            data = self.custom_mixes[ctx.author.id]
+            if not data:
+                await ctx.send('No recent user mix found. Use the mix command to create one.')
+                return
+            chart = data.chart
+            title = 'Mix Score:\n' + data.name
+        else:
+            song = self.bot.asset_filters.music.get(song_name, ctx)
 
-        if not song:
-            await ctx.send(f'Failed to find chart {song_name}.')
-            return
-        if not song.charts:
-            await ctx.send('Song does not have charts.')
-            return
+            if not song:
+                await ctx.send(f'Failed to find chart {song_name}.')
+                return
+            if not song.charts:
+                await ctx.send('Song does not have charts.')
+                return
 
-        chart = song.charts[difficulty]
+            chart = song.charts[difficulty]
+            title = f'Song Score: {song.name} [{chart.difficulty.name}]'
 
         if not (0 <= accuracy <= 100):
             await ctx.send('Accuracy must be between 0 and 100.')
@@ -191,7 +207,7 @@ class Music(commands.Cog):
             await ctx.send('Invalid skill count.')
             return
 
-        embed = discord.Embed(title=f'Song Score: {song.name} [{chart.difficulty.name}]',
+        embed = discord.Embed(title=title,
                               description=f'Power: {power:,}\n'
                                           f'Accuracy: {accuracy * 100:.1f}%\n'
                                           f'Skills: {", ".join(format_skill(skill) for skill in skills)}\n'
@@ -219,8 +235,10 @@ class Music(commands.Cog):
         for name in [a, b, c, d]:
             song = self.bot.asset_filters.music.get(name, ctx)
             if not song:
-                await ctx.send(f'Unknown song "{name}".')
+                await ctx.send(f'Unknown song "{name}".', allowed_mentions=AllowedMentions.none())
                 return
+            if not song.mix_info:
+                await ctx.send(f'Song "{song.name}" does not have mix enabled.')
             songs.append(song)
 
         mix = get_best_mix(songs)
@@ -230,6 +248,54 @@ class Music(commands.Cog):
                               description=f'```{nl.join(f"{i}. {self.format_song_title(song)}" for i, song in enumerate(mix, 1))}\n\n'
                                           f'Total Duration: {sum(md.duration for md in mix_data):.2f}s```')
         await ctx.send(embed=embed)
+
+    @commands.command(name='mix',
+                      aliases=[],
+                      description='Creates a custom mix.',
+                      help='!mix grgr hard cyber hard puransu expert "cats eye" easy')
+    async def mix(self, ctx: commands.Context, a: str, a_diff: str, b: str, b_diff: str, c: str, c_diff: str,
+                  d: str, d_diff: str):
+        songs = []
+        for name in [a, b, c, d]:
+            song = self.bot.asset_filters.music.get(name, ctx)
+            if not song:
+                await ctx.send(f'Unknown song "{name}".', allowed_mentions=AllowedMentions.none())
+                return
+            if not song.mix_info:
+                await ctx.send(f'Song "{song.name}" does not have mix enabled.')
+            songs.append(song)
+        diffs = []
+        for diff in [a_diff, b_diff, c_diff, d_diff]:
+            diff = self.difficulty_names.get(diff.lower())
+            if not diff:
+                await ctx.send(f'Unknown difficulty "{diff}".', allowed_mentions=AllowedMentions.none())
+            diffs.append(diff)
+
+        mix = Chart.create_mix(songs, diffs)
+        mix_image = await self.bot.loop.run_in_executor(self.bot.thread_pool, mix.render)
+        mix_name = '\n'.join(f'{song.name} [{diff.name}]' for song, diff in zip(songs, diffs))
+
+        now = datetime.datetime.now()
+        self.custom_mixes = {k: v
+                             for k, v in self.custom_mixes.items()
+                             if (now - v.create_time).total_seconds() < self.CUSTOM_MIX_MIN_LIFETIME}
+        self.custom_mixes[ctx.author.id] = CustomMixData(mix_name, mix, now)
+
+        buffer = BytesIO()
+        mix_image.save(buffer, 'png')
+        buffer.seek(0)
+
+        embed = discord.Embed(title='Custom Mix')
+        embed.add_field(name='Songs',
+                        value=mix_name,
+                        inline=False)
+        embed.add_field(name='Info',
+                        value=f'Duration: {self.format_duration(mix.info.end_time - mix.info.start_time)}\n'
+                              f'Level: {mix.info.level}',
+                        inline=False)
+        embed.set_image(url='attachment://mix.png')
+
+        await ctx.send(embed=embed, file=discord.File(fp=buffer, filename='mix.png'))
 
     @commands.command(name='mixrating',
                       aliases=['mix_rating'],
@@ -448,8 +514,8 @@ class Music(commands.Cog):
         difficulty = ChartDifficulty.Expert
         if len(split_args) >= 2:
             final_word = split_args[-1].lower()
-            if final_word in self.difficulty_names:
-                difficulty = self.difficulty_names[final_word]
+            if final_word.lower() in self.difficulty_names:
+                difficulty = self.difficulty_names[final_word.lower()]
                 arg = ''.join(split_args[:-1])
         return arg, difficulty
 
@@ -519,6 +585,13 @@ music_attribute_aliases = {
     'bpm': MusicAttribute.BPM,
     'combo': MusicAttribute.Combo,
 }
+
+
+@dataclass
+class CustomMixData:
+    name: str
+    chart: Chart
+    create_time: datetime.datetime
 
 
 def setup(bot):

@@ -1,4 +1,5 @@
 from concurrent.futures.thread import ThreadPoolExecutor
+from pathlib import Path
 
 import aiohttp
 from d4dj_utils.master.asset_manager import AssetManager
@@ -16,10 +17,11 @@ class D4DJBot(commands.Bot):
     aliases: NameAliases
     thread_pool: ThreadPoolExecutor
 
+    asset_path: Path
     asset_url = 'https://qwewqa.github.io/d4dj-dumps/'
 
     def __init__(self, asset_path, *args, **kwargs):
-        self.asset_path = asset_path
+        self.asset_path = Path(asset_path)
         self.assets = AssetManager(self.asset_path, drop_extra_fields=True)
         self.asset_filters = MasterFilterManager(self.assets)
         self.aliases = NameAliases(self.assets)

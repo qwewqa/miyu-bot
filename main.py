@@ -39,6 +39,7 @@ bot.load_extension('miyu_bot.commands.cogs.event')
 bot.load_extension('miyu_bot.commands.cogs.music')
 bot.load_extension('miyu_bot.commands.cogs.utility')
 bot.load_extension('miyu_bot.commands.cogs.preferences')
+bot.load_extension('miyu_bot.commands.cogs.audio')
 
 
 @bot.event

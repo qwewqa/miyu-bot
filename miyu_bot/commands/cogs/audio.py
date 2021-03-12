@@ -1,7 +1,9 @@
 import asyncio
 import logging
 import random
+import re
 from asyncio import Task
+from collections import defaultdict
 from typing import Dict
 
 import discord
@@ -18,9 +20,17 @@ class Audio(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
 
-        self.live_audio_paths = [dir for dir in
-                                 (self.bot.asset_path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
-                                 dir.is_dir()]
+        self.live_interaction_paths = [dir for dir in
+                                       (self.bot.asset_path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
+                                       dir.is_dir() and not dir.name.startswith('live_general')]
+        live_interaction_path_characters = defaultdict(lambda: set())
+        live_audio_re = re.compile(r'.*([1-6][1-4])\.hca\.wav')
+        for interaction_path in self.live_interaction_paths:
+            for path in interaction_path.iterdir():
+                if match := live_audio_re.fullmatch(path.name):
+                    character_id = int(match.groups()[0])
+                    live_interaction_path_characters[interaction_path].add(character_id)
+        self.live_interaction_path_characters = live_interaction_path_characters
         self.tasks = {}
 
     def cog_unload(self):
@@ -57,12 +67,38 @@ class Audio(commands.Cog):
 
     @commands.command(name='play',
                       aliases=[],
-                      description='Plays audio.',
+                      description='Plays live interaction audio.'
+                                  'Giving one character as an argument restricts to interactions including that character.'
+                                  'Giving multiple characters as arguments restricts to interactions only including the given characters.',
                       help='!play')
-    async def play(self, ctx: commands.Context):
-        self.tasks[ctx.guild.id] = asyncio.create_task(self.play_live_audio(ctx))
+    async def play(self, ctx: commands.Context, *allowed_characters):
+        if allowed_characters:
+            allowed_cids = set()
+            for character_name in allowed_characters:
+                if cid := self.bot.aliases.characters_by_name.get(character_name.lower()).id:
+                    allowed_cids.add(cid)
+                else:
+                    await ctx.send('Unknown character.')
+                    return
+        else:
+            allowed_cids = None
+        self.tasks[ctx.guild.id] = asyncio.create_task(self.play_live_audio(ctx, allowed_cids))
 
-    async def play_live_audio(self, ctx):
+    async def play_live_audio(self, ctx, allowed_character_ids):
+        if not allowed_character_ids:
+            paths = self.live_interaction_paths
+        elif len(allowed_character_ids) == 1:
+            allowed_character_id = next(iter(allowed_character_ids))
+            paths = [p for p in self.live_interaction_paths
+                     if allowed_character_id in self.live_interaction_path_characters[p]]
+        else:
+            paths = [p for p in self.live_interaction_paths
+                     if all(cid in allowed_character_ids for cid in self.live_interaction_path_characters[p])]
+
+        if not paths:
+            await ctx.send('No results for given filters.')
+            return
+
         queue = []
         event = asyncio.Event()
 
@@ -71,7 +107,7 @@ class Audio(commands.Cog):
 
         while True:
             if not queue:
-                interaction = random.choice(self.live_audio_paths)
+                interaction = random.choice(paths)
                 queue.extend([a for a in interaction.iterdir() if a.suffix == '.wav'][::-1])
                 await asyncio.sleep(random.randint(8, 12))
             else:

@@ -70,6 +70,16 @@ class Audio(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid play subcommand.')
 
+    @play.command(name='file',
+                  hidden=True)
+    @commands.is_owner()
+    async def play_file(self, ctx: commands.Context, *, name: str):
+        file = self.bot.assets.path / 'plain' / name
+        if not file.exists():
+            await ctx.send('Does not exist.')
+            return
+        self.queues[ctx.guild.id].enqueue(str(file))
+
     @play.command(name='stamp',
                   aliases=['sticker'],
                   description='Plays stamp audio.',

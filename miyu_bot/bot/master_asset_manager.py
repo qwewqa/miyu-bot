@@ -37,6 +37,11 @@ class MasterFilterManager:
             naming_function=lambda g: f'{g.name}',
             filter_function=lambda g: g.is_released,
         )
+        self.stamps = MasterFilter(
+            self.manager.stamp_master,
+            naming_function=lambda s: f'{s.quote.replace("～", "ー") if s.quote else s.description}',
+            filter_function=lambda s: s.is_released,
+        )
 
 
 class MasterFilter:

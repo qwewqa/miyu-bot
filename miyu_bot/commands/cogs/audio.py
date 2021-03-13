@@ -75,13 +75,14 @@ class Audio(commands.Cog):
                   description='Plays stamp audio.',
                   help='!play stamp')
     async def stamp(self, ctx: commands.Context, *, name: str):
-        stamp = self.bot.asset_filters.stamps.get(name, ctx)
+        stamp = list(stamp
+                     for stamp in self.bot.asset_filters.stamps.get_sorted(name, ctx)
+                     if stamp.audio_path.exists())
         if not stamp:
-            await ctx.send('Stamp not found.')
+            await ctx.send('Stamp not found or no audio.')
             return
-        if not stamp.audio_path.exists():
-            await ctx.send('Stamp audio not found.')
-            return
+        stamp = stamp[0]
+        print(stamp.quote)
         self.queues[ctx.guild.id].enqueue(str(stamp.audio_path))
 
     @play.command(name='interactions',

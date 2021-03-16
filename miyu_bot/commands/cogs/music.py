@@ -10,6 +10,7 @@ from typing import Tuple
 
 import discord
 from d4dj_utils.chart.chart import Chart
+from d4dj_utils.chart.mix import get_best_mix, get_mix_data, calculate_mix_rating
 from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
 from d4dj_utils.master.common_enums import ChartSectionType
@@ -25,7 +26,6 @@ from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message, run_deletable_message
-from miyu_bot.commands.common.song_list_generator import calculate_mix_rating, get_best_mix, get_mix_data
 
 
 class Music(commands.Cog):

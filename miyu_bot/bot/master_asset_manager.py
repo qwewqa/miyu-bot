@@ -94,12 +94,21 @@ class MasterFilter:
                     return None
                 return self.default_filter[name_or_id]
 
-    def get_sorted(self, name: str, ctx: commands.Context):
+    def get_by_relevance(self, name: str, ctx: commands.Context):
+        try:
+            master = self.masters[int(name)]
+            id_result = [master]
+            if not ctx or (ctx.channel.id not in no_filter_channels and master not in self.default_filter.values()):
+                if master not in self.default_filter.values():
+                    id_result = []
+        except (KeyError, ValueError):
+            id_result = []
+
         if name:
             if ctx.channel.id in no_filter_channels:
-                return self.unrestricted_filter.get_sorted(name)
+                return id_result + self.unrestricted_filter.get_sorted(name)
             else:
-                return self.default_filter.get_sorted(name)
+                return id_result + self.default_filter.get_sorted(name)
         else:
             if ctx.channel.id in no_filter_channels:
                 return list(self.unrestricted_filter.values())

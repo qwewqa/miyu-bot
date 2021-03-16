@@ -390,7 +390,7 @@ class Music(commands.Cog):
         difficulty = arguments.repeatable_op(['difficulty', 'diff', 'level'], is_list=True,
                                              converter=difficulty_converter)
 
-        songs = self.bot.asset_filters.music.get_sorted(arguments.text(), ctx)
+        songs = self.bot.asset_filters.music.get_by_relevance(arguments.text(), ctx)
 
         arguments.require_all_arguments_used()
 

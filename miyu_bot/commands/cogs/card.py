@@ -207,7 +207,7 @@ class Card(commands.Cog):
 
         arguments.require_all_arguments_used()
 
-        cards = self.bot.asset_filters.cards.get_sorted(arguments.text(), ctx)
+        cards = self.bot.asset_filters.cards.get_by_relevance(arguments.text(), ctx)
         if not (arguments.text() and sort is None):
             sort = sort or CardAttribute.Power
             cards = sorted(cards, key=lambda c: (sort.get_sort_key_from_card(c), c.max_power_with_limit_break))
@@ -324,7 +324,7 @@ class Card(commands.Cog):
         text = arguments.text()
         arguments.require_all_arguments_used()
 
-        gacha = self.bot.asset_filters.gacha.get_sorted(text, ctx)
+        gacha = self.bot.asset_filters.gacha.get_by_relevance(text, ctx)
 
         if not text:
             gacha.sort(key=lambda g: (g.start_datetime, -g.ascending_sort_id))

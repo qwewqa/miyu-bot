@@ -144,13 +144,16 @@ class Music(commands.Cog):
 
         arguments = parse_arguments(arg)
 
-        difficulty = arguments.single(['diff', 'difficulty'], default=ChartDifficulty.Expert,
+        difficulty = arguments.single(['diff', 'difficulty'], default=None,
                                       converter=self.difficulty_names)
         power = arguments.single('power', default=150000, converter=lambda p: int(p))
         accuracy = arguments.single(['acc', 'accuracy'], default=100, converter=lambda a: float(a))
         skill = arguments.single(['skill', 'skills'], default=['40'], is_list=True)
         assist = arguments.tag('assist')
-        song_name = arguments.text()
+        if difficulty:
+            song_name = arguments.text()
+        else:
+            song_name, difficulty = self.parse_chart_args(arguments.text())
         arguments.require_all_arguments_used()
 
         if song_name.lower() == 'mix':
@@ -164,7 +167,7 @@ class Music(commands.Cog):
             song = self.bot.asset_filters.music.get(song_name, ctx)
 
             if not song:
-                await ctx.send(f'Failed to find chart {song_name}.')
+                await ctx.send(f'Failed to find chart.')
                 return
             if not song.charts:
                 await ctx.send('Song does not have charts.')
@@ -538,7 +541,7 @@ class Music(commands.Cog):
             final_word = split_args[-1].lower()
             if final_word.lower() in self.difficulty_names:
                 difficulty = self.difficulty_names[final_word.lower()]
-                arg = ''.join(split_args[:-1])
+                arg = ' '.join(split_args[:-1])
         return arg, difficulty
 
     _music_durations = {}

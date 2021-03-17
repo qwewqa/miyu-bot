@@ -4,6 +4,10 @@ from pathlib import Path
 _cache = {}
 
 
+def clear_asset_filename_cache():
+    _cache.clear()
+
+
 def get_asset_filename(path):
     path = Path(path).resolve()
     if path in _cache:

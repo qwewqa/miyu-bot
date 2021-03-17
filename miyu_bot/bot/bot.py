@@ -9,6 +9,7 @@ from tortoise import Tortoise
 from miyu_bot.bot.master_asset_manager import MasterFilterManager
 from miyu_bot.bot.name_aliases import NameAliases
 from miyu_bot.bot.tortoise_config import TORTOISE_ORM
+from miyu_bot.commands.common.asset_paths import clear_asset_filename_cache
 
 
 class D4DJBot(commands.Bot):
@@ -40,6 +41,7 @@ class D4DJBot(commands.Bot):
         self.assets = assets
         self.asset_filters = asset_filters
         self.aliases = aliases
+        clear_asset_filename_cache()
         return True
 
     async def login(self, token, *, bot=True):

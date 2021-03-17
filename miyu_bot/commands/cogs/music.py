@@ -21,7 +21,7 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for
-from miyu_bot.commands.common.asset_paths import get_chart_image_path, get_music_jacket_path, get_chart_mix_path
+from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
@@ -74,7 +74,7 @@ class Music(commands.Cog):
         self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
         embed = discord.Embed(title=song.name)
-        embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
+        embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
 
         artist_info = {
             'Lyricist': song.lyricist,
@@ -429,8 +429,8 @@ class Music(commands.Cog):
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart = song.charts[difficulty]
             embed = discord.Embed(title=f'{song.name} [{chart.difficulty.name}]')
-            embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
-            embed.set_image(url=self.bot.asset_url + get_chart_image_path(chart))
+            embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
+            embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.image_path))
             chart_data = chart.load_chart_data()
             note_counts = chart_data.get_note_counts()
 
@@ -469,8 +469,8 @@ class Music(commands.Cog):
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart: ChartMaster = song.charts[difficulty]
             embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]')
-            embed.set_thumbnail(url=self.bot.asset_url + get_music_jacket_path(song))
-            embed.set_image(url=self.bot.asset_url + get_chart_mix_path(chart))
+            embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
+            embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.mix_path))
 
             note_counts = chart.note_counts
             mix_info = chart.mix_info

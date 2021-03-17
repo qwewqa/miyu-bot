@@ -15,7 +15,7 @@ from discord.ext import commands
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError, \
     list_operator_for, full_operators
-from miyu_bot.commands.common.asset_paths import get_card_icon_path, get_card_art_path, get_gacha_banner_path
+from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
     unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, common_unit_emoji_id, grey_emoji_id
 from miyu_bot.commands.common.formatting import format_info
@@ -239,8 +239,8 @@ class Card(commands.Cog):
     def get_card_embed(self, card: CardMaster, limit_break):
         embed = discord.Embed(title=self.format_card_name(card))
 
-        thumb_url = self.bot.asset_url + get_card_icon_path(card, limit_break)
-        art_url = self.bot.asset_url + get_card_art_path(card, limit_break)
+        thumb_url = self.bot.asset_url + get_asset_filename(card.icon_path(limit_break))
+        art_url = self.bot.asset_url + get_asset_filename(card.art_path(limit_break))
 
         embed.set_thumbnail(url=thumb_url)
         embed.set_image(url=art_url)
@@ -335,7 +335,7 @@ class Card(commands.Cog):
     def get_gacha_embed(self, gacha: GachaMaster):
         embed = discord.Embed(title=gacha.name)
 
-        thumb_url = self.bot.asset_url + get_gacha_banner_path(gacha)
+        thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
 
         embed.set_thumbnail(url=thumb_url)
 

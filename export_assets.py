@@ -1,58 +1,30 @@
 import shutil
+from pathlib import Path
 
 from d4dj_utils.master.asset_manager import AssetManager
 
-from miyu_bot.commands.common.asset_paths import *
+from miyu_bot.commands.common.asset_paths import get_asset_filename
 
 
 def main():
-    target_dir = Path('./export')
-    target_dir.mkdir(parents=True, exist_ok=True)
+    base_path = Path('assets')
+    target_path = Path('export')
 
-    asset_manager = AssetManager('assets')
+    asset_paths = [
+        'music_jacket/*.jpg',
+        'ondemand/card_chara/*.jpg',
+        'ondemand/card_icon/*.jpg',
+        'ondemand/chart/*.png',
+        'ondemand/event/*/*.jpg',
+        'ondemand/event/*/*.png',
+        'ondemand/gacha/top/banner/*.png'
+    ]
 
-    (target_dir / music_dir).mkdir(exist_ok=True)
-    (target_dir / chart_dir).mkdir(exist_ok=True)
-    (target_dir / jacket_dir).mkdir(exist_ok=True)
-    (target_dir / card_dir).mkdir(exist_ok=True)
-    (target_dir / card_icon_dir).mkdir(exist_ok=True)
-    (target_dir / card_art_dir).mkdir(exist_ok=True)
-    (target_dir / event_dir).mkdir(exist_ok=True)
-    (target_dir / event_logo_dir).mkdir(exist_ok=True)
-    (target_dir / gacha_dir).mkdir(exist_ok=True)
-    (target_dir / gacha_banner_dir).mkdir(exist_ok=True)
-
-    for music in asset_manager.music_master.values():
-        try:
-            shutil.copy(music.jacket_path, target_dir / get_music_jacket_path(music))
-        except FileNotFoundError:
-            pass
-        for chart in music.charts.values():
-            try:
-                shutil.copy(chart.image_path, target_dir / get_chart_image_path(chart))
-                shutil.copy(chart.mix_path, target_dir / get_chart_mix_path(chart))
-            except FileNotFoundError:
-                pass
-
-    for card in asset_manager.card_master.values():
-        try:
-            for lb in range(2):
-                shutil.copy(card.art_path(lb), target_dir / get_card_art_path(card, lb))
-                shutil.copy(card.icon_path(lb), target_dir / get_card_icon_path(card, lb))
-        except FileNotFoundError:
-            pass
-
-    for event in asset_manager.event_master.values():
-        try:
-            shutil.copy(event.logo_path, target_dir / get_event_logo_path(event))
-        except FileNotFoundError:
-            pass
-
-    for gacha in asset_manager.gacha_master.values():
-        try:
-            shutil.copy(gacha.banner_path, target_dir / get_gacha_banner_path(gacha))
-        except FileNotFoundError:
-            pass
+    for asset_path in asset_paths:
+        for path in base_path.glob(asset_path):
+            target_file = target_path / get_asset_filename(path)
+            if not target_file.exists():
+                shutil.copy(path, target_file)
 
 
 if __name__ == '__main__':

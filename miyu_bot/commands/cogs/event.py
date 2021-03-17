@@ -15,7 +15,7 @@ from miyu_bot.bot import models
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.bot.models import valid_loop_intervals
 from miyu_bot.commands.common.argument_parsing import parse_arguments
-from miyu_bot.commands.common.asset_paths import get_event_logo_path
+from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, \
     event_point_emoji_id
@@ -89,7 +89,7 @@ class Event(commands.Cog):
     def get_event_embed(self, event, timezone):
         embed = discord.Embed(title=event.name)
 
-        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
 
         duration_hour_part = round((event.duration.seconds / 3600), 2)
         duration_hour_part = duration_hour_part if not duration_hour_part.is_integer() else int(duration_hour_part)
@@ -175,34 +175,36 @@ class Event(commands.Cog):
 
         embed = discord.Embed(title=event.name)
 
-        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
 
         progress = None
 
+        now = dt.datetime.now(dt.timezone.utc)
+
         if state == EventState.Upcoming:
             time_delta_heading = 'Time Until Start'
-            delta = event.start_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.start_datetime - now
             date_heading = 'Start Date'
             date_value = event.start_datetime
         elif state == EventState.Open:
             time_delta_heading = 'Time Until Close'
-            delta = event.reception_close_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.reception_close_datetime - now
             progress = 1 - (delta / (event.reception_close_datetime - event.start_datetime))
             date_heading = 'Close Date'
             date_value = event.reception_close_datetime
         elif state in (EventState.Closing, EventState.Ranks_Fixed):
             time_delta_heading = 'Time Until Results'
-            delta = event.result_announcement_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.result_announcement_datetime - now
             date_heading = 'Results Date'
             date_value = event.result_announcement_datetime
         elif state == EventState.Results:
             time_delta_heading = 'Time Until End'
-            delta = event.end_datetime - dt.datetime.now(dt.timezone.utc)
+            delta = event.end_datetime - now
             date_heading = 'End Date'
             date_value = event.end_datetime
         else:
             time_delta_heading = 'Time Since End'
-            delta = dt.datetime.now(dt.timezone.utc) - event.end_datetime
+            delta = now - event.end_datetime
             date_heading = 'End Date'
             date_value = event.end_datetime
 
@@ -320,7 +322,7 @@ class Event(commands.Cog):
             for rank, stats in statistics.items())
         embed = discord.Embed(title=f'{event.name} Leaderboard', description=f'```{header}\n{body}```',
                               timestamp=datetime.datetime.now())
-        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
         return embed
 
     async def get_tier_embed(self, tier: str, event: EventMaster):
@@ -340,7 +342,7 @@ class Event(commands.Cog):
             progress = 'N/A'
 
         embed = discord.Embed(title=f'{event.name} [t{tier}]', timestamp=dt.datetime.now(dt.timezone.utc))
-        embed.set_thumbnail(url=self.bot.asset_url + get_event_logo_path(event))
+        embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
 
         average_rate = "\n( +" + str(
             math.ceil((data['rate'] * self.EPRATE_RESOLUTION) / data['count'])) + " avg )" if int(

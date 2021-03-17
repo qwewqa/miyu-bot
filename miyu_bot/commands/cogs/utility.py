@@ -103,7 +103,7 @@ class Utility(commands.Cog):
             if value:
                 await ctx.send(str(value))
             else:
-                await ctx.send('Done')
+                await ctx.author.send('Done')
         except Exception as e:
             await ctx.send(f'```{e.__class__.__name__}: {e}\n```')
 

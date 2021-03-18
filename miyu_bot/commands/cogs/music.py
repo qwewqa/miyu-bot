@@ -220,28 +220,19 @@ class Music(commands.Cog):
                                           f'\u200b')
 
         baseline = None
-        for enable_fever in [True, False]:
+        for heading, enable_fever, autoplay, enable_combo_bonus in [
+            ('Multi Live', True, False, True),
+            ('Multi Live (No Combo)', True, False, False),
+            ('Multi Live (Autoplay)', True, True, True),
+            ('Solo Live / No Groovy', False, False, True),
+            ('Solo Live (No Combo)', False, False, False),
+            ('Solo Live (Autoplay)', False, True, True)
+        ]:
             score = int(calculate_score(chart, power, skills, enable_fever, accuracy, assist,
-                                        autoplay=False, enable_combo_bonus=True))
+                                        autoplay=autoplay, enable_combo_bonus=enable_combo_bonus))
             if not baseline:
                 baseline = score
-            embed.add_field(name=f'{"Multi" if enable_fever else "Solo"} Live',
-                            value=f'Score: {score:,}\n'
-                                  f'Value: {score / baseline * 100:.1f}%'
-                                  f'{f" ({(score - baseline) / baseline * 100:+.1f}%)" if score != baseline else ""}',
-                            inline=True)
-
-            score = int(calculate_score(chart, power, skills, enable_fever, accuracy, assist,
-                                        autoplay=False, enable_combo_bonus=False))
-            embed.add_field(name=f'{"Multi" if enable_fever else "Solo"} Live (No Combo)',
-                            value=f'Score: {score:,}\n'
-                                  f'Value: {score / baseline * 100:.1f}%'
-                                  f'{f" ({(score - baseline) / baseline * 100:+.1f}%)" if score != baseline else ""}',
-                            inline=True)
-
-            score = int(calculate_score(chart, power, skills, enable_fever, accuracy, assist,
-                                        autoplay=True, enable_combo_bonus=False))
-            embed.add_field(name=f'{"Multi" if enable_fever else "Solo"} Live (Autoplay)',
+            embed.add_field(name=heading,
                             value=f'Score: {score:,}\n'
                                   f'Value: {score / baseline * 100:.1f}%'
                                   f'{f" ({(score - baseline) / baseline * 100:+.1f}%)" if score != baseline else ""}',

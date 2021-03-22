@@ -251,23 +251,21 @@ class Event(commands.Cog):
         other_stats = stats[20:]
         if t20_stats:
             t20_embed = discord.Embed(title=f'{event.name} [t20]')
-            t20_embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
             for rank, stat in t20_stats:
                 t20_embed.add_field(name=f't{rank}. {stat["name"]}',
                                     value=f'Points: {stat["points"]:,}\n'
                                           f'Rate: {stat["rate"]:,} pts/hr\n'
                                           f'Average Gain: {math.ceil(stat["rate"] * self.EPRATE_RESOLUTION / stat["count"]):,}\n'
-                                          f'Last Update: {stat["lastUpdate"]}',
-                                    inline=False)
+                                          f'Update: {stat["lastUpdate"]}',
+                                    inline=True)
             embeds.append(t20_embed)
         if other_stats:
             other_embed = discord.Embed(title=f'{event.name} [t50+]')
-            other_embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
             for rank, stat in other_stats:
                 other_embed.add_field(name=f't{rank}. {stat["name"]}',
                                       value=f'Points: {stat["points"]:,}\n'
                                             f'Rate: {stat["rate"]:,} pts/hr',
-                                      inline=False)
+                                      inline=True)
             embeds.append(other_embed)
         if len(embeds) == 1:
             asyncio.create_task(run_deletable_message(ctx, await ctx.send(embed=embeds[0])))

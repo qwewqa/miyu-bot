@@ -22,7 +22,7 @@ from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, 
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.fuzzy_matching import romanize
 from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message, \
-    run_deletable_message
+    run_deletable_message, run_tabbed_message
 
 
 class Event(commands.Cog):
@@ -237,6 +237,42 @@ class Event(commands.Cog):
         embed = await self.get_leaderboard_embed(self.bot.asset_filters.events.get_latest_event(ctx))
         message = await ctx.send(embed=embed)
         asyncio.ensure_future(run_deletable_message(ctx, message))
+
+    @commands.command(name='detailed_leaderboard',
+                      aliases=['dlb', 'llb', 'lbb', 'llbb'],
+                      description='Displays a detailed leaderboard.',
+                      help='!dlb')
+    async def detailed_leaderboard(self, ctx: commands.Context):
+        event = self.bot.asset_filters.events.get_latest_event(ctx)
+        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+            stats = [(int(k), v) for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()]
+        embeds = []
+        t20_stats = stats[:20]
+        other_stats = stats[20:]
+        if t20_stats:
+            t20_embed = discord.Embed(title=f'{event.name} [t20]')
+            t20_embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
+            for rank, stat in t20_stats:
+                t20_embed.add_field(name=f't{rank}. {stat["name"]}',
+                                    value=f'Points: {stat["points"]:,}\n'
+                                          f'Rate: {stat["rate"]:,} pts/hr\n'
+                                          f'Average Gain: {math.ceil(stat["rate"] * self.EPRATE_RESOLUTION / stat["count"]):,}\n'
+                                          f'Last Update: {stat["lastUpdate"]}',
+                                    inline=False)
+            embeds.append(t20_embed)
+        if other_stats:
+            other_embed = discord.Embed(title=f'{event.name} [t50+]')
+            other_embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
+            for rank, stat in other_stats:
+                other_embed.add_field(name=f't{rank}. {stat["name"]}',
+                                      value=f'Points: {stat["points"]:,}\n'
+                                            f'Rate: {stat["rate"]:,} pts/hr',
+                                      inline=False)
+            embeds.append(other_embed)
+        if len(embeds) == 1:
+            asyncio.create_task(run_deletable_message(ctx, await ctx.send(embed=embeds[0])))
+        elif len(embeds) == 2:
+            asyncio.create_task(run_tabbed_message(ctx, ['🏆', '🏅'], embeds))
 
     valid_tiers = [50, 100, 500, 1000, 2000, 5000, 10000, 20000, 30000, 50000]
 

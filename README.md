@@ -30,7 +30,7 @@ initialize the database.
 At a minimum, the bot requires decrypted and decompressed master files
 in the working directory at `assets/Master`. 
 
-If extended functions of d4dj-utils are available, `export_assets.py` 
+If extended functions of d4dj-utils are available, `update_assets.py` 
 may be used to download or update assets to the latest version and to
 perform the necessary decryption and decompression.
 

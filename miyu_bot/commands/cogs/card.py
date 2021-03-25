@@ -38,7 +38,7 @@ class Card(commands.Cog):
                       aliases=[],
                       description='Finds the card with the given name.',
                       help='!card secretcage')
-    async def card(self, ctx: commands.Context, *, arg: commands.clean_content):
+    async def card(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for card "{arg}".')
 
         arguments = parse_arguments(arg)
@@ -170,8 +170,8 @@ class Card(commands.Cog):
                                             allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
         reverse_sort = sort_op == '<' or arguments.tag('reverse')
         # Not used, but here because it's a valid argument before running require_all_arguments_used.
-        display, _op = arguments.single_op(['display', 'disp'], sort, allowed_operators=['='],
-                                           converter=card_attribute_aliases)
+        arguments.single_op(['display', 'disp'], sort, allowed_operators=['='],
+                            converter=card_attribute_aliases)
         characters = {self.bot.aliases.characters_by_name[c].id
                       for c in arguments.words(self.bot.aliases.characters_by_name.keys()) |
                       arguments.tags(self.bot.aliases.characters_by_name.keys())}
@@ -202,14 +202,11 @@ class Card(commands.Cog):
             if bonus.attribute_id:
                 attributes = {bonus.attribute_id}
 
-            if not arguments.has_named('sort'):
-                sort = CardAttribute.Date
-
         arguments.require_all_arguments_used()
 
         cards = self.bot.asset_filters.cards.get_by_relevance(arguments.text(), ctx)
         if not (arguments.text() and sort is None):
-            sort = sort or CardAttribute.Power
+            sort = sort or CardAttribute.Date
             cards = sorted(cards, key=lambda c: (sort.get_sort_key_from_card(c), c.max_power_with_limit_break))
             if sort in [CardAttribute.Power, CardAttribute.Date, CardAttribute.ScoreUp, CardAttribute.Heal]:
                 cards = cards[::-1]
@@ -446,6 +443,8 @@ card_attribute_aliases = {
     'char': CardAttribute.Character,
     'id': CardAttribute.Id,
     'power': CardAttribute.Power,
+    'pow': CardAttribute.Power,
+    'bp': CardAttribute.Power,
     'stats': CardAttribute.Power,
     'date': CardAttribute.Date,
     'skill': CardAttribute.ScoreUp,

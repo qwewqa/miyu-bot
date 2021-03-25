@@ -38,6 +38,7 @@ class D4DJBot(commands.Bot):
             aliases = NameAliases(assets)
         except:
             return False
+        self.assets.db.close()
         self.assets = assets
         self.asset_filters = asset_filters
         self.aliases = aliases

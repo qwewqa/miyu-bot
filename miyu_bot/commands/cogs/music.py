@@ -438,6 +438,12 @@ class Music(commands.Cog):
         embeds = []
 
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
+            if difficulty not in song.charts:
+                embed = discord.Embed(title=f'{song.name} [{difficulty.name}]', description='No Data')
+                embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
+                embeds.append(embed)
+                continue
+
             chart = song.charts[difficulty]
             embed = discord.Embed(title=f'{song.name} [{chart.difficulty.name}]')
             embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))

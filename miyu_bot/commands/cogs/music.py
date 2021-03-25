@@ -93,6 +93,7 @@ class Music(commands.Cog):
             'Levels': ', '.join(c.display_level for c in song.charts.values()),
             'Release Date': song.start_datetime,
             'Hidden': song.is_hidden,
+            'Fair Use': song.can_fair_use,
         }
 
         embed.add_field(name='Artist',

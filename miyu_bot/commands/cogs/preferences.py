@@ -4,12 +4,12 @@ from typing import Dict, Type
 from discord.ext import commands
 
 from miyu_bot.bot import models
-from miyu_bot.bot.bot import D4DJBot
+import miyu_bot.bot.bot
 from miyu_bot.bot.models import PreferenceScope
 
 
 class Preferences(commands.Cog):
-    bot: D4DJBot
+    bot: 'miyu_bot.bot.bot.D4DJBot'
 
     def __init__(self, bot):
         self.bot = bot
@@ -36,7 +36,7 @@ class Preferences(commands.Cog):
         if not entry:
             await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
             return
-        original = entry.get_preference(name)
+        original = entry.get_preference_no_convert(name)
         entry.set_preference(name, value)
         await entry.save()
         await ctx.send(f'Successfully changed preference "{name}" '
@@ -96,7 +96,7 @@ preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
 }
 
 
-async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool):
+async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool = False):
     sources = []
     if user_prefs := await models.User.get_or_none(id=ctx.author.id):
         if not toggle_user_prefs:
@@ -106,14 +106,14 @@ async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool):
     if guild_prefs := ctx.guild and await models.Guild.get_or_none(id=ctx.guild.id):
         sources.append(guild_prefs)
 
+    preference_values = {}
     preferences = {}
-    preference_types = {}
     for source in sources:
         for k, v in source.preferences.items():
-            if v.name not in preferences:
-                preferences[v.name] = source.get_preference(k)
-                preference_types[v.name] = v
-    return preferences, preference_types
+            if v.name not in preference_values:
+                preference_values[v.name] = source.get_preference(k)
+                preferences[v.name] = v
+    return preference_values, preferences
 
 
 def setup(bot):

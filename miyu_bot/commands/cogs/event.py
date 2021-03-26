@@ -68,7 +68,7 @@ class Event(commands.Cog):
 
     async def parse_event_argument(self, ctx, arg):
         arguments = parse_arguments(arg)
-        preferences = await arguments.preferences(ctx)
+        await arguments.update_preferences(ctx)
         text = arguments.text()
         arguments.require_all_arguments_used()
 
@@ -84,7 +84,7 @@ class Event(commands.Cog):
                 event = self.bot.asset_filters.events.get(text, ctx)
         else:
             event = self.bot.asset_filters.events.get_latest_event(ctx)
-        return event, pytz.timezone(preferences['timezone'])
+        return event, ctx.preferences.timezone
 
     def get_event_embed(self, event, timezone):
         embed = discord.Embed(title=event.name)

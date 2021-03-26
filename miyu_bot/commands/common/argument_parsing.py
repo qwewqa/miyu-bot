@@ -1,6 +1,7 @@
 import re
 
 from collections import namedtuple
+from types import SimpleNamespace
 from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, Iterable
 
 # https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
@@ -32,7 +33,6 @@ def _parse_named_argument(arg):
 
 
 def parse_arguments(arg):
-    arg = arg.lower()
     named_arguments_parsed = [_parse_named_argument(na[0]) for na in _param_re.findall(arg)]
     arg = _param_re.sub('', arg)
     # Technically, the order (named arguments then tags)
@@ -113,10 +113,11 @@ class ParsedArguments:
         return name in self.named_arguments
 
     def single(self, names: Union[List[str], str], default: Any = None,
-                  is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
+               is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         return self.single_op(names, default, ['='], is_list, numeric, converter)[0]
 
-    def single_op(self, names: Union[List[str], str], default: Any = None, allowed_operators: Optional[Container] = None,
+    def single_op(self, names: Union[List[str], str], default: Any = None,
+                  allowed_operators: Optional[Container] = None,
                   is_list=False, numeric=False, converter: Union[dict, Callable] = lambda n: n):
         if allowed_operators is None:
             allowed_operators = ['=']
@@ -213,15 +214,18 @@ class ParsedArguments:
                 f'Unknown tags {", ".join(quote(v) for v in self.tag_arguments if v not in self.used_tags)}.')
 
     async def preferences(self, ctx):
-        prefs, pref_types = await get_preferences(ctx, self.tag('p'))
-        for name in prefs.keys():
-            pref_type = pref_types[name]
+        preference_values, preferences = await get_preferences(ctx, self.tag('p'))
+        for name in preference_values.keys():
+            preference = preferences[name]
             override, _op = self.single_op(name)
             if override:
-                if error_message := pref_type.validate_or_get_error_message(override):
+                if error_message := preference.validate_or_get_error_message(override):
                     raise ArgumentError(f'Invalid value "{override}" for preference "{name}": {error_message}')
-                prefs[name] = pref_type.transform(override)
-        return prefs
+                preference_values[name] = preference.transform(override)
+        return preference_values
+
+    async def update_preferences(self, ctx):
+        ctx.preferences = SimpleNamespace(**await self.preferences(ctx))
 
 
 _operators = {

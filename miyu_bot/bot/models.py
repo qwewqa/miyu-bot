@@ -21,6 +21,7 @@ class Preference:
                  *,
                  validator: Callable[[str], Union[bool, str, None]] = lambda _v: None,
                  transformer: Callable[[str], Any] = lambda v: v,
+                 load_converter: Callable[[Any], Any] = lambda v: v,
                  is_privileged: bool = False):
         self.name = name
         self.field = field
@@ -28,6 +29,7 @@ class Preference:
         self.unset_value = unset_value
         self._validator = validator
         self._transformer = transformer
+        self._load_converter = load_converter
         self.is_privileged = is_privileged
 
     def validate_or_get_error_message(self, value: str) -> Optional[str]:
@@ -40,6 +42,9 @@ class Preference:
 
     def transform(self, value: str) -> Any:
         return self._transformer(value)
+
+    def convert(self, value: Any) -> Any:
+        return self._load_converter(value)
 
 
 all_preferences = {}
@@ -81,6 +86,15 @@ class PreferenceScope(Model, metaclass=PreferenceScopeMeta):
         raise NotImplementedError
 
     def get_preference(self, name):
+        if name not in self.preferences:
+            raise KeyError(f'Unknown preference "{name}".')
+        preference = self.preferences[name]
+        value = getattr(self, preference.attribute_name)
+        if value == preference.unset_value:
+            value = preference.default_value
+        return preference.convert(value)
+
+    def get_preference_no_convert(self, name):
         if name not in self.preferences:
             raise KeyError(f'Unknown preference "{name}".')
         preference = self.preferences[name]
@@ -141,7 +155,8 @@ timezone_pref = Preference('timezone',
                            default_value='etc/utc',
                            unset_value='',
                            validator=lambda tz: None if tz.lower() in lowercase_tzs else 'Invalid timezone.',
-                           transformer=lambda tz: tz.lower())
+                           transformer=lambda tz: tz.lower(),
+                           load_converter=lambda tz: pytz.timezone(tz))
 language_pref = Preference('language',
                            fields.CharField(max_length=15, default=''),
                            default_value='en',

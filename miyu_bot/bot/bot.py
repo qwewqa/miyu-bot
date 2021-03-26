@@ -1,14 +1,18 @@
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
+from types import SimpleNamespace
+from typing import Dict, Optional
 
 import aiohttp
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
+from discord.ext.commands import Context
 from tortoise import Tortoise
 
 from miyu_bot.bot.master_asset_manager import MasterFilterManager
 from miyu_bot.bot.name_aliases import NameAliases
 from miyu_bot.bot.tortoise_config import TORTOISE_ORM
+from miyu_bot.commands.cogs.preferences import get_preferences
 from miyu_bot.commands.common.asset_paths import clear_asset_filename_cache
 
 
@@ -65,3 +69,17 @@ class D4DJBot(commands.Bot):
     def reload_all_extensions(self):
         for name in self.extension_names:
             self.reload_extension(name)
+
+    async def get_context(self, message, *, cls=None):
+        ctx = await super().get_context(message, cls=PrefContext)
+        if ctx.command and not getattr(ctx.command, 'no_preferences', False):
+            ctx.preferences = SimpleNamespace(**(await get_preferences(ctx))[0])
+        return ctx
+
+
+class PrefContext(Context):
+    preferences: Optional[SimpleNamespace]
+
+    def __init__(self, **kwargs):
+        self.preferences = None
+        super(PrefContext, self).__init__(**kwargs)

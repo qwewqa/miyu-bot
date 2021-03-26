@@ -1,5 +1,5 @@
 acb-py==1.1.0
-aerich==0.5.0
+aerich==0.5.2
 aiohttp==3.7.4.post0
 aiosqlite==0.17.0
 async-timeout==3.0.1
@@ -22,14 +22,14 @@ Pillow==8.1.2
 pox==0.2.9
 pycparser==2.20
 pydantic==1.8.1
-pykakasi==2.0.6
+pykakasi~=2.0.7
 PyNaCl==1.4.0
 pyparsing==2.4.7
 PyPika==0.47.7
 python-dateutil==2.8.1
 pytz==2021.1
 six==1.15.0
-tortoise-orm==0.16.21
+tortoise-orm==0.17.0
 tqdm==4.59.0
 typing-extensions==3.7.4.3
 yarl==1.6.3

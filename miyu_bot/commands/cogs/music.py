@@ -308,7 +308,8 @@ class Music(commands.Cog):
                         inline=False)
         embed.add_field(name='Info',
                         value=f'Duration: {self.format_duration(mix.info.end_time - mix.info.start_time)}\n'
-                              f'Level: {mix.info.level}',
+                              f'Level: {mix.info.level}\n'
+                              f'Ordered: {all(a == b for a, b in zip(get_best_mix(songs), songs))}',
                         inline=False)
         embed.set_image(url='attachment://mix.png')
 

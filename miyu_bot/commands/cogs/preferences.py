@@ -32,6 +32,7 @@ class Preferences(commands.Cog):
             return
         if error_message := preference.validate_or_get_error_message(value):
             await ctx.send(f'Invalid value "{value}" for preference "{name}": {error_message}')
+            return
         entry = await scope.get_from_context(ctx)
         if not entry:
             await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')

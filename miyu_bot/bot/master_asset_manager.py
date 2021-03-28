@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import hashlib
 from typing import Callable, Any, Optional, Union
 
@@ -7,6 +9,7 @@ from d4dj_utils.master.master_asset import MasterDict, MasterAsset
 from discord.ext import commands
 
 from miyu_bot.bot.aliases.event import event_aliases
+import miyu_bot.bot.bot
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 
 import datetime as dt
@@ -75,8 +78,8 @@ class MasterFilter:
         self.default_filter[alias] = master
         self.unrestricted_filter[alias] = master
 
-    def get(self, name_or_id: Union[str, int], ctx: Optional[commands.Context]):
-        if ctx and ctx.channel.id in no_filter_channels:
+    def get(self, name_or_id: Union[str, int], ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+        if ctx and ctx.preferences.leaks:
             try:
                 return self.masters[int(name_or_id)]
             except (KeyError, ValueError):
@@ -94,29 +97,29 @@ class MasterFilter:
                     return None
                 return self.default_filter[name_or_id]
 
-    def get_by_relevance(self, name: str, ctx: commands.Context):
+    def get_by_relevance(self, name: str, ctx: miyu_bot.bot.bot.PrefContext):
         try:
             master = self.masters[int(name)]
             id_result = [master]
-            if not ctx or (ctx.channel.id not in no_filter_channels and master not in self.default_filter.values()):
+            if not ctx or (not ctx.preferences.leaks and master not in self.default_filter.values()):
                 if master not in self.default_filter.values():
                     id_result = []
         except (KeyError, ValueError):
             id_result = []
 
         if name:
-            if ctx.channel.id in no_filter_channels:
+            if ctx.preferences.leaks:
                 return id_result + self.unrestricted_filter.get_sorted(name)
             else:
                 return id_result + self.default_filter.get_sorted(name)
         else:
-            if ctx.channel.id in no_filter_channels:
+            if ctx.preferences.leaks:
                 return list(self.unrestricted_filter.values())
             else:
                 return list(self.default_filter.values())
 
-    def values(self, ctx: Optional[commands.Context]):
-        if ctx is not None and ctx.channel.id in no_filter_channels:
+    def values(self, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+        if ctx is not None and ctx.preferences.leaks:
             return self.unrestricted_filter.values()
         else:
             return self.default_filter.values()
@@ -139,6 +142,3 @@ class EventFilter(MasterFilter):
 
 def hash_master(master: MasterAsset):
     return hashlib.md5(master.extended_description().encode('utf-8')).hexdigest()
-
-
-no_filter_channels = {790033228600705048, 790033272376918027, 795640603114864640}

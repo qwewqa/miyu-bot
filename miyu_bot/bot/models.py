@@ -128,7 +128,8 @@ bool_strings = bool_true_strings | bool_false_strings
 
 
 def validate_boolean(v: str):
-    return v in bool_strings
+    if v not in bool_strings:
+        return 'Not a valid boolean'
 
 
 def transform_boolean(v: str):
@@ -163,13 +164,19 @@ language_pref = Preference('language',
 prefix_pref = Preference('prefix',
                          fields.CharField(max_length=63, null=True),
                          default_value='!',
-                         validator=lambda pfx: (None if len(pfx) <= 63
+                         validator=lambda pfx: (None if 1 <= len(pfx) <= 63
                                                 else 'Invalid prefix length. Should be between 1 and 63 characters.'))
 loop_pref = Preference('loop',
                        fields.IntField(null=True, index=True),
                        default_value=None,
                        validator=validate_loop_interval,
                        transformer=lambda v: int(v))
+leaks_pref = Preference('leaks',
+                        fields.BooleanField(null=True),
+                        default_value=False,
+                        validator=validate_boolean,
+                        transformer=transform_boolean,
+                        is_privileged=True)
 
 
 class Guild(PreferenceScope):
@@ -203,6 +210,7 @@ class Channel(PreferenceScope):
     timezone = timezone_pref
     language = language_pref
     loop = loop_pref
+    leaks = leaks_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):

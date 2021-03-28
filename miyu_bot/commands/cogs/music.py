@@ -268,10 +268,20 @@ class Music(commands.Cog):
                       aliases=[],
                       description='Creates a custom mix.',
                       help='!mix grgr hard cyber hard puransu expert "cats eye" easy')
-    async def mix(self, ctx: commands.Context, a: str, a_diff: str, b: str, b_diff: str, c: str, c_diff: str,
-                  d: str, d_diff: str):
+    async def mix(self, ctx: commands.Context, *args: str):
+        if len(args) == 8:
+            a, a_diff, b, b_diff, c, c_diff, d, d_diff = args
+            names = [a, b, c, d]
+            diff_names = [a_diff, b_diff, c_diff, d_diff]
+        elif len(args) == 4:
+            names = args
+            diff_names = ['ex'] * 4
+        else:
+            await ctx.send('Invalid argument count.')
+            return
+
         songs = []
-        for name in [a, b, c, d]:
+        for name in names:
             song = self.bot.asset_filters.music.get(name, ctx)
             if not song:
                 await ctx.send(f'Unknown song "{name}".', allowed_mentions=AllowedMentions.none())
@@ -281,7 +291,7 @@ class Music(commands.Cog):
                 return
             songs.append(song)
         diffs = []
-        for diff_name in [a_diff, b_diff, c_diff, d_diff]:
+        for diff_name in diff_names:
             diff = self.difficulty_names.get(diff_name.lower())
             if not diff:
                 await ctx.send(f'Unknown difficulty "{diff_name}".', allowed_mentions=AllowedMentions.none())

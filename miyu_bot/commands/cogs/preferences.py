@@ -5,7 +5,7 @@ from discord.ext import commands
 
 from miyu_bot.bot import models
 import miyu_bot.bot.bot
-from miyu_bot.bot.models import PreferenceScope
+from miyu_bot.bot.models import PreferenceScope, all_preferences
 
 
 class Preferences(commands.Cog):
@@ -108,13 +108,13 @@ async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool = False
         sources.append(guild_prefs)
 
     preference_values = {}
-    preferences = {}
     for source in sources:
         for k, v in source.preferences.items():
-            if v.name not in preference_values:
-                preference_values[v.name] = source.get_preference(k)
-                preferences[v.name] = v
-    return preference_values, preferences
+            preference_values[v.name] = source.get_preference(k)
+    for v in all_preferences.values():
+        if v.name not in preference_values:
+            preference_values[v.name] = v.default_value
+    return preference_values
 
 
 def setup(bot):

@@ -73,7 +73,7 @@ class D4DJBot(commands.Bot):
     async def get_context(self, message, *, cls=None):
         ctx = await super().get_context(message, cls=PrefContext)
         if ctx.command and not getattr(ctx.command, 'no_preferences', False):
-            ctx.preferences = SimpleNamespace(**(await get_preferences(ctx))[0])
+            ctx.preferences = SimpleNamespace(**(await get_preferences(ctx)))
         return ctx
 
 

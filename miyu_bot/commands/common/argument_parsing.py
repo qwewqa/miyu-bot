@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, I
 # https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
 # https://stackoverflow.com/questions/21105360/regex-find-comma-not-inside-quotes
 # The ` ?` is just so it matches the space after during the replace with blank so there's no double spaces
+from miyu_bot.bot.models import all_preferences
 from miyu_bot.commands.cogs.preferences import get_preferences
 
 _param_re = re.compile(
@@ -214,9 +215,9 @@ class ParsedArguments:
                 f'Unknown tags {", ".join(quote(v) for v in self.tag_arguments if v not in self.used_tags)}.')
 
     async def preferences(self, ctx):
-        preference_values, preferences = await get_preferences(ctx, self.tag('p'))
+        preference_values = await get_preferences(ctx, self.tag('p'))
         for name in preference_values.keys():
-            preference = preferences[name]
+            preference = all_preferences[name]
             override, _op = self.single_op(name)
             if override:
                 if error_message := preference.validate_or_get_error_message(override):

@@ -17,7 +17,7 @@ class Preference:
                  name: str,
                  field: fields.Field,
                  default_value: Any,
-                 unset_value: Any,
+                 unset_value: Any = None,
                  *,
                  validator: Callable[[str], Union[bool, str, None]] = lambda _v: None,
                  transformer: Callable[[str], Any] = lambda v: v,
@@ -151,26 +151,23 @@ def validate_loop_interval(v: str):
 
 
 timezone_pref = Preference('timezone',
-                           fields.CharField(max_length=31, default=''),
+                           fields.CharField(max_length=31, null=True),
                            default_value='etc/utc',
-                           unset_value='',
                            validator=lambda tz: None if tz.lower() in lowercase_tzs else 'Invalid timezone.',
                            transformer=lambda tz: tz.lower(),
                            load_converter=lambda tz: pytz.timezone(tz))
 language_pref = Preference('language',
-                           fields.CharField(max_length=15, default=''),
+                           fields.CharField(max_length=15, null=True),
                            default_value='en',
-                           unset_value='',
                            validator=lambda lang: 'Translations are not supported yet.')
 prefix_pref = Preference('prefix',
-                         fields.CharField(max_length=63, default=''),
+                         fields.CharField(max_length=63, null=True),
                          default_value='!',
-                         unset_value='',
-                         validator=lambda prefix: None if len(prefix) <= 63 else 'Prefix is too long.')
+                         validator=lambda pfx: (None if len(pfx) <= 63
+                                                else 'Invalid prefix length. Should be between 1 and 63 characters.'))
 loop_pref = Preference('loop',
-                       fields.IntField(default=None, null=True, index=True),
+                       fields.IntField(null=True, index=True),
                        default_value=None,
-                       unset_value=None,
                        validator=validate_loop_interval,
                        transformer=lambda v: int(v))
 

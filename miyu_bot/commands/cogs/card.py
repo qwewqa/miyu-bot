@@ -299,7 +299,7 @@ class Card(commands.Cog):
             def generator(n):
                 nonlocal idx
                 idx += n
-                idx = max(0, min(idx, len(gachas)))
+                idx = max(0, min(idx, len(gachas) - 1))
                 return self.get_gacha_embed(gachas[idx])
 
             asyncio.ensure_future(run_dynamically_paged_message(ctx, generator))

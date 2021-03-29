@@ -48,7 +48,7 @@ class Card(commands.Cog):
             await ctx.send(f'No results for card "{arg}"')
             return
 
-        if len(cards) == 1 or arguments.text():
+        if len(cards) == 1:
             embeds = self.get_card_embeds(cards[0])
             asyncio.ensure_future(run_tabbed_message(ctx, self.rarity_emoji, embeds, starting_index=1))
         else:
@@ -290,7 +290,7 @@ class Card(commands.Cog):
             await ctx.send(f'No results for gacha "{arg}"')
             return
 
-        if len(gachas) == 1 or arguments.text():
+        if len(gachas) == 1:
             embed = self.get_gacha_embed(gachas[0])
             asyncio.ensure_future(run_deletable_message(ctx, await ctx.send(embed=embed)))
         else:

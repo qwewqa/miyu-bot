@@ -9,6 +9,7 @@ from io import BytesIO
 from typing import Tuple
 
 import discord
+from PIL import ImageColor
 from d4dj_utils.chart.chart import Chart
 from d4dj_utils.chart.mix import get_best_mix, get_mix_data, calculate_mix_rating
 from d4dj_utils.chart.score_calculator import calculate_score
@@ -73,7 +74,10 @@ class Music(commands.Cog):
             return
         self.logger.info(f'Found song "{song}" ({romanize(song.name)}).')
 
-        embed = discord.Embed(title=song.name)
+        color_code = song.unit.main_color_code
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+
+        embed = discord.Embed(title=song.name, color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
 
         artist_info = {
@@ -495,9 +499,12 @@ class Music(commands.Cog):
     def get_mix_embeds(self, song):
         embeds = []
 
+        color_code = song.unit.main_color_code
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+
         for difficulty in [ChartDifficulty.Easy, ChartDifficulty.Normal, ChartDifficulty.Hard, ChartDifficulty.Expert]:
             chart: ChartMaster = song.charts[difficulty]
-            embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]')
+            embed = discord.Embed(title=f'Mix: {song.name} [{chart.difficulty.name}]', color=color)
             embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
             embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.mix_path))
 

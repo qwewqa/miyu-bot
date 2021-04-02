@@ -4,6 +4,7 @@ import logging
 import re
 
 import discord
+from PIL import ImageColor
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
 from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
@@ -234,7 +235,10 @@ class Card(commands.Cog):
         return cards
 
     def get_card_embed(self, card: CardMaster, limit_break):
-        embed = discord.Embed(title=self.format_card_name(card))
+        color_code = card.character.color_code
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+
+        embed = discord.Embed(title=self.format_card_name(card), color=color)
 
         thumb_url = self.bot.asset_url + get_asset_filename(card.icon_path(limit_break))
         art_url = self.bot.asset_url + get_asset_filename(card.art_path(limit_break))

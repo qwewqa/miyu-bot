@@ -293,13 +293,10 @@ class Event(commands.Cog):
                     channels = await models.Channel.filter(loop=interval)
                     for channel_data in channels:
                         channel = self.bot.get_channel(channel_data.id)
-                        if not channel:
-                            try:
-                                channel = await self.bot.fetch_channel(channel_data.id)
-                            except Exception as e:
-                                self.logger.warning(f'Failed to get channel {channel_data.id}: {e}.')
-                                continue
-                        await channel.send(embed=embed)
+                        if channel:
+                            await channel.send(embed=embed)
+                        else:
+                            self.logger.warning(f'Failed to get channel for loop (id: {channel_data.id}).')
         except Exception as e:
             self.logger.warning(f'Error in leaderboard loop: {getattr(e, "message", repr(e))}')
 

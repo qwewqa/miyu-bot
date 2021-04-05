@@ -62,7 +62,7 @@ class Music(commands.Cog):
                       aliases=['music'],
                       description='Finds the song with the given name.',
                       help='!song grgr')
-    async def song(self, ctx: commands.Context, *, arg: commands.clean_content):
+    async def song(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         self.logger.info(f'Searching for song "{arg}".')
 
         song = self.bot.asset_filters.music.get(arg, ctx)

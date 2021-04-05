@@ -220,7 +220,7 @@ class ParsedArguments:
             preference = all_preferences[name]
             override, _op = self.single_op(name)
             if override:
-                if preference.is_privileged and not ctx.bot.is_owner(ctx.author):
+                if preference.is_privileged and not await ctx.bot.is_owner(ctx.author):
                     raise ArgumentError(f'Privileged preference.')
                 if error_message := preference.validate_or_get_error_message(override):
                     raise ArgumentError(f'Invalid value "{override}" for preference "{name}": {error_message}')

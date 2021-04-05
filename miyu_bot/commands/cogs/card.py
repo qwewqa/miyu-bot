@@ -1,7 +1,7 @@
 import asyncio
 import enum
 import logging
-import re
+from typing import Sequence
 
 import discord
 from PIL import ImageColor
@@ -9,16 +9,17 @@ from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
 from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
+from d4dj_utils.master.gacha_table_master import GachaTableMaster
+from d4dj_utils.master.gacha_table_rate_master import GachaTableRateMaster
 from d4dj_utils.master.skill_master import SkillMaster
-from d4dj_utils.master.stock_master import StockCategory
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, ArgumentError, \
-    list_operator_for, full_operators
+from miyu_bot.commands.common.argument_parsing import ParsedArguments, parse_arguments, list_operator_for, \
+    full_operators
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
-    unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, common_unit_emoji_id, grey_emoji_id
+    unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, grey_emoji_id
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message, \
     run_deletable_message, run_dynamically_paged_message
@@ -291,12 +292,12 @@ class Card(commands.Cog):
         gachas = self.get_gachas(ctx, arguments)
 
         if not gachas:
-            await ctx.send(f'No results for gacha "{arg}"')
+            await ctx.send(f'No results.')
             return
 
         if len(gachas) == 1:
             embed = self.get_gacha_embed(gachas[0])
-            asyncio.ensure_future(run_deletable_message(ctx, await ctx.send(embed=embed)))
+            asyncio.create_task(run_deletable_message(ctx, await ctx.send(embed=embed)))
         else:
             idx = 0
 
@@ -306,7 +307,35 @@ class Card(commands.Cog):
                 idx = max(0, min(idx, len(gachas) - 1))
                 return self.get_gacha_embed(gachas[idx])
 
-            asyncio.ensure_future(run_dynamically_paged_message(ctx, generator))
+            asyncio.create_task(run_dynamically_paged_message(ctx, generator))
+
+    @commands.command(name='gacha_tables',
+                      aliases=['gacha_table', 'gachatable', 'gachatables'],
+                      description='Displays gacha table info.',
+                      help='!gacha_tables Shiny Smily Scratch')
+    async def gacha_tables(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
+        self.logger.info(f'Searching for gacha "{arg}".')
+
+        arguments = parse_arguments(arg)
+        gachas = self.get_gachas(ctx, arguments)
+
+        if not gachas:
+            await ctx.send(f'No results.')
+            return
+
+        if len(gachas) == 1:
+            embed = self.get_gacha_table_embed(gachas[0])
+            asyncio.create_task(run_deletable_message(ctx, await ctx.send(embed=embed)))
+        else:
+            idx = 0
+
+            def generator(n):
+                nonlocal idx
+                idx += n
+                idx = max(0, min(idx, len(gachas) - 1))
+                return self.get_gacha_table_embed(gachas[idx])
+
+            asyncio.create_task(run_dynamically_paged_message(ctx, generator))
 
     @commands.command(name='gachas',
                       aliases=['banners'],
@@ -358,6 +387,43 @@ class Card(commands.Cog):
                         inline=False)
         embed.add_field(name='Costs',
                         value='\n'.join(self.format_draw_data(draw) for draw in gacha.draw_data))
+
+        return embed
+
+    def get_gacha_table_embed(self, gacha: GachaMaster):
+        embed = discord.Embed(title=gacha.name)
+
+        thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
+
+        embed.set_thumbnail(url=thumb_url)
+
+        def add_table_field(table_rate: GachaTableRateMaster, tables: Sequence[Sequence[GachaTableMaster]]):
+            body = ''
+            for table_normalized_rate, table in zip(table_rate.normalized_rates, tables):
+                if table_normalized_rate == 0:
+                    continue
+                rates = [t.rate for t in table]
+                total_rate = sum(rates)
+                rate_up_rate = max(rates)
+
+                # Exclude tables with no rate up, except those with very few rate ups (mainly for pity pull)
+                if rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05:
+                    continue
+
+                rate_up_card_entries = [t for t in table if t.rate == rate_up_rate]
+
+                for entry in rate_up_card_entries:
+                    body += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {self.format_card_name_for_list(entry.card)}`\n'
+
+            embed.add_field(name=table_rate.tab_name,
+                            value=body,
+                            inline=False)
+
+        for table_rate in gacha.table_rates:
+            add_table_field(table_rate, gacha.tables)
+
+        if gacha.bonus_tables:
+            add_table_field(gacha.bonus_table_rate, gacha.bonus_tables)
 
         return embed
 

@@ -214,7 +214,7 @@ class Channel(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.update_or_create(id=ctx.channel.id, name=ctx.channel.name))[0]
+        return (await cls.update_or_create(id=ctx.channel.id, name=getattr(ctx.channel, 'name', 'DM')))[0]
 
     def __str__(self):
         return f'{self.name} ({self.id})'

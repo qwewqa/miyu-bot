@@ -192,7 +192,7 @@ class Guild(PreferenceScope):
     async def get_from_context(cls, ctx: commands.Context):
         if not ctx.guild:
             return None
-        return (await cls.update_or_create(id=ctx.guild.id, name=ctx.guild.name))[0]
+        return (await cls.update_or_create(id=ctx.guild.id, defaults=dict(name=ctx.guild.name)))[0]
 
     def __str__(self):
         return f'{self.name} ({self.id})'
@@ -214,7 +214,7 @@ class Channel(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.update_or_create(id=ctx.channel.id, name=getattr(ctx.channel, 'name', 'DM')))[0]
+        return (await cls.update_or_create(id=ctx.channel.id, defaults=dict(name=getattr(ctx.channel, 'name', 'DM'))))[0]
 
     def __str__(self):
         return f'{self.name} ({self.id})'
@@ -236,7 +236,7 @@ class User(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.update_or_create(id=ctx.author.id, name=f'{ctx.author.name}#{ctx.author.discriminator}'))[0]
+        return (await cls.update_or_create(id=ctx.author.id, defaults=dict(name=f'{ctx.author.name}#{ctx.author.discriminator}')))[0]
 
     def __str__(self):
         return f'{self.name} ({self.id})'

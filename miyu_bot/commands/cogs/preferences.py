@@ -99,13 +99,13 @@ preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
 
 async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool = False):
     sources = []
+    if guild_prefs := ctx.guild and await models.Guild.get_or_none(id=ctx.guild.id):
+        sources.append(guild_prefs)
+    if channel_prefs := await models.Channel.get_or_none(id=ctx.channel.id):
+        sources.append(channel_prefs)
     if user_prefs := await models.User.get_or_none(id=ctx.author.id):
         if not toggle_user_prefs:
             sources.append(user_prefs)
-    if channel_prefs := await models.Channel.get_or_none(id=ctx.channel.id):
-        sources.append(channel_prefs)
-    if guild_prefs := ctx.guild and await models.Guild.get_or_none(id=ctx.guild.id):
-        sources.append(guild_prefs)
 
     preference_values = {}
     for source in sources:

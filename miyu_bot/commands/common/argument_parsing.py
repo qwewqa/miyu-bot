@@ -224,7 +224,7 @@ class ParsedArguments:
                     raise ArgumentError(f'Privileged preference.')
                 if error_message := preference.validate_or_get_error_message(override):
                     raise ArgumentError(f'Invalid value "{override}" for preference "{name}": {error_message}')
-                preference_values[name] = preference.transform(override)
+                preference_values[name] = preference.convert(preference.transform(override))
         return preference_values
 
     async def update_preferences(self, ctx):

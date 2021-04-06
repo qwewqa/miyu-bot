@@ -232,6 +232,7 @@ class User(PreferenceScope):
     timezone = timezone_pref
     language = language_pref
     prefix = prefix_pref
+    leaks = leaks_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):

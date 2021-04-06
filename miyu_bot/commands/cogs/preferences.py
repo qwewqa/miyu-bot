@@ -21,7 +21,7 @@ class Preferences(commands.Cog):
     async def setpref(self, ctx: commands.Context, scope: str, name: str, value: str):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope.scope_name}".')
+            await ctx.send(f'Invalid scope.')
             return
         if name not in scope.preferences:
             await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')

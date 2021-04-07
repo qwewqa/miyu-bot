@@ -110,7 +110,8 @@ async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool = False
     preference_values = {}
     for source in sources:
         for k, v in source.preferences.items():
-            preference_values[v.name] = source.get_preference(k)
+            if source.preference_set(k):
+                preference_values[v.name] = source.get_preference(k)
     for v in all_preferences.values():
         if v.name not in preference_values:
             preference_values[v.name] = v.default_value

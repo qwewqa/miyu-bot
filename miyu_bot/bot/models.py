@@ -94,13 +94,20 @@ class PreferenceScope(Model, metaclass=PreferenceScopeMeta):
             value = preference.default_value
         return preference.convert(value)
 
+    def preference_set(self, name):
+        if name not in self.preferences:
+            raise KeyError(f'Unknown preference "{name}".')
+        preference = self.preferences[name]
+        value = getattr(self, preference.attribute_name)
+        return value != preference.unset_value
+
     def get_preference_no_convert(self, name):
         if name not in self.preferences:
             raise KeyError(f'Unknown preference "{name}".')
         preference = self.preferences[name]
         value = getattr(self, preference.attribute_name)
         if value == preference.unset_value:
-            value = preference.default_value
+            return None
         return value
 
     def set_preference(self, name, value):
@@ -214,7 +221,8 @@ class Channel(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.update_or_create(id=ctx.channel.id, defaults=dict(name=getattr(ctx.channel, 'name', 'DM'))))[0]
+        return (await cls.update_or_create(id=ctx.channel.id,
+                                           defaults={'name': getattr(ctx.channel, 'name', 'DM')}))[0]
 
     def __str__(self):
         return f'{self.name} ({self.id})'
@@ -236,7 +244,8 @@ class User(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.update_or_create(id=ctx.author.id, defaults=dict(name=f'{ctx.author.name}#{ctx.author.discriminator}')))[0]
+        return (await cls.update_or_create(id=ctx.author.id,
+                                           defaults={'name': f'{ctx.author.name}#{ctx.author.discriminator}'}))[0]
 
     def __str__(self):
         return f'{self.name} ({self.id})'

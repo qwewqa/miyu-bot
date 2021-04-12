@@ -160,7 +160,7 @@ def validate_loop_interval(v: str):
 
 timezone_pref = Preference('timezone',
                            fields.CharField(max_length=31, null=True),
-                           default_value='etc/utc',
+                           default_value=pytz.timezone('etc/utc'),
                            validator=lambda tz: None if tz.lower() in lowercase_tzs else 'Invalid timezone.',
                            transformer=lambda tz: tz.lower(),
                            load_converter=lambda tz: pytz.timezone(tz))

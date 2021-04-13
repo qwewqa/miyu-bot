@@ -323,7 +323,10 @@ class Music(commands.Cog):
         embed.add_field(name='Info',
                         value=f'Duration: {self.format_duration(mix.info.end_time - mix.info.start_time)}\n'
                               f'Level: {mix.info.level}\n'
-                              f'Ordered: {all(a == b for a, b in zip(get_best_mix(songs), songs))}',
+                              f'Ordered: {all(a == b for a, b in zip(get_best_mix(songs), songs))}\n'
+                              f'Skills: {", ".join("{:.2f}s".format(t - mix.info.start_time) if t not in mix.info.base_skill_times else "[{:.2f}s]".format(t - mix.info.start_time) for t in mix.info.skill_times)}\n'
+                              f'Fever: {mix.info.fever_start - mix.info.start_time:.2f}s - {mix.info.fever_end - mix.info.start_time:.2f}s\n'
+                              f'Transitions: {", ".join("{:.2f}s".format(t - mix.info.start_time) for t in mix.info.medley_transition_times)}',
                         inline=False)
         embed.set_image(url='attachment://mix.png')
 

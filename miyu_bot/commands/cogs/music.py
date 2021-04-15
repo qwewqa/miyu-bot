@@ -426,7 +426,7 @@ class Music(commands.Cog):
 
         for value, op in difficulty:
             operator = list_operator_for(op)
-            songs = [song for song in songs if operator(song.charts[4].level, value)]
+            songs = [song for song in songs if len(song.charts) == 4 and operator(song.charts[4].level, value)]
 
         if units:
             songs = [song for song in songs if song.unit.id in units]

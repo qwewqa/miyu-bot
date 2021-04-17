@@ -246,6 +246,8 @@ class Event(commands.Cog):
         event = self.bot.asset_filters.events.get_latest_event(ctx)
         async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
             stats = [(int(k), v) for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()]
+        for _rank, stat in stats:
+            stat['points'] = stat['points'] if isinstance(stat['points'], int) else 0
         embeds = []
         t20_stats = stats[:20]
         other_stats = stats[20:]

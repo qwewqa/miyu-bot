@@ -381,7 +381,7 @@ class Card(commands.Cog):
         embed.add_field(name='Summary',
                         value=gacha.summary,
                         inline=False)
-        embed.add_field(name='Rateups',
+        embed.add_field(name='Featured',
                         value='\n'.join(
                             self.format_card_name_with_emoji(card) for card in gacha.pick_up_cards) or 'None',
                         inline=False)

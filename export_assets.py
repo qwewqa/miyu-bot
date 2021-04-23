@@ -15,8 +15,8 @@ def main():
         'ondemand/chart/*.png',
         'ondemand/event/*/*.jpg',
         'ondemand/event/*/*.png',
-        'ondemand/gacha/top/banner/*.png'
-        'ondemand/loginBonus/*.jpg'
+        'ondemand/gacha/top/banner/*.png',
+        'ondemand/loginBonus/*.jpg',
     ]
 
     for asset_path in asset_paths:

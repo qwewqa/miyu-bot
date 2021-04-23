@@ -418,7 +418,11 @@ class Card(commands.Cog):
                     body += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {self.format_card_name_for_list(entry.card)}`\n'
                     body_short += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {entry.card.rarity_id}★ {entry.card.name} {entry.card.character.first_name_english}`\n'
 
-            if len(body) <= 1000:
+            if len(body) == 0:
+                embed.add_field(name=table_rate.tab_name,
+                                value='`Too many or no entries`',
+                                inline=False)
+            elif len(body) <= 1000:
                 embed.add_field(name=table_rate.tab_name,
                                 value=body,
                                 inline=False)
@@ -428,7 +432,7 @@ class Card(commands.Cog):
                                 inline=False)
             else:
                 embed.add_field(name=table_rate.tab_name,
-                                value='`Too Many Entries`',
+                                value='`Too many entries`',
                                 inline=False)
 
 

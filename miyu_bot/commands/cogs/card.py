@@ -399,6 +399,8 @@ class Card(commands.Cog):
 
         def add_table_field(table_rate: GachaTableRateMaster, tables: Sequence[Sequence[GachaTableMaster]]):
             body = ''
+            body_short = ''
+
             for table_normalized_rate, table in zip(table_rate.normalized_rates, tables):
                 if table_normalized_rate == 0:
                     continue
@@ -414,16 +416,30 @@ class Card(commands.Cog):
 
                 for entry in rate_up_card_entries:
                     body += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {self.format_card_name_for_list(entry.card)}`\n'
+                    body_short += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {entry.card.rarity_id}★ {entry.card.name} {entry.card.character.first_name_english}`\n'
 
-            embed.add_field(name=table_rate.tab_name,
-                            value=body,
-                            inline=False)
+            if len(body) <= 1500:
+                embed.add_field(name=table_rate.tab_name,
+                                value=body,
+                                inline=False)
+            elif len(body_short) <= 1500:
+                embed.add_field(name=table_rate.tab_name,
+                                value=body_short,
+                                inline=False)
+            else:
+                embed.add_field(name=table_rate.tab_name,
+                                value='`Too Many Entries`',
+                                inline=False)
+
 
         for table_rate in gacha.table_rates:
             add_table_field(table_rate, gacha.tables)
 
         if gacha.bonus_tables:
             add_table_field(gacha.bonus_table_rate, gacha.bonus_tables)
+
+        if not embed.fields:
+            embed.description = "None or too many rate up cards."
 
         return embed
 

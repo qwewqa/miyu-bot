@@ -228,7 +228,7 @@ class Card(commands.Cog):
 
         for value, operation in score_up_filters:
             operator = list_operator_for(operation)
-            cards = [card for card in cards if operator(card.skill.score_up_rate, value)]
+            cards = [card for card in cards if operator(card.skill.score_up_rate + card.skill.perfect_score_up_rate, value)]
         for value, operation in heal_filters:
             operator = list_operator_for(operation)
             cards = [card for card in cards if operator(card.skill.max_recovery_value, value)]
@@ -507,7 +507,7 @@ class CardAttribute(enum.Enum):
             self.Id: card.id,
             self.Power: card.max_power_with_limit_break,
             self.Date: card.start_datetime,
-            self.ScoreUp: card.skill.score_up_rate,
+            self.ScoreUp: card.skill.score_up_rate + card.skill.perfect_score_up_rate,
             self.Heal: card.skill.max_recovery_value,
         }[self]
 
@@ -524,7 +524,7 @@ class CardAttribute(enum.Enum):
 
     @staticmethod
     def format_skill(skill):
-        return f'{str(skill.score_up_rate).rjust(2)}%,{str(skill.max_recovery_value).rjust(3)}hp'
+        return f'{str(skill.score_up_rate + skill.perfect_score_up_rate).rjust(2)}%,{str(skill.max_recovery_value).rjust(3)}hp'
 
 
 card_attribute_aliases = {

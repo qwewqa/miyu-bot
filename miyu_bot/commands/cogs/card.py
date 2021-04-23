@@ -272,7 +272,7 @@ class Card(commands.Cog):
                         value=format_info({
                             'Name': card.skill_name,
                             'Duration': f'{skill.min_seconds}-{skill.max_seconds}s',
-                            'Score Up': f'{skill.score_up_rate}%',
+                            'Score Up': f'{skill.score_up_rate}%' if not skill.perfect_score_up_rate else f'{skill.score_up_rate}% + {skill.perfect_score_up_rate}%p',
                             'Heal': (f'{skill.min_recovery_value}-{skill.max_recovery_value}'
                                      if skill.min_recovery_value != skill.max_recovery_value
                                      else str(skill.min_recovery_value))

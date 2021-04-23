@@ -1,8 +1,6 @@
 import shutil
 from pathlib import Path
 
-from d4dj_utils.master.asset_manager import AssetManager
-
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 
 
@@ -18,6 +16,7 @@ def main():
         'ondemand/event/*/*.jpg',
         'ondemand/event/*/*.png',
         'ondemand/gacha/top/banner/*.png'
+        'ondemand/loginBonus/*.jpg'
     ]
 
     for asset_path in asset_paths:

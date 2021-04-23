@@ -45,6 +45,11 @@ class MasterFilterManager:
             naming_function=lambda s: f'{s.name + " " + s.quote.replace("～", "ー") if s.quote else s.description}',
             filter_function=lambda s: s.is_released,
         )
+        self.login_bonuses = MasterFilter(
+            self.manager.login_bonus_master,
+            naming_function=lambda l: l.title,
+            filter_function=lambda l: l.is_released,
+        )
 
 
 class MasterFilter:

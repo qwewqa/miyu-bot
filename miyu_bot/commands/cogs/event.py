@@ -3,6 +3,7 @@ import datetime
 import datetime as dt
 import logging
 import math
+import textwrap
 
 import dateutil.parser
 import discord
@@ -169,7 +170,6 @@ class Event(commands.Cog):
 
             asyncio.create_task(run_dynamically_paged_message(ctx, generator))
 
-
     @commands.command(name='login_bonuses',
                       aliases=['loginbonuses'],
                       description='Displays login bonuses.',
@@ -207,12 +207,21 @@ class Event(commands.Cog):
                         }),
                         inline=False)
 
-        rewards = '\n'.join(
-            f'`{item.sequence}. {", ".join(reward.get_friendly_description() for reward in item.rewards)}`'
-            for item in login_bonus.items) or 'None'
+        def format_login_bonus(item):
+            rewards = item.rewards
+            if len(rewards) > 1:
+                prefix = f'{item.sequence}. '
+                return prefix + ('\n' + ' ' * len(prefix)).join(reward.get_friendly_description()
+                                                                for reward in rewards)
+            elif len(rewards) == 1:
+                return f'{item.sequence}. {rewards[0].get_friendly_description()}'
+            else:
+                return 'None'
+
+        reward_text = '```' + ('\n'.join(format_login_bonus(item) for item in login_bonus.items) or 'None') + '```'
 
         embed.add_field(name='Rewards',
-                        value=rewards,
+                        value=reward_text,
                         inline=False)
 
         embed.set_image(url=self.bot.asset_url + get_asset_filename(login_bonus.image_path))

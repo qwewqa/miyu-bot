@@ -228,7 +228,8 @@ class Card(commands.Cog):
 
         for value, operation in score_up_filters:
             operator = list_operator_for(operation)
-            cards = [card for card in cards if operator(card.skill.score_up_rate + card.skill.perfect_score_up_rate, value)]
+            cards = [card for card in cards if
+                     operator(card.skill.score_up_rate + card.skill.perfect_score_up_rate, value)]
         for value, operation in heal_filters:
             operator = list_operator_for(operation)
             cards = [card for card in cards if operator(card.skill.max_recovery_value, value)]
@@ -369,6 +370,13 @@ class Card(commands.Cog):
 
         embed.set_thumbnail(url=thumb_url)
 
+        featured_text = '\n'.join(self.format_card_name_with_emoji(card) for card in gacha.pick_up_cards) or 'None'
+
+        if len(featured_text) > 1024:
+            featured_text = '\n'.join(self.format_card_name_short(card) for card in gacha.pick_up_cards) or 'None'
+        if len(featured_text) > 1024:
+            featured_text = 'Too Many Entries'
+
         embed.add_field(name='Info',
                         value=format_info({
                             'Start Date': f'{gacha.start_datetime}',
@@ -382,8 +390,7 @@ class Card(commands.Cog):
                         value=gacha.summary,
                         inline=False)
         embed.add_field(name='Featured',
-                        value='\n'.join(
-                            self.format_card_name_with_emoji(card) for card in gacha.pick_up_cards) or 'None',
+                        value=featured_text or 'None',
                         inline=False)
         embed.add_field(name='Costs',
                         value='\n'.join(self.format_draw_data(draw) for draw in gacha.draw_data))
@@ -416,7 +423,7 @@ class Card(commands.Cog):
 
                 for entry in rate_up_card_entries:
                     body += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {self.format_card_name_for_list(entry.card)}`\n'
-                    body_short += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {entry.card.rarity_id}★ {entry.card.name} {entry.card.character.first_name_english}`\n'
+                    body_short += f'`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {self.format_card_name_short(entry.card)}`\n'
 
             if len(body) == 0:
                 embed.add_field(name=table_rate.tab_name,
@@ -434,7 +441,6 @@ class Card(commands.Cog):
                 embed.add_field(name=table_rate.tab_name,
                                 value='`Too many entries`',
                                 inline=False)
-
 
         for table_rate in gacha.table_rates:
             add_table_field(table_rate, gacha.tables)
@@ -470,6 +476,9 @@ class Card(commands.Cog):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
         attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
+
+    def format_card_name_short(self, card):
+        return f'{card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     def format_card_name_with_emoji(self, card):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])

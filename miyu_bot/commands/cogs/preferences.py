@@ -61,8 +61,9 @@ class Preferences(commands.Cog):
                 return
             await ctx.send(str(getattr(entry, scope.preferences[name].attribute_name) or None))
         else:
-            await ctx.send(
-                '\n'.join(f'{name}: {getattr(entry, pref.attribute_name)}' for name, pref in scope.preferences.items()))
+            await ctx.send('\n'.join(f'{name}: {getattr(entry, pref.attribute_name)}'
+                                     for name, pref in scope.preferences.items()
+                                     if not pref.is_privileged))
 
     @commands.command(name='clearpref',
                       description='',

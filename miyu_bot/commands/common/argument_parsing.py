@@ -30,15 +30,17 @@ def _parse_named_argument(arg):
     operator = groups[2]
     values = [value[1:-1] if _param_string_re.fullmatch(value) else value for value in
               _param_argument_re.findall(groups[3])]
-    return NamedArgument(name, operator, values)
+    return NamedArgument(name.lower(), operator, values)
 
 
 def parse_arguments(arg):
+    # Note: this lowercases tags, words, and argument names
+
     named_arguments_parsed = [_parse_named_argument(na[0]) for na in _param_re.findall(arg)]
     arg = _param_re.sub('', arg)
     # Technically, the order (named arguments then tags)
     # matters because otherwise a fake tag could appear as a value to a named argument
-    tags = [t[1:] for t in _tag_re.findall(arg)]
+    tags = [t[1:].lower() for t in _tag_re.findall(arg)]
     arg = _tag_re.sub('', arg)
     named_arguments = {}
     for na in named_arguments_parsed:
@@ -60,7 +62,7 @@ class ParsedArguments:
 
     def __init__(self, text: str, tags: Set[str], named_arguments: Dict[str, List[ArgumentValue]]):
         self.text_argument = text
-        self.word_arguments = set(text.split())
+        self.word_arguments = set(word.lower() for word in text.split())
         self.tag_arguments = tags
         self.named_arguments = named_arguments
         self.used_named_arguments = set()
@@ -235,6 +237,7 @@ class ParsedArguments:
         value = parse_arguments(argument)
         await value.update_preferences(ctx)
         return value
+
 
 _operators = {
     '=': lambda a, b: a == b,

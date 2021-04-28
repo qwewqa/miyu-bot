@@ -230,6 +230,11 @@ class ParsedArguments:
     async def update_preferences(self, ctx):
         ctx.preferences = SimpleNamespace(**await self.preferences(ctx))
 
+    @classmethod
+    async def convert(cls, ctx, argument):
+        value = parse_arguments(argument)
+        await value.update_preferences(ctx)
+        return value
 
 _operators = {
     '=': lambda a, b: a == b,

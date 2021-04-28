@@ -40,14 +40,11 @@ class Card(commands.Cog):
                       aliases=[],
                       description='Finds the card with the given name.',
                       help='!card secretcage')
-    async def card(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
-        self.logger.info(f'Searching for card "{arg}".')
-
-        arguments = parse_arguments(arg)
-        cards = self.get_cards(ctx, arguments)
+    async def card(self, ctx: commands.Context, *, arg: ParsedArguments):
+        cards = self.get_cards(ctx, arg)
 
         if not cards:
-            await ctx.send(f'No results for card "{arg}"')
+            await ctx.send(f'No results.')
             return
 
         if len(cards) == 1:

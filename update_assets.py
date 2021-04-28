@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import logging
 import logging.config
@@ -11,13 +12,29 @@ from d4dj_utils.extended.manager.revision_manager import RevisionManager
 async def main():
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
-    revision_manager = RevisionManager('assets')
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('version', type=str)
+    parser.add_argument('server', type=str)
+    args = parser.parse_args()
+
+    if args.server == 'jp':
+        asset_path = 'assets'
+        base_url = f'https://resources.d4dj-groovy-mix.com/{args.version}/'
+    elif args.server == 'en':
+        asset_path = 'assets_en'
+        base_url = ''
+        raise
+    else:
+        raise
+
+    revision_manager = RevisionManager(asset_path, base_url)
     await revision_manager.repair_downloads()
     await revision_manager.update_assets()
-    manager = AssetManager('assets')
+    manager = AssetManager(asset_path)
     manager.render_charts_by_master()
 
-    for root, dirs, files in os.walk('assets'):
+    for root, dirs, files in os.walk(asset_path):
         if 'adv' in root or 'music' in root:
             continue
         for file in files:
@@ -27,7 +44,7 @@ async def main():
                 except Exception as e:
                     logger.warning(f'Failed to extract audio {os.path.join(root, file)}: {e}')
 
-    for root, dirs, files in os.walk('assets'):
+    for root, dirs, files in os.walk(asset_path):
         for file in files:
             if file.endswith(".hca"):
                 path = os.path.join(root, file)

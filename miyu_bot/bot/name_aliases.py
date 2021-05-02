@@ -27,6 +27,8 @@ class NameAliases:
         units_by_name['rondo'] = units_by_name['燐舞曲']
         units_by_name['special'] = units_by_name['スペシャル']
         units_by_name['other'] = units_by_name['その他']
+        for alias, value in self.unit_aliases.items():
+            units_by_name[alias] = units_by_name[value]
         return units_by_name
 
     unit_aliases = {
@@ -53,6 +55,7 @@ class NameAliases:
         'lililili': 'lyrical_lily',
         'lily': 'lyrical_lily',
         'lili': 'lyrical_lily',
+        'riri': 'lyrical_lily',
         'll': 'lyrical_lily',
         'fuhifumi': 'lyrical_lily',
     }

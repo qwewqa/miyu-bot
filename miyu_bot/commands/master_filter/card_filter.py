@@ -1,6 +1,9 @@
+from typing import List
+
 import discord
 from PIL import ImageColor
 from d4dj_utils.master.card_master import CardMaster
+from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
 from d4dj_utils.master.skill_master import SkillMaster
 
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -25,13 +28,25 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['char'],
                     is_sortable=True,
                     is_keyword=True,
-                    is_tag=True)
+                    is_tag=True,
+                    is_eq=True)
     def character(self, value: CardMaster):
         return value.character_id
 
     @character.init
     def init_character(self, info: DataAttributeInfo):
         info.value_mapping = {k: v.id for k, v in self.bot.aliases.characters_by_name.items()}
+
+    @data_attribute('unit',
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def unit(self, value: CardMaster):
+        return value.character.unit_id
+
+    @unit.init
+    def init_unit(self, info: DataAttributeInfo):
+        info.value_mapping = {k: v.id for k, v in self.bot.aliases.units_by_name.items()}
 
     @data_attribute('id',
                     is_sortable=True,
@@ -53,26 +68,86 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @power.formatter
     def format_power(self, value: CardMaster):
-        return str(value.max_power).rjust(5)
+        return str(value.max_power_with_limit_break).rjust(5)
 
     @data_attribute('date',
                     aliases=['release', 'recent'],
                     is_sortable=True,
                     reverse_sort=True)
-    def date(self, value: CardMaster):
+    def date(self, ctx, value: CardMaster):
         return value.start_datetime
 
     @date.formatter
-    def format_date(self, value: CardMaster):
+    def format_date(self, ctx, value: CardMaster):
         return f'{value.start_datetime.month:>2}/{value.start_datetime.day:02}'
 
-    @command_source(default_sort=date,
+    @data_attribute('rarity',
+                    aliases=['stars'],
+                    is_keyword=True,
+                    value_mapping={r'4*': 4,
+                                   r'4\*': 4,
+                                   r'3*': 3,
+                                   r'3\*': 3,
+                                   r'2*': 2,
+                                   r'2\*': 1,
+                                   r'1*': 1,
+                                   r'1\*': 1},
+                    is_sortable=True,
+                    reverse_sort=True)
+    def rarity(self, value: CardMaster):
+        return value.rarity_id
+
+    @data_attribute('skill',
+                    aliases=['score_up', 'score'],
+                    is_comparable=True,
+                    is_sortable=True,
+                    reverse_sort=True)
+    def skill(self, value: CardMaster):
+        skill = value.skill
+        return skill.score_up_rate + skill.perfect_score_up_rate
+
+    @skill.formatter
+    def skill_formatter(self, value: CardMaster):
+        skill = value.skill
+        if skill.perfect_score_up_rate:
+            return f'{skill.score_up_rate + skill.perfect_score_up_rate:>2} ({skill.perfect_score_up_rate:>2}p)'
+        else:
+            return f'{skill.score_up_rate + skill.perfect_score_up_rate:>2}      '
+
+    @data_attribute('event',
+                    aliases=['event_bonus', 'eventbonus', 'bonus'],
+                    is_comparable=True,
+                    is_sortable=True,
+                    is_flag=True,
+                    reverse_sort=True)
+    def event(self, value: CardMaster):
+        return value.event.id if value.event else -1
+
+    @event.flag_callback
+    def event_flag_callback(self, ctx, values: List[CardMaster]):
+        latest_event = self.bot.asset_filters.events.get_latest_event(ctx)
+        bonus: EventSpecificBonusMaster = latest_event.bonus
+        character_ids = {*bonus.character_ids}
+        return [v for v in values if v.character_id in character_ids and v.attribute_id == bonus.attribute_id]
+
+    @command_source(command_args=
+                    dict(name='card',
+                         description='Finds the card with the given name.',
+                         help='!card secretcage'),
+                    list_command_args=
+                    dict(name='cards',
+                         description='Lists cards matching the given search terms.',
+                         help='!cards'),
+                    default_sort=date,
                     default_display=power,
                     tabs=list(rarity_emoji_ids.values()),
                     default_tab=1,
                     suffix_tab_aliases={'untrained': 0, 'trained': 1},
                     list_name='Card Search')
     def get_card_embed(self, ctx, card: CardMaster, limit_break):
+        if card.rarity_id <= 2:
+            limit_break = 0
+
         color_code = card.character.color_code
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 

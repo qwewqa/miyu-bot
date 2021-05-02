@@ -2,13 +2,16 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import re
 from abc import abstractmethod, ABCMeta
 from dataclasses import dataclass
+from inspect import getfullargspec
 from typing import Any, Optional, Union, Callable, List
 from typing import TypeVar, Generic, Dict
 
 import discord
 from d4dj_utils.master.master_asset import MasterAsset
+from discord.ext import commands
 
 import miyu_bot.bot.bot
 from miyu_bot.bot.bot import D4DJBot
@@ -118,8 +121,27 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     def is_released(self, value: TData) -> bool:
         return value.is_released
 
-    def get_current_id(self, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+    def get_current(self, ctx) -> Optional[TData]:
         return None
+
+    def get_commands(self, include_self_parameter: bool = False):
+        def wrap(f):
+            async def wrapped(self, ctx, *, arg: Optional[ParsedArguments]):
+                return await f(ctx, arg=arg)
+
+            return wrapped
+
+        for cs in self.command_sources:
+            if include_self_parameter:
+                if args := cs.command_args:
+                    yield commands.command(**args)(wrap(self.get_primary_command_function(cs)))
+                if args := cs.list_command_args:
+                    yield commands.command(**args)(wrap(self.get_list_command_function(cs)))
+            else:
+                if args := cs.command_args:
+                    yield commands.command(**args)(self.get_primary_command_function(cs))
+                if args := cs.list_command_args:
+                    yield commands.command(**args)(self.get_list_command_function(cs))
 
     def get_primary_command_function(self, source):
         if hasattr(source, '_command_source_info'):
@@ -152,15 +174,27 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in keyword_data_attributes}
             flag_arguments = {a: bool(arg.tags([a.name] + a.aliases)) for a in flag_data_attributes}
             comparable_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True, converter=a.compare_converter) for a in
+                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
+                                     allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
+                                     converter=a.compare_converter or (lambda s: int(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True, allowed_operators=['='],
-                                     converter=a.compare_converter) for a in
-                eq_data_attributes}
+                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
+                                     allowed_operators=['=', '==', '!='] if a.is_multi_category else ['='],
+                                     converter=a.compare_converter or a.value_mapping or (lambda s: int(s)))
+                for a in eq_data_attributes}
             text = arg.text()
 
             arg.require_all_arguments_used()
+
+            index = 0
+            current = self.get_current(ctx)
+            is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
+            if is_relative_only:
+                text = ''
+            elif re.fullmatch(r'-\d+', text.strip()):
+                index = int(text.strip()[1:]) - 1
+                text = ''
 
             tab = source.default_tab
             if source.suffix_tab_aliases:
@@ -174,29 +208,34 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, tags in tag_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    values = [v for v in values if attr.accessor(self, v) in targets]
+                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    values = [v for v in values if attr.accessor(self, v) in targets]
+                    if attr.is_multi_category:
+                        values = [v for v in values if all(a in targets for a in attr.accessor(self, ctx, v))]
+                    else:
+                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, flag_present in flag_arguments.items():
                 if flag_present:
                     if attr.flag_callback:
-                        values = attr.flag_callback(values)
+                        callback_value = attr.flag_callback(self, ctx, values)
+                        if callback_value is not None:
+                            values = callback_value
                     else:
-                        values = [v for v in values if attr.accessor(self, v)]
+                        values = [v for v in values if attr.accessor(self, ctx, v)]
             for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
                 for argument in arguments:
                     argument_value, operation = argument
                     operator = list_operator_for(operation)
-                    values = [v for v in values if operator(attr.accessor(self, v), argument_value)]
+                    values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
 
             if source.default_sort and not text:
-                values = sorted(values, key=lambda v: source.default_sort.accessor(self, v))
-                if source.default_sort.reverse_sort:
+                values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
+                if source.default_sort.reverse_sort ^ reverse_sort:
                     values = values[::-1]
             if sort:
-                values = sorted(values, key=lambda v: sort.accessor(self, v))
+                values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
             if reverse_sort:
                 values = values[::-1]
 
@@ -204,7 +243,11 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 await ctx.send('No results.')
                 return
 
-            index = 0
+            if is_relative_only and current in values:
+                index = values.index(current)
+                index -= int(arg.original.strip()[1:]) - 1
+
+            index = min(len(values) - 1, max(0, index))
 
             if source.tabs:
                 message = await ctx.send(embed=source.embed_source(self, ctx, values[index], tab))
@@ -284,17 +327,21 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 sort, sort_op = arg.single_op('sort', None, allowed_operators=['<', '>', '='], converter=sort_arguments)
                 if sort:
                     reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
-                display = arg.single(['display', 'disp'], sort, converter=sort_arguments)
+                display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
+                                     converter={**sort_arguments, 'none': None})
             tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in tag_data_attributes}
             keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in keyword_data_attributes}
             flag_arguments = {a: bool(arg.tags([a.name] + a.aliases)) for a in flag_data_attributes}
             comparable_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True, converter=a.compare_converter) for a in
+                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
+                                     allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
+                                     converter=a.compare_converter or (lambda s: int(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True, allowed_operators=['='],
-                                     converter=a.compare_converter) for a in
-                eq_data_attributes}
+                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
+                                     allowed_operators=['=', '==', '!='] if a.is_multi_category else ['='],
+                                     converter=a.compare_converter or a.value_mapping or (lambda s: int(s)))
+                for a in eq_data_attributes}
             text = arg.text()
 
             arg.require_all_arguments_used()
@@ -304,36 +351,41 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, tags in tag_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    values = [v for v in values if attr.accessor(self, v) in targets]
+                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    values = [v for v in values if attr.accessor(self, v) in targets]
+                    if attr.is_multi_category:
+                        values = [v for v in values if all(a in targets for a in attr.accessor(self, ctx, v))]
+                    else:
+                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, flag_present in flag_arguments.items():
                 if flag_present:
                     if attr.flag_callback:
-                        values = attr.flag_callback(values)
+                        callback_value = attr.flag_callback(self, ctx, values)
+                        if callback_value is not None:
+                            values = callback_value
                     else:
-                        values = [v for v in values if attr.accessor(self, v)]
+                        values = [v for v in values if attr.accessor(self, ctx, v)]
             for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
                 for argument in arguments:
                     argument_value, operation = argument
                     operator = list_operator_for(operation)
-                    values = [v for v in values if operator(attr.accessor(self, v), argument_value)]
+                    values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
 
             display = display or source.default_display or source.default_sort
 
             if source.default_sort and not text:
-                values = sorted(values, key=lambda v: source.default_sort.accessor(self, v))
-                if source.default_sort.reverse_sort:
+                values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
+                if source.default_sort.reverse_sort ^ reverse_sort:
                     values = values[::-1]
             if sort:
-                values = sorted(values, key=lambda v: sort.accessor(self, v))
+                values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
             if reverse_sort:
                 values = values[::-1]
 
             if display and display.formatter:
-                listing = [f'{display.formatter(self, value)} {source.list_formatter(self, value)}' for value in values]
+                listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, value)}' for value in values]
             else:
                 listing = [source.list_formatter(self, value) for value in values]
 
@@ -346,8 +398,10 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 @dataclass
 class CommandSourceInfo:
     embed_source: Callable
-    default_sort: Optional[DataAttributeInfo]
-    default_display: Optional[DataAttributeInfo]
+    command_args: Optional[Dict] = None
+    list_command_args: Optional[Dict] = None
+    default_sort: Optional[DataAttributeInfo] = None
+    default_display: Optional[DataAttributeInfo] = None
     tabs: Optional[List] = None
     default_tab: int = 0
     suffix_tab_aliases: Optional[Dict[str, int]] = None
@@ -356,6 +410,9 @@ class CommandSourceInfo:
 
 
 def command_source(
+        *,
+        command_args: Optional[Dict] = None,
+        list_command_args: Optional[Dict] = None,
         default_sort: Optional[Union[DataAttributeInfo, Callable]] = None,
         default_display: Optional[Union[DataAttributeInfo, Callable]] = None,
         tabs: Optional[List] = None,
@@ -365,6 +422,8 @@ def command_source(
 ):
     def decorator(func):
         info = CommandSourceInfo(
+            command_args=command_args,
+            list_command_args=list_command_args,
             embed_source=func,
             default_sort=getattr(default_sort, '_data_attribute_info', default_sort),
             default_display=getattr(default_display, '_data_attribute_info', default_sort),
@@ -391,13 +450,14 @@ class DataAttributeInfo:
     name: str
     aliases: List[str]
     description: Optional[str]
-    accessor: Callable[[MasterFilter, MasterAsset], Any]
-    formatter: Optional[Callable[[MasterFilter, MasterAsset], str]] = None
+    accessor: Callable
+    formatter: Optional[Callable] = None
     value_mapping: Optional[Dict[str, Any]] = None
     is_flag: bool = False
     flag_callback: Optional[Callable] = None
     is_tag: bool = False
     is_keyword: bool = False
+    is_multi_category: bool = False
     is_sortable: bool = False
     reverse_sort: bool = False
     is_comparable: bool = False
@@ -411,27 +471,39 @@ class DataAttributeInfo:
 
 def data_attribute(
         name: str,
+        *,
         aliases: Optional[List[str]] = None,
         description: Optional[str] = None,
         value_mapping: Optional[Dict[str, Any]] = None,
         is_flag: bool = False,
         is_tag: bool = False,
         is_keyword: bool = False,
+        is_multi_category: bool = False,
         is_sortable: bool = False,
         reverse_sort: bool = False,
         is_comparable: bool = False,
         is_eq: bool = False,
 ):
     def decorator(func):
+        def get_accessor(f):
+            if len(getfullargspec(f).args) == 2:
+                def accessor(self, ctx, value):
+                    return f(self, value)
+                return accessor
+            else:
+                return f
+            
+
         info = DataAttributeInfo(
             name=name,
             aliases=aliases or [],
             description=description,
-            accessor=func,
+            accessor=get_accessor(func),
             value_mapping=value_mapping,
             is_flag=is_flag,
             is_tag=is_tag,
             is_keyword=is_keyword,
+            is_multi_category=is_multi_category,
             is_sortable=is_sortable,
             reverse_sort=reverse_sort,
             is_comparable=is_comparable,
@@ -440,7 +512,7 @@ def data_attribute(
         func._data_attribute_info = info
 
         def formatter(f):
-            info.formatter = f
+            info.formatter = get_accessor(f)
             return f
 
         def compare_converter(f):
@@ -448,7 +520,7 @@ def data_attribute(
             return f
 
         def flag_callback(f):
-            info.flag_callback = f
+            info.flag_callback = get_accessor(f)
             return f
 
         def init(f):

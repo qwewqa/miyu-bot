@@ -36,6 +36,7 @@ def _parse_named_argument(arg):
 def parse_arguments(arg):
     # Note: this lowercases tags, words, and argument names
 
+    original = arg
     named_arguments_parsed = [_parse_named_argument(na[0]) for na in _param_re.findall(arg)]
     arg = _param_re.sub('', arg)
     # Technically, the order (named arguments then tags)
@@ -47,7 +48,7 @@ def parse_arguments(arg):
         if na.name not in named_arguments:
             named_arguments[na.name] = []
         named_arguments[na.name].append(ArgumentValue(na.value, na.operator))
-    return ParsedArguments(arg.strip(), set(tags), named_arguments)
+    return ParsedArguments(original, arg.strip(), set(tags), named_arguments)
 
 
 class ArgumentError(Exception):
@@ -60,7 +61,8 @@ class ParsedArguments:
     tag_arguments: Set[str]
     named_arguments: Dict[str, List[ArgumentValue]]
 
-    def __init__(self, text: str, tags: Set[str], named_arguments: Dict[str, List[ArgumentValue]]):
+    def __init__(self, original: str, text: str, tags: Set[str], named_arguments: Dict[str, List[ArgumentValue]]):
+        self.original = original
         self.text_argument = text
         self.word_arguments = set(word.lower() for word in text.split())
         self.tag_arguments = tags

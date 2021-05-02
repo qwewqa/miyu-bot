@@ -21,7 +21,7 @@ from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import rarity_emoji_ids, attribute_emoji_ids_by_attribute_id, \
     unit_emoji_ids_by_unit_id, parameter_bonus_emoji_ids_by_parameter_id, grey_emoji_id
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_reaction_message, run_paged_message, \
+from miyu_bot.commands.common.reaction_message import run_paged_message, \
     run_deletable_message, run_dynamically_paged_message
 
 
@@ -35,82 +35,6 @@ class Card(commands.Cog):
     @property
     def rarity_emoji(self):
         return [self.bot.get_emoji(eid) for eid in rarity_emoji_ids.values()]
-
-    @commands.command(name='card',
-                      aliases=[],
-                      description='Finds the card with the given name.',
-                      help='!card secretcage')
-    async def card(self, ctx: commands.Context, *, arg: ParsedArguments):
-        cards = self.get_cards(ctx, arg)
-
-        if not cards:
-            await ctx.send(f'No results.')
-            return
-
-        if len(cards) == 1:
-            embeds = self.get_card_embeds(cards[0])
-            asyncio.ensure_future(run_tabbed_message(ctx, self.rarity_emoji, embeds, starting_index=1))
-        else:
-            message = await ctx.send(embed=self.get_card_embeds(cards[0])[1])
-
-            emojis = self.rarity_emoji + ['◀', '▶']
-
-            index = 0
-            limit_break = 1
-
-            async def callback(emoji):
-                nonlocal index
-                nonlocal limit_break
-                try:
-                    emoji_index = emojis.index(emoji)
-                    if emoji_index == 0:
-                        limit_break = 0
-                    elif emoji_index == 1:
-                        limit_break = 1
-                    elif emoji_index == 2:
-                        index -= 1
-                    else:
-                        index += 1
-
-                    index = min(len(cards) - 1, max(0, index))
-
-                    await message.edit(embed=self.get_card_embeds(cards[index])[limit_break])
-                except ValueError:
-                    pass
-
-            asyncio.ensure_future(run_reaction_message(ctx, message, emojis, callback))
-
-    def get_card_embeds(self, card):
-        if card.rarity_id >= 3:
-            return [self.get_card_embed(card, 0), self.get_card_embed(card, 1)]
-        else:
-            return [self.get_card_embed(card, 0)] * 2  # no actual awakened art for 1/2* cards
-
-    @commands.command(name='cards',
-                      aliases=[],
-                      description='Lists cards matching the given search terms.',
-                      help='!cards')
-    async def cards(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
-        self.logger.info(f'Searching for cards "{arg}".')
-
-        arguments = parse_arguments(arg)
-        cards = self.get_cards(ctx, arguments)
-        sort, sort_op = arguments.single_op('sort', None,
-                                            allowed_operators=['<', '>', '='], converter=card_attribute_aliases)
-        display, _op = arguments.single_op(['display', 'disp'], sort or CardAttribute.Power, allowed_operators=['='],
-                                           converter=card_attribute_aliases)
-
-        listing = []
-        for card in cards:
-            display_prefix = display.get_formatted_from_card(card)
-            if display_prefix:
-                listing.append(
-                    f'{display_prefix} {self.format_card_name_for_list(card)}')
-            else:
-                listing.append(self.format_card_name_for_list(card))
-
-        embed = discord.Embed(title=f'Card Search "{arg}"' if arg else 'Cards')
-        asyncio.ensure_future(run_paged_message(ctx, embed, listing))
 
     @commands.command(name='cardexp',
                       aliases=['card_exp', 'cdexp'],

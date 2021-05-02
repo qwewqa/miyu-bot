@@ -34,6 +34,7 @@ async def get_prefix(bot: D4DJBot, message: discord.Message):
 bot = D4DJBot('assets', command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
 
+bot.load_extension('miyu_bot.commands.cogs.search')
 bot.load_extension('miyu_bot.commands.cogs.card')
 bot.load_extension('miyu_bot.commands.cogs.event')
 bot.load_extension('miyu_bot.commands.cogs.music')

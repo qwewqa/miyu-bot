@@ -53,6 +53,11 @@ async def main():
                 vgmstream(path)
                 logger.info(f'Decoded audio {path}.')
 
+    for music in manager.music_master.values():
+        if not music.audio_path.with_name(music.audio_path.name + '.wav').exists():
+            music.decode_audio()
+            logger.info(f'Decoded audio for {music.name}.')
+
 
 if __name__ == '__main__':
     asyncio.run(main())

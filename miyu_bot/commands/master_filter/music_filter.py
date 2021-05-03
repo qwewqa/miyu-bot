@@ -32,7 +32,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
 
     @date.formatter
     def format_date(self, ctx, value: MusicMaster):
-        return f'{value.start_datetime.month:>2}/{value.start_datetime.day:02}/{value.start_datetime.year % 100:02}'
+        return f'{value.start_datetime.year % 100:02}/{value.start_datetime.month:>2}/{value.start_datetime.day:02}'
 
     @data_attribute('unit',
                     is_sortable=True,

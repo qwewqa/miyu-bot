@@ -25,7 +25,7 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
 
     @date.formatter
     def format_date(self, ctx, value: LoginBonusMaster):
-        return f'{value.start_datetime.month:>2}/{value.start_datetime.day:02}/{value.start_datetime.year % 100:02}'
+        return f'{value.start_datetime.year % 100:02}/{value.start_datetime.month:>2}/{value.start_datetime.day:02}'
 
     @data_attribute('id',
                     is_sortable=True,

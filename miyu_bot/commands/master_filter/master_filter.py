@@ -235,7 +235,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             if source.default_sort and not text:
                 values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
-                if source.default_sort.reverse_sort ^ reverse_sort:
+                if source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
                     values = values[::-1]
             if sort:
                 values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
@@ -383,7 +383,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             if source.default_sort and not text:
                 values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
-                if source.default_sort.reverse_sort ^ reverse_sort:
+                if source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
                     values = values[::-1]
             if sort:
                 values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))

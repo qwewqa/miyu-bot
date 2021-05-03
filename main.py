@@ -14,7 +14,8 @@ from miyu_bot.commands.common.argument_parsing import ArgumentError
 logging.basicConfig(level=logging.INFO)
 
 with open('config.json') as f:
-    bot_token = json.load(f)['token']
+    config = json.load(f)
+    bot_token = config['token']
 
 
 async def get_prefix(bot: D4DJBot, message: discord.Message):
@@ -33,6 +34,8 @@ async def get_prefix(bot: D4DJBot, message: discord.Message):
 
 bot = D4DJBot('assets', command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
+
+bot.config = config
 
 bot.load_extension('miyu_bot.commands.cogs.search')
 bot.load_extension('miyu_bot.commands.cogs.card')

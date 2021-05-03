@@ -1,8 +1,8 @@
 import logging
 import textwrap
 
+import discord
 from discord.ext import commands
-from tortoise import Tortoise
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
@@ -14,6 +14,15 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+
+    @commands.command(aliases=['t'], hidden=True)
+    async def translate(self, ctx: commands.Context, *, arg: str):
+        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
+                                        params={'auth_key': self.bot.config['deepl'],
+                                                'text': arg,
+                                                'target_lang': 'EN'}) as resp:
+            embed = discord.Embed(title='Translate', description=(await resp.json())['translations'][0]['text'])
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True)
     @commands.is_owner()

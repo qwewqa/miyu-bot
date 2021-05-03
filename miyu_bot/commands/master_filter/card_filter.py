@@ -51,6 +51,17 @@ class CardFilter(MasterFilter[CardMaster]):
     def init_unit(self, info: DataAttributeInfo):
         info.value_mapping = {k: v.id for k, v in self.bot.aliases.units_by_name.items()}
 
+    @data_attribute('attribute',
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def attribute(self, value: CardMaster):
+        return value.attribute_id
+
+    @attribute.init
+    def init_attribute(self, info: DataAttributeInfo):
+        info.value_mapping = {k: v.id for k, v in self.bot.aliases.attributes_by_name.items()}
+
     @data_attribute('id',
                     is_sortable=True,
                     is_comparable=True)

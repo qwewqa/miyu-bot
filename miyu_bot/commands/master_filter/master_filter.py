@@ -16,7 +16,7 @@ from discord.ext import commands
 
 import miyu_bot.bot.bot
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for
+from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message
 
@@ -231,7 +231,10 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
                 for argument in arguments:
                     argument_value, operation = argument
-                    operator = list_operator_for(operation)
+                    if attr.is_multi_category:
+                        operator = list_to_list_operator_for(operation)
+                    else:
+                        operator = list_operator_for(operation)
                     values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
 
             if source.default_sort and not text:
@@ -377,7 +380,10 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
                 for argument in arguments:
                     argument_value, operation = argument
-                    operator = list_operator_for(operation)
+                    if attr.is_multi_category:
+                        operator = list_to_list_operator_for(operation)
+                    else:
+                        operator = list_operator_for(operation)
                     values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
 
             display = display or source.default_display

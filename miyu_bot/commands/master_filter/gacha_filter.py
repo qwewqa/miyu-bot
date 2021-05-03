@@ -52,6 +52,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
     @data_attribute('character',
                     aliases=['char'],
                     is_tag=True,
+                    is_eq=True,
                     is_multi_category=True)
     def character(self, value: GachaMaster):
         return {c.character_id for c in value.pick_up_cards}
@@ -59,6 +60,36 @@ class GachaFilter(MasterFilter[GachaMaster]):
     @character.init
     def init_character(self, info: DataAttributeInfo):
         info.value_mapping = {k: v.id for k, v in self.bot.aliases.characters_by_name.items()}
+
+    @data_attribute('unit',
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def unit(self, value: GachaMaster):
+        units = {c.character.unit_id for c in value.pick_up_cards}
+        if len(units) == 1:
+            return next(iter(units))
+        else:
+            return -1
+
+    @unit.init
+    def init_unit(self, info: DataAttributeInfo):
+        info.value_mapping = {**{k: v.id for k, v in self.bot.aliases.units_by_name.items()}, 'mixed': -1}
+
+    @data_attribute('attribute',
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def attribute(self, value: GachaMaster):
+        attributes = {c.attribute_id for c in value.pick_up_cards}
+        if len(attributes) == 1:
+            return next(iter(attributes))
+        else:
+            return -1
+
+    @attribute.init
+    def init_attribute(self, info: DataAttributeInfo):
+        info.value_mapping = {k: v.id for k, v in self.bot.aliases.attributes_by_name.items()}
 
     @data_attribute('id',
                     is_sortable=True,

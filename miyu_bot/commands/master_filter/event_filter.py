@@ -10,7 +10,8 @@ from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, attribute_emoji_ids_by_attribute_id, \
     grey_emoji_id, event_point_emoji_id, parameter_bonus_emoji_ids_by_parameter_id
 from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source
+from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source, \
+    DataAttributeInfo
 
 
 class EventFilter(MasterFilter[EventMaster]):
@@ -57,6 +58,44 @@ class EventFilter(MasterFilter[EventMaster]):
         if y < 100:
             y += ctx.localize(dt.datetime.now()).year // 100 * 100
         return ctx.localize(dt.datetime(year=y, month=m, day=d)).date()
+
+    @data_attribute('character',
+                    aliases=['char'],
+                    is_tag=True,
+                    is_eq=True,
+                    is_multi_category=True)
+    def character(self, value: EventMaster):
+        return {*value.bonus.character_ids}
+
+    @character.init
+    def init_character(self, info: DataAttributeInfo):
+        info.value_mapping = {k: v.id for k, v in self.bot.aliases.characters_by_name.items()}
+
+    @data_attribute('unit',
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def unit(self, value: EventMaster):
+        units = {c.unit_id for c in value.bonus.characters}
+        if len(units) == 1:
+            return next(iter(units))
+        else:
+            return -1
+
+    @unit.init
+    def init_unit(self, info: DataAttributeInfo):
+        info.value_mapping = {**{k: v.id for k, v in self.bot.aliases.units_by_name.items()}, 'mixed': -1}
+
+    @data_attribute('attribute',
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def attribute(self, value: EventMaster):
+        return value.bonus.attribute_id
+
+    @attribute.init
+    def init_attribute(self, info: DataAttributeInfo):
+        info.value_mapping = {k: v.id for k, v in self.bot.aliases.attributes_by_name.items()}
 
     @command_source(command_args=
                     dict(name='event',

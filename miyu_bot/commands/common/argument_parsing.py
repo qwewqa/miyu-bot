@@ -253,12 +253,22 @@ _operators = {
 
 _list_operators = {
     '=': lambda a, b: any(a == v for v in b),
-    '==': lambda a, b: all(a == v for v in b),
+    '==': lambda a, b: all(a == v for v in b),  # Not very useful when b has more than one element
     '!=': lambda a, b: all(a != v for v in b),
     '>': lambda a, b: all(a > v for v in b),
     '<': lambda a, b: all(a < v for v in b),
     '>=': lambda a, b: all(a >= v for v in b),
     '<=': lambda a, b: all(a <= v for v in b),
+}
+
+_list_to_list_operators = {
+    '=': lambda a, b: not set(a).isdisjoint(b),
+    '==': lambda a, b: set(b).issubset(set(a)),
+    '!=': lambda a, b: set(a).isdisjoint(b),
+    '>': lambda a, b: all(u > v for v in b for u in a),  # Also not very useful when b has more than one element
+    '<': lambda a, b: all(u < v for v in b for u in a),  # Same here and below
+    '>=': lambda a, b: all(u >= v for v in b for u in a),
+    '<=': lambda a, b: all(u <= v for v in b for u in a),
 }
 
 full_operators = {'>', '<', '>=', '<=', '!=', '==', '='}
@@ -270,3 +280,7 @@ def operator_for(operator: str):
 
 def list_operator_for(operator: str):
     return _list_operators[operator]
+
+
+def list_to_list_operator_for(operator: str):
+    return _list_to_list_operators[operator]

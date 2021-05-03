@@ -59,7 +59,8 @@ class Utility(commands.Cog):
             'bot': self.bot,
             'ctx': ctx,
             'assets': self.bot.assets,
-            'asset_filters': self.bot.asset_filters,
+            'asset_filters': self.bot.master_filters,
+            'master_filters': self.bot.master_filters,
             **globals(),
         }
 
@@ -82,7 +83,8 @@ class Utility(commands.Cog):
             'bot': self.bot,
             'ctx': ctx,
             'assets': self.bot.assets,
-            'asset_filters': self.bot.asset_filters,
+            'asset_filters': self.bot.master_filters,
+            'master_filters': self.bot.master_filters,
             **globals(),
         }
 

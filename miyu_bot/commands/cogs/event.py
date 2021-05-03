@@ -122,14 +122,14 @@ class Event(commands.Cog):
             # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
             if text[0] in ['-', '+']:
                 try:
-                    latest = self.bot.asset_filters.events.get_latest_event(ctx)
-                    event = self.bot.asset_filters.events.get(str(latest.id + int(text)), ctx)
+                    latest = self.bot.master_filters.events.get_latest_event(ctx)
+                    event = self.bot.master_filters.events.get(str(latest.id + int(text)), ctx)
                 except ValueError:
-                    event = self.bot.asset_filters.events.get(text, ctx)
+                    event = self.bot.master_filters.events.get(text, ctx)
             else:
-                event = self.bot.asset_filters.events.get(text, ctx)
+                event = self.bot.master_filters.events.get(text, ctx)
         else:
-            event = self.bot.asset_filters.events.get_latest_event(ctx)
+            event = self.bot.master_filters.events.get_latest_event(ctx)
         return event, ctx.preferences.timezone
 
     @staticmethod
@@ -144,7 +144,7 @@ class Event(commands.Cog):
                       description='Displays the full leaderboard',
                       help='!leaderboard')
     async def leaderboard(self, ctx: commands.Context):
-        embed = await self.get_leaderboard_embed(self.bot.asset_filters.events.get_latest_event(ctx))
+        embed = await self.get_leaderboard_embed(self.bot.master_filters.events.get_latest_event(ctx))
         message = await ctx.send(embed=embed)
         asyncio.ensure_future(run_deletable_message(ctx, message))
 
@@ -153,7 +153,7 @@ class Event(commands.Cog):
                       description='Displays a detailed leaderboard.',
                       help='!dlb')
     async def detailed_leaderboard(self, ctx: commands.Context):
-        event = self.bot.asset_filters.events.get_latest_event(ctx)
+        event = self.bot.master_filters.events.get_latest_event(ctx)
         async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
             stats = [(int(k), v) for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()]
         for _rank, stat in stats:
@@ -192,7 +192,7 @@ class Event(commands.Cog):
         if not hasattr(self.bot, 'last_leaderboard_loop_embeds'):
             self.bot.last_leaderboard_loop_embeds = {}
         try:
-            event = self.bot.asset_filters.events.get_latest_event(None)
+            event = self.bot.master_filters.events.get_latest_event(None)
             now = datetime.datetime.now()
             minutes = now.minute + 60 * now.hour
             embed = await self.get_leaderboard_embed(event)
@@ -245,7 +245,7 @@ class Event(commands.Cog):
         else:
             tier = process_tier_arg(ctx.invoked_with)
 
-        embed = await self.get_tier_embed(tier, self.bot.asset_filters.events.get_latest_event(ctx))
+        embed = await self.get_tier_embed(tier, self.bot.master_filters.events.get_latest_event(ctx))
 
         if embed:
             await ctx.send(embed=embed)

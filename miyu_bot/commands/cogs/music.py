@@ -75,7 +75,7 @@ class Music(commands.Cog):
             chart = data.chart
             title = 'Mix Score:\n' + data.name
         else:
-            song = self.bot.asset_filters.music.get(song_name, ctx)
+            song = self.bot.master_filters.music.get(song_name, ctx)
 
             if not song:
                 await ctx.send(f'Failed to find chart.')
@@ -157,7 +157,7 @@ class Music(commands.Cog):
     async def mix_order(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
         songs = []
         for name in [a, b, c, d]:
-            song = self.bot.asset_filters.music.get(name, ctx)
+            song = self.bot.master_filters.music.get(name, ctx)
             if not song:
                 await ctx.send(f'Unknown song "{name}".', allowed_mentions=AllowedMentions.none())
                 return
@@ -192,7 +192,7 @@ class Music(commands.Cog):
 
         songs = []
         for name in names:
-            song = self.bot.asset_filters.music.get(name, ctx)
+            song = self.bot.master_filters.music.get(name, ctx)
             if not song:
                 await ctx.send(f'Unknown song "{name}".', allowed_mentions=AllowedMentions.none())
                 return
@@ -245,7 +245,7 @@ class Music(commands.Cog):
     async def mixrating(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
         songs = []
         for name in [a, b, c, d]:
-            song = self.bot.asset_filters.music.get(name, ctx)
+            song = self.bot.master_filters.music.get(name, ctx)
             if not song:
                 await ctx.send(f'Unknown song "{name}".')
                 return

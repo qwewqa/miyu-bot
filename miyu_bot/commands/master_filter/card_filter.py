@@ -125,7 +125,7 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @event.flag_callback
     def event_flag_callback(self, ctx, values: List[CardMaster]):
-        latest_event = self.bot.asset_filters.events.get_latest_event(ctx)
+        latest_event = self.bot.master_filters.events.get_latest_event(ctx)
         bonus: EventSpecificBonusMaster = latest_event.bonus
         character_ids = {*bonus.character_ids}
         return [v for v in values if v.character_id in character_ids and v.attribute_id == bonus.attribute_id]

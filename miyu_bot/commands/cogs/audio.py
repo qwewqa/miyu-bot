@@ -86,7 +86,7 @@ class Audio(commands.Cog):
                   help='!play stamp')
     async def stamp(self, ctx: commands.Context, *, name: str):
         stamp = list(stamp
-                     for stamp in self.bot.asset_filters.stamps.get_by_relevance(name, ctx)
+                     for stamp in self.bot.master_filters.stamps.get_by_relevance(name, ctx)
                      if stamp.audio_path.exists())
         if not stamp:
             await ctx.send('Stamp not found or no audio.')

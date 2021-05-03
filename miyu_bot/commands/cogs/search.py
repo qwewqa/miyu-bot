@@ -1,14 +1,12 @@
 from discord.ext import commands
 
-from miyu_bot.commands.master_filter.master_filter_manager import MasterFilterManager
-
 
 class Search(commands.Cog):
-    def __init__(self, bot, master_filter_manager):
-        master_filter_manager.reload()
+    def __init__(self, bot):
         self.bot = bot
+        bot.master_filters.reload()
         self.commands = set()
-        self.master_filters = master_filter_manager.filters
+        self.master_filters = bot.master_filters.filters
         for master_filter in self.master_filters:
             self.load_commands_from_filter(master_filter)
 
@@ -22,4 +20,4 @@ class Search(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Search(bot, MasterFilterManager(bot)))
+    bot.add_cog(Search(bot))

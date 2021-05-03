@@ -9,16 +9,16 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from tortoise import Tortoise
 
-from miyu_bot.bot.master_asset_manager import MasterFilterManager
 from miyu_bot.bot.name_aliases import NameAliases
 from miyu_bot.bot.tortoise_config import TORTOISE_ORM
 from miyu_bot.commands.cogs.preferences import get_preferences
 from miyu_bot.commands.common.asset_paths import clear_asset_filename_cache
+from miyu_bot.commands.master_filter.master_filter_manager import MasterFilterManager
 
 
 class D4DJBot(commands.Bot):
     assets: AssetManager
-    asset_filters: MasterFilterManager
+    master_filters: MasterFilterManager
     aliases: NameAliases
     thread_pool: ThreadPoolExecutor
 
@@ -28,8 +28,8 @@ class D4DJBot(commands.Bot):
     def __init__(self, asset_path, *args, **kwargs):
         self.asset_path = Path(asset_path)
         self.assets = AssetManager(self.asset_path, drop_extra_fields=True)
-        self.asset_filters = MasterFilterManager(self.assets)
         self.aliases = NameAliases(self.assets)
+        self.master_filters = MasterFilterManager(self, self.assets)
         self.session = aiohttp.ClientSession()
         self.extension_names = set()
         self.thread_pool = ThreadPoolExecutor()
@@ -38,13 +38,13 @@ class D4DJBot(commands.Bot):
     def try_reload_assets(self):
         try:
             assets = AssetManager(self.asset_path, drop_extra_fields=True)
-            asset_filters = MasterFilterManager(assets)
             aliases = NameAliases(assets)
+            master_filters = MasterFilterManager(self, assets)
         except:
             return False
         self.assets.db.close()
         self.assets = assets
-        self.asset_filters = asset_filters
+        self.master_filters = master_filters
         self.aliases = aliases
         clear_asset_filename_cache()
         return True

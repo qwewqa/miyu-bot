@@ -248,7 +248,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             if is_relative_only and current in values:
                 index = values.index(current)
-                index -= int(arg.original.strip()[1:]) - 1
+                index -= int(arg.original.strip())
 
             index = min(len(values) - 1, max(0, index))
 

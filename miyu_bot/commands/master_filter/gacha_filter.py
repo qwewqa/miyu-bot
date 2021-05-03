@@ -58,7 +58,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
     @command_source(command_args=
                     dict(name='banner',
                          aliases=['gacha'],
-                         description='Displays gacha banner x`info.',
+                         description='Displays gacha banner info.',
                          help='!banner Shiny Smily Scratch'),
                     list_command_args=
                     dict(name='banners',

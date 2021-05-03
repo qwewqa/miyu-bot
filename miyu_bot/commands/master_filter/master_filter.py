@@ -210,14 +210,14 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
                     if attr.is_multi_category:
-                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
+                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
                     if attr.is_multi_category:
-                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
+                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, flag_present in flag_arguments.items():
@@ -359,14 +359,14 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
                     if attr.is_multi_category:
-                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
+                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
                     if attr.is_multi_category:
-                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
+                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, flag_present in flag_arguments.items():

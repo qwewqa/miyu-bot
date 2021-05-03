@@ -125,6 +125,51 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     def get_current(self, ctx) -> Optional[TData]:
         return None
 
+    def get_help_text(self):
+        entries = []
+        for attr in self.data_attributes:
+            text = f'# {attr.name}'
+            if attr.aliases:
+                text += ' (' + ', '.join(attr.aliases) + ')'
+            text += '\n'
+            if attr.is_flag:
+                text += '[Flag]'
+            if attr.is_sortable:
+                text += '[Sortable]'
+            if attr.formatter:
+                text += '[Display]'
+            if attr.is_comparable:
+                text += '[Comparable]'
+            if attr.is_eq:
+                text += '[Filterable]'
+            if attr.is_tag:
+                text += '[Tag]'
+            if attr.is_keyword:
+                text += '[Keyword]'
+            if attr.is_multi_category:
+                text += '[Plural]'
+            text += '\n'
+            if attr.value_mapping or attr.is_flag:
+                text += 'Tags: '
+                tags = []
+                if attr.is_flag:
+                    tags += [f'${attr.name}'] + [f'${v}' for v in attr.aliases]
+                if attr.is_keyword:
+                    tags += attr.value_mapping.keys()
+                if attr.is_tag:
+                    tags += [f'${v}' for v in attr.value_mapping.keys()]
+                text += ', '.join(tags)
+                text += '\n'
+            if attr.is_comparable or attr.is_eq:
+                if attr.is_comparable:
+                    text += f'{attr.name} (=, ==, !=, >, <, >=, <=) {attr.help_sample_argument or "[value]"}'
+                if attr.is_eq:
+                    text += f'{attr.name} (=, ==, !=) {attr.help_sample_argument or "[value]"}'
+                text += '\n'
+            entries.append(text.strip())
+        print(f'{self}' + '\n\n'.join(entries))
+        return '\n\n'.join(entries)
+
     def get_commands(self, include_self_parameter: bool = False):
         def wrap(f):
             async def wrapped(self, ctx, *, arg: Optional[ParsedArguments]):
@@ -132,17 +177,27 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             return wrapped
 
+        help_text = self.get_help_text()
+
         for cs in self.command_sources:
             if include_self_parameter:
                 if args := cs.command_args:
-                    yield commands.command(**args)(wrap(self.get_primary_command_function(cs)))
+                    yield commands.command(**{**args,
+                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                        wrap(self.get_primary_command_function(cs)))
                 if args := cs.list_command_args:
-                    yield commands.command(**args)(wrap(self.get_list_command_function(cs)))
+                    yield commands.command(**{**args,
+                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                        wrap(self.get_list_command_function(cs)))
             else:
                 if args := cs.command_args:
-                    yield commands.command(**args)(self.get_primary_command_function(cs))
+                    yield commands.command(**{**args,
+                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                        self.get_primary_command_function(cs))
                 if args := cs.list_command_args:
-                    yield commands.command(**args)(self.get_list_command_function(cs))
+                    yield commands.command(**{**args,
+                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                        self.get_list_command_function(cs))
 
     def get_primary_command_function(self, source):
         if hasattr(source, '_command_source_info'):
@@ -177,12 +232,15 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             comparable_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (lambda s: float(s))) for a in
+                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (
+                                         lambda s: float(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!='],
-                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or a.value_mapping or (lambda s: float(s)))
+                                     converter=self.wrap_compare_converter(ctx,
+                                                                           a.compare_converter) or a.value_mapping or (
+                                                   lambda s: float(s)))
                 for a in eq_data_attributes}
             text = arg.text()
 
@@ -342,12 +400,15 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             comparable_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (lambda s: float(s))) for a in
+                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (
+                                         lambda s: float(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!='],
-                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or a.value_mapping or (lambda s: float(s)))
+                                     converter=self.wrap_compare_converter(ctx,
+                                                                           a.compare_converter) or a.value_mapping or (
+                                                   lambda s: float(s)))
                 for a in eq_data_attributes}
             text = arg.text()
 
@@ -398,7 +459,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 values = values[::-1]
 
             if display and display.formatter:
-                listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, ctx,  value)}' for value in values]
+                listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, ctx, value)}' for value
+                           in values]
             else:
                 listing = [source.list_formatter(self, ctx, value) for value in values]
 
@@ -417,13 +479,16 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             else:
                 return functools.partial(f, self, ctx)
 
+
 def _get_accessor(f):
     if len(getfullargspec(f).args) == 2:
         def accessor(self, ctx, value):
             return f(self, value)
+
         return accessor
     else:
         return f
+
 
 @dataclass
 class CommandSourceInfo:
@@ -494,6 +559,7 @@ class DataAttributeInfo:
     is_eq: bool = False
     compare_converter: Optional[Callable] = None
     init_function: Optional[Callable] = None
+    help_sample_argument: Optional[str] = None
 
     def __hash__(self):
         return self.name.__hash__()
@@ -513,6 +579,7 @@ def data_attribute(
         reverse_sort: bool = False,
         is_comparable: bool = False,
         is_eq: bool = False,
+        help_sample_argument: Optional[str] = None,
 ):
     def decorator(func):
         info = DataAttributeInfo(
@@ -529,6 +596,7 @@ def data_attribute(
             reverse_sort=reverse_sort,
             is_comparable=is_comparable,
             is_eq=is_eq,
+            help_sample_argument=help_sample_argument,
         )
         func._data_attribute_info = info
 

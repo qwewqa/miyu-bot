@@ -13,13 +13,20 @@ class NameAliases:
     def characters_by_name(self):
         characters_by_name = {}
         for character in self.assets.character_master.values():
-            for name in character.full_name_english.split():
-                characters_by_name[name.lower()] = character
+            characters_by_name[character.first_name_english.lower()] = character
         return characters_by_name
 
     @cached_property
     def attributes_by_name(self):
-        return {attribute.en_name: attribute for attribute in self.assets.attribute_master.values()}
+        attributes_by_name = {attribute.en_name: attribute for attribute in self.assets.attribute_master.values()}
+        attributes_by_name['purple'] = attributes_by_name['street']
+        attributes_by_name['yellow'] = attributes_by_name['party']
+        attributes_by_name['orange'] = attributes_by_name['party']
+        attributes_by_name['pink'] = attributes_by_name['cute']
+        attributes_by_name['red'] = attributes_by_name['cute']
+        attributes_by_name['blue'] = attributes_by_name['cool']
+        attributes_by_name['green'] = attributes_by_name['elegant']
+        return attributes_by_name
 
     @cached_property
     def units_by_name(self):
@@ -57,5 +64,4 @@ class NameAliases:
         'lili': 'lyrical_lily',
         'riri': 'lyrical_lily',
         'll': 'lyrical_lily',
-        'fuhifumi': 'lyrical_lily',
     }

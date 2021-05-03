@@ -1,32 +1,23 @@
-import asyncio
 import datetime
 import enum
 import logging
 import re
 from dataclasses import dataclass
-from inspect import cleandoc
 from io import BytesIO
 from typing import Tuple
 
 import discord
-from PIL import ImageColor
 from d4dj_utils.chart.chart import Chart
 from d4dj_utils.chart.mix import get_best_mix, get_mix_data, calculate_mix_rating
 from d4dj_utils.chart.score_calculator import calculate_score
-from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
-from d4dj_utils.master.common_enums import ChartSectionType
+from d4dj_utils.master.chart_master import ChartDifficulty
 from d4dj_utils.master.music_master import MusicMaster
 from d4dj_utils.master.skill_master import SkillMaster
 from discord import AllowedMentions
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import parse_arguments, list_operator_for
-from miyu_bot.commands.common.asset_paths import get_asset_filename
-from miyu_bot.commands.common.emoji import difficulty_emoji_ids
-from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.reaction_message import run_tabbed_message, run_paged_message, run_deletable_message
+from miyu_bot.commands.common.argument_parsing import parse_arguments
 
 
 class Music(commands.Cog):
@@ -37,6 +28,23 @@ class Music(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.custom_mixes = {}
+
+    difficulty_names = {
+        'expert': ChartDifficulty.Expert,
+        'hard': ChartDifficulty.Hard,
+        'normal': ChartDifficulty.Normal,
+        'easy': ChartDifficulty.Easy,
+        'expt': ChartDifficulty.Expert,
+        'norm': ChartDifficulty.Normal,
+        'exp': ChartDifficulty.Expert,
+        'hrd': ChartDifficulty.Hard,
+        'nrm': ChartDifficulty.Normal,
+        'esy': ChartDifficulty.Easy,
+        'ex': ChartDifficulty.Expert,
+        'hd': ChartDifficulty.Hard,
+        'nm': ChartDifficulty.Normal,
+        'es': ChartDifficulty.Easy,
+    }
 
     @commands.command(name='score',
                       aliases=[],
@@ -149,6 +157,19 @@ class Music(commands.Cog):
                                   f'{f" ({(score - baseline) / baseline * 100:+.1f}%)" if score != baseline else ""}',
                             inline=True)
         await ctx.send(embed=embed)
+
+    def parse_chart_args(self, arg: str) -> Tuple[str, ChartDifficulty]:
+        split_args = arg.split()
+
+        difficulty = ChartDifficulty.Expert
+        if len(split_args) >= 2:
+            final_word = split_args[-1].lower()
+            if final_word.lower() in self.difficulty_names:
+                difficulty = self.difficulty_names[final_word.lower()]
+                arg = ' '.join(split_args[:-1])
+        return arg, difficulty
+
+    _music_durations = {}
 
     @commands.command(name='mixorder',
                       aliases=['ordermix', 'mix_order', 'order_mix'],

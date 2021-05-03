@@ -9,7 +9,8 @@ if TYPE_CHECKING:
 _MODULES = {
     'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'card_master', 'cards')],
     'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'gacha_master', 'gacha')],
-    'miyu_bot.commands.master_filter.event_filter': [('EventFilter', 'event_master', 'events')]
+    'miyu_bot.commands.master_filter.event_filter': [('EventFilter', 'event_master', 'events')],
+    'miyu_bot.commands.master_filter.music_filter': [('MusicFilter', 'music_master', 'music')],
 }
 
 

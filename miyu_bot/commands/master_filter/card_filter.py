@@ -132,11 +132,11 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @command_source(command_args=
                     dict(name='card',
-                         description='Finds the card with the given name.',
+                         description='Displays card info.',
                          help='!card secretcage'),
                     list_command_args=
                     dict(name='cards',
-                         description='Lists cards matching the given search terms.',
+                         description='Lists cards.',
                          help='!cards'),
                     default_sort=date,
                     default_display=power,

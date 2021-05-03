@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import dataclasses
+import functools
 import re
 from abc import abstractmethod, ABCMeta
 from dataclasses import dataclass
@@ -176,12 +177,12 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             comparable_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=a.compare_converter or (lambda s: int(s))) for a in
+                                     converter=self.wrap_compare_converter(a.compare_converter) or (lambda s: float(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!='],
-                                     converter=a.compare_converter or a.value_mapping or (lambda s: int(s)))
+                                     converter=self.wrap_compare_converter(a.compare_converter) or a.value_mapping or (lambda s: float(s)))
                 for a in eq_data_attributes}
             text = arg.text()
 
@@ -338,12 +339,12 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             comparable_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=a.compare_converter or (lambda s: int(s))) for a in
+                                     converter=self.wrap_compare_converter(a.compare_converter) or (lambda s: float(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!='],
-                                     converter=a.compare_converter or a.value_mapping or (lambda s: int(s)))
+                                     converter=self.wrap_compare_converter(a.compare_converter) or a.value_mapping or (lambda s: float(s)))
                 for a in eq_data_attributes}
             text = arg.text()
 
@@ -399,6 +400,12 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             asyncio.create_task(run_paged_message(ctx, embed, listing))
 
         return command
+
+    def wrap_compare_converter(self, f):
+        if f is None:
+            return None
+        else:
+            return functools.partial(f, self)
 
 def _get_accessor(f):
     if len(getfullargspec(f).args) == 2:

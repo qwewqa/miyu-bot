@@ -180,7 +180,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                     allowed_operators=['=', '==', '!='] if a.is_multi_category else ['='],
+                                     allowed_operators=['=', '==', '!='],
                                      converter=a.compare_converter or a.value_mapping or (lambda s: int(s)))
                 for a in eq_data_attributes}
             text = arg.text()
@@ -208,12 +208,15 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, tags in tag_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
+                    if attr.is_multi_category:
+                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
+                    else:
+                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
                     if attr.is_multi_category:
-                        values = [v for v in values if all(a in targets for a in attr.accessor(self, ctx, v))]
+                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, flag_present in flag_arguments.items():
@@ -339,7 +342,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                     allowed_operators=['=', '==', '!='] if a.is_multi_category else ['='],
+                                     allowed_operators=['=', '==', '!='],
                                      converter=a.compare_converter or a.value_mapping or (lambda s: int(s)))
                 for a in eq_data_attributes}
             text = arg.text()
@@ -351,12 +354,15 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, tags in tag_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
+                    if attr.is_multi_category:
+                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
+                    else:
+                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
                     if attr.is_multi_category:
-                        values = [v for v in values if all(a in targets for a in attr.accessor(self, ctx, v))]
+                        values = [v for v in values if any(a in targets for a in attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, flag_present in flag_arguments.items():
@@ -373,7 +379,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     operator = list_operator_for(operation)
                     values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
 
-            display = display or source.default_display or source.default_sort
+            display = display or source.default_display
 
             if source.default_sort and not text:
                 values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
@@ -385,15 +391,22 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 values = values[::-1]
 
             if display and display.formatter:
-                listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, value)}' for value in values]
+                listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, ctx,  value)}' for value in values]
             else:
-                listing = [source.list_formatter(self, value) for value in values]
+                listing = [source.list_formatter(self, ctx, value) for value in values]
 
             embed = discord.Embed(title=source.list_name if source.list_name is not None else 'Search')
             asyncio.create_task(run_paged_message(ctx, embed, listing))
 
         return command
 
+def _get_accessor(f):
+    if len(getfullargspec(f).args) == 2:
+        def accessor(self, ctx, value):
+            return f(self, value)
+        return accessor
+    else:
+        return f
 
 @dataclass
 class CommandSourceInfo:
@@ -426,7 +439,7 @@ def command_source(
             list_command_args=list_command_args,
             embed_source=func,
             default_sort=getattr(default_sort, '_data_attribute_info', default_sort),
-            default_display=getattr(default_display, '_data_attribute_info', default_sort),
+            default_display=getattr(default_display, '_data_attribute_info', default_display),
             tabs=tabs,
             default_tab=default_tab,
             suffix_tab_aliases=suffix_tab_aliases,
@@ -435,7 +448,7 @@ def command_source(
         func._command_source_info = info
 
         def list_formatter(f):
-            info.list_formatter = f
+            info.list_formatter = _get_accessor(f)
             return f
 
         func.list_formatter = list_formatter
@@ -485,20 +498,11 @@ def data_attribute(
         is_eq: bool = False,
 ):
     def decorator(func):
-        def get_accessor(f):
-            if len(getfullargspec(f).args) == 2:
-                def accessor(self, ctx, value):
-                    return f(self, value)
-                return accessor
-            else:
-                return f
-            
-
         info = DataAttributeInfo(
             name=name,
             aliases=aliases or [],
             description=description,
-            accessor=get_accessor(func),
+            accessor=_get_accessor(func),
             value_mapping=value_mapping,
             is_flag=is_flag,
             is_tag=is_tag,
@@ -512,7 +516,7 @@ def data_attribute(
         func._data_attribute_info = info
 
         def formatter(f):
-            info.formatter = get_accessor(f)
+            info.formatter = _get_accessor(f)
             return f
 
         def compare_converter(f):
@@ -520,7 +524,7 @@ def data_attribute(
             return f
 
         def flag_callback(f):
-            info.flag_callback = get_accessor(f)
+            info.flag_callback = _get_accessor(f)
             return f
 
         def init(f):

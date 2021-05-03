@@ -7,7 +7,8 @@ if TYPE_CHECKING:
     from miyu_bot.commands.master_filter.card_filter import CardFilter
 
 _MODULES = {
-    'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'card_master', 'cards')]
+    'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'card_master', 'card_filter')],
+    'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'gacha_master', 'gacha_filter')]
 }
 
 

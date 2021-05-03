@@ -51,11 +51,11 @@ class CardFilter(MasterFilter[CardMaster]):
     @data_attribute('id',
                     is_sortable=True,
                     is_comparable=True)
-    def card_id(self, value: CardMaster):
+    def id(self, value: CardMaster):
         return value.id
 
-    @card_id.formatter
-    def format_card_id(self, value: CardMaster):
+    @id.formatter
+    def format_id(self, value: CardMaster):
         return str(value.id).zfill(8)
 
     @data_attribute('power',

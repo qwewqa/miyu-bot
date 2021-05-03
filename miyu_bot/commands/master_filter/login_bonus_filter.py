@@ -71,8 +71,8 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
 
         embed.add_field(name='Info',
                         value=format_info({
-                            'Start Date': login_bonus.start_datetime,
-                            'End Date': login_bonus.end_datetime,
+                            'Start Date': ctx.convert_tz(login_bonus.start_datetime),
+                            'End Date': ctx.convert_tz(login_bonus.end_datetime),
                             'Type': login_bonus.login_bonus_type.name,
                             'Loop': login_bonus.loop,
                         }),

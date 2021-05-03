@@ -181,7 +181,7 @@ class CardFilter(MasterFilter[CardMaster]):
                             'Character': f'{card.character.full_name_english}',
                             'Attribute': f'{ctx.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
                             'Unit': f'{ctx.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
-                            'Release Date': f'{card.start_datetime}',
+                            'Release Date': f'{ctx.convert_tz(card.start_datetime)}',
                             'Event': f'{card.event.name if card.event else "None"}',
                             'Gacha': f'{card.gacha.name if card.gacha else "None"}',
                             'Availability': f'{card.availability.name}',

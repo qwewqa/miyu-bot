@@ -99,8 +99,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
         embed.add_field(name='Info',
                         value=format_info({
-                            'Start Date': f'{gacha.start_datetime}',
-                            'End Date': f'{gacha.end_datetime}',
+                            'Start Date': f'{ctx.convert_tz(gacha.start_datetime)}',
+                            'End Date': f'{ctx.convert_tz(gacha.end_datetime)}',
                             'Event': f'{gacha.event.name if gacha.event else "None"}',
                             'Pity Requirement': gacha.bonus_max_value or 'None',
                             'Type': gacha.gacha_type.name,

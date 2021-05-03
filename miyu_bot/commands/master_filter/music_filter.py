@@ -188,7 +188,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
             'Section Trend': song.section_trend.name,
             'Sort Order': song.default_order,
             'Levels': ', '.join(c.display_level for c in song.charts.values()),
-            'Release Date': song.start_datetime,
+            'Release Date': ctx.convert_tz(song.start_datetime),
             'Hidden': song.is_hidden,
             'Fair Use': song.can_fair_use,
         }

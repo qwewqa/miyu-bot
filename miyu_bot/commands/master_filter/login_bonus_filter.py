@@ -1,6 +1,10 @@
+import re
+from datetime import datetime
+
 import discord
 from d4dj_utils.master.login_bonus_master import LoginBonusMaster
 
+from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source
@@ -19,13 +23,25 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
     @data_attribute('date',
                     aliases=['release', 'recent'],
                     is_sortable=True,
+                    is_comparable=True,
                     reverse_sort=True)
     def date(self, ctx, value: LoginBonusMaster):
-        return value.start_datetime
+        return ctx.convert_tz(value.start_datetime).date()
 
     @date.formatter
     def format_date(self, ctx, value: LoginBonusMaster):
-        return f'{value.start_datetime.year % 100:02}/{value.start_datetime.month:>2}/{value.start_datetime.day:02}'
+        dt = ctx.convert_tz(value.start_datetime)
+        return f'{dt.year % 100:02}/{dt.month:02}/{dt.day:02}'
+
+    @date.compare_converter
+    def date_compare_converter(self, ctx: PrefContext, s):
+        match = re.fullmatch(r'(\d+)/(\d+)/(\d+)', s)
+        if not match:
+            raise
+        y, m, d = (int(n) for n in match.groups())
+        if y < 100:
+            y += ctx.localize(datetime.now()).year // 100 * 100
+        return ctx.localize(datetime(year=y, month=m, day=d)).date()
 
     @data_attribute('id',
                     is_sortable=True,

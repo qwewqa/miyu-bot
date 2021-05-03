@@ -177,12 +177,12 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             comparable_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=self.wrap_compare_converter(a.compare_converter) or (lambda s: float(s))) for a in
+                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (lambda s: float(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!='],
-                                     converter=self.wrap_compare_converter(a.compare_converter) or a.value_mapping or (lambda s: float(s)))
+                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or a.value_mapping or (lambda s: float(s)))
                 for a in eq_data_attributes}
             text = arg.text()
 
@@ -339,12 +339,12 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             comparable_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=self.wrap_compare_converter(a.compare_converter) or (lambda s: float(s))) for a in
+                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (lambda s: float(s))) for a in
                 comparable_data_attributes}
             eq_arguments = {
                 a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                      allowed_operators=['=', '==', '!='],
-                                     converter=self.wrap_compare_converter(a.compare_converter) or a.value_mapping or (lambda s: float(s)))
+                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or a.value_mapping or (lambda s: float(s)))
                 for a in eq_data_attributes}
             text = arg.text()
 
@@ -401,11 +401,15 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         return command
 
-    def wrap_compare_converter(self, f):
+    def wrap_compare_converter(self, ctx, f):
         if f is None:
             return None
         else:
-            return functools.partial(f, self)
+            argspec = getfullargspec(f)
+            if len(argspec.args) == 2:
+                return functools.partial(f, self)
+            else:
+                return functools.partial(f, self, ctx)
 
 def _get_accessor(f):
     if len(getfullargspec(f).args) == 2:

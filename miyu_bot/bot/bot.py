@@ -1,12 +1,16 @@
+import datetime
 from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Dict, Optional
+from typing import Optional, Union
 
 import aiohttp
+import pytz
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
 from discord.ext.commands import Context
+from pytz import BaseTzInfo
+from pytz.tzinfo import StaticTzInfo, DstTzInfo
 from tortoise import Tortoise
 
 from miyu_bot.bot.name_aliases import NameAliases
@@ -77,9 +81,28 @@ class D4DJBot(commands.Bot):
         return ctx
 
 
+class Preferences(SimpleNamespace):
+    leaks: bool
+    loop: Optional[int]
+    prefix: str
+    timezone: Union[BaseTzInfo, StaticTzInfo, DstTzInfo]
+
+
 class PrefContext(Context):
-    preferences: Optional[SimpleNamespace]
+    preferences: Optional[Preferences]
 
     def __init__(self, **kwargs):
         self.preferences = None
         super(PrefContext, self).__init__(**kwargs)
+
+    def convert_tz(self, dt: datetime.datetime) -> datetime.datetime:
+        if self.preferences:
+            return dt.astimezone(self.preferences.timezone)
+        else:
+            return dt
+
+    def localize(self, dt: datetime.datetime) -> datetime.datetime:
+        if self.preferences:
+            return self.preferences.timezone.localize(dt)
+        else:
+            return dt

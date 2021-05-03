@@ -1,3 +1,5 @@
+import re
+from datetime import datetime
 from typing import Sequence
 
 import discord
@@ -6,6 +8,7 @@ from d4dj_utils.master.gacha_master import GachaMaster
 from d4dj_utils.master.gacha_table_master import GachaTableMaster
 from d4dj_utils.master.gacha_table_rate_master import GachaTableRateMaster
 
+from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, attribute_emoji_ids_by_attribute_id, grey_emoji_id
 from miyu_bot.commands.common.formatting import format_info
@@ -26,13 +29,25 @@ class GachaFilter(MasterFilter[GachaMaster]):
     @data_attribute('date',
                     aliases=['release', 'recent'],
                     is_sortable=True,
+                    is_comparable=True,
                     reverse_sort=True)
     def date(self, ctx, value: GachaMaster):
-        return value.start_datetime
+        return ctx.convert_tz(value.start_datetime).date()
 
     @date.formatter
     def format_date(self, ctx, value: GachaMaster):
-        return f'{value.start_datetime.year % 100:02}/{value.start_datetime.month:>2}/{value.start_datetime.day:02}'
+        dt = ctx.convert_tz(value.start_datetime)
+        return f'{dt.year % 100:02}/{dt.month:02}/{dt.day:02}'
+
+    @date.compare_converter
+    def date_compare_converter(self, ctx: PrefContext, s):
+        match = re.fullmatch(r'(\d+)/(\d+)/(\d+)', s)
+        if not match:
+            raise
+        y, m, d = (int(n) for n in match.groups())
+        if y < 100:
+            y += ctx.localize(datetime.now()).year // 100 * 100
+        return ctx.localize(datetime(year=y, month=m, day=d)).date()
 
     @data_attribute('character',
                     aliases=['char'],

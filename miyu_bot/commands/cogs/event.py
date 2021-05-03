@@ -3,28 +3,19 @@ import datetime
 import datetime as dt
 import logging
 import math
-import textwrap
 
-import dateutil.parser
 import discord
 import pytz
 from d4dj_utils.master.event_master import EventMaster, EventState
-from d4dj_utils.master.login_bonus_master import LoginBonusMaster
 from discord.ext import commands, tasks
 from pytz import UnknownTimeZoneError
 
 from miyu_bot.bot import models
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.bot.models import valid_loop_intervals
-from miyu_bot.commands.common.argument_parsing import parse_arguments, ParsedArguments
+from miyu_bot.commands.common.argument_parsing import parse_arguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
-from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
-    parameter_bonus_emoji_ids_by_parameter_id, \
-    event_point_emoji_id
-from miyu_bot.commands.common.formatting import format_info
-from miyu_bot.commands.common.fuzzy_matching import romanize
-from miyu_bot.commands.common.reaction_message import run_paged_message, run_dynamically_paged_message, \
-    run_deletable_message, run_tabbed_message
+from miyu_bot.commands.common.reaction_message import run_deletable_message, run_tabbed_message
 
 
 class Event(commands.Cog):
@@ -38,92 +29,6 @@ class Event(commands.Cog):
 
     def cog_unload(self):
         self.leaderboard_loop.cancel()
-
-    @commands.command(name='login_bonus',
-                      aliases=['loginbonus'],
-                      description='Displays login bonus info.',
-                      help='!loginbonus Happy Birthday')
-    async def login_bonus(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
-        self.logger.info(f'Searching for login bonus "{arg}".')
-
-        arguments = parse_arguments(arg)
-        login_bonuses = self.get_login_bonuses(ctx, arguments)
-
-        if not login_bonuses:
-            await ctx.send(f'No results.')
-            return
-
-        if len(login_bonuses) == 1:
-            embed = self.get_login_bonus_embed(login_bonuses[0])
-            asyncio.create_task(run_deletable_message(ctx, await ctx.send(embed=embed)))
-        else:
-            idx = 0
-
-            def generator(n):
-                nonlocal idx
-                idx += n
-                idx = max(0, min(idx, len(login_bonuses) - 1))
-                return self.get_login_bonus_embed(login_bonuses[idx])
-
-            asyncio.create_task(run_dynamically_paged_message(ctx, generator))
-
-    @commands.command(name='login_bonuses',
-                      aliases=['loginbonuses'],
-                      description='Displays login bonuses.',
-                      help='!loginbonuses Happy Birthday')
-    async def login_bonuses(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
-        self.logger.info(f'Searching for login bonus "{arg}".')
-
-        arguments = parse_arguments(arg)
-        login_bonuses = self.get_login_bonuses(ctx, arguments)
-        embed = discord.Embed(title='Login Bonuses')
-        asyncio.ensure_future(run_paged_message(ctx, embed, [l.title for l in login_bonuses]))
-
-    def get_login_bonuses(self, ctx, arguments: ParsedArguments):
-        text = arguments.text()
-        arguments.require_all_arguments_used()
-
-        login_bonuses = self.bot.asset_filters.login_bonuses.get_by_relevance(text, ctx)
-
-        if not text:
-            login_bonuses.sort(key=lambda l: (l.start_datetime, l.id))
-            login_bonuses.reverse()
-
-        return login_bonuses
-
-    def get_login_bonus_embed(self, login_bonus: LoginBonusMaster):
-
-        embed = discord.Embed(title=login_bonus.title)
-
-        embed.add_field(name='Info',
-                        value=format_info({
-                            'Start Date': login_bonus.start_datetime,
-                            'End Date': login_bonus.end_datetime,
-                            'Type': login_bonus.login_bonus_type.name,
-                            'Loop': login_bonus.loop,
-                        }),
-                        inline=False)
-
-        def format_login_bonus(item):
-            rewards = item.rewards
-            if len(rewards) > 1:
-                prefix = f'{item.sequence}. '
-                return prefix + ('\n' + ' ' * len(prefix)).join(reward.get_friendly_description()
-                                                                for reward in rewards)
-            elif len(rewards) == 1:
-                return f'{item.sequence}. {rewards[0].get_friendly_description()}'
-            else:
-                return 'None'
-
-        reward_text = '```' + ('\n'.join(format_login_bonus(item) for item in login_bonus.items) or 'None') + '```'
-
-        embed.add_field(name='Rewards',
-                        value=reward_text,
-                        inline=False)
-
-        embed.set_image(url=self.bot.asset_url + get_asset_filename(login_bonus.image_path))
-
-        return embed
 
     @commands.command(name='time',
                       aliases=[],
@@ -206,6 +111,26 @@ class Event(commands.Cog):
                         inline=True)
 
         await ctx.send(embed=embed)
+
+    async def parse_event_argument(self, ctx, arg):
+        arguments = parse_arguments(arg)
+        await arguments.update_preferences(ctx)
+        text = arguments.text()
+        arguments.require_all_arguments_used()
+
+        if text:
+            # Allows relative id searches like `!event +1` for next event or `!event -2` for the event before last event
+            if text[0] in ['-', '+']:
+                try:
+                    latest = self.bot.asset_filters.events.get_latest_event(ctx)
+                    event = self.bot.asset_filters.events.get(str(latest.id + int(text)), ctx)
+                except ValueError:
+                    event = self.bot.asset_filters.events.get(text, ctx)
+            else:
+                event = self.bot.asset_filters.events.get(text, ctx)
+        else:
+            event = self.bot.asset_filters.events.get_latest_event(ctx)
+        return event, ctx.preferences.timezone
 
     @staticmethod
     def format_timedelta(delta: datetime.timedelta):

@@ -32,7 +32,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
     @date.formatter
     def format_date(self, ctx, value: GachaMaster):
-        return f'{value.start_datetime.month:>2}/{value.start_datetime.day:02}'
+        return f'{value.start_datetime.month:>2}/{value.start_datetime.day:02}/{value.start_datetime.year % 100:02}'
 
     @data_attribute('character',
                     aliases=['char'],

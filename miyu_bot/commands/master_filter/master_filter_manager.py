@@ -11,6 +11,7 @@ _MODULES = {
     'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'gacha_master', 'gacha')],
     'miyu_bot.commands.master_filter.event_filter': [('EventFilter', 'event_master', 'events')],
     'miyu_bot.commands.master_filter.music_filter': [('MusicFilter', 'music_master', 'music')],
+    'miyu_bot.commands.master_filter.login_bonus_filter': [('LoginBonusFilter', 'login_bonus_master', 'login_bonuses')],
 }
 
 

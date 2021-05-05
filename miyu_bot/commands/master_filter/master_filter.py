@@ -167,7 +167,6 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     text += f'{attr.name} (=, ==, !=) {attr.help_sample_argument or "[value]"}'
                 text += '\n'
             entries.append(text.strip())
-        print(f'{self}' + '\n\n'.join(entries))
         return '\n\n'.join(entries)
 
     def get_commands(self, include_self_parameter: bool = False):

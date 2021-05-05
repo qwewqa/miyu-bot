@@ -69,6 +69,29 @@ class MusicFilter(MasterFilter[MusicMaster]):
     def format_id(self, value: MusicMaster):
         return str(value.id).zfill(7)
 
+    @data_attribute('chart_designer',
+                    aliases=['chartdesigner', 'designer'],
+                    is_sortable=True,
+                    is_eq=True,
+                    is_multi_category=True)  # Some music have charts with multiple designers
+    def chart_designer(self, value: MusicMaster):
+        return {c.designer.id for c in value.charts.values()}
+
+    @chart_designer.formatter
+    def format_chart_designer(self, value: MusicMaster):
+        return '/'.join({str(c.designer.id): None for c in value.charts.values()}.keys()) or 'None'
+
+    @chart_designer.init
+    def init_chart_designer(self, info):
+        self.chart_designers_by_name = {v.name.lower(): k for k, v in self.bot.assets.chart_designer_master.items()}
+
+    @chart_designer.compare_converter
+    def chart_designer_compare_converter(self, s):
+        if s.isnumeric():
+            return int(s)
+        else:
+            return self.chart_designers_by_name[s.lower()]
+
     @data_attribute('level',
                     aliases=['difficulty', 'diff'],
                     is_sortable=True,
@@ -188,6 +211,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
             'Section Trend': song.section_trend.name,
             'Sort Order': song.default_order,
             'Levels': ', '.join(c.display_level for c in song.charts.values()),
+            'Chart Designers': ', '.join({c.designer.name: None for c in song.charts.values()}.keys()),
             'Release Date': ctx.convert_tz(song.start_datetime),
             'Hidden': song.is_hidden,
             'Fair Use': song.can_fair_use,

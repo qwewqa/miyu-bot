@@ -92,7 +92,7 @@ class ParsedArguments:
         return results
 
     def text(self):
-        return ' '.join(word for word in self.text_argument.split() if word not in self.used_words)
+        return ' '.join(word for word in self.text_argument.split() if word.lower() not in self.used_words)
 
     def tag(self, name: str):
         if name in self.tag_arguments:

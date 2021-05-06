@@ -111,12 +111,12 @@ class Gacha(commands.Cog):
     @commands.command(name='pull')
     async def pull(self, ctx: commands.Context, *, arg: Optional[ParsedArguments]):
         if not arg:
-            await ctx.send('No banner specified.')
+            await ctx.send('A gacha id must be given (can be found using the !banner command and checking the footer).')
             return
         name = arg.text()
         arg.require_all_arguments_used()
         if not name.isnumeric():
-            await ctx.send('A gacha id must be specified (can be found using the !banner command and checking the footer).')
+            await ctx.send('A gacha id must be given (can be found using the !banner command and checking the footer).')
             return
         gacha: GachaMaster = self.bot.master_filters.gacha.get_by_id(int(name), ctx)
         if not gacha:

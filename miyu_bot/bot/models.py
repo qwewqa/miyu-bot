@@ -249,3 +249,9 @@ class User(PreferenceScope):
 
     def __str__(self):
         return f'{self.name} ({self.id})'
+
+
+class PityCount(Model):
+    user_id = fields.BigIntField()
+    gacha_id = fields.IntField()
+    counter = fields.IntField(default=0)

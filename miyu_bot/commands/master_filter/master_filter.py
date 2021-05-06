@@ -88,6 +88,21 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     return None
                 return self.default_filter[name_or_id]
 
+    def get_by_id(self, master_id: int, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+        if ctx and ctx.preferences.leaks:
+            try:
+                return self.data[master_id]
+            except KeyError:
+                return None
+        else:
+            try:
+                master = self.data[master_id]
+                if master not in self.default_filter.values():
+                    return None
+                return master
+            except KeyError:
+                return None
+
     def get_by_relevance(self, name: str, ctx: miyu_bot.bot.bot.PrefContext):
         try:
             master = self.data[int(name)]
@@ -182,20 +197,24 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             if include_self_parameter:
                 if args := cs.command_args:
                     yield commands.command(**{**args,
-                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                                              'description': args.get('description',
+                                                                      'No Description') + '\n\n' + help_text})(
                         wrap(self.get_primary_command_function(cs)))
                 if args := cs.list_command_args:
                     yield commands.command(**{**args,
-                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                                              'description': args.get('description',
+                                                                      'No Description') + '\n\n' + help_text})(
                         wrap(self.get_list_command_function(cs)))
             else:
                 if args := cs.command_args:
                     yield commands.command(**{**args,
-                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                                              'description': args.get('description',
+                                                                      'No Description') + '\n\n' + help_text})(
                         self.get_primary_command_function(cs))
                 if args := cs.list_command_args:
                     yield commands.command(**{**args,
-                                           'description': args.get('description', 'No Description') + '\n\n' + help_text})(
+                                              'description': args.get('description',
+                                                                      'No Description') + '\n\n' + help_text})(
                         self.get_list_command_function(cs))
 
     def get_primary_command_function(self, source):

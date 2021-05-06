@@ -18,7 +18,7 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_att
 
 class GachaFilter(MasterFilter[GachaMaster]):
     def get_name(self, value: GachaMaster) -> str:
-        return value.name
+        return f'{value.name} {value.id}'
 
     @data_attribute('name',
                     aliases=['title'],

@@ -1,5 +1,7 @@
 import functools
+import itertools
 import logging
+import random
 from io import BytesIO
 from pathlib import Path
 from typing import List, Optional
@@ -7,10 +9,13 @@ from typing import List, Optional
 import discord
 from PIL import Image
 from d4dj_utils.master.card_master import CardMaster
+from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.models import PityCount
 from miyu_bot.commands.common.argument_parsing import ParsedArguments
+from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import rarity_emoji_ids
 
 
@@ -102,6 +107,77 @@ class Gacha(commands.Cog):
     def cog_unload(self):
         for image in self.images:
             image.close()
+
+    @commands.command(name='pull')
+    async def pull(self, ctx: commands.Context, *, arg: Optional[ParsedArguments]):
+        if not arg:
+            await ctx.send('No banner specified.')
+            return
+        name = arg.text()
+        arg.require_all_arguments_used()
+        if not name.isnumeric():
+            await ctx.send('A gacha id must be specified (can be found using the !banner command and checking the footer).')
+            return
+        gacha: GachaMaster = self.bot.master_filters.gacha.get_by_id(int(name), ctx)
+        if not gacha:
+            await ctx.send('Unknown banner.')
+            return
+        draw_data = [d for d in gacha.draw_data
+                     if (d.stock_id == 902) or (d.stock_id in (1, 2) and d.stock_amount == 3000)]
+        if len(draw_data) != 1:
+            await ctx.send('Unsupported banner.')
+            return
+        draw_data = draw_data[0]
+        tables = gacha.tables
+        tables_rates = [list(itertools.accumulate(t.rate for t in table)) for table in tables]
+
+        cards = []
+        for draw_amount, table_rate in zip(draw_data.draw_amounts, gacha.table_rates):
+            rates = list(itertools.accumulate(table_rate.rates))
+            for _i in range(draw_amount):
+                rng = random.randint(1, rates[-1])
+                table_index = next(i for i, s in enumerate(rates) if rng <= s)
+                table_rates = tables_rates[table_index]
+                rng = random.randint(1, table_rates[-1])
+                result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
+                cards.append(self.bot.assets.card_master[tables[table_index][result_index].card_id])
+
+        bonus = None
+        current_pity = None
+
+        if gacha.bonus_max_value:
+            pity_data, _ = await PityCount.get_or_create(user_id=ctx.author.id, gacha_id=gacha.id)
+            pity_data.counter += 10
+            current_pity = pity_data.counter
+            if pity_data.counter >= gacha.bonus_max_value:
+                bonus_tables = gacha.bonus_tables
+                pity_data.counter -= gacha.bonus_max_value
+                current_pity = pity_data.counter
+                rates = list(itertools.accumulate(gacha.bonus_table_rate.rates))
+                rng = random.randint(1, rates[-1])
+                table_index = next(i for i, s in enumerate(rates) if rng <= s)
+                table_rates = list(itertools.accumulate(t.rate for t in bonus_tables[table_index]))
+                rng = random.randint(1, table_rates[-1])
+                result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
+                bonus = self.bot.assets.card_master[bonus_tables[table_index][result_index].card_id]
+            await pity_data.save()
+
+        img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
+                                                  functools.partial(self.create_pull_image, cards, bonus))
+
+        buffer = BytesIO()
+        img.save(buffer, 'png')
+        buffer.seek(0)
+
+        embed = discord.Embed(title=gacha.name)
+        thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
+        embed.set_thumbnail(url=thumb_url)
+        embed.set_image(url='attachment://pull.png')
+
+        if current_pity is not None:
+            embed.description = f'Pity: {current_pity}/{gacha.bonus_max_value}'
+
+        await ctx.send(embed=embed, file=discord.File(fp=buffer, filename='pull.png'))
 
     @commands.command(name='card_icon',
                       aliases=['cardicon'],

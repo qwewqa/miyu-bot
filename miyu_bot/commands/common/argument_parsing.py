@@ -149,7 +149,7 @@ class ParsedArguments:
                 raise ArgumentError(f'Expected numerical arguments for parameter "{name}".')
         try:
             if isinstance(converter, dict):
-                value = ArgumentValue([converter[v] for v in value.value], value.operator)
+                value = ArgumentValue([converter[v.lower()] for v in value.value], value.operator)
             else:
                 value = ArgumentValue([converter(v) for v in value.value], value.operator)
         except Exception:
@@ -187,7 +187,7 @@ class ParsedArguments:
                 raise ArgumentError(f'Expected numerical arguments for parameter "{name}".')
         try:
             if isinstance(converter, dict):
-                values = [ArgumentValue([converter[v] for v in value.value], value.operator) for value in values]
+                values = [ArgumentValue([converter[v.lower()] for v in value.value], value.operator) for value in values]
             else:
                 values = [ArgumentValue([converter(v) for v in value.value], value.operator) for value in values]
         except Exception:

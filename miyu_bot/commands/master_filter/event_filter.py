@@ -3,6 +3,7 @@ import re
 from typing import Optional
 
 import discord
+from d4dj_utils.master.common_enums import EventType
 from d4dj_utils.master.event_master import EventMaster, EventState
 
 from miyu_bot.bot.bot import PrefContext
@@ -96,6 +97,18 @@ class EventFilter(MasterFilter[EventMaster]):
     @attribute.init
     def init_attribute(self, info: DataAttributeInfo):
         info.value_mapping = {k: v.id for k, v in self.bot.aliases.attributes_by_name.items()}
+
+    @data_attribute('type',
+                    value_mapping={t.name.lower(): t for t in EventType},
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def type(self, value: EventMaster):
+        return value.event_type_id
+
+    @type.formatter
+    def format_type(self, value: EventMaster):
+        return value.event_type.name.ljust(6)
 
     @command_source(command_args=
                     dict(name='event',

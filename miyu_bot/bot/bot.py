@@ -13,7 +13,7 @@ from pytz import BaseTzInfo
 from pytz.tzinfo import StaticTzInfo, DstTzInfo
 from tortoise import Tortoise
 
-from miyu_bot.bot.name_aliases import NameAliases
+from miyu_bot.bot.common_aliases import CommonAliases
 from miyu_bot.bot.tortoise_config import TORTOISE_ORM
 from miyu_bot.commands.cogs.preferences import get_preferences
 from miyu_bot.commands.common.asset_paths import clear_asset_filename_cache
@@ -23,7 +23,7 @@ from miyu_bot.commands.master_filter.master_filter_manager import MasterFilterMa
 class D4DJBot(commands.Bot):
     assets: AssetManager
     master_filters: MasterFilterManager
-    aliases: NameAliases
+    aliases: CommonAliases
     thread_pool: ThreadPoolExecutor
 
     asset_path: Path
@@ -32,7 +32,7 @@ class D4DJBot(commands.Bot):
     def __init__(self, asset_path, *args, **kwargs):
         self.asset_path = Path(asset_path)
         self.assets = AssetManager(self.asset_path, drop_extra_fields=True)
-        self.aliases = NameAliases(self.assets)
+        self.aliases = CommonAliases(self.assets)
         self.master_filters = MasterFilterManager(self, self.assets)
         self.session = aiohttp.ClientSession()
         self.extension_names = set()
@@ -42,7 +42,7 @@ class D4DJBot(commands.Bot):
     def try_reload_assets(self):
         try:
             assets = AssetManager(self.asset_path, drop_extra_fields=True)
-            aliases = NameAliases(assets)
+            aliases = CommonAliases(assets)
             master_filters = MasterFilterManager(self, assets)
         except:
             return False

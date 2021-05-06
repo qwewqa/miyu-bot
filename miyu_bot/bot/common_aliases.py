@@ -3,7 +3,7 @@ from functools import cached_property
 from d4dj_utils.master.asset_manager import AssetManager
 
 
-class NameAliases:
+class CommonAliases:
     assets: AssetManager
 
     def __init__(self, assets):

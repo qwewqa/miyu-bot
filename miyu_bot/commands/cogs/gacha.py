@@ -108,7 +108,10 @@ class Gacha(commands.Cog):
         for image in self.images:
             image.close()
 
-    @commands.command(name='pull')
+    @commands.command(name='pull',
+                      aliases=['gachasim'],
+                      description='Simulates gacha given the gacha id (can be found using the !banner command and checking the footer).',
+                      help='!pull 1')
     async def pull(self, ctx: commands.Context, *, arg: Optional[ParsedArguments]):
         if not arg:
             await ctx.send('A gacha id must be given (can be found using the !banner command and checking the footer).')

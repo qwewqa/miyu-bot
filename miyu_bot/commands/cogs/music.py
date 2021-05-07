@@ -261,8 +261,9 @@ class Music(commands.Cog):
 
     @commands.command(name='mixrating',
                       aliases=['mix_rating'],
-                      description='Returns the rating of a mix.',
-                      help='!mixrating grgr grgr grgr "cyber cyber"')
+                      description='Returns the rating of a mix. Used internally.',
+                      help='!mixrating grgr grgr grgr "cyber cyber"',
+                      hidden=True)
     async def mixrating(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
         songs = []
         for name in [a, b, c, d]:

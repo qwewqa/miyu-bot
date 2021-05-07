@@ -98,6 +98,13 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     is_comparable=True,
                     reverse_sort=True)
     def level(self, value: MusicMaster):
+        if override_levels := [self.level_compare_converter(c.override_level)
+                               for c in value.charts.values() if re.fullmatch(r'\d+\+?', c.override_level)]:
+            level = max(override_levels)
+            if level > 99:
+                return 0  # Mainly just so April fools doesn't show at the top
+            else:
+                return level
         if value.chart_levels:
             return max(value.chart_levels)
         else:
@@ -106,7 +113,11 @@ class MusicFilter(MasterFilter[MusicMaster]):
     @level.formatter
     def format_level(self, value: MusicMaster):
         if value.chart_levels:
-            level = max(value.chart_levels)
+            if override_levels := [self.level_compare_converter(c.override_level)
+                                   for c in value.charts.values() if re.fullmatch(r'\d+\+?', c.override_level)]:
+                level = max(override_levels)
+            else:
+                level = max(value.chart_levels)
             if level % 1 != 0:
                 return f'{int(level - 0.5):>2}+'
             else:
@@ -117,9 +128,9 @@ class MusicFilter(MasterFilter[MusicMaster]):
     @level.compare_converter
     def level_compare_converter(self, s):
         if s[-1] == '+':
-            return int(s[:-1]) + 0.5
+            return float(s[:-1]) + 0.5
         else:
-            return int(s)
+            return float(s)
 
     @data_attribute('duration',
                     aliases=['length'],

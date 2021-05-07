@@ -269,7 +269,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
             if is_relative_only:
                 text = ''
-            elif re.fullmatch(r'-\d+', text.strip()):
+            elif re.fullmatch(r'~\d+', text.strip()):
                 index = int(text.strip()[1:]) - 1
                 text = ''
 

@@ -57,6 +57,7 @@ class CommonAliases:
         'pm': 'photon_maiden',
         'mermaid': 'merm4id',
         'mmd': 'merm4id',
+        'm4': 'merm4id',
         'lyricallily': 'lyrical_lily',
         'riririri': 'lyrical_lily',
         'lililili': 'lyrical_lily',

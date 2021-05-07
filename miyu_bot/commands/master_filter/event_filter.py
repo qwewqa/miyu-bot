@@ -61,7 +61,7 @@ class EventFilter(MasterFilter[EventMaster]):
         return ctx.localize(dt.datetime(year=y, month=m, day=d)).date()
 
     @data_attribute('character',
-                    aliases=['char'],
+                    aliases=['char', 'chara'],
                     is_tag=True,
                     is_eq=True,
                     is_multi_category=True)

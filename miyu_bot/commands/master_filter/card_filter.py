@@ -28,7 +28,7 @@ class CardFilter(MasterFilter[CardMaster]):
         return value.name
 
     @data_attribute('character',
-                    aliases=['char'],
+                    aliases=['char', 'chara'],
                     is_sortable=True,
                     is_keyword=True,
                     is_tag=True,

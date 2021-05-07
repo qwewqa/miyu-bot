@@ -276,7 +276,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             tab = source.default_tab
             if source.suffix_tab_aliases:
                 words = text.split()
-                if len(words) >= 2 and words[-1].lower() in source.suffix_tab_aliases:
+                if len(words) >= 1 and words[-1].lower() in source.suffix_tab_aliases:
                     tab = source.suffix_tab_aliases[words[-1].lower()]
                     text = ' '.join(words[:-1])
 

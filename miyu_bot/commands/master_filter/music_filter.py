@@ -125,7 +125,119 @@ class MusicFilter(MasterFilter[MusicMaster]):
         else:
             return f'N/A'
 
+    @data_attribute('expert',
+                    aliases=['exp', 'ex'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def expert(self, value: MusicMaster):
+        if chart := value.charts.get(4):
+            level = chart.level
+            if chart.override_level and re.fullmatch(r'\d+\+?', chart.override_level):
+                level = self.level_compare_converter(chart.override_level)
+            if level > 99:
+                return 0
+            else:
+                return level
+        return -1
+
+    @expert.formatter
+    def format_expert(self, value: MusicMaster):
+        level = self.expert(value)
+        if level == -1:
+            return 'N/A'
+        else:
+            if level % 1 != 0:
+                return f'{int(level - 0.5):>2}+'
+            else:
+                return f'{int(level):>2} '
+
+    @data_attribute('hard',
+                    aliases=['hrd', 'hd'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def hard(self, value: MusicMaster):
+        if chart := value.charts.get(3):
+            level = chart.level
+            if chart.override_level and re.fullmatch(r'\d+\+?', chart.override_level):
+                level = self.level_compare_converter(chart.override_level)
+            if level > 99:
+                return 0
+            else:
+                return level
+        return -1
+
+    @hard.formatter
+    def format_hard(self, value: MusicMaster):
+        level = self.hard(value)
+        if level == -1:
+            return 'N/A'
+        else:
+            if level % 1 != 0:
+                return f'{int(level - 0.5):>2}+'
+            else:
+                return f'{int(level):>2} '
+
+    @data_attribute('normal',
+                    aliases=['norm', 'nrm', 'nm'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def normal(self, value: MusicMaster):
+        if chart := value.charts.get(2):
+            level = chart.level
+            if chart.override_level and re.fullmatch(r'\d+\+?', chart.override_level):
+                level = self.level_compare_converter(chart.override_level)
+            if level > 99:
+                return 0
+            else:
+                return level
+        return -1
+
+    @normal.formatter
+    def format_normal(self, value: MusicMaster):
+        level = self.normal(value)
+        if level == -1:
+            return 'N/A'
+        else:
+            if level % 1 != 0:
+                return f'{int(level - 0.5):>2}+'
+            else:
+                return f'{int(level):>2} '
+
+    @data_attribute('easy',
+                    aliases=['esy', 'es'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def easy(self, value: MusicMaster):
+        if chart := value.charts.get(1):
+            level = chart.level
+            if chart.override_level and re.fullmatch(r'\d+\+?', chart.override_level):
+                level = self.level_compare_converter(chart.override_level)
+            if level > 99:
+                return 0
+            else:
+                return level
+        return -1
+
+    @easy.formatter
+    def format_easy(self, value: MusicMaster):
+        level = self.easy(value)
+        if level == -1:
+            return 'N/A'
+        else:
+            if level % 1 != 0:
+                return f'{int(level - 0.5):>2}+'
+            else:
+                return f'{int(level):>2} '
+
     @level.compare_converter
+    @expert.compare_converter
+    @hard.compare_converter
+    @normal.compare_converter
+    @easy.compare_converter
     def level_compare_converter(self, s):
         if s[-1] == '+':
             return float(s[:-1]) + 0.5

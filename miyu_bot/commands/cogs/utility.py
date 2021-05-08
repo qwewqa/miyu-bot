@@ -26,6 +26,29 @@ class Utility(commands.Cog):
             embed = discord.Embed(title='Translate', description=(await resp.json())['translations'][0]['text'])
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=['tjp'], hidden=True)
+    async def translate_jp(self, ctx: commands.Context, *, arg: str):
+        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
+                                        params={'auth_key': self.bot.config['deepl'],
+                                                'text': arg,
+                                                'target_lang': 'JA'}) as resp:
+            embed = discord.Embed(title='Translate JP', description=(await resp.json())['translations'][0]['text'])
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=['tt'], hidden=True)
+    async def transtranslate(self, ctx: commands.Context, *, arg: str):
+        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
+                                        params={'auth_key': self.bot.config['deepl'],
+                                                'text': arg,
+                                                'target_lang': 'JA'}) as resp:
+            arg = (await resp.json())['translations'][0]['text']
+        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
+                                        params={'auth_key': self.bot.config['deepl'],
+                                                'text': arg,
+                                                'target_lang': 'EN'}) as resp:
+            embed = discord.Embed(title='Transtranslate', description=(await resp.json())['translations'][0]['text'])
+        await ctx.send(embed=embed)
+
     @commands.command(hidden=True)
     @commands.is_owner()
     async def romanize(self, ctx: commands.Context, *, arg: str):
@@ -129,7 +152,9 @@ class Utility(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar_url)
         embed.add_field(name='Developer', value='qwewqa#3948', inline=False)
         embed.add_field(name='Server', value='https://discord.gg/TThMwrAZTR', inline=False)
-        embed.add_field(name='Bot Invite', value='https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=388160&scope=bot', inline=False)
+        embed.add_field(name='Bot Invite',
+                        value='https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=388160&scope=bot',
+                        inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(name='command_usage',
@@ -139,10 +164,10 @@ class Utility(commands.Cog):
     async def command_usage(self, ctx: commands.Context):
         usage_counts = (
             await CommandUsageCount
-            .all()
-            .annotate(use_count=Sum('counter'))
-            .group_by('name')
-            .values_list('name', 'use_count')
+                .all()
+                .annotate(use_count=Sum('counter'))
+                .group_by('name')
+                .values_list('name', 'use_count')
         )
         await ctx.send('\n'.join(f'{name}: {count}' for name, count in usage_counts)
                        + f'\ntotal: {sum(c for _, c in usage_counts)}')
@@ -154,10 +179,10 @@ class Utility(commands.Cog):
     async def guild_usage(self, ctx: commands.Context):
         usage_counts = (
             await CommandUsageCount
-            .all()
-            .annotate(use_count=Sum('counter'))
-            .group_by('guild_id')
-            .values_list('guild_id', 'use_count')
+                .all()
+                .annotate(use_count=Sum('counter'))
+                .group_by('guild_id')
+                .values_list('guild_id', 'use_count')
         )
         await ctx.send('\n'.join(f'{self.bot.get_guild(gid) or "Unknown"}: {count}' for gid, count in usage_counts)
                        + f'\ntotal: {sum(c for _, c in usage_counts)}')

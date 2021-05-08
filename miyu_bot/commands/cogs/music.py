@@ -232,6 +232,7 @@ class Music(commands.Cog):
         mix = Chart.create_mix(songs, diffs)
         mix_image = await self.bot.loop.run_in_executor(self.bot.thread_pool, mix.render)
         mix_name = '\n'.join(f'{song.name} [{diff.name}]' for song, diff in zip(songs, diffs))
+        note_counts = mix.get_note_counts()
 
         now = datetime.datetime.now()
         self.custom_mixes = {k: v
@@ -255,6 +256,14 @@ class Music(commands.Cog):
                               f'Fever: {mix.info.fever_start - mix.info.start_time:.2f}s - {mix.info.fever_end - mix.info.start_time:.2f}s\n'
                               f'Transitions: {", ".join("{:.2f}s".format(t - mix.info.start_time) for t in mix.info.medley_transition_times)}',
                         inline=False)
+        embed.add_field(name='Combo',
+                        value=f'Max Combo: {len(mix.notes)}\n'
+                              f'Taps: {note_counts["tap"]} (dark: {note_counts["tap1"]}, light: {note_counts["tap2"]})\n'
+                              f'Scratches: {note_counts["scratch"]} (left: {note_counts["scratch_left"]}, right: {note_counts["scratch_right"]})\n'
+                              f'Stops: {note_counts["stop"]} (head: {note_counts["stop_start"]}, tail: {note_counts["stop_end"]})\n'
+                              f'Long: {note_counts["long"]} (head: {note_counts["long_start"]}, tail: {note_counts["long_end"]})\n'
+                              f'Slide: {note_counts["slide"]} (tick: {note_counts["slide_tick"]}, flick {note_counts["slide_flick"]})',
+                        inline=True)
         embed.set_image(url='attachment://mix.png')
 
         await ctx.send(embed=embed, file=discord.File(fp=buffer, filename='mix.png'))

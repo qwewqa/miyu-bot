@@ -3,8 +3,10 @@ import textwrap
 
 import discord
 from discord.ext import commands
+from tortoise.functions import Count, Sum
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
 
 
@@ -125,6 +127,36 @@ class Utility(commands.Cog):
     async def invite(self, ctx: commands.Context):
         await ctx.send(
             'https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=388160&scope=bot')
+
+    @commands.command(name='command_usage',
+                      aliases=['commandusage'],
+                      hidden=True)
+    @commands.is_owner()
+    async def command_usage(self, ctx: commands.Context):
+        usage_counts = (
+            await CommandUsageCount
+            .all()
+            .annotate(use_count=Sum('counter'))
+            .group_by('name')
+            .values_list('name', 'use_count')
+        )
+        await ctx.send('\n'.join(f'{name}: {count}' for name, count in usage_counts)
+                       + f'\ntotal: {sum(c for _, c in usage_counts)}')
+
+    @commands.command(name='guild_usage',
+                      aliases=['guildusage'],
+                      hidden=True)
+    @commands.is_owner()
+    async def guild_usage(self, ctx: commands.Context):
+        usage_counts = (
+            await CommandUsageCount
+            .all()
+            .annotate(use_count=Sum('counter'))
+            .group_by('guild_id')
+            .values_list('guild_id', 'use_count')
+        )
+        await ctx.send('\n'.join(f'{self.bot.get_guild(gid) or "Unknown"}: {count}' for gid, count in usage_counts)
+                       + f'\ntotal: {sum(c for _, c in usage_counts)}')
 
 
 def setup(bot):

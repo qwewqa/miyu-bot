@@ -255,3 +255,16 @@ class PityCount(Model):
     user_id = fields.BigIntField()
     gacha_id = fields.IntField()
     counter = fields.IntField(default=0)
+
+    class Meta:
+        unique_together = (('user_id', 'gacha_id'),)
+
+
+class CommandUsageCount(Model):
+    guild_id = fields.BigIntField()
+    name = fields.CharField(max_length=31)
+    counter = fields.IntField(default=0)
+
+    class Meta:
+        unique_together = (('guild_id', 'name'),)
+

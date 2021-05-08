@@ -9,6 +9,7 @@ from discord.ext.commands import Cog
 
 from miyu_bot.bot import models
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.argument_parsing import ArgumentError
 
 logging.basicConfig(level=logging.INFO)
@@ -86,6 +87,15 @@ async def on_command_error(context: commands.Context, exception):
 
     print('Ignoring exception in command {}:'.format(context.command), file=sys.stderr)
     traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
+
+
+@bot.listen()
+async def on_command(ctx: commands.Context):
+    if not ctx.guild:
+        return
+    cnt, _ = await CommandUsageCount.get_or_create(guild_id=ctx.guild.id, name=ctx.command.name)
+    cnt.counter += 1
+    await cnt.save()
 
 
 bot.run(bot_token)

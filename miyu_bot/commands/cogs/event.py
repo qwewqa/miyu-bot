@@ -1,8 +1,11 @@
 import asyncio
 import datetime
 import datetime as dt
+import itertools
 import logging
 import math
+from collections import namedtuple
+from typing import List, Optional
 
 import discord
 import pytz
@@ -189,24 +192,25 @@ class Event(commands.Cog):
     @tasks.loop(minutes=1)
     async def leaderboard_loop(self):
         # Storing this on the bot object allows it to persist past bot reloads
-        if not hasattr(self.bot, 'last_leaderboard_loop_embeds'):
-            self.bot.last_leaderboard_loop_embeds = {}
+        if not hasattr(self.bot, 'last_leaderboard_loop_data'):
+            self.bot.last_leaderboard_loop_data = {}
         try:
             event = self.bot.master_filters.events.get_latest_event(None)
             now = datetime.datetime.now()
             minutes = now.minute + 60 * now.hour
-            embed = await self.get_leaderboard_embed(event)
+            data = await self.get_leaderboard_data()
             for interval in valid_loop_intervals:
                 if minutes % interval == 0:
-                    if (interval in self.bot.last_leaderboard_loop_embeds and
-                            self.bot.last_leaderboard_loop_embeds[interval].description == embed.description):
+                    if (interval in self.bot.last_leaderboard_loop_data and
+                            self.bot.last_leaderboard_loop_data[interval] == data):
                         continue
-                    self.bot.last_leaderboard_loop_embeds[interval] = embed
+                    prev = self.bot.last_leaderboard_loop_data.get(interval)
+                    self.bot.last_leaderboard_loop_data[interval] = data
                     channels = await models.Channel.filter(loop=interval)
                     for channel_data in channels:
                         channel = self.bot.get_channel(channel_data.id)
                         if channel:
-                            await channel.send(embed=embed)
+                            await channel.send(self.get_leaderboard_text(event, interval, data, prev))
                         else:
                             self.logger.warning(f'Failed to get channel for loop (id: {channel_data.id}).')
         except Exception as e:
@@ -252,21 +256,30 @@ class Event(commands.Cog):
         else:
             await ctx.send(f'No data available for tier {tier}.')
 
-    async def get_leaderboard_embed(self, event: EventMaster):
-        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20') as resp:
-            leaderboard = {entry['rank']: entry for entry in (await resp.json(encoding='utf-8'))}
+    LBStatistic = namedtuple('LBStatistic', 'rank points name')
+
+    async def get_leaderboard_data(self):
         async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
-            statistics = {int(k): v for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()}
-        max_points_digits = len(f'{statistics.get(1, {}).get("points", 1):,}')
-        nl = "\n"
-        header = f'Rank     {"Points":<{max_points_digits}}  Name'
-        body = '\n'.join(
-            f'{rank:<7,}  {stats["points"] if isinstance(stats["points"], int) else 0:>{max_points_digits},}  {leaderboard.get(rank, {}).get("name", "").replace(nl, "")}'
-            for rank, stats in statistics.items())
-        embed = discord.Embed(title=f'{event.name} Leaderboard', description=f'```{header}\n{body}```',
-                              timestamp=datetime.datetime.now())
-        embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
-        return embed
+            return [self.LBStatistic(int(k), v['points'] if isinstance(v['points'], int) else 0, v['name']) for k, v in
+                    (await resp.json(encoding='utf-8'))['statistics'].items()]
+
+    def get_leaderboard_text(self, event: EventMaster, interval: int, data: List[LBStatistic],
+                             prev: Optional[List[LBStatistic]]):
+        if prev is None:
+            prev = []
+        header = f'{event.name} [{interval} min]\n\nRank     Points      Change    Name\n'
+
+        def get_change_text(d, p):
+            if p and d.points != p.points:
+                t = f'+{d.points - p.points:,}'
+                return f'{t:>8}'
+            else:
+                return f'     ---'
+
+        body = '\n'.join(f'{d.rank:<7,}  {d.points:>10,}  '
+                         f'{get_change_text(d, p)}  {d.name.replace("`", " ")}'
+                         for d, p in itertools.zip_longest(data, prev))
+        return f'```{header}{body}```'
 
     async def get_tier_embed(self, tier: str, event: EventMaster):
         async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:

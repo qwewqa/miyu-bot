@@ -178,8 +178,8 @@ class CardFilter(MasterFilter[CardMaster]):
                         'bday': 5,
                         'welfare': 6,
                         'free': 6,
-                        'event': 6,
-                        'evnt': 6,
+                        'reward': 6,
+                        'rwrd': 6,
                     },
                     is_tag=True)
     def availability(self, value: CardMaster):
@@ -193,7 +193,7 @@ class CardFilter(MasterFilter[CardMaster]):
             3: 'Lmtd',
             4: 'Cllb',
             5: 'Bday',
-            6: 'Evnt',
+            6: 'Rwrd',
         }[value.availability]
 
     @command_source(command_args=

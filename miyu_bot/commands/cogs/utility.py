@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import textwrap
 
@@ -8,6 +9,7 @@ from tortoise.functions import Count, Sum
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
+from miyu_bot.commands.common.reaction_message import run_paged_message
 
 
 class Utility(commands.Cog):
@@ -166,11 +168,15 @@ class Utility(commands.Cog):
             await CommandUsageCount
                 .all()
                 .annotate(use_count=Sum('counter'))
+                .order_by('name')
                 .group_by('name')
                 .values_list('name', 'use_count')
         )
-        await ctx.send('\n'.join(f'{name}: {count}' for name, count in usage_counts)
-                       + f'\ntotal: {sum(c for _, c in usage_counts)}')
+        embed = discord.Embed(title='Command Usage')
+        asyncio.create_task(run_paged_message(ctx, embed,
+                                              [f'{name}: {count}' for name, count in usage_counts] +
+                                              [f'total: {sum(c for _, c in usage_counts)}'],
+                                              page_size=40))
 
     @commands.command(name='guild_usage',
                       aliases=['guildusage'],
@@ -181,11 +187,15 @@ class Utility(commands.Cog):
             await CommandUsageCount
                 .all()
                 .annotate(use_count=Sum('counter'))
+                .order_by('guild_id')
                 .group_by('guild_id')
                 .values_list('guild_id', 'use_count')
         )
-        await ctx.send('\n'.join(f'{self.bot.get_guild(gid) or "Unknown"}: {count}' for gid, count in usage_counts)
-                       + f'\ntotal: {sum(c for _, c in usage_counts)}')
+        embed = discord.Embed(title='Guild Usage')
+        asyncio.create_task(run_paged_message(ctx, embed,
+                                              [f'{self.bot.get_guild(gid)}: {count}' for gid, count in usage_counts] +
+                                              [f'total: {sum(c for _, c in usage_counts)}'],
+                                              page_size=40))
 
 
 def setup(bot):

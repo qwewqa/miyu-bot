@@ -306,7 +306,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                          help='!song grgr'),
                     list_command_args=
                     dict(name='songs',
-                         aliases=['musics'],
+                         aliases=['musics', 'charts'],
                          description='Lists songs.',
                          help='!songs'),
                     default_sort=date,

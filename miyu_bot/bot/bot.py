@@ -29,6 +29,9 @@ class D4DJBot(commands.Bot):
     asset_path: Path
     asset_url = 'https://qwewqa.github.io/d4dj-dumps/'
 
+    config: dict
+    scripts_path: Optional[Path]
+
     def __init__(self, asset_path, *args, **kwargs):
         self.asset_path = Path(asset_path)
         self.assets = AssetManager(self.asset_path, drop_extra_fields=True)
@@ -37,6 +40,7 @@ class D4DJBot(commands.Bot):
         self.session = aiohttp.ClientSession()
         self.extension_names = set()
         self.thread_pool = ThreadPoolExecutor()
+        self.scripts_path = None
         super().__init__(*args, **kwargs)
 
     def try_reload_assets(self):

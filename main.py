@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import traceback
+from pathlib import Path
 
 import discord
 from discord.ext import commands
@@ -37,6 +38,10 @@ bot = D4DJBot('assets', command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
 
 bot.config = config
+
+scripts_path = Path('scripts.yaml').resolve()
+if scripts_path.exists():
+    bot.scripts_path = scripts_path
 
 bot.load_extension('miyu_bot.commands.cogs.search')
 bot.load_extension('miyu_bot.commands.cogs.card')

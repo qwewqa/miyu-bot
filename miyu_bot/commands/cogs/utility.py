@@ -3,6 +3,7 @@ import logging
 import textwrap
 
 import discord
+import yaml
 from discord.ext import commands
 from tortoise.functions import Count, Sum
 
@@ -18,6 +19,36 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+        bot.loop.create_task(self.run_scripts())
+
+    async def run_scripts(self):
+        if self.bot.scripts_path:
+            with self.bot.scripts_path.open() as f:
+                for k, v in yaml.safe_load(f.read()).items():
+                    env = {
+                        'bot': self.bot,
+                        'assets': self.bot.assets,
+                        'asset_filters': self.bot.master_filters,
+                        'master_filters': self.bot.master_filters,
+                        **globals(),
+                    }
+                    v = 'async def f():\n' + textwrap.indent(v, '  ')
+                    l = locals()
+                    exec(v, env, l)
+                    f = l['f']
+
+                    try:
+                        await f()
+                        self.logger.info(f'Script {k}: Successful')
+                    except Exception as e:
+                        self.logger.warning(f'Script {k}: ```{e.__class__.__name__}: {e}\n```')
+
+    @commands.command(name='run_scripts',
+                      aliases=['runscripts'],
+                      hidden=True)
+    @commands.is_owner()
+    async def run_scripts_cmd(self, ctx: commands.Context):
+        await self.run_scripts()
 
     @commands.command(aliases=['t'], hidden=True)
     async def translate(self, ctx: commands.Context, *, arg: str):

@@ -334,7 +334,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
             'Section Trend': song.section_trend.name,
             'Sort Order': song.default_order,
             'Levels': ', '.join(c.display_level for c in song.charts.values()),
-            'Chart Designers': ', '.join({c.designer.name: None for c in song.charts.values()}.keys()),
+            'Chart Designers': ', '.join({f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
             'Release Date': ctx.convert_tz(song.start_datetime),
             'Hidden': song.is_hidden,
             'Fair Use': song.can_fair_use,
@@ -404,7 +404,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                               f'Unit: {song.special_unit_name or song.unit.name}\n'
                               f'Category: {song.category.name}\n'
                               f'BPM: {song.bpm}\n'
-                              f'Designer: {chart.designer.name}\n'
+                              f'Designer: {chart.designer.name} ({chart.designer.id})\n'
                               f'Skills: {", ".join("{:.2f}s".format(t) if t not in chart_data.info.base_skill_times else "[{:.2f}s]".format(t) for t in chart_data.info.skill_times)}\n'
                               f'Fever: {chart_data.info.fever_start:.2f}s - {chart_data.info.fever_end:.2f}s\n',
                         inline=False)

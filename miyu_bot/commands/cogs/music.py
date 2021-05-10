@@ -4,7 +4,7 @@ import logging
 import re
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Tuple
+from typing import Tuple, Any
 
 import discord
 from d4dj_utils.chart.chart import Chart
@@ -69,6 +69,7 @@ class Music(commands.Cog):
         accuracy = arguments.single(['acc', 'accuracy'], default=100, converter=lambda a: float(a))
         skill = arguments.single(['skill', 'skills'], default=['40'], is_list=True)
         assist = arguments.tag('assist')
+        random_skill_order = arguments.tags(['rng', 'randomorder', 'random_order'])
         if difficulty:
             song_name = arguments.text()
         else:
@@ -127,9 +128,28 @@ class Music(commands.Cog):
 
         if len(skills) == 1:
             skills = skills * 5
+        if len(skills) == 4:
+            skills = skills + [skills[0]]
         if len(skills) != 5:
             await ctx.send('Invalid skill count.')
             return
+
+        if random_skill_order:
+            # Score calc doesn't care that these aren't actually ints
+            mean_score_up: Any = sum(s.score_up_rate for s in skills[:4]) / 4
+            mean_perfect_score_up: Any = sum(s.perfect_score_up_rate for s in skills[:4]) / 4
+            avg_skill = SkillMaster(
+                self.bot.assets,
+                id=0,
+                min_recovery_value=0,
+                max_recovery_value=0,
+                combo_support_count=0,
+                score_up_rate=mean_score_up,
+                min_seconds=5,
+                max_seconds=9,
+                perfect_score_up_rate=mean_perfect_score_up,
+            )
+            skills = [avg_skill] * 4 + [skills[-1]]
 
         embed = discord.Embed(title=title,
                               description=f'Power: {power:,}\n'

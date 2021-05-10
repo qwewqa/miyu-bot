@@ -147,8 +147,11 @@ class Event(commands.Cog):
                       description='Displays the full leaderboard',
                       help='!leaderboard')
     async def leaderboard(self, ctx: commands.Context):
-        embed = await self.get_leaderboard_embed(self.bot.master_filters.events.get_latest_event(ctx))
-        message = await ctx.send(embed=embed)
+        text = self.get_leaderboard_text(self.bot.master_filters.events.get_latest_event(ctx),
+                                          None,
+                                          await self.get_leaderboard_data(),
+                                          None)
+        message = await ctx.send(text)
         asyncio.ensure_future(run_deletable_message(ctx, message))
 
     @commands.command(name='detailed_leaderboard',
@@ -263,13 +266,18 @@ class Event(commands.Cog):
             return [self.LBStatistic(int(k), v['points'] if isinstance(v['points'], int) else 0, v['name']) for k, v in
                     (await resp.json(encoding='utf-8'))['statistics'].items()]
 
-    def get_leaderboard_text(self, event: EventMaster, interval: int, data: List[LBStatistic],
+    def get_leaderboard_text(self, event: EventMaster, interval: Optional[int], data: List[LBStatistic],
                              prev: Optional[List[LBStatistic]]):
         if prev is None:
             prev = []
-        header = f'{event.name} [{interval} min]\n\nRank     Points      Change    Name\n'
+        if interval is not None:
+            header = f'{event.name} [{interval} min]\n\nRank     Points      Change    Name\n'
+        else:
+            header = f'{event.name}\n\nRank     Points        Name\n'
 
         def get_change_text(d, p):
+            if interval is None:
+                return ''
             if p and d.points != p.points:
                 t = f'+{d.points - p.points:,}'
                 return f'{t:>8}'

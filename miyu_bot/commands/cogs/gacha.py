@@ -1,6 +1,7 @@
 import functools
 import itertools
 import logging
+import math
 import random
 from io import BytesIO
 from pathlib import Path
@@ -64,19 +65,14 @@ class Gacha(commands.Cog):
 
     def create_pull_image(self, cards: List[CardMaster], bonus: Optional[CardMaster] = None):
         if bonus:
-            img = Image.new('RGBA', (259 * 6, 259 * 2), (255, 255, 255, 0))
-        else:
-            img = Image.new('RGBA', (259 * 5, 259 * 2), (255, 255, 255, 0))
+            cards = cards + [bonus]
+        width = min(15, max(5, (len(cards) - 1) // 5 + 4))
+        height = math.ceil(len(cards) / width)
+        img = Image.new('RGBA', (259 * width, 259 * height), (255, 255, 255, 0))
 
-        for i in range(5):
-            for j in range(2):
-                card = cards[i + j * 5]
-                icon = self.get_card_icon(card)
-                img.paste(icon, (259 * i, 259 * j), icon)
-
-        if bonus:
-            icon = self.get_card_icon(bonus)
-            img.paste(icon, (259 * 5, 259 * 1), icon)
+        for i, card in enumerate(cards):
+            icon = self.get_card_icon(card)
+            img.paste(icon, (259 * (i % width), 259 * (i // width)), icon)
 
         return img
 
@@ -200,7 +196,12 @@ class Gacha(commands.Cog):
                 img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
                                                           functools.partial(self.create_pull_image, [card] * 10))
         else:
-            img = await self.bot.loop.run_in_executor(self.bot.thread_pool, functools.partial(self.get_card_icon, card))
+            if bonus:
+                img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
+                                                          functools.partial(self.create_pull_image, [card], card))
+            else:
+                img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
+                                                          functools.partial(self.create_pull_image, [card]))
 
         buffer = BytesIO()
         img.save(buffer, 'png')

@@ -101,7 +101,7 @@ class Music(commands.Cog):
             return
         accuracy /= 100
 
-        skill_re = re.compile(r'\d{1,3}%?|\d{1,3}%?\+\d{1,3}%?p|\d{1,3}%?p')
+        skill_re = re.compile(r'\d{1,3}(\.\d+)?%?|\d{1,3}(\.\d+)?%?\+\d{1,3}(\.\d+)?%?p|\d{1,3}(\.\d+)?%?p')
 
         def create_dummy_skill(score, perfect):
             return SkillMaster(
@@ -110,10 +110,10 @@ class Music(commands.Cog):
                 min_recovery_value=0,
                 max_recovery_value=0,
                 combo_support_count=0,
-                score_up_rate=int(score),
+                score_up_rate=float(score),
                 min_seconds=5,
                 max_seconds=9,
-                perfect_score_up_rate=int(perfect),
+                perfect_score_up_rate=float(perfect),
             )
 
         skills = []

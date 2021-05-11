@@ -224,6 +224,14 @@ class Music(commands.Cog):
             a, a_diff, b, b_diff, c, c_diff, d, d_diff = args
             names = [a, b, c, d]
             diff_names = [a_diff, b_diff, c_diff, d_diff]
+        elif len(args) == 5:
+            if re.match(r'[1-4]{4}', args[-1]):
+                diff_mapping = {1: 'easy', 2: 'normal', 3: 'hard', 4: 'expert'}
+                names = args[:-1]
+                diff_names = [diff_mapping[int(c)] for c in args[-1]]
+            else:
+                await ctx.send('Invalid difficulty format')
+                return
         elif len(args) == 4:
             names = args
             diff_names = ['ex'] * 4

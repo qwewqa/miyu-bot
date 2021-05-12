@@ -35,7 +35,8 @@ async def get_prefix(bot: D4DJBot, message: discord.Message):
 
 
 bot = D4DJBot('assets', command_prefix=get_prefix, case_insensitive=True,
-              activity=discord.Game(name='https://discord.gg/TThMwrAZTR'))
+              activity=discord.Game(name='https://discord.gg/TThMwrAZTR'),
+              owner_ids={169163991434788865})
 
 bot.config = config
 

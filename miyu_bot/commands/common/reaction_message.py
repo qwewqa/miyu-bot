@@ -2,10 +2,10 @@ import asyncio
 from typing import List, Callable, Awaitable, Union
 
 import discord
-from discord import Message, Embed, Emoji
+from discord import Message, Embed, Emoji, PartialEmoji, RawReactionActionEvent
 from discord.ext.commands import Context
 
-AnyEmoji = Union[str, Emoji]
+AnyEmoji = Union[str, Emoji, PartialEmoji]
 
 
 async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[Embed], files=None, starting_index=0,
@@ -129,17 +129,30 @@ async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyE
     for emoji in emojis:
         await message.add_reaction(emoji)
 
-    def check(rxn, usr):
-        return usr == ctx.author and rxn.emoji in emojis and rxn.message.id == message.id
+    def check(ev: RawReactionActionEvent):
+        return ev.message_id == message.id and ev.user_id in {ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids}
 
     while True:
         try:
-            reaction, user = await ctx.bot.wait_for('reaction_add', timeout=timeout, check=check)
-            if reaction.emoji == '❎':
+            tasks = [
+                asyncio.create_task(ctx.bot.wait_for('raw_reaction_add', check=check)),
+                asyncio.create_task(ctx.bot.wait_for('raw_reaction_remove', check=check))
+            ]
+            done, pending = await asyncio.wait(tasks, timeout=timeout, return_when=asyncio.FIRST_COMPLETED)
+            for task in pending:
+                task.cancel()
+            emoji = done.pop().result().emoji
+
+            if emoji.id:
+                emoji = ctx.bot.get_emoji(emoji.id) or emoji
+            elif emoji.name:
+                emoji = emoji.name
+
+            if emoji == '❎':
                 await message.delete()
-                return
-            await callback(reaction.emoji)
-            await message.remove_reaction(reaction, user)
+                break
+
+            await callback(emoji)
         except asyncio.TimeoutError:
             for emoji in emojis:
                 await message.remove_reaction(emoji, ctx.bot.user)

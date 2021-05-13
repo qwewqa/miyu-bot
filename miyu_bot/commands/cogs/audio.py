@@ -70,6 +70,19 @@ class Audio(commands.Cog):
         if ctx.invoked_subcommand is None:
             await ctx.send('Invalid play subcommand.')
 
+    @play.command(name='volume',
+                  description='Adjusts or displays volume.',
+                  help='!volume 100')
+    async def volume(self, ctx: commands.Context, *, value: Optional[int]):
+        if value is None:
+            await ctx.send(f'{self.queues[ctx.guild.id].volume * 100:.0f}%')
+        else:
+            if 0 <= value <= 100:
+                self.queues[ctx.guild.id].volume = value / 100
+                await ctx.send('Volume changed.')
+            else:
+                await ctx.send('Volume should be between 0 and 100, inclusive.')
+
     @play.command(name='file',
                   hidden=True)
     @commands.is_owner()

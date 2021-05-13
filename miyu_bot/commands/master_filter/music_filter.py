@@ -73,7 +73,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     aliases=['chartdesigner', 'designer'],
                     is_sortable=True,
                     is_eq=True,
-                    is_multi_category=True)  # Some music have charts with multiple designers
+                    is_plural=True)  # Some music have charts with multiple designers
     def chart_designer(self, value: MusicMaster):
         return {c.designer.id for c in value.charts.values()}
 

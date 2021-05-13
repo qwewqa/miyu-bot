@@ -64,7 +64,7 @@ class EventFilter(MasterFilter[EventMaster]):
                     aliases=['char', 'chara'],
                     is_tag=True,
                     is_eq=True,
-                    is_multi_category=True)
+                    is_plural=True)
     def character(self, value: EventMaster):
         return {*value.bonus.character_ids}
 

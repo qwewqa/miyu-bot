@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from miyu_bot.commands.master_filter.music_filter import MusicFilter
     from miyu_bot.commands.master_filter.stamp_filter import StampFilter
 
+# The list of modules to import/reload.
+# Format is {'module_name': [('class_name', 'name_in_asset_manager', 'attribute_name_for_filter_manager')]}
 _MODULES = {
     'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'card_master', 'cards')],
     'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'gacha_master', 'gacha')],

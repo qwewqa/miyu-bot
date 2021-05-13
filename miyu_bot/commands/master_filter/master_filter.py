@@ -1,3 +1,7 @@
+"""
+Master filter class and related functions.
+"""
+
 from __future__ import annotations
 
 import asyncio
@@ -7,7 +11,7 @@ import re
 from abc import abstractmethod, ABCMeta
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List
+from typing import Any, Optional, Union, Callable, List, Sequence
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -15,7 +19,7 @@ from d4dj_utils.master.master_asset import MasterAsset
 from discord.ext import commands
 
 import miyu_bot.bot.bot
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import D4DJBot, PrefContext
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message
@@ -161,7 +165,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 text += '[Tag]'
             if attr.is_keyword:
                 text += '[Keyword]'
-            if attr.is_multi_category:
+            if attr.is_plural:
                 text += '[Plural]'
             text += '\n'
             if attr.value_mapping or attr.is_flag:
@@ -285,14 +289,14 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, tags in tag_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_multi_category:
+                    if attr.is_plural:
                         values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_multi_category:
+                    if attr.is_plural:
                         values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
@@ -307,7 +311,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
                 for argument in arguments:
                     argument_value, operation = argument
-                    if attr.is_multi_category:
+                    if attr.is_plural:
                         operator = list_to_list_operator_for(operation)
                     else:
                         operator = list_operator_for(operation)
@@ -437,14 +441,14 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, tags in tag_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_multi_category:
+                    if attr.is_plural:
                         values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
             for attr, tags in keyword_arguments.items():
                 if tags:
                     targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_multi_category:
+                    if attr.is_plural:
                         values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
                     else:
                         values = [v for v in values if attr.accessor(self, ctx, v) in targets]
@@ -459,7 +463,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
                 for argument in arguments:
                     argument_value, operation = argument
-                    if attr.is_multi_category:
+                    if attr.is_plural:
                         operator = list_to_list_operator_for(operation)
                     else:
                         operator = list_operator_for(operation)
@@ -498,7 +502,12 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 return functools.partial(f, self, ctx)
 
 
-def _get_accessor(f):
+DataAttributeAccessor = Callable[[MasterFilter, PrefContext, Any], Any]
+ContextlessDataAttributeAccessor = Callable[[MasterFilter, Any], Any]
+AnyDataAccessor = Union[DataAttributeAccessor, ContextlessDataAttributeAccessor]
+
+
+def _get_accessor(f: Union[AnyDataAccessor]) -> DataAttributeAccessor:
     if len(getfullargspec(f).args) == 2:
         def accessor(self, ctx, value):
             return f(self, value)
@@ -508,32 +517,69 @@ def _get_accessor(f):
         return f
 
 
+EmbedSourceCallable = Union[
+    Callable[[MasterFilter, PrefContext, Any], discord.Embed], Callable[
+        [MasterFilter, PrefContext, Any, int], discord.Embed]]
+ListFormatterCallable = AnyDataAccessor
+AnyEmoji = Union[int, str, discord.Emoji]
+
+
 @dataclass
 class CommandSourceInfo:
-    embed_source: Callable
-    command_args: Optional[Dict] = None
-    list_command_args: Optional[Dict] = None
+    embed_source: EmbedSourceCallable
+    command_args: Optional[Dict[str, Any]] = None
+    list_command_args: Optional[Dict[str, Any]] = None
     default_sort: Optional[DataAttributeInfo] = None
     default_display: Optional[DataAttributeInfo] = None
-    tabs: Optional[List] = None
+    tabs: Optional[Sequence[AnyEmoji]] = None
     default_tab: int = 0
     suffix_tab_aliases: Optional[Dict[str, int]] = None
     list_name: Optional[str] = None
-    list_formatter: Optional[Callable] = None
+    list_formatter: Optional[ListFormatterCallable] = None
 
 
 def command_source(
         *,
-        command_args: Optional[Dict] = None,
-        list_command_args: Optional[Dict] = None,
+        command_args: Optional[Dict[str, Any]] = None,
+        list_command_args: Optional[Dict[str, Any]] = None,
         default_sort: Optional[Union[DataAttributeInfo, Callable]] = None,
         default_display: Optional[Union[DataAttributeInfo, Callable]] = None,
-        tabs: Optional[List] = None,
+        tabs: Optional[Sequence[AnyEmoji]] = None,
         default_tab: int = 0,
         suffix_tab_aliases: Optional[Dict[str, int]] = None,
         list_name: Optional[str] = None,
-):
-    def decorator(func):
+) -> Callable[[EmbedSourceCallable], EmbedSourceCallable]:
+    """A decorator that marks a function as an command source.
+
+    The function should have, apart from the self parameter, either two more parameters
+    if ``tabs`` is not specified, one for the context and one for the master asset,
+    or three more with an additional parameter for the tab index.
+
+    Parameters
+    ----------
+    command_args
+        A dict containing the arguments to supply to the Command constructor for the primary command.
+        If this is not supplied, no primary command will be created.
+    list_command_args
+        A dict containing the arguments to supply to the Command constructor for the list command.
+        If this is not supplied, no list command will be created.
+    default_sort
+        The default ``data_attribute`` to sort by, which should be sortable.
+        If not supplied, default order is preserved.
+    default_display
+        The default ``data_attribute`` to display in lists, if any, which should have a formatter.
+        If not supplied, defaults to no display.
+    tabs
+        A list of emoji and emoji ids to use for tab buttons.
+    default_tab
+        The default tab index if ``tabs`` is specified. Defaults to 0.
+    suffix_tab_aliases
+        A dict mapping potential final search term words with tab indexes.
+    list_name
+        The name to use in the header of the list command.
+    """
+
+    def decorator(func: EmbedSourceCallable) -> EmbedSourceCallable:
         info = CommandSourceInfo(
             command_args=command_args,
             list_command_args=list_command_args,
@@ -570,7 +616,7 @@ class DataAttributeInfo:
     flag_callback: Optional[Callable] = None
     is_tag: bool = False
     is_keyword: bool = False
-    is_multi_category: bool = False
+    is_plural: bool = False
     is_sortable: bool = False
     reverse_sort: bool = False
     is_comparable: bool = False
@@ -592,13 +638,57 @@ def data_attribute(
         is_flag: bool = False,
         is_tag: bool = False,
         is_keyword: bool = False,
-        is_multi_category: bool = False,
+        is_plural: bool = False,
         is_sortable: bool = False,
         reverse_sort: bool = False,
         is_comparable: bool = False,
         is_eq: bool = False,
         help_sample_argument: Optional[str] = None,
 ):
+    """Marks a function as a data attribute.
+
+    The function should have, apart from the self parameter, either one more parameter
+    for the master asset, or two more with one for the context and one for the master asset,
+    respectively.
+
+    Parameters
+    ----------
+    name
+        The name of this attribute.
+    aliases
+        A list of aliases for the attribute.
+    description
+        A description of the attribute for use in help.
+    value_mapping
+        A dict mapping strings to potential return values.
+        Used for keywords, tags, and as eq.
+    is_flag
+        Marks the attribute as a flag.
+        If a flag_callback is declared, it is called instead of using default behavior.
+        Otherwise, filters based on truthiness of the return value.
+    is_tag
+        Marks the attribute as a tag.
+        Uses the ``value_mapping`` to get tag values.
+        If plural, filters for values that include all tags.
+        Otherwise, filters for values that match any of the given tags.
+    is_keyword
+        Marks the attribute as a keyword.
+        Functions identically to ``is_tag``.
+    is_plural
+        Marks the attribute as returning a collection of values rather than a single value.
+    is_sortable
+        Marks the attribute as returning an ordered value. Allows it to be used a sort argument.
+    reverse_sort
+        Whether to reverse sort by default.
+    is_comparable
+        Marks the attribute as comparable, and allows use as a named argument
+        with comparison and equality operators. Usually combined with ``is_sortable``.
+    is_eq
+        Marks the attribute as support equality, and allows use as a named argument
+        with equality operators. Should not be used with ``is_comparable``.
+    help_sample_argument
+        An example argument value to use in command help.
+    """
     def decorator(func):
         info = DataAttributeInfo(
             name=name,
@@ -609,7 +699,7 @@ def data_attribute(
             is_flag=is_flag,
             is_tag=is_tag,
             is_keyword=is_keyword,
-            is_multi_category=is_multi_category,
+            is_plural=is_plural,
             is_sortable=is_sortable,
             reverse_sort=reverse_sort,
             is_comparable=is_comparable,

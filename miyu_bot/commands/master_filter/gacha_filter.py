@@ -53,7 +53,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                     aliases=['char', 'chara'],
                     is_tag=True,
                     is_eq=True,
-                    is_multi_category=True)
+                    is_plural=True)
     def character(self, value: GachaMaster):
         return {c.character_id for c in value.pick_up_cards}
 

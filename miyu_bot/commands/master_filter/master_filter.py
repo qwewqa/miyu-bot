@@ -23,6 +23,7 @@ from miyu_bot.bot.bot import D4DJBot, PrefContext
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class MasterFilterMeta(ABCMeta):
@@ -47,21 +48,21 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     _data_attributes: List[DataAttributeInfo]
     command_sources: List[CommandSourceInfo]
     data_attributes: List[DataAttributeInfo]
+    l10n: LocalizationManager
 
-    def __init__(self, bot: D4DJBot, data: Dict[Any, TData], aliases: Dict[str, Any] = {}):
+    def __init__(self, bot: D4DJBot, data: Dict[Any, TData], name: str):
+        self.name = name
         self.bot = bot
         self.data = data
         self.default_filter = FuzzyFilteredMap(self.is_released)
         self.unrestricted_filter = FuzzyFilteredMap()
         for master in data.values():
-            name = self.get_name(master)
-            self.default_filter[name] = master
-            self.unrestricted_filter[name] = master
-        if aliases:
-            for alias, mid in aliases.items():
-                self.add_alias(alias, mid)
+            master_name = self.get_name(master)
+            self.default_filter[master_name] = master
+            self.unrestricted_filter[master_name] = master
         self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
         self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
+        self.l10n = LocalizationManager(self.bot.fluent_loader, name + '.ftl')
 
         for d in self.data_attributes:
             if init_function := d.init_function:
@@ -190,7 +191,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
     def get_commands(self, include_self_parameter: bool = False):
         def wrap(f):
-            async def wrapped(self, ctx, *, arg: Optional[ParsedArguments]):
+            # Note how a default argument used, so that the error propagates properly
+            async def wrapped(self, ctx, *, arg: ParsedArguments = None):
                 return await f(ctx, arg=arg)
 
             return wrapped

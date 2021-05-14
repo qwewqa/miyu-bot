@@ -22,7 +22,7 @@ class Audio(commands.Cog):
         self.logger = logging.getLogger(__name__)
 
         self.live_interaction_paths = [interaction_dir for interaction_dir in
-                                       (self.bot.asset_path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
+                                       (self.bot.assets.path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
                                        interaction_dir.is_dir() and not interaction_dir.name.startswith('live_general')]
         live_interaction_path_characters = defaultdict(lambda: set())
         live_audio_re = re.compile(r'.*([1-6][1-4])\.hca\.wav')

@@ -9,6 +9,7 @@ import pytz
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
 from discord.ext.commands import Context
+from fluent.runtime import FluentResourceLoader
 from pytz import BaseTzInfo
 from pytz.tzinfo import StaticTzInfo, DstTzInfo
 from tortoise import Tortoise
@@ -35,6 +36,7 @@ class D4DJBot(commands.Bot):
     def __init__(self, asset_path, *args, **kwargs):
         self.asset_path = Path(asset_path)
         self.assets = AssetManager(self.asset_path, drop_extra_fields=True)
+        self.fluent_loader = FluentResourceLoader("l10n/{locale}")
         self.aliases = CommonAliases(self.assets)
         self.master_filters = MasterFilterManager(self, self.assets)
         self.session = aiohttp.ClientSession()

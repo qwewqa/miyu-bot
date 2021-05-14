@@ -7,6 +7,8 @@ from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, I
 # https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
 # https://stackoverflow.com/questions/21105360/regex-find-comma-not-inside-quotes
 # The ` ?` is just so it matches the space after during the replace with blank so there's no double spaces
+from discord.ext.commands import CommandError, BadArgument
+
 from miyu_bot.bot.models import all_preferences
 from miyu_bot.commands.cogs.preferences import get_preferences
 
@@ -51,7 +53,7 @@ def parse_arguments(arg):
     return ParsedArguments(original, arg.strip(), set(tags), named_arguments)
 
 
-class ArgumentError(Exception):
+class ArgumentError(BadArgument):
     pass
 
 
@@ -222,7 +224,7 @@ class ParsedArguments:
         preference_values = await get_preferences(ctx, self.tag('p'))
         for name in preference_values.keys():
             preference = all_preferences[name]
-            override, _op = self.single_op(name)
+            override = self.single(name)
             if override:
                 if preference.is_privileged and not await ctx.bot.is_owner(ctx.author):
                     raise ArgumentError(f'Privileged preference.')

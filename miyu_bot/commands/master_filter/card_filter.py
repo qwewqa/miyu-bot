@@ -211,6 +211,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     suffix_tab_aliases={'untrained': 0, 'trained': 1},
                     list_name='Card Search')
     def get_card_embed(self, ctx, card: CardMaster, limit_break):
+        l10n = self.l10n[ctx.preferences.language]
+
         if card.rarity_id <= 2:
             limit_break = 0
 
@@ -225,16 +227,16 @@ class CardFilter(MasterFilter[CardMaster]):
         embed.set_thumbnail(url=thumb_url)
         embed.set_image(url=art_url)
 
-        embed.add_field(name='Info',
-                        value=format_info({
-                            'Rarity': f'{card.rarity_id}★',
-                            'Character': f'{card.character.full_name_english}',
-                            'Attribute': f'{ctx.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
-                            'Unit': f'{ctx.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
-                            'Release Date': f'{ctx.convert_tz(card.start_datetime)}',
-                            'Event': f'{card.event.name if card.event else "None"}',
-                            'Gacha': f'{card.gacha.name if card.gacha else "None"}',
-                            'Availability': f'{card.availability.name}',
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('info-desc', {
+                            'rarity': f'{card.rarity_id}★',
+                            'character': f'{card.character.full_name_english}',
+                            'attribute': f'{ctx.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
+                            'unit': f'{ctx.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
+                            'release_date': ctx.convert_tz(card.start_datetime),
+                            'event': f'{card.event.name if card.event else "None"}',
+                            'gacha': f'{card.gacha.name if card.gacha else "None"}',
+                            'availability': card.availability.name,
                         }),
                         inline=False)
         embed.add_field(name='Parameters',

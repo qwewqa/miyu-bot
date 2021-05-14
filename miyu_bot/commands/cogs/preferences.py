@@ -24,24 +24,22 @@ class Preferences(commands.Cog):
             await ctx.send(f'Invalid scope.')
             return
         if name not in scope.preferences:
-            await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
+            await ctx.send(f'Invalid preference.')
             return
         preference = scope.preferences[name]
         if not (await ctx.bot.is_owner(ctx.author) or (scope.has_permissions(ctx) and not preference.is_privileged)):
             await ctx.send(f'Insufficient permissions.')
             return
         if error_message := preference.validate_or_get_error_message(value):
-            await ctx.send(f'Invalid value "{value}" for preference "{name}": {error_message}')
+            await ctx.send(f'Invalid value: {error_message}')
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
+            await ctx.send(f'Scope not available in current channel.')
             return
-        original = entry.get_preference_no_convert(name)
         entry.set_preference(name, value)
         await entry.save()
-        await ctx.send(f'Successfully changed preference "{name}" '
-                       f'for scope "{scope.scope_name}" from "{original}" to "{value}".')
+        await ctx.send(f'Preference updated.')
 
     @commands.command(name='getpref',
                       description='',
@@ -49,15 +47,15 @@ class Preferences(commands.Cog):
     async def getpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope}".')
+            await ctx.send(f'Invalid scope.')
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
+            await ctx.send(f'Scope not available in current channel.')
             return
         if name:
             if name not in scope.preferences:
-                await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
+                await ctx.send(f'Invalid preference.')
                 return
             await ctx.send(str(getattr(entry, scope.preferences[name].attribute_name) or None))
         else:
@@ -71,10 +69,10 @@ class Preferences(commands.Cog):
     async def clearpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope "{scope}".')
+            await ctx.send(f'Invalid scope.')
             return
         if name not in scope.preferences:
-            await ctx.send(f'Invalid preference "{name}" for scope "{scope.scope_name}".')
+            await ctx.send(f'Invalid preference.')
             return
         preference = scope.preferences[name]
         if not (await ctx.bot.is_owner(ctx.author) or (scope.has_permissions(ctx) and not preference.is_privileged)):
@@ -82,11 +80,11 @@ class Preferences(commands.Cog):
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope "{scope.scope_name}" not available in current channel.')
+            await ctx.send(f'Scope not available in current channel.')
             return
         entry.clear_preference(name)
         await entry.save()
-        await ctx.send(f'Successfully cleared preference "{name}" for scope "{scope.scope_name}".')
+        await ctx.send(f'Successfully cleared preference.')
 
 
 preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {

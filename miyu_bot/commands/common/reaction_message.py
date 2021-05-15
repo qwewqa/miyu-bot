@@ -141,6 +141,10 @@ async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyE
             done, pending = await asyncio.wait(tasks, timeout=timeout, return_when=asyncio.FIRST_COMPLETED)
             for task in pending:
                 task.cancel()
+                
+            if len(done) == 0:
+                raise asyncio.TimeoutError()
+                
             emoji = done.pop().result().emoji
 
             if emoji.id:

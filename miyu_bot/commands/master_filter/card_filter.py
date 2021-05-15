@@ -233,27 +233,30 @@ class CardFilter(MasterFilter[CardMaster]):
                             'character': f'{card.character.full_name_english}',
                             'attribute': f'{ctx.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
                             'unit': f'{ctx.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
-                            'release_date': ctx.convert_tz(card.start_datetime),
+                            'release-date': ctx.convert_tz(card.start_datetime),
                             'event': f'{card.event.name if card.event else "None"}',
                             'gacha': f'{card.gacha.name if card.gacha else "None"}',
                             'availability': card.availability.name,
                         }),
                         inline=False)
-        embed.add_field(name='Parameters',
-                        value=format_info({
-                            f'Total': f'{"{:,}".format(card.max_power_with_limit_break)}',
-                            f'{ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[1])} Heart': f'{"{:,}".format(card.max_parameters_with_limit_break[0])}',
-                            f'{ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[2])} Technique': f'{"{:,}".format(card.max_parameters_with_limit_break[1])}',
-                            f'{ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[3])} Physical': f'{"{:,}".format(card.max_parameters_with_limit_break[2])}',
+        embed.add_field(name=l10n.format_value('parameters'),
+                        value=l10n.format_value('parameters-desc', {
+                            'total': card.max_power_with_limit_break,
+                            'heart': card.max_parameters_with_limit_break[0],
+                            'technique': card.max_parameters_with_limit_break[1],
+                            'physical': card.max_parameters_with_limit_break[2],
+                            'heart-emoji': str(ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[1])),
+                            'technique-emoji': str(ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[2])),
+                            'physical-emoji': str(ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[3])),
                         }),
                         inline=True)
         skill: SkillMaster = card.skill
-        embed.add_field(name='Skill',
-                        value=format_info({
-                            'Name': card.skill_name,
-                            'Duration': f'{skill.min_seconds}-{skill.max_seconds}s',
-                            'Score Up': f'{skill.score_up_rate}%' if not skill.perfect_score_up_rate else f'{skill.score_up_rate}% + {skill.perfect_score_up_rate}% perfect',
-                            'Heal': (f'{skill.min_recovery_value}-{skill.max_recovery_value}'
+        embed.add_field(name=l10n.format_value('skill'),
+                        value=l10n.format_value('skill-desc', {
+                            'name': card.skill_name,
+                            'duration': f'{skill.min_seconds}-{skill.max_seconds}s',
+                            'score-up': f'{skill.score_up_rate}%' if not skill.perfect_score_up_rate else f'{skill.score_up_rate}% + {skill.perfect_score_up_rate}% perfect',
+                            'heal': (f'{skill.min_recovery_value}-{skill.max_recovery_value}'
                                      if skill.min_recovery_value != skill.max_recovery_value
                                      else str(skill.min_recovery_value))
                         }),

@@ -98,7 +98,7 @@ class Utility(commands.Cog):
         await ctx.send('Shutting down.')
         await self.bot.logout()
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['rld'])
     @commands.is_owner()
     async def reload_extension(self, ctx: commands.Context, *, name: str = ''):
         try:

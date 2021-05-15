@@ -50,36 +50,26 @@ class Utility(commands.Cog):
     async def run_scripts_cmd(self, ctx: commands.Context):
         await self.run_scripts()
 
-    @commands.command(aliases=['t'], hidden=True)
-    async def translate(self, ctx: commands.Context, *, arg: str):
+    async def get_translation(self, text, language):
         async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
                                         params={'auth_key': self.bot.config['deepl'],
-                                                'text': arg,
-                                                'target_lang': 'EN'}) as resp:
-            embed = discord.Embed(title='Translate', description=(await resp.json())['translations'][0]['text'])
+                                                'text': text,
+                                                'target_lang': language}) as resp:
+            return (await resp.json())['translations'][0]['text']
+
+    @commands.command(aliases=['t'], hidden=True)
+    async def translate(self, ctx: commands.Context, *, arg: str):
+        embed = discord.Embed(title='Translate', description=await self.get_translation(arg, 'EN'))
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['tjp'], hidden=True)
     async def translate_jp(self, ctx: commands.Context, *, arg: str):
-        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
-                                        params={'auth_key': self.bot.config['deepl'],
-                                                'text': arg,
-                                                'target_lang': 'JA'}) as resp:
-            embed = discord.Embed(title='Translate JP', description=(await resp.json())['translations'][0]['text'])
+        embed = discord.Embed(title='Translate', description=await self.get_translation(arg, 'JA'))
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['tt'], hidden=True)
-    async def transtranslate(self, ctx: commands.Context, *, arg: str):
-        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
-                                        params={'auth_key': self.bot.config['deepl'],
-                                                'text': arg,
-                                                'target_lang': 'JA'}) as resp:
-            arg = (await resp.json())['translations'][0]['text']
-        async with self.bot.session.get('https://api-free.deepl.com/v2/translate',
-                                        params={'auth_key': self.bot.config['deepl'],
-                                                'text': arg,
-                                                'target_lang': 'EN'}) as resp:
-            embed = discord.Embed(title='Transtranslate', description=(await resp.json())['translations'][0]['text'])
+    @commands.command(aliases=['tzh'], hidden=True)
+    async def translate_zh(self, ctx: commands.Context, *, arg: str):
+        embed = discord.Embed(title='Translate', description=await self.get_translation(arg, 'ZH'))
         await ctx.send(embed=embed)
 
     @commands.command(hidden=True)

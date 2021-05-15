@@ -7,14 +7,17 @@ info-desc =
     Release Date: { $release-date }
     Event: { $event }
     Gacha: { $gacha }
+    { availability }
+
+availability =
     Availability: { $availability ->
-        [Permanent] Permanant
-        [Limited] Limited
-        [Collab] Collab
-        [Birthday] Birthday
-        [Welfare] Reward
-        *[other] Unknown
-    }
+            [Permanent] Permanant
+            [Limited] Limited
+            [Collab] Collab
+            [Birthday] Birthday
+            [Welfare] Reward
+            *[other] Unknown
+        }
 
 parameters = Parameters
 parameters-desc =

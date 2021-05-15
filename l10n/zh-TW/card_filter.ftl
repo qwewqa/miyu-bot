@@ -8,6 +8,9 @@ info-desc =
     上架日期: { $release-date }
     活動: { $event }
     抽池: { $gacha }
+    { availability }
+
+availability =
     取得方法: { $availability ->
         [Permanent] 恆常
         [Limited] 限定

@@ -8,16 +8,16 @@ info-desc =
     上架日期: { $release-date }
     活動: { $event }
     抽池: { $gacha }
-    取得方法: { availability }
+    取得方法: { availability-name }
 
-availability =
+availability-name =
     { $availability ->
         [Permanent] 恆常
         [Limited] 限定
         [Collab] 合作限定
         [Birthday] 生日限定
         [Welfare] 活動報酬
-        *[other] Unknown
+       *[other] Unknown
     }
 
 parameters = 卡片能力

@@ -20,8 +20,8 @@ class LocalizationManager:
             return self._values[item]
         else:
             if item == 'en-US':
-                localization = FluentLocalization(['en-US'], [self.name], self.loader)
+                localization = FluentLocalization(['en-US'], [self.name, 'common.ftl'], self.loader)
             else:
-                localization = FluentLocalization([item, 'en-US'], [self.name], self.loader)
+                localization = FluentLocalization([item, 'en-US'], [self.name, 'common.ftl'], self.loader)
             self._values[item] = localization
             return localization

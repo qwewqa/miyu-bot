@@ -7,6 +7,7 @@ from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from d4dj_utils.master.gacha_table_master import GachaTableMaster
 from d4dj_utils.master.gacha_table_rate_master import GachaTableRateMaster
+from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -115,6 +116,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
                     default_display=date,
                     list_name='Banner Search')
     def get_gacha_embed(self, ctx, gacha: GachaMaster):
+        l10n = self.l10n[ctx.preferences.language]
+
         embed = discord.Embed(title=gacha.name)
 
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
@@ -126,27 +129,31 @@ class GachaFilter(MasterFilter[GachaMaster]):
         if len(featured_text) > 1024:
             featured_text = '\n'.join(self.format_card_name_short(card) for card in gacha.pick_up_cards) or 'None'
         if len(featured_text) > 1024:
-            featured_text = 'Too Many Entries'
+            featured_text = l10n.format_value('too-many-results')
 
-        embed.add_field(name='Info',
-                        value=format_info({
-                            'Start Date': f'{ctx.convert_tz(gacha.start_datetime)}',
-                            'End Date': f'{ctx.convert_tz(gacha.end_datetime)}',
-                            'Event': f'{gacha.event.name if gacha.event else "None"}',
-                            'Pity Requirement': gacha.bonus_max_value or 'None',
-                            'Type': gacha.gacha_type.name,
+        def fmt_date(date):
+            return fluent_date(date, dateStyle='medium', timeStyle='medium')
+
+
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('info-desc', {
+                            'start-date': fmt_date(ctx.convert_tz(gacha.start_datetime)),
+                            'end-date': fmt_date(ctx.convert_tz(gacha.end_datetime)),
+                            'event-name': gacha.event.name if gacha.event else 'None',
+                            'pity-requirement': gacha.bonus_max_value or 'None',
+                            'gacha-type': gacha.gacha_type.name,
                         }),
                         inline=False)
-        embed.add_field(name='Summary',
+        embed.add_field(name=l10n.format_value('summary'),
                         value=gacha.summary,
                         inline=False)
-        embed.add_field(name='Featured',
-                        value=featured_text or 'None',
+        embed.add_field(name=l10n.format_value('featured'),
+                        value=l10n.format_value('featured-text', {'featured-text': featured_text or 'None'}),
                         inline=False)
-        embed.add_field(name='Costs',
-                        value='\n'.join(self.format_draw_data(draw) for draw in gacha.draw_data))
+        embed.add_field(name=l10n.format_value('costs'),
+                        value='\n'.join(self.format_draw_data(draw, l10n) for draw in gacha.draw_data))
 
-        embed.set_footer(text=f'Gacha Id: {gacha.id:>05}')
+        embed.set_footer(text=l10n.format_value('gacha-id', {'gacha-id': f'{gacha.id:>05}'}))
 
         return embed
 
@@ -175,6 +182,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
                          help='!banner_rates Shiny Smily Scratch'),
                     default_sort=date)
     def get_gacha_table_embed(self, ctx, gacha: GachaMaster):
+        l10n = self.l10n[ctx.preferences.language]
+
         embed = discord.Embed(title=gacha.name)
 
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
@@ -204,7 +213,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
             if len(body) == 0:
                 embed.add_field(name=table_rate.tab_name,
-                                value='`Too many or no entries`',
+                                value=f'`{l10n.format_value("none-or-too-many")}`',
                                 inline=False)
             elif len(body) <= 1000:
                 embed.add_field(name=table_rate.tab_name,
@@ -216,7 +225,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                                 inline=False)
             else:
                 embed.add_field(name=table_rate.tab_name,
-                                value='`Too many entries`',
+                                value=f'`{l10n.format_value("too-many")}`',
                                 inline=False)
 
         for table_rate in gacha.table_rates:
@@ -226,25 +235,35 @@ class GachaFilter(MasterFilter[GachaMaster]):
             add_table_field(gacha.bonus_table_rate, gacha.bonus_tables)
 
         if not embed.fields:
-            embed.description = "None or too many rate up cards."
+            embed.description = l10n.format_value("none-or-too-many")
 
         return embed
 
     stock_names = {
-        1: 'Diamond',
-        2: 'Paid Diamond',
-        901: 'Single Ticket',
-        902: 'Ten Pull Ticket',
-        903: '4★ Ticket'
+        1: 'diamond',
+        2: 'paid-diamond',
+        901: 'single-ticket',
+        902: 'ten-pull-ticket',
+        903: 'four-star-ticket'
     }
 
-    def format_draw_data(self, draw: GachaDrawMaster):
+    def format_draw_data(self, draw: GachaDrawMaster, l10n):
         name = self.stock_names.get(draw.stock_id, draw.stock.name)
         pull_count = sum(draw.draw_amounts)
         if draw.draw_limit:
-            return f'{pull_count} Pull: {draw.stock_amount}x {name}, Limit: {draw.draw_limit}, Refresh: {draw.is_reset_limit_every_day}'
+            return l10n.format_value('limit-draw-cost-desc', {
+                'pull-count': pull_count,
+                'draw-cost': draw.stock_amount,
+                'draw-item-name': name,
+                'draw-limit': draw.draw_limit,
+                'refresh': draw.is_reset_limit_every_day
+            })
         else:
-            return f'{pull_count} Pull: {draw.stock_amount}x {name}'
+            return l10n.format_value('draw-cost-desc', {
+                'pull-count': pull_count,
+                'draw-cost': draw.stock_amount,
+                'draw-item-name': name,
+            })
 
     def format_card_name_for_list(self, card):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])

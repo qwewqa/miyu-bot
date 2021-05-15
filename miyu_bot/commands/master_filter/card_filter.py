@@ -7,12 +7,12 @@ from PIL import ImageColor
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
 from d4dj_utils.master.skill_master import SkillMaster
+from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, rarity_emoji_ids
-from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source, \
     DataAttributeInfo
 
@@ -106,7 +106,6 @@ class CardFilter(MasterFilter[CardMaster]):
         if y < 100:
             y += ctx.localize(datetime.now()).year // 100 * 100
         return ctx.localize(datetime(year=y, month=m, day=d)).date()
-
 
     @data_attribute('rarity',
                     aliases=['stars'],
@@ -233,7 +232,8 @@ class CardFilter(MasterFilter[CardMaster]):
                             'character': f'{card.character.full_name_english}',
                             'attribute': f'{ctx.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
                             'unit': f'{ctx.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
-                            'release-date': ctx.convert_tz(card.start_datetime),
+                            'release-date': fluent_date(ctx.convert_tz(card.start_datetime),
+                                                        dateStyle='medium', timeStyle='medium'),
                             'event': f'{card.event.name if card.event else "None"}',
                             'gacha': f'{card.gacha.name if card.gacha else "None"}',
                             'availability': card.availability.name,
@@ -261,7 +261,7 @@ class CardFilter(MasterFilter[CardMaster]):
                                      else str(skill.min_recovery_value))
                         }),
                         inline=True)
-        embed.set_footer(text=f'Card Id: {card.id:0>8}')
+        embed.set_footer(text=l10n.format_value('card-id', {'card-id': f'{card.id:0>8}'}))
 
         return embed
 

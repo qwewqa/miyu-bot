@@ -5,6 +5,7 @@ from typing import Optional
 import discord
 from d4dj_utils.master.common_enums import EventType
 from d4dj_utils.master.event_master import EventMaster, EventState
+from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -122,6 +123,8 @@ class EventFilter(MasterFilter[EventMaster]):
                     default_display=date,
                     list_name='Event Search')
     def get_event_embed(self, ctx, event: EventMaster):
+        l10n = self.l10n[ctx.preferences.language]
+
         timezone = ctx.preferences.timezone
 
         embed = discord.Embed(title=event.name)
@@ -133,47 +136,51 @@ class EventFilter(MasterFilter[EventMaster]):
         duration_hours = round((event.duration.days * 24 + event.duration.seconds / 3600), 2)
         duration_hours = duration_hours if not duration_hours.is_integer() else int(duration_hours)
 
-        embed.add_field(name='Information',
-                        value=format_info({
-                            'Duration': f'{event.duration.days} days, {duration_hour_part} hours '
-                                        f'({duration_hours} hours)',
-                            'Start': event.start_datetime.astimezone(timezone),
-                            'Close': event.reception_close_datetime.astimezone(timezone),
-                            'Rank Fix': event.rank_fix_start_datetime.astimezone(timezone),
-                            'Results': event.result_announcement_datetime.astimezone(timezone),
-                            'End': event.end_datetime.astimezone(timezone),
-                            'Story Unlock': event.story_unlock_datetime.astimezone(timezone),
-                            'Status': event.state().name,
+        def fmt_date(date):
+            return fluent_date(date, dateStyle='medium', timeStyle='medium')
+
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('info-desc', {
+                            'duration-days': event.duration.days,
+                            'duration-hours': duration_hour_part,
+                            'duration-total-hours': duration_hours,
+                            'start-date': fmt_date(event.start_datetime.astimezone(timezone)),
+                            'close-date': fmt_date(event.reception_close_datetime.astimezone(timezone)),
+                            'rank-fix-date': fmt_date(event.rank_fix_start_datetime.astimezone(timezone)),
+                            'results-date': fmt_date(event.result_announcement_datetime.astimezone(timezone)),
+                            'end-date': fmt_date(event.end_datetime.astimezone(timezone)),
+                            'story-unlock-date': fmt_date(event.story_unlock_datetime.astimezone(timezone)),
+                            'status': event.state().name,
                         }),
                         inline=False)
-        embed.add_field(name='Event Type',
-                        value=event.event_type.name,
+        embed.add_field(name=l10n.format_value('event-type'),
+                        value=l10n.format_value('event-type-name', {'event-type': event.event_type.name}),
                         inline=True)
-        embed.add_field(name='Bonus Characters',
+        embed.add_field(name=l10n.format_value('bonus-characters'),
                         value='\n'.join(
                             f'{self.bot.get_emoji(unit_emoji_ids_by_unit_id[char.unit_id])} {char.full_name_english}'
                             for char in event.bonus.characters
                         ),
                         inline=True)
-        embed.add_field(name='Bonus Attribute',
+        embed.add_field(name=l10n.format_value('bonus-attribute'),
                         value=f'{self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[event.bonus.attribute_id])} '
                               f'{event.bonus.attribute.en_name.capitalize()}' if event.bonus.attribute else 'None',
                         inline=True)
-        embed.add_field(name='Point Bonus',
-                        value=format_info({
-                            'Attribute': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
-                            'Character': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.character_match_point_bonus_value}%' if event.bonus.character_match_point_bonus_value else 'None',
-                            'Both': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.all_match_point_bonus_value}%' if event.bonus.all_match_point_bonus_value else 'None',
+        embed.add_field(name=l10n.format_value('point-bonus'),
+                        value=l10n.format_value('bonus-description', {
+                            'attribute': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
+                            'character': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.character_match_point_bonus_value}%' if event.bonus.character_match_point_bonus_value else 'None',
+                            'both': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.all_match_point_bonus_value}%' if event.bonus.all_match_point_bonus_value else 'None',
                         }),
                         inline=True)
-        embed.add_field(name='Parameter Bonus',
-                        value=format_info({
-                            'Attribute': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.attribute_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
-                            'Character': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.character_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
-                            'Both': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.all_match_parameter_bonus_id])} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
+        embed.add_field(name=l10n.format_value('parameter-bonus'),
+                        value=l10n.format_value('bonus-description', {
+                            'attribute': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.attribute_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
+                            'character': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.character_match_parameter_bonus_id])} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
+                            'both': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.all_match_parameter_bonus_id])} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
                         }),
                         inline=True)
-        embed.set_footer(text=f'Event Id: {event.id}')
+        embed.set_footer(text=l10n.format_value('event-id', {'event-id': event.id}))
 
         return embed
 

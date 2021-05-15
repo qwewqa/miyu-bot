@@ -1,4 +1,4 @@
-info = Info
+info = Information
 info-desc =
     Rarity: { $rarity }
     Character: { $character }
@@ -7,16 +7,16 @@ info-desc =
     Release Date: { $release-date }
     Event: { $event }
     Gacha: { $gacha }
-    Availability: { availability }
+    Availability: { availability-name }
 
-availability =
+availability-name =
     { $availability ->
-        [Permanent] Permanant
+        [Permanent] Permanent
         [Limited] Limited
         [Collab] Collab
         [Birthday] Birthday
         [Welfare] Reward
-        *[other] Unknown
+       *[other] Unknown
     }
 
 parameters = Parameters
@@ -32,3 +32,5 @@ skill-desc =
     Duration: { $duration }
     Score Up: { $score-up }
     Heal: { $heal }
+
+card-id = Card Id: { $card-id }

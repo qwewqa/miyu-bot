@@ -8,17 +8,16 @@ info-desc =
        *[1] { yes }
     }
 
-login-bonus-type-name =
-    { $login-bonus-type ->
-        [Common] Common
-        [Campaign] Campaign
-        [Subscription] Subscription
-        [VipBronze] Bronze Mileage
-        [VipSilver] Silver Mileage
-        [VipGold] Gold Mileage
-        [VipPlatinum] Platinum Mileage
-       *[other] Unknown
-    }
+login-bonus-type-name = { $login-bonus-type ->
+    [Common] Common
+    [Campaign] Campaign
+    [Subscription] Subscription
+    [VipBronze] Bronze Mileage
+    [VipSilver] Silver Mileage
+    [VipGold] Gold Mileage
+    [VipPlatinum] Platinum Mileage
+   *[other] Unknown
+}
 
 rewards = Rewards
 

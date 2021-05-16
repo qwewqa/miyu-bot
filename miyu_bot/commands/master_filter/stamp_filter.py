@@ -12,7 +12,7 @@ class StampFilter(MasterFilter[StampMaster]):
                          aliases=['stickers'],
                          description='Lists stamps.',
                          help='!stamps'),
-                    list_name='Stamp Search')
+                    list_name='stamp-search')
     def get_stamp_embed(self, ctx, stamp):
         pass
 

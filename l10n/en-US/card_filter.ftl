@@ -9,15 +9,14 @@ info-desc =
     Gacha: { $gacha }
     Availability: { availability-name }
 
-availability-name =
-    { $availability ->
-        [Permanent] Permanent
-        [Limited] Limited
-        [Collab] Collab
-        [Birthday] Birthday
-        [Welfare] Reward
-       *[other] Unknown
-    }
+availability-name = { $availability ->
+    [Permanent] Permanent
+    [Limited] Limited
+    [Collab] Collab
+    [Birthday] Birthday
+    [Welfare] Reward
+   *[other] Unknown
+}
 
 parameters = Parameters
 parameters-desc =

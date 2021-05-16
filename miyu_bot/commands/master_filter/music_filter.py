@@ -6,6 +6,7 @@ from PIL import ImageColor
 from d4dj_utils.master.chart_master import ChartDifficulty
 from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
+from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -313,41 +314,40 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     default_display=level,
                     list_name='Song Search')
     def get_song_embed(self, ctx, song: MusicMaster):
+        l10n = self.l10n[ctx]
+
         color_code = song.unit.main_color_code
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 
         embed = discord.Embed(title=song.name, color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
 
-        artist_info = {
-            'Lyricist': song.lyricist,
-            'Composer': song.composer,
-            'Arranger': song.arranger,
-            'Unit': song.unit.name,
-            'Special Unit Name': song.special_unit_name,
-        }
-
-        music_info = {
-            'Category': song.category.name,
-            'Duration': self.format_duration(song.duration),
-            'BPM': song.bpm,
-            'Section Trend': song.section_trend.name,
-            'Sort Order': song.default_order,
-            'Levels': ', '.join(c.display_level for c in song.charts.values()),
-            'Chart Designers': ', '.join({f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
-            'Release Date': ctx.convert_tz(song.start_datetime),
-            'Hidden': song.is_hidden,
-            'Fair Use': song.can_fair_use,
-        }
-
-        embed.add_field(name='Artist',
-                        value=format_info(artist_info),
+        embed.add_field(name=l10n.format_value('artist'),
+                        value=l10n.format_value('artist-desc', {
+                            'lyricist': song.lyricist,
+                            'composer': song.composer,
+                            'arranger': song.arranger,
+                            'unit-name': song.unit.name,
+                            'special-unit-name': song.special_unit_name or 'None',
+                        }),
                         inline=False)
-        embed.add_field(name='Info',
-                        value=format_info(music_info),
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('song-info-desc', {
+                            'song-category': song.category.name,
+                            'duration': self.format_duration(song.duration),
+                            'bpm': song.bpm,
+                            'section-trend': song.section_trend.name,
+                            'sort-order': song.default_order,
+                            'levels': ', '.join(c.display_level for c in song.charts.values()),
+                            'chart-designers': ', '.join(
+                                {f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
+                            'release-date': fluent_date(ctx.convert_tz(song.start_datetime), dateStyle='medium', timeStyle='medium'),
+                            'hidden': song.is_hidden,
+                            'fair use': song.can_fair_use,
+                        }),
                         inline=False)
 
-        embed.set_footer(text=f'Song Id: {song.id:>07}')
+        embed.set_footer(text=l10n.format_value('song-id', {'song-id': f'{song.id:>07}'}))
 
         return embed
 
@@ -381,6 +381,8 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     default_tab=3,
                     suffix_tab_aliases=difficulty_names)
     def get_chart_embed(self, ctx, song: MusicMaster, difficulty):
+        l10n = self.l10n[ctx]
+
         difficulty = ChartDifficulty(difficulty + 1)
 
         if difficulty not in song.charts:
@@ -398,32 +400,32 @@ class MusicFilter(MasterFilter[MusicMaster]):
         chart_data = chart.load_chart_data()
         note_counts = chart_data.get_note_counts()
 
-        embed.add_field(name='Info',
-                        value=f'Level: {chart.display_level}\n'
-                              f'Duration: {self.format_duration(song.duration)}\n'
-                              f'Unit: {song.special_unit_name or song.unit.name}\n'
-                              f'Category: {song.category.name}\n'
-                              f'BPM: {song.bpm}\n'
-                              f'Designer: {chart.designer.name} ({chart.designer.id})\n'
-                              f'Skills: {", ".join("{:.2f}s".format(t) if t not in chart_data.info.base_skill_times else "[{:.2f}s]".format(t) for t in chart_data.info.skill_times)}\n'
-                              f'Fever: {chart_data.info.fever_start:.2f}s - {chart_data.info.fever_end:.2f}s\n',
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('chart-info-desc', {
+                            'level': chart.display_level,
+                            'duration': self.format_duration(song.duration),
+                            'unit-name': song.special_unit_name or song.unit.name,
+                            'song-category': song.category.name,
+                            'bpm': song.bpm,
+                            'designer': f'{chart.designer.name} ({chart.designer.id})',
+                            'skills': ', '.join('{:.2f}s'.format(t) if t not in chart_data.info.base_skill_times else '[{:.2f}s]'.format(t) for t in chart_data.info.skill_times),
+                            'fever': f'{chart_data.info.fever_start:.2f}s - {chart_data.info.fever_end:.2f}s'
+                        }),
                         inline=False)
-        embed.add_field(name='Combo',
-                        value=f'Max Combo: {chart.note_counts[ChartSectionType.Full].count}\n'
-                              f'Taps: {note_counts["tap"]} (dark: {note_counts["tap1"]}, light: {note_counts["tap2"]})\n'
-                              f'Scratches: {note_counts["scratch"]} (left: {note_counts["scratch_left"]}, right: {note_counts["scratch_right"]})\n'
-                              f'Stops: {note_counts["stop"]} (head: {note_counts["stop_start"]}, tail: {note_counts["stop_end"]})\n'
-                              f'Long: {note_counts["long"]} (head: {note_counts["long_start"]}, tail: {note_counts["long_end"]})\n'
-                              f'Slide: {note_counts["slide"]} (tick: {note_counts["slide_tick"]}, flick {note_counts["slide_flick"]})',
+        embed.add_field(name=l10n.format_value('combo'),
+                        value=l10n.format_value('combo-desc', {
+                            'max-combo': chart.note_counts[ChartSectionType.Full].count,
+                            **note_counts,
+                        }),
                         inline=True)
-        embed.add_field(name='Ratings',
+        embed.add_field(name=l10n.format_value('ratings'),
                         value=f'NTS: {round(chart.trends[0] * 100, 2)}%\n'
                               f'DNG: {round(chart.trends[1] * 100, 2)}%\n'
                               f'SCR: {round(chart.trends[2] * 100, 2)}%\n'
                               f'EFT: {round(chart.trends[3] * 100, 2)}%\n'
                               f'TEC: {round(chart.trends[4] * 100, 2)}%\n',
                         inline=True)
-        embed.set_footer(text=f'Chart Id: {chart.id:>08}; 1 column = 10 seconds, 9 second skills')
+        embed.set_footer(text=l10n.format_value('chart-id', {'chart-id': f'{chart.id:>08}'}))
 
         return embed
 
@@ -437,10 +439,12 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     default_tab=3,
                     suffix_tab_aliases=difficulty_names)
     def get_sections_embed(self, ctx, song: MusicMaster, difficulty):
+        l10n = self.l10n[ctx]
+
         difficulty = ChartDifficulty(difficulty + 1)
 
         if difficulty not in song.charts:
-            embed = discord.Embed(title=f'Mix: {song.name} [{difficulty.name}]', description='No Data')
+            embed = discord.Embed(title=f'Mix: {song.name} [{difficulty.name}]', description=l10n.format_value('no-data'))
             embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
             return embed
 
@@ -455,39 +459,33 @@ class MusicFilter(MasterFilter[MusicMaster]):
         note_counts = chart.note_counts
         mix_info = chart.mix_info
 
-        info = {
-            'Level': chart.display_level,
-            'Unit': song.unit.name,
-            'BPM': song.bpm,
-            'Section Trend': song.section_trend.name,
-        }
-
-        begin = {
-            'Time': f'{round(mix_info[ChartSectionType.Begin].duration, 2)}s',
-            'Combo': note_counts[ChartSectionType.Begin].count,
-        }
-        middle = {
-            'Time': f'{round(mix_info[ChartSectionType.Middle].duration, 2)}s',
-            'Combo': note_counts[ChartSectionType.Middle].count,
-        }
-        end = {
-            'Time': f'{round(mix_info[ChartSectionType.End].duration, 2)}s',
-            'Combo': note_counts[ChartSectionType.End].count,
-        }
-
-        embed.add_field(name='Info',
-                        value=format_info(info),
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('sections-info-desc', {
+                            'level': chart.display_level,
+                            'unit-name': song.unit.name,
+                            'bpm': song.bpm,
+                            'section-trend': song.section_trend.name,
+                        }),
                         inline=False)
-        embed.add_field(name='Begin',
-                        value=format_info(begin),
+        embed.add_field(name=l10n.format_value('section-begin'),
+                        value=l10n.format_value('section-desc', {
+                            'time': f'{round(mix_info[ChartSectionType.Begin].duration, 2)}s',
+                            'combo': note_counts[ChartSectionType.Begin].count,
+                        }),
                         inline=True)
-        embed.add_field(name='Middle',
-                        value=format_info(middle),
+        embed.add_field(name=l10n.format_value('section-middle'),
+                        value=l10n.format_value('section-desc', {
+                            'time': f'{round(mix_info[ChartSectionType.Middle].duration, 2)}s',
+                            'combo': note_counts[ChartSectionType.Middle].count,
+                        }),
                         inline=True)
-        embed.add_field(name='End',
-                        value=format_info(end),
+        embed.add_field(name=l10n.format_value('section-end'),
+                        value=l10n.format_value('section-desc', {
+                            'time': f'{round(mix_info[ChartSectionType.End].duration, 2)}s',
+                            'combo': note_counts[ChartSectionType.End].count,
+                        }),
                         inline=True)
-        embed.set_footer(text=f'Chart Id: {chart.id:>08}; 1 column = 10 seconds')
+        embed.set_footer(text=l10n.format_value('chart-id', {'chart-id': f'{chart.id:>08}'}))
 
         return embed
 

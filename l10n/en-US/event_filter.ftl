@@ -9,26 +9,24 @@ info-desc =
     Story Unlock: { $story-unlock-date }
     Status: { status-name }
 
-status-name =
-    { $status ->
-        [Upcoming] Upcoming
-        [Open] Open
-        [Closing] Closing
-        [Ranks_Fixed] Ranks Fixed
-        [Results] Results
-        [Ended] Ended
-       *[other] Unknown
-    }
+status-name = { $status ->
+    [Upcoming] Upcoming
+    [Open] Open
+    [Closing] Closing
+    [Ranks_Fixed] Ranks Fixed
+    [Results] Results
+    [Ended] Ended
+   *[other] Unknown
+}
 
 event-type = Event Type
-event-type-name =
-    { $event-type ->
-        [Bingo] Bingo
-        [Medley] Medley
-        [Poker] Poker
-        [Raid] Raid
-       *[other] Unknown
-    }
+event-type-name = { $event-type ->
+    [Bingo] Bingo
+    [Medley] Medley
+    [Poker] Poker
+    [Raid] Raid
+   *[other] Unknown
+}
 
 bonus-characters = Bonus Characters
 

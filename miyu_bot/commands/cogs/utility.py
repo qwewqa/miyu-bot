@@ -179,6 +179,10 @@ class Utility(commands.Cog):
         embed.add_field(name='Bot Invite',
                         value='https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=388160&scope=bot',
                         inline=False)
+        embed.add_field(name='Acknowledgements',
+                        value='Farley#8054 (Mechanics Testing)\n'
+                              'sigonasr2#6262 (Leaderboard Data)\n'
+                              'AcerYue#3826 (TW Translation)')
         await ctx.send(embed=embed)
 
     @commands.command(name='command_usage',

@@ -35,6 +35,8 @@ def _parse_named_argument(arg):
     return NamedArgument(name.lower(), operator, values)
 
 
+# ParsedArgument.convert is preferred in most cases, and will update
+# ctx preferences unlike this function.
 def parse_arguments(arg):
     # Note: this lowercases tags, words, and argument names
 

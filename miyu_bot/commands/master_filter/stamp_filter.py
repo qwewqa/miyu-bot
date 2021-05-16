@@ -18,4 +18,4 @@ class StampFilter(MasterFilter[StampMaster]):
 
     @get_stamp_embed.list_formatter
     def format_stamp_name(self, stamp: StampMaster):
-        return stamp.name
+        return f'{stamp.name}: {stamp.quote}'

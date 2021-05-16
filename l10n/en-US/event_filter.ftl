@@ -49,3 +49,5 @@ bonus-description =
     }
 
 event-id = Event Id: { $event-id }
+
+event-search = Event Search

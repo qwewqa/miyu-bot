@@ -1,27 +1,29 @@
+from typing import Union
+
 from fluent.runtime import FluentLocalization
 
-locale_aliases = {
-    'en': 'en-US',
-    'cn-TW': 'zh-TW',
-}
-valid_locales = {'en-US', 'zh-TW'}
-valid_locales_and_aliases = valid_locales.union(locale_aliases.keys())
-lowercase_locale_mapping = {n.lower(): locale_aliases.get(n, n) for n in valid_locales_and_aliases}
+from miyu_bot.bot.bot import PrefContext
+from miyu_bot.commands.master_filter.locales import locale_aliases
+
 
 class LocalizationManager:
-    def __init__(self, loader, name):
-        self.name = name
+    def __init__(self, loader, names):
+        if isinstance(names, str):
+            names = [names]
+        self.names = names
         self.loader = loader
         self._values = {}
 
-    def __getitem__(self, item: str) -> FluentLocalization:
+    def __getitem__(self, item: Union[str, PrefContext]) -> FluentLocalization:
+        if isinstance(item, PrefContext):
+            return self[item.preferences.language]
         item = locale_aliases.get(item, item)
         if item in self._values:
             return self._values[item]
         else:
             if item == 'en-US':
-                localization = FluentLocalization(['en-US'], [self.name, 'common.ftl'], self.loader)
+                localization = FluentLocalization(['en-US'], [*self.names, 'common.ftl'], self.loader)
             else:
-                localization = FluentLocalization([item, 'en-US'], [self.name, 'common.ftl'], self.loader)
+                localization = FluentLocalization([item, 'en-US'], [*self.names, 'common.ftl'], self.loader)
             self._values[item] = localization
             return localization

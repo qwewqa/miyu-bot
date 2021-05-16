@@ -48,3 +48,5 @@ draw-item-name = { $draw-item-name ->
 }
 
 gacha-id = Gacha Id: { $gacha-id }
+
+gacha-search = Gacha Search

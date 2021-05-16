@@ -3,6 +3,7 @@ from datetime import datetime
 
 import discord
 from d4dj_utils.master.login_bonus_master import LoginBonusMaster
+from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -65,16 +66,21 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
                          help='!login_bonuses'),
                     default_sort=date,
                     default_display=date,
-                    list_name='Login Bonus Search')
+                    list_name='login-bonus-search')
     def get_login_bonus_embed(self, ctx, login_bonus: LoginBonusMaster):
+        l10n = self.l10n[ctx]
+
         embed = discord.Embed(title=login_bonus.title)
 
-        embed.add_field(name='Info',
-                        value=format_info({
-                            'Start Date': ctx.convert_tz(login_bonus.start_datetime),
-                            'End Date': ctx.convert_tz(login_bonus.end_datetime),
-                            'Type': login_bonus.login_bonus_type.name,
-                            'Loop': login_bonus.loop,
+        def fmt_date(date):
+            return fluent_date(date, dateStyle='medium', timeStyle='medium')
+
+        embed.add_field(name=l10n.format_value('info'),
+                        value=l10n.format_value('info-desc', {
+                            'start-date': fmt_date(ctx.convert_tz(login_bonus.start_datetime)),
+                            'end-date': fmt_date(ctx.convert_tz(login_bonus.end_datetime)),
+                            'login-bonus-type': login_bonus.login_bonus_type.name,
+                            'loop': login_bonus.loop,
                         }),
                         inline=False)
 
@@ -87,17 +93,17 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
             elif len(rewards) == 1:
                 return f'{item.sequence}. {rewards[0].get_friendly_description()}'
             else:
-                return 'None'
+                return l10n.format_value('none')
 
         reward_text = '```' + ('\n'.join(format_login_bonus(item) for item in login_bonus.items) or 'None') + '```'
 
-        embed.add_field(name='Rewards',
+        embed.add_field(name=l10n.format_value('rewards'),
                         value=reward_text,
                         inline=False)
 
         embed.set_image(url=self.bot.asset_url + get_asset_filename(login_bonus.image_path))
 
-        embed.set_footer(text=f'Login Bonus Id: {login_bonus.id:>04}')
+        embed.set_footer(text=l10n.format_value('login-bonus-id', {'login-bonus-id': f'{login_bonus.id:>04}'}))
 
         return embed
 

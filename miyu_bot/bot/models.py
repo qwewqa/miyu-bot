@@ -7,8 +7,7 @@ from discord.ext import commands
 from tortoise import Model, fields
 from tortoise.models import ModelMeta
 
-from miyu_bot.commands.master_filter.localization_manager import valid_locales_and_aliases, locale_aliases, \
-    lowercase_locale_mapping
+from miyu_bot.commands.master_filter.locales import lowercase_locale_mapping
 
 
 class Preference:
@@ -170,7 +169,8 @@ timezone_pref = Preference('timezone',
 language_pref = Preference('language',
                            fields.CharField(max_length=15, null=True),
                            default_value='en-US',
-                           validator=lambda lang: None if lang.lower() in lowercase_locale_mapping else 'Invalid language.',
+                           validator=lambda
+                               lang: None if lang.lower() in lowercase_locale_mapping else 'Invalid language.',
                            transformer=lambda lang: lowercase_locale_mapping[lang.lower()])
 prefix_pref = Preference('prefix',
                          fields.CharField(max_length=63, null=True),
@@ -271,4 +271,3 @@ class CommandUsageCount(Model):
 
     class Meta:
         unique_together = (('guild_id', 'name'),)
-

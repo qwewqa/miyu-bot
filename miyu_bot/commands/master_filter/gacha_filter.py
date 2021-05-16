@@ -114,9 +114,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
                          help='!banners'),
                     default_sort=date,
                     default_display=date,
-                    list_name='Banner Search')
+                    list_name='gacha-search')
     def get_gacha_embed(self, ctx, gacha: GachaMaster):
-        l10n = self.l10n[ctx.preferences.language]
+        l10n = self.l10n[ctx]
 
         embed = discord.Embed(title=gacha.name)
 
@@ -182,7 +182,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                          help='!banner_rates Shiny Smily Scratch'),
                     default_sort=date)
     def get_gacha_table_embed(self, ctx, gacha: GachaMaster):
-        l10n = self.l10n[ctx.preferences.language]
+        l10n = self.l10n[ctx]
 
         embed = discord.Embed(title=gacha.name)
 

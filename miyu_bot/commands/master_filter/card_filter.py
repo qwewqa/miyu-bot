@@ -208,9 +208,9 @@ class CardFilter(MasterFilter[CardMaster]):
                     tabs=list(rarity_emoji_ids.values()),
                     default_tab=1,
                     suffix_tab_aliases={'untrained': 0, 'trained': 1},
-                    list_name='Card Search')
+                    list_name='card-search')
     def get_card_embed(self, ctx, card: CardMaster, limit_break):
-        l10n = self.l10n[ctx.preferences.language]
+        l10n = self.l10n[ctx]
 
         if card.rarity_id <= 2:
             limit_break = 0

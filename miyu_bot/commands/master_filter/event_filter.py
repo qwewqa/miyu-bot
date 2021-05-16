@@ -121,9 +121,9 @@ class EventFilter(MasterFilter[EventMaster]):
                          help='!events'),
                     default_sort=date,
                     default_display=date,
-                    list_name='Event Search')
+                    list_name='event-search')
     def get_event_embed(self, ctx, event: EventMaster):
-        l10n = self.l10n[ctx.preferences.language]
+        l10n = self.l10n[ctx]
 
         timezone = ctx.preferences.timezone
 

@@ -34,3 +34,5 @@ skill-desc =
     Heal: { $heal }
 
 card-id = Card Id: { $card-id }
+
+card-search = Card Search

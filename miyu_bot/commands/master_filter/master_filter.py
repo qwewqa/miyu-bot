@@ -488,7 +488,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             else:
                 listing = [source.list_formatter(self, ctx, value) for value in values]
 
-            embed = discord.Embed(title=source.list_name if source.list_name is not None else 'Search')
+            embed = discord.Embed(title=self.l10n[ctx].format_value(source.list_name or 'search'))
             asyncio.create_task(run_paged_message(ctx, embed, listing))
 
         return command

@@ -92,6 +92,7 @@ class Preferences(SimpleNamespace):
     loop: Optional[int]
     prefix: str
     timezone: Union[BaseTzInfo, StaticTzInfo, DstTzInfo]
+    language: str
 
 
 class PrefContext(Context):

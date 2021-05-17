@@ -184,7 +184,9 @@ class Utility(commands.Cog):
         embed.add_field(name='Acknowledgements',
                         value='Farley#8054 (Mechanics Testing)\n'
                               'sigonasr2#6262 (Leaderboard Data)\n'
-                              'AcerYue#3826 (TW Translation)')
+                              'AcerYue#3826 (TW Translation)\n'
+                              'かえる#1919 (JP Translation)\n'
+                              'HamP#4125 (JP Translation)')
         await ctx.send(embed=embed)
 
     @commands.command(name='command_usage',

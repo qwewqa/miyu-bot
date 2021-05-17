@@ -25,7 +25,7 @@ parameters-desc =
     { $technique-emoji } テクニック: { $technique }
     { $physical-emoji } フィジカル: { $physical }
 
-skill = ステータス
+skill = スキル
 skill-desc =
     スキル名: { $name }
     スキル時間: { $duration }

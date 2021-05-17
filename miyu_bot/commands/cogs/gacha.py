@@ -18,6 +18,7 @@ from miyu_bot.bot.models import PityCount
 from miyu_bot.commands.common.argument_parsing import ParsedArguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import rarity_emoji_ids
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Gacha(commands.Cog):
@@ -57,6 +58,8 @@ class Gacha(commands.Cog):
 
         for card in self.bot.assets.card_master.values():
             self.images.append(self.get_card_icon(card))
+
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'gacha.ftl')
 
     def load_image(self, path):
         image = Image.open(self.base_path / path)

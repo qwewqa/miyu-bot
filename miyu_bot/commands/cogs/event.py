@@ -19,6 +19,7 @@ from miyu_bot.bot.models import valid_loop_intervals
 from miyu_bot.commands.common.argument_parsing import parse_arguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.reaction_message import run_deletable_message, run_tabbed_message
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Event(commands.Cog):
@@ -29,6 +30,7 @@ class Event(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.leaderboard_loop.start()
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'event.ftl')
 
     def cog_unload(self):
         self.leaderboard_loop.cancel()

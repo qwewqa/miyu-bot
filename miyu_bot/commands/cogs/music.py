@@ -18,6 +18,7 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.argument_parsing import parse_arguments
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Music(commands.Cog):
@@ -28,6 +29,7 @@ class Music(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.custom_mixes = {}
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'music.ftl')
 
     difficulty_names = {
         'expert': ChartDifficulty.Expert,

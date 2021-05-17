@@ -14,6 +14,8 @@ class Preferences(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+        from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'preferences.ftl')
 
     @commands.command(name='setpref',
                       description='',

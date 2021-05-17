@@ -5,6 +5,7 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.commands.common.emoji import rarity_emoji_ids
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Card(commands.Cog):
@@ -13,6 +14,7 @@ class Card(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'card.ftl')
 
     @property
     def rarity_emoji(self):

@@ -11,6 +11,7 @@ import discord
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Audio(commands.Cog):
@@ -33,6 +34,7 @@ class Audio(commands.Cog):
                     live_interaction_path_characters[interaction_path].add(character_id)
         self.live_interaction_path_characters = live_interaction_path_characters
         self.queues = defaultdict(lambda: AudioQueue())
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'audio.ftl')
 
     def cog_unload(self):
         for queue in self.queues.values():

@@ -11,6 +11,7 @@ from miyu_bot.bot.bot import D4DJBot
 from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
 from miyu_bot.commands.common.reaction_message import run_paged_message
+from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Utility(commands.Cog):
@@ -20,6 +21,7 @@ class Utility(commands.Cog):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         bot.loop.create_task(self.run_scripts())
+        self.l10n = LocalizationManager(self.bot.fluent_loader, 'utility.ftl')
 
     async def run_scripts(self):
         if self.bot.scripts_path:

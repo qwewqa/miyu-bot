@@ -312,7 +312,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                          help='!songs'),
                     default_sort=date,
                     default_display=level,
-                    list_name='Song Search')
+                    list_name='song-search')
     def get_song_embed(self, ctx, song: MusicMaster):
         l10n = self.l10n[ctx]
 

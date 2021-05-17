@@ -53,6 +53,8 @@ song-category-name = { $song-category ->
 
 song-id = Song Id: { $song-id }
 
+song-search = Song Search
+
 chart-info-desc =
     Level: { $level }
     Duration: { $duration }

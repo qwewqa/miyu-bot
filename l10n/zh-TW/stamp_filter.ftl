@@ -1,0 +1,1 @@
+stamp-search = 貼圖搜尋

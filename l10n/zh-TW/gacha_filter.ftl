@@ -1,4 +1,4 @@
-too-many-results = 太多
+too-many-results = 結果過多
 
 info = 資訊
 info-desc =
@@ -6,7 +6,7 @@ info-desc =
     結束: { $end-date }
     活動: { $event-name }
     保底抽數: { $pity-requirement ->
-        [None] { none }
+        [None] 無保底
        *[other] { $pity-requirement }
     }
     類型: { gacha-type }

@@ -42,7 +42,7 @@ bonus-description =
     { attribute }: { $attribute }
     { character }: { $character }
     { both }: { $both  ->
-        [None] { none }
+        [None] 無加成
        *[other] $both
     }
 

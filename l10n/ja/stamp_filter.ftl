@@ -1,0 +1,1 @@
+stamp-search = スタンプ検索

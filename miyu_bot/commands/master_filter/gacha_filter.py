@@ -250,9 +250,16 @@ class GachaFilter(MasterFilter[GachaMaster]):
     def format_draw_data(self, draw: GachaDrawMaster, l10n):
         name = self.stock_names.get(draw.stock_id, draw.stock.name)
         pull_count = sum(draw.draw_amounts)
+
+        if pull_count < 10:
+            pull_count_category = 'few'
+        else:
+            pull_count_category = 'many'
+
         if draw.draw_limit:
             return l10n.format_value('limit-draw-cost-desc', {
                 'pull-count': pull_count,
+                'pull-count-category': pull_count_category,
                 'draw-cost': draw.stock_amount,
                 'draw-item-name': name,
                 'draw-limit': draw.draw_limit,
@@ -261,6 +268,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
         else:
             return l10n.format_value('draw-cost-desc', {
                 'pull-count': pull_count,
+                'pull-count-category': pull_count_category,
                 'draw-cost': draw.stock_amount,
                 'draw-item-name': name,
             })

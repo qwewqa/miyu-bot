@@ -32,7 +32,10 @@ too-many = { none }
 none-or-too-many = 結果多すぎる
 
 costs = 消費
-draw-cost-desc = { $pull-count }引く: { $draw-cost }x { draw-item-name }
+draw-cost-desc = { $pull-count }{ $pull-count-category ->
+   *[few] 回引く
+    [many] 連
+}: { $draw-cost }x { draw-item-name }
 limit-draw-cost-desc = { draw-cost-desc }, 上限: { $draw-limit }, 更新: { $refresh ->
     [0] { no }
    *[1] { yes }

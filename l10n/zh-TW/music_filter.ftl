@@ -74,7 +74,7 @@ combo-desc =
     長壓: { $long } (頭: { $long_start }, 尾: { $long_end })
     滑軌: { $slide } (拍點: { $slide_tick }, 滑鍵: { $slide_flick })
 
-ratings = Ratings
+ratings = 譜面要素
 
 chart-id = 譜面ID: { $chart-id }；1行 = 10秒, 技能9秒
 

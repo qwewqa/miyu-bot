@@ -32,7 +32,7 @@ too-many = 太多
 none-or-too-many = 沒有或太多
 
 costs = 消費
-draw-cost-desc = { $pull-count } 抽卡: { $draw-cost }x { draw-item-name }
+draw-cost-desc = { $pull-count }抽卡: { $draw-cost }x { draw-item-name }
 limit-draw-cost-desc = { draw-cost-desc }, 上限: { $draw-limit }, 更新: { $refresh ->
     [0] { no }
    *[1] { yes }

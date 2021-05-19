@@ -63,7 +63,7 @@ chart-info-desc =
     BPM: { $bpm }
     譜面制作: { $designer }
     技能時間: { $skills }
-    時間Fever: { $fever }
+    時間Groovy: { $fever }
 
 combo = 物量分析
 combo-desc =

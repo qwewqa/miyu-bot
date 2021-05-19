@@ -43,7 +43,7 @@ bonus-description =
     { character }: { $character }
     { both }: { $both  ->
         [None] 無加成
-       *[other] $both
+       *[other] { $both }
     }
 
 event-id = 活動ID: { $event-id }

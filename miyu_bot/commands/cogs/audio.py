@@ -153,7 +153,7 @@ class Audio(commands.Cog):
             if not queue:
                 while not queue:
                     interaction = random.choice(paths)
-                    queue.extend([a for a in interaction.iterdir() if a.suffix == '.wav'][::-1])
+                    queue.extend(sorted(a for a in interaction.iterdir() if a.suffix == '.wav'))
                 await asyncio.sleep(random.randint(8, 12))
             else:
                 await asyncio.sleep(0.5)

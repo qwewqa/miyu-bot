@@ -186,7 +186,17 @@ class Utility(commands.Cog):
                               'sigonasr2#6262 (Leaderboard Data)\n'
                               'AcerYue#3826 (TW Translation)\n'
                               'かえる#1919 (JP Translation)\n'
-                              'HamP#4125 (JP Translation)')
+                              'HamP#4125 (JP Translation)\n'
+                              'うさみょん(myon2019)/mtripg6666tdr#4470 (JP Translation)',
+                        inline=False)
+        embed.add_field(name='Supporters',
+                        value='Hifumi-chan#0123\n'
+                              'marshmallowpan#1781\n'
+                              'oh_that_will#8488\n'
+                              'rainyfran#7450\n'
+                              'lizardhospital#9358\n'
+                              'winkip#0271',
+                        inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(name='command_usage',

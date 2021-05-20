@@ -53,7 +53,7 @@ song-category-name = { $song-category ->
 
 song-id = 楽曲ID: { $song-id }
 
-song-search = 譜面検索
+song-search = 楽曲検索
 
 chart-info-desc =
     レベル: { $level }

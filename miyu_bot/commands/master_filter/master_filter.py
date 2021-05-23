@@ -526,6 +526,10 @@ ListFormatterCallable = AnyDataAccessor
 AnyEmoji = Union[int, str, discord.Emoji]
 
 
+class AnnotatedEmbedSourceCallable(EmbedSourceCallable):
+    list_formatter: Callable
+
+
 @dataclass
 class CommandSourceInfo:
     embed_source: EmbedSourceCallable
@@ -550,7 +554,7 @@ def command_source(
         default_tab: int = 0,
         suffix_tab_aliases: Optional[Dict[str, int]] = None,
         list_name: Optional[str] = None,
-) -> Callable[[EmbedSourceCallable], EmbedSourceCallable]:
+) -> Callable[[EmbedSourceCallable], AnnotatedEmbedSourceCallable]:
     """A decorator that marks a function as an command source.
 
     The function should have, apart from the self parameter, either two more parameters
@@ -581,7 +585,7 @@ def command_source(
         The name to use in the header of the list command.
     """
 
-    def decorator(func: EmbedSourceCallable) -> EmbedSourceCallable:
+    def decorator(func: EmbedSourceCallable) -> AnnotatedEmbedSourceCallable:
         info = CommandSourceInfo(
             command_args=command_args,
             list_command_args=list_command_args,
@@ -691,6 +695,7 @@ def data_attribute(
     help_sample_argument
         An example argument value to use in command help.
     """
+
     def decorator(func):
         info = DataAttributeInfo(
             name=name,

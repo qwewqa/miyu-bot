@@ -134,7 +134,6 @@ class GachaFilter(MasterFilter[GachaMaster]):
         def fmt_date(date):
             return fluent_date(date, dateStyle='medium', timeStyle='medium')
 
-
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {
                             'start-date': fmt_date(ctx.convert_tz(gacha.start_datetime)),
@@ -277,7 +276,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
         attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
-        
+
     def format_card_name_short(self, card):
         return f'{card.rarity_id}★ {card.name} {card.character.first_name_english}'
 

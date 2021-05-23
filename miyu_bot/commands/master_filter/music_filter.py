@@ -343,7 +343,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                                 {f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
                             'release-date': fluent_date(ctx.convert_tz(song.start_datetime), dateStyle='medium', timeStyle='medium'),
                             'hidden': song.is_hidden,
-                            'fair use': song.can_fair_use,
+                            'fair-use': song.can_fair_use,
                         }),
                         inline=False)
 

@@ -111,6 +111,21 @@ class EventFilter(MasterFilter[EventMaster]):
     def format_type(self, value: EventMaster):
         return value.event_type.name.ljust(6)
 
+    @data_attribute('parameter',
+                    aliases=['param'],
+                    value_mapping={'heart': 0,
+                                   'technique': 1,
+                                   'tech': 1,
+                                   'physical': 2,
+                                   'phys': 2,
+                                   'no_parameter': 99,
+                                   'noparameter': 99},
+                    is_sortable=True,
+                    is_tag=True,
+                    is_eq=True)
+    def parameter(self, value: EventMaster):
+        return value.bonus.event_point_parameter_bonus_id if value.bonus.event_point_parameter_bonus_rate else 99
+
     @command_source(command_args=
                     dict(name='event',
                          description='Displays event info.',
@@ -166,6 +181,13 @@ class EventFilter(MasterFilter[EventMaster]):
                         value=f'{self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[event.bonus.attribute_id])} '
                               f'{event.bonus.attribute.en_name.capitalize()}' if event.bonus.attribute else 'None',
                         inline=True)
+        embed.add_field(name=l10n.format_value('parameter-point-bonus'),
+                        value=l10n.format_value('parameter-point-bonus-description', {
+                            'parameter-emoji': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.event_point_parameter_bonus_id + 1])}',
+                            'parameter-bonus-rate': event.bonus.event_point_parameter_bonus_rate
+                        }) if event.bonus.event_point_parameter_bonus_rate else
+                        l10n.format_value('no-parameter-point-bonus'),
+                        inline=False)
         embed.add_field(name=l10n.format_value('point-bonus'),
                         value=l10n.format_value('bonus-description', {
                             'attribute': f'{self.bot.get_emoji(event_point_emoji_id)} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
@@ -194,4 +216,10 @@ class EventFilter(MasterFilter[EventMaster]):
             unit_emoji = self.bot.get_emoji(grey_emoji_id)
         attribute_emoji = self.bot.get_emoji(
             attribute_emoji_ids_by_attribute_id.get(event.bonus.attribute_id, grey_emoji_id))
-        return f'`{unit_emoji}`+`{attribute_emoji}` {event.name}'
+        if event.bonus.event_point_parameter_bonus_rate:
+            parameter_emoji = self.bot.get_emoji(
+                parameter_bonus_emoji_ids_by_parameter_id.get(event.bonus.event_point_parameter_bonus_id + 1,
+                                                              grey_emoji_id))
+        else:
+            parameter_emoji = self.bot.get_emoji(grey_emoji_id)
+        return f'`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {event.name}'

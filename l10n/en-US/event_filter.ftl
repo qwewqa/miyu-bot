@@ -46,6 +46,13 @@ bonus-description =
        *[other] { $both }
     }
 
+parameter-point-bonus = Parameter Point Bonus
+
+parameter-point-bonus-description =
+     Every { $parameter-bonus-rate } { $parameter-emoji }
+
+no-parameter-point-bonus = None
+
 event-id = Event Id: { $event-id }
 
 event-search = Event Search

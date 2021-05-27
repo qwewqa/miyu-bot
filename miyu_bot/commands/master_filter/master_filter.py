@@ -9,6 +9,7 @@ import dataclasses
 import functools
 import re
 from abc import abstractmethod, ABCMeta
+from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
 from typing import Any, Optional, Union, Callable, List, Sequence, Protocol
@@ -20,6 +21,7 @@ from discord.ext import commands
 
 import miyu_bot.bot.bot
 from miyu_bot.bot.bot import D4DJBot, PrefContext
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
 from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message
@@ -50,59 +52,59 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     data_attributes: List[DataAttributeInfo]
     l10n: LocalizationManager
 
-    def __init__(self, bot: D4DJBot, data: Dict[Any, TData], name: str):
+    def __init__(self, bot: D4DJBot, master_name: str, name: str):
         self.name = name
         self.bot = bot
-        self.data = data
-        self.default_filter = FuzzyFilteredMap(self.is_released)
-        self.unrestricted_filter = FuzzyFilteredMap()
-        for master in data.values():
-            master_name = self.get_name(master)
-            self.default_filter[master_name] = master
-            self.unrestricted_filter[master_name] = master
+        self.master_name = master_name
+        self.default_filter = defaultdict(lambda: FuzzyFilteredMap(self.is_released))
+        self.unrestricted_filter = defaultdict(lambda: FuzzyFilteredMap())
+        for server, manager in bot.assets.items():
+            for master in manager.masters[self.master_name].values():
+                alias = self.get_name(master)
+                self.default_filter[server][alias] = master
+                self.unrestricted_filter[server][alias] = master
         self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
         self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
-        self.l10n = LocalizationManager(self.bot.fluent_loader, name + '.ftl')
+        self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + '.ftl')
 
         for d in self.data_attributes:
             if init_function := d.init_function:
                 init_function(self, d)
 
-    def add_alias(self, alias, master_id):
-        master = self.data[master_id]
-        alias = romanize(alias)
-        self.default_filter[alias] = master
-        self.unrestricted_filter[alias] = master
+    def get_asset_source(self, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+        if ctx is None:
+            return self.bot.assets[Server.JP][self.master_name]
+        return ctx.assets.masters[self.master_name]
 
     def get(self, name_or_id: Union[str, int], ctx: Optional[miyu_bot.bot.bot.PrefContext]):
         if ctx and ctx.preferences.leaks:
             try:
-                return self.data[int(name_or_id)]
+                return self.get_asset_source(ctx)[int(name_or_id)]
             except (KeyError, ValueError):
                 if isinstance(name_or_id, int):
                     return None
-                return self.unrestricted_filter[name_or_id]
+                return self.unrestricted_filter[ctx.preferences.server][name_or_id]
         else:
             try:
-                master = self.data[int(name_or_id)]
-                if master not in self.default_filter.values():
-                    master = self.default_filter[name_or_id]
+                master = self.get_asset_source(ctx)[int(name_or_id)]
+                if master not in self.default_filter[ctx.preferences.server].values():
+                    master = self.default_filter[ctx.preferences.server][name_or_id]
                 return master
             except (KeyError, ValueError):
                 if isinstance(name_or_id, int):
                     return None
-                return self.default_filter[name_or_id]
+                return self.default_filter[ctx.preferences.server][name_or_id]
 
     def get_by_id(self, master_id: int, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
         if ctx and ctx.preferences.leaks:
             try:
-                return self.data[master_id]
+                return self.get_asset_source(ctx)[master_id]
             except KeyError:
                 return None
         else:
             try:
-                master = self.data[master_id]
-                if master not in self.default_filter.values():
+                master = self.get_asset_source(ctx)[master_id]
+                if master not in self.default_filter[ctx.preferences.server].values():
                     return None
                 return master
             except KeyError:
@@ -110,30 +112,32 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
     def get_by_relevance(self, name: str, ctx: miyu_bot.bot.bot.PrefContext):
         try:
-            master = self.data[int(name)]
+            master = self.get_asset_source(ctx)[int(name)]
             id_result = [master]
-            if not ctx or (not ctx.preferences.leaks and master not in self.default_filter.values()):
-                if master not in self.default_filter.values():
+            if not ctx.preferences.leaks and master not in self.default_filter[ctx.preferences.server].values():
+                if master not in self.default_filter[ctx.preferences.server].values():
                     id_result = []
         except (KeyError, ValueError):
             id_result = []
 
         if name:
             if ctx.preferences.leaks:
-                return id_result + self.unrestricted_filter.get_sorted(name)
+                return id_result + self.unrestricted_filter[ctx.preferences.server].get_sorted(name)
             else:
-                return id_result + self.default_filter.get_sorted(name)
+                return id_result + self.default_filter[ctx.preferences.server].get_sorted(name)
         else:
             if ctx.preferences.leaks:
-                return list(self.unrestricted_filter.values())
+                return list(self.unrestricted_filter[ctx.preferences.server].values())
             else:
-                return list(self.default_filter.values())
+                return list(self.default_filter[ctx.preferences.server].values())
 
     def values(self, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
         if ctx is not None and ctx.preferences.leaks:
-            return self.unrestricted_filter.values()
+            return self.unrestricted_filter[ctx.preferences.server].values()
+        elif ctx:
+            return self.default_filter[ctx.preferences.server].values()
         else:
-            return self.default_filter.values()
+            return self.default_filter[Server.JP].values()
 
     @abstractmethod
     def get_name(self, value: TData) -> str:

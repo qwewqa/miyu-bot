@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.emoji import rarity_emoji_ids
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
@@ -26,7 +27,7 @@ class Card(commands.Cog):
                       help='!cardexp 1-80')
     async def cardexp(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         assert isinstance(arg, str)
-        exp = self.bot.assets.card_exp_master
+        exp = self.bot.assets[Server.JP].card_exp_master
 
         def comma_number(n):
             return '{:,}'.format(n)

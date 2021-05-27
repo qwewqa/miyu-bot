@@ -7,7 +7,7 @@ class CommonAliases:
     assets: AssetManager
 
     def __init__(self, assets):
-        self.assets = assets
+        self.assets = assets[0]
 
     @cached_property
     def characters_by_name(self):
@@ -18,7 +18,7 @@ class CommonAliases:
 
     @cached_property
     def attributes_by_name(self):
-        attributes_by_name = {attribute.en_name: attribute for attribute in self.assets.attribute_master.values()}
+        attributes_by_name = {attribute.en_name.lower(): attribute for attribute in self.assets.attribute_master.values()}
         attributes_by_name['purple'] = attributes_by_name['street']
         attributes_by_name['yellow'] = attributes_by_name['party']
         attributes_by_name['orange'] = attributes_by_name['party']
@@ -31,9 +31,9 @@ class CommonAliases:
     @cached_property
     def units_by_name(self):
         units_by_name = {unit.name.lower().replace(' ', '_'): unit for unit in self.assets.unit_master.values()}
-        units_by_name['rondo'] = units_by_name['燐舞曲']
-        units_by_name['special'] = units_by_name['スペシャル']
-        units_by_name['other'] = units_by_name['その他']
+        units_by_name['rondo'] = self.assets.unit_master[5]
+        units_by_name['special'] = self.assets.unit_master[30]
+        units_by_name['other'] = self.assets.unit_master[50]
         for alias, value in self.unit_aliases.items():
             units_by_name[alias] = units_by_name[value]
         return units_by_name

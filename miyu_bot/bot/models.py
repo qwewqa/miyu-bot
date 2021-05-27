@@ -7,6 +7,7 @@ from discord.ext import commands
 from tortoise import Model, fields
 from tortoise.models import ModelMeta
 
+from miyu_bot.bot.servers import Server, SERVER_NAMES
 from miyu_bot.commands.master_filter.locales import lowercase_locale_mapping
 
 
@@ -188,6 +189,11 @@ leaks_pref = Preference('leaks',
                         validator=validate_boolean,
                         transformer=transform_boolean,
                         is_privileged=True)
+server_pref = Preference('server',
+                         fields.IntEnumField(Server, null=True),
+                         default_value=Server.JP,
+                         validator=lambda v: None if v.lower() in SERVER_NAMES else 'Invalid server.',
+                         transformer=lambda v: SERVER_NAMES[v.lower()])
 
 
 class Guild(PreferenceScope):
@@ -198,6 +204,7 @@ class Guild(PreferenceScope):
     timezone = timezone_pref
     language = language_pref
     prefix = prefix_pref
+    server = server_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
@@ -222,6 +229,7 @@ class Channel(PreferenceScope):
     language = language_pref
     loop = loop_pref
     leaks = leaks_pref
+    server = server_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
@@ -245,6 +253,7 @@ class User(PreferenceScope):
     language = language_pref
     prefix = prefix_pref
     leaks = leaks_pref
+    server = server_pref
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):

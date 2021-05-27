@@ -13,11 +13,11 @@ from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
 
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import D4DJBot, PrefContext
 from miyu_bot.bot.models import PityCount
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
-from miyu_bot.commands.common.emoji import rarity_emoji_ids
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -56,7 +56,7 @@ class Gacha(commands.Cog):
             1: self.load_image('CharaIcon_RarityIcon_Evolution.png'),
         }
 
-        for card in self.bot.assets.card_master.values():
+        for card in self.bot.assets[Server.JP].card_master.values():
             self.images.append(self.get_card_icon(card))
 
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'gacha.ftl')
@@ -88,7 +88,7 @@ class Gacha(commands.Cog):
 
     @functools.lru_cache(None)
     def _get_card_icon(self, card_id: int):
-        card = self.bot.assets.card_master[card_id]
+        card = self.bot.assets[Server.JP].card_master[card_id]
         img = Image.new('RGBA', (259, 259), (255, 255, 255, 0))
         with Image.open(card.icon_path(0)) as icon:
             img.paste(icon.crop((11, 11, 247, 247)), (12, 12))
@@ -111,7 +111,7 @@ class Gacha(commands.Cog):
                       aliases=['gachasim', 'roll'],
                       description='Simulates gacha given the gacha id (can be found using the !banner command and checking the footer).',
                       help='!pull 1')
-    async def pull(self, ctx: commands.Context, *, arg: Optional[ParsedArguments]):
+    async def pull(self, ctx: PrefContext, *, arg: Optional[ParsedArguments]):
         if not arg:
             await ctx.send('A gacha id must be given (can be found using the !banner command and checking the footer).')
             return
@@ -142,7 +142,7 @@ class Gacha(commands.Cog):
                 table_rates = tables_rates[table_index]
                 rng = random.randint(1, table_rates[-1])
                 result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                cards.append(self.bot.assets.card_master[tables[table_index][result_index].card_id])
+                cards.append(ctx.assets.card_master[tables[table_index][result_index].card_id])
 
         bonus = None
         current_pity = None
@@ -161,7 +161,7 @@ class Gacha(commands.Cog):
                 table_rates = list(itertools.accumulate(t.rate for t in bonus_tables[table_index]))
                 rng = random.randint(1, table_rates[-1])
                 result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                bonus = self.bot.assets.card_master[bonus_tables[table_index][result_index].card_id]
+                bonus = ctx.assets.card_master[bonus_tables[table_index][result_index].card_id]
             await pity_data.save()
 
         img = await self.bot.loop.run_in_executor(self.bot.thread_pool,

@@ -237,6 +237,7 @@ class ParsedArguments:
 
     async def update_preferences(self, ctx):
         ctx.preferences = SimpleNamespace(**await self.preferences(ctx))
+        ctx.assets = ctx.bot.assets[ctx.preferences.server]
 
     @classmethod
     async def convert(cls, ctx, argument):

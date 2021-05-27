@@ -15,13 +15,13 @@ if TYPE_CHECKING:
 # The list of modules to import/reload.
 # Format is {'module_name': [('class_name', 'name_in_asset_manager', 'attribute_name_for_filter_manager', 'name')]}
 _MODULES = {
-    'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'card_master', 'cards', 'card_filter')],
-    'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'gacha_master', 'gacha', 'gacha_filter')],
-    'miyu_bot.commands.master_filter.event_filter': [('EventFilter', 'event_master', 'events', 'event_filter')],
-    'miyu_bot.commands.master_filter.music_filter': [('MusicFilter', 'music_master', 'music', 'music_filter')],
+    'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'CardMaster', 'cards', 'card_filter')],
+    'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'GachaMaster', 'gacha', 'gacha_filter')],
+    'miyu_bot.commands.master_filter.event_filter': [('EventFilter', 'EventMaster', 'events', 'event_filter')],
+    'miyu_bot.commands.master_filter.music_filter': [('MusicFilter', 'MusicMaster', 'music', 'music_filter')],
     'miyu_bot.commands.master_filter.login_bonus_filter':
-        [('LoginBonusFilter', 'login_bonus_master', 'login_bonuses', 'login_bonus_filter')],
-    'miyu_bot.commands.master_filter.stamp_filter': [('StampFilter', 'stamp_master', 'stamps', 'stamp_filter')],
+        [('LoginBonusFilter', 'LoginBonusMaster', 'login_bonuses', 'login_bonus_filter')],
+    'miyu_bot.commands.master_filter.stamp_filter': [('StampFilter', 'StampMaster', 'stamps', 'stamp_filter')],
 }
 
 
@@ -33,15 +33,14 @@ class MasterFilterManager:
     login_bonuses: LoginBonusFilter
     stamps: StampFilter
 
-    def __init__(self, bot, assets):
+    def __init__(self, bot):
         self.bot = bot
-        self.assets = assets
         self.filters = []
         for module, values in _MODULES.items():
             module = importlib.import_module(module)
             for class_name, master_name, attribute_name, name in values:
                 master_filter_class = getattr(module, class_name)
-                master_filter = master_filter_class(self.bot, getattr(self.assets, master_name), name)
+                master_filter = master_filter_class(self.bot, master_name, name)
                 self.filters.append(master_filter)
                 setattr(self, attribute_name, master_filter)
 
@@ -52,6 +51,6 @@ class MasterFilterManager:
             module = importlib.reload(module)
             for class_name, master_name, attribute_name, name in values:
                 master_filter_class = getattr(module, class_name)
-                master_filter = master_filter_class(self.bot, getattr(self.assets, master_name), name)
+                master_filter = master_filter_class(self.bot, master_name, name)
                 self.filters.append(master_filter)
                 setattr(self, attribute_name, master_filter)

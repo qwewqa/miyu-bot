@@ -11,6 +11,7 @@ import discord
 from discord.ext import commands
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -23,7 +24,7 @@ class Audio(commands.Cog):
         self.logger = logging.getLogger(__name__)
 
         self.live_interaction_paths = [interaction_dir for interaction_dir in
-                                       (self.bot.assets.path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
+                                       (self.bot.assets[Server.JP].path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
                                        interaction_dir.is_dir() and not interaction_dir.name.startswith('live_general')]
         live_interaction_path_characters = defaultdict(lambda: set())
         live_audio_re = re.compile(r'.*([1-6][1-4])\.hca\.wav')
@@ -89,7 +90,7 @@ class Audio(commands.Cog):
                   hidden=True)
     @commands.is_owner()
     async def play_file(self, ctx: commands.Context, *, name: str):
-        file = self.bot.assets.path / 'plain' / name
+        file = self.bot.assets[Server.JP].path / 'plain' / name
         if not file.exists():
             await ctx.send('Does not exist.')
             return

@@ -3,6 +3,7 @@ import asyncio
 import logging
 import logging.config
 
+import pytz
 from d4dj_utils.extended.manager.revision_manager import RevisionManager
 from d4dj_utils.master.asset_manager import AssetManager
 
@@ -21,8 +22,7 @@ async def main():
         base_url = f'https://resources.d4dj-groovy-mix.com/{args.version}/'
     elif args.server == 'en':
         asset_path = 'assets_en'
-        base_url = ''
-        raise
+        base_url = f'https://resources.en.d4dj-world-groovy-mix.com/{args.version}/'
     else:
         raise
 

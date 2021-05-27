@@ -16,8 +16,8 @@ from d4dj_utils.master.skill_master import SkillMaster
 from discord import AllowedMentions
 from discord.ext import commands
 
-from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.common.argument_parsing import parse_arguments
+from miyu_bot.bot.bot import D4DJBot, PrefContext
+from miyu_bot.commands.common.argument_parsing import parse_arguments, ParsedArguments
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -52,7 +52,7 @@ class Music(commands.Cog):
                       aliases=[],
                       description='Calculates chart score.',
                       help='!score Cyber Cyber diff=ex power=150000 acc=100 skill=50 $assist')
-    async def score(self, ctx: commands.Context, *, arg: commands.clean_content):
+    async def score(self, ctx: PrefContext, *, arguments: ParsedArguments):
         def format_skill(skill):
             if skill.score_up_rate and skill.perfect_score_up_rate:
                 return f'{skill.score_up_rate}%+{skill.perfect_score_up_rate}%p'
@@ -62,8 +62,6 @@ class Music(commands.Cog):
                 return f'{skill.perfect_score_up_rate}%p'
             else:
                 return f'0%'
-
-        arguments = parse_arguments(arg)
 
         difficulty = arguments.single(['diff', 'difficulty'], default=None,
                                       converter=self.difficulty_names)
@@ -107,7 +105,7 @@ class Music(commands.Cog):
 
         def create_dummy_skill(score, perfect):
             return SkillMaster(
-                self.bot.assets,
+                ctx.assets,
                 id=0,
                 min_recovery_value=0,
                 max_recovery_value=0,
@@ -141,7 +139,7 @@ class Music(commands.Cog):
             mean_score_up: Any = sum(s.score_up_rate for s in skills[:4]) / 4
             mean_perfect_score_up: Any = sum(s.perfect_score_up_rate for s in skills[:4]) / 4
             avg_skill = SkillMaster(
-                self.bot.assets,
+                ctx.assets,
                 id=0,
                 min_recovery_value=0,
                 max_recovery_value=0,

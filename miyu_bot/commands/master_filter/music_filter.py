@@ -84,7 +84,9 @@ class MusicFilter(MasterFilter[MusicMaster]):
 
     @chart_designer.init
     def init_chart_designer(self, info):
-        self.chart_designers_by_name = {v.name.lower(): k for k, v in self.bot.assets.chart_designer_master.items()}
+        self.chart_designers_by_name = {}
+        for assets in self.bot.assets.values():
+            self.chart_designers_by_name.update({v.name.lower(): k for k, v in assets.chart_designer_master.items()})
 
     @chart_designer.compare_converter
     def chart_designer_compare_converter(self, s):

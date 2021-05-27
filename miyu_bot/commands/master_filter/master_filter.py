@@ -11,7 +11,7 @@ import re
 from abc import abstractmethod, ABCMeta
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence
+from typing import Any, Optional, Union, Callable, List, Sequence, Protocol
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -525,8 +525,10 @@ EmbedSourceCallable = Union[
 ListFormatterCallable = AnyDataAccessor
 AnyEmoji = Union[int, str, discord.Emoji]
 
+ESC = TypeVar('ESC', bound=EmbedSourceCallable)
 
-class AnnotatedEmbedSourceCallable(EmbedSourceCallable):
+
+class AnnotatedEmbedSourceCallable(Protocol[ESC]):
     list_formatter: Callable
 
 

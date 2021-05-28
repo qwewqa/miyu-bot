@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from miyu_bot.commands.master_filter.stamp_filter import StampFilter
 
 # The list of modules to import/reload.
-# Format is {'module_name': [('class_name', 'name_in_asset_manager', 'attribute_name_for_filter_manager', 'name')]}
+# Format is {'module_name': [('class_name', 'master_class_name', 'attribute_name_for_filter_manager', 'name')]}
 _MODULES = {
     'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'CardMaster', 'cards', 'card_filter')],
     'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'GachaMaster', 'gacha', 'gacha_filter')],

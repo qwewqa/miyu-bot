@@ -35,6 +35,7 @@ class D4DJBot(commands.Bot):
     scripts_path: Optional[Path]
 
     def __init__(self, asset_path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.asset_path = Path(asset_path)
         self.assets = {
             Server.JP: AssetManager(self.asset_path,
@@ -51,7 +52,6 @@ class D4DJBot(commands.Bot):
         self.extension_names = set()
         self.thread_pool = ThreadPoolExecutor()
         self.scripts_path = None
-        super().__init__(*args, **kwargs)
 
     def try_reload_assets(self):
         try:

@@ -156,7 +156,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     is_comparable=True,
                     reverse_sort=True)
     def score30solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 30, False)
+        return self.get_song_score_ratio(value, 30, False)[1]
 
     @score30solo.formatter
     def format_score30solo(self, value: MusicMaster):
@@ -167,7 +167,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     is_comparable=True,
                     reverse_sort=True)
     def score40solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 40, False)
+        return self.get_song_score_ratio(value, 40, False)[1]
 
     @score40solo.formatter
     def format_score40solo(self, value: MusicMaster):
@@ -178,7 +178,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     is_comparable=True,
                     reverse_sort=True)
     def score50solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 50, False)
+        return self.get_song_score_ratio(value, 50, False)[1]
 
     @score50solo.formatter
     def format_score50solo(self, value: MusicMaster):
@@ -189,7 +189,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     is_comparable=True,
                     reverse_sort=True)
     def score60solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 60, False)
+        return self.get_song_score_ratio(value, 60, False)[1]
 
     @score60solo.formatter
     def format_score60solo(self, value: MusicMaster):
@@ -232,12 +232,12 @@ class MusicFilter(MasterFilter[MusicMaster]):
         if song.id in cache:
             return cache[song.id]
         skills = [self.get_dummy_skill(score)] * 5
-        if not song.charts or song.id in (2, 3):
+        charts = [(diff, calculate_score(chart, 150000, skills, fever))
+                  for diff, chart in song.charts.items()
+                  if diff >= 3]  # Skips easy/norma
+        if not charts or song.id in (2, 3):
             return None, 0
-        result = max(((diff, calculate_score(chart, 150000, skills, fever))
-                      for diff, chart in song.charts.items()
-                      if diff >= 3),  # Skips easy/normal
-                     key=lambda k: k[1])
+        result = max(charts, key=lambda k: k[1])
         cache[song.id] = result
         return result
 

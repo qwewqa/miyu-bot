@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Container, Any, Union, Callable, Set, I
 from discord.ext.commands import CommandError, BadArgument
 
 from miyu_bot.bot.models import all_preferences
+from miyu_bot.bot.servers import SERVER_NAMES
 from miyu_bot.commands.cogs.preferences import get_preferences
 
 _param_re = re.compile(
@@ -237,6 +238,8 @@ class ParsedArguments:
 
     async def update_preferences(self, ctx):
         ctx.preferences = SimpleNamespace(**await self.preferences(ctx))
+        if server := self.tags(['en', 'jp']):
+            ctx.preferences.server = SERVER_NAMES[next(iter(server))]
         ctx.assets = ctx.bot.assets[ctx.preferences.server]
 
     @classmethod

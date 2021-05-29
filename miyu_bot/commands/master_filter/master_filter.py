@@ -144,7 +144,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         pass
 
     def is_released(self, value: TData) -> bool:
-        return value.is_released
+        return value.is_available
 
     def get_current(self, ctx) -> Optional[TData]:
         return None

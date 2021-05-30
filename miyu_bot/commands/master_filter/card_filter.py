@@ -20,6 +20,9 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_att
 class CardFilter(MasterFilter[CardMaster]):
     def get_name(self, value: CardMaster) -> str:
         return f'{value.name} {value.character.first_name_english}'
+    
+    def is_released(self, value: CardMaster) -> bool:
+        return value.is_available
 
     @data_attribute('name',
                     aliases=['title'],

@@ -6,12 +6,12 @@ A Discord utility bot for mobile rhythm game D4DJ Groovy Mix.
 
 ### d4dj-utils
 Miyu Bot depends on [d4dj-utils](https://github.com/qwewqa/d4dj-utils),
-which should visible via the PYTHONPATH, or a `.pth` file in a venv.
+which should be visible via the PYTHONPATH, or a `.pth` file in a venv.
 Some functionality of d4dj-utils is not fully public, such as some chart related functions or asset downloading and decryption,
 and is considered "extended" functionality.
 
 ### Bot token
-A JSON file called `config.json` should created in the working directory
+A JSON file called `config.json` should be created in the working directory
 containing a dict with a single key `"token"` corresponding to the bot token.
 
 ### Database initialization

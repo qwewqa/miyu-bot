@@ -21,7 +21,7 @@ class EventFilter(MasterFilter[EventMaster]):
         return value.name
 
     def is_released(self, value: EventMaster) -> bool:
-        return value.start_datetime < dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=12)
+        return value.start_datetime < dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=3)
 
     def get_current(self, ctx) -> Optional[EventMaster]:
         """Returns the oldest event that has not ended or the newest event otherwise."""

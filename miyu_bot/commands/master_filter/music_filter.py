@@ -477,13 +477,13 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     default_sort=date,
                     default_display=level,
                     list_name='song-search')
-    def get_song_embed(self, ctx, song: MusicMaster):
+    def get_song_embed(self, ctx, song: MusicMaster, server):
         l10n = self.l10n[ctx]
 
         color_code = song.unit.main_color_code
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {song.name}', color=color)
+        embed = discord.Embed(title=f'[{server.name}] {song.name}', color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
 
         embed.add_field(name=l10n.format_value('artist'),
@@ -544,13 +544,13 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     tabs=list(difficulty_emoji_ids.values()),
                     default_tab=3,
                     suffix_tab_aliases=difficulty_names)
-    def get_chart_embed(self, ctx, song: MusicMaster, difficulty):
+    def get_chart_embed(self, ctx, song: MusicMaster, difficulty, server):
         l10n = self.l10n[ctx]
 
         difficulty = ChartDifficulty(difficulty + 1)
 
         if difficulty not in song.charts:
-            embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {song.name} [{difficulty.name}]', description='No Data')
+            embed = discord.Embed(title=f'[{server.name}] {song.name} [{difficulty.name}]', description='No Data')
             embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
             return embed
 
@@ -558,7 +558,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 
         chart = song.charts[difficulty]
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {song.name} [{chart.difficulty.name}]', color=color)
+        embed = discord.Embed(title=f'[{server.name}] {song.name} [{chart.difficulty.name}]', color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
         embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.image_path))
         chart_data = chart.load_chart_data()
@@ -604,13 +604,13 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     tabs=list(difficulty_emoji_ids.values()),
                     default_tab=3,
                     suffix_tab_aliases=difficulty_names)
-    def get_sections_embed(self, ctx, song: MusicMaster, difficulty):
+    def get_sections_embed(self, ctx, song: MusicMaster, difficulty, server):
         l10n = self.l10n[ctx]
 
         difficulty = ChartDifficulty(difficulty + 1)
 
         if difficulty not in song.charts:
-            embed = discord.Embed(title=f'[{ctx.preferences.server.name}] Mix: {song.name} [{difficulty.name}]',
+            embed = discord.Embed(title=f'[{server.name}] Mix: {song.name} [{difficulty.name}]',
                                   description=l10n.format_value('no-data'))
             embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
             return embed
@@ -619,7 +619,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 
         chart = song.charts[difficulty]
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] Mix: {song.name} [{chart.difficulty.name}]', color=color)
+        embed = discord.Embed(title=f'[{server.name}] Mix: {song.name} [{chart.difficulty.name}]', color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
         embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.mix_path))
 

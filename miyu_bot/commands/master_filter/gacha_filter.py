@@ -115,10 +115,10 @@ class GachaFilter(MasterFilter[GachaMaster]):
                     default_sort=date,
                     default_display=date,
                     list_name='gacha-search')
-    def get_gacha_embed(self, ctx, gacha: GachaMaster):
+    def get_gacha_embed(self, ctx, gacha: GachaMaster, server):
         l10n = self.l10n[ctx]
 
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {gacha.name}')
+        embed = discord.Embed(title=f'[{server.name}] {gacha.name}')
 
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
 
@@ -180,10 +180,10 @@ class GachaFilter(MasterFilter[GachaMaster]):
                          description='Displays gacha banner rate info.',
                          help='!banner_rates Shiny Smily Scratch'),
                     default_sort=date)
-    def get_gacha_table_embed(self, ctx, gacha: GachaMaster):
+    def get_gacha_table_embed(self, ctx, gacha: GachaMaster, server):
         l10n = self.l10n[ctx]
 
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {gacha.name}')
+        embed = discord.Embed(title=f'[{server.name}] {gacha.name}')
 
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
 

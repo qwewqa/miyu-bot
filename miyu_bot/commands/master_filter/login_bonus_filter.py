@@ -67,10 +67,10 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
                     default_sort=date,
                     default_display=date,
                     list_name='login-bonus-search')
-    def get_login_bonus_embed(self, ctx, login_bonus: LoginBonusMaster):
+    def get_login_bonus_embed(self, ctx, login_bonus: LoginBonusMaster, server):
         l10n = self.l10n[ctx]
 
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {login_bonus.title}')
+        embed = discord.Embed(title=f'[{server.name}] {login_bonus.title}')
 
         def fmt_date(date):
             return str(date)

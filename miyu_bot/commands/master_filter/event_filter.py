@@ -137,12 +137,12 @@ class EventFilter(MasterFilter[EventMaster]):
                     default_sort=date,
                     default_display=date,
                     list_name='event-search')
-    def get_event_embed(self, ctx, event: EventMaster):
+    def get_event_embed(self, ctx, event: EventMaster, server):
         l10n = self.l10n[ctx]
 
         timezone = ctx.preferences.timezone
 
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {event.name}')
+        embed = discord.Embed(title=f'[{server.name}] {event.name}')
 
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
 

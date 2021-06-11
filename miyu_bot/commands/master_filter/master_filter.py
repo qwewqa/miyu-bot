@@ -71,10 +71,13 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             if init_function := d.init_function:
                 init_function(self, d)
 
-    def get_asset_source(self, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
-        if ctx is None:
-            return self.bot.assets[Server.JP][self.master_name]
-        return ctx.assets.masters[self.master_name]
+    def get_asset_source(self, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None):
+        if server is None:
+            if ctx is None:
+                server = Server.JP
+            else:
+                server = ctx.preferences.server
+        return self.bot.assets[server][self.master_name]
 
     def get(self, name_or_id: Union[str, int], ctx: Optional[miyu_bot.bot.bot.PrefContext]):
         if ctx and ctx.preferences.leaks:
@@ -95,16 +98,18 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     return None
                 return self.default_filter[ctx.preferences.server][name_or_id]
 
-    def get_by_id(self, master_id: int, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+    def get_by_id(self, master_id: int, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None):
+        if server is None:
+            server = ctx.preferences.server
         if ctx and ctx.preferences.leaks:
             try:
-                return self.get_asset_source(ctx)[master_id]
+                return self.get_asset_source(ctx, server)[master_id]
             except KeyError:
                 return None
         else:
             try:
-                master = self.get_asset_source(ctx)[master_id]
-                if master not in self.default_filter[ctx.preferences.server].values():
+                master = self.get_asset_source(ctx, server)[master_id]
+                if master not in self.default_filter[server].values():
                     return None
                 return master
             except KeyError:
@@ -341,47 +346,72 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 index -= int(arg.original.strip())
 
             index = min(len(values) - 1, max(0, index))
+            servers = list(Server)
+            target_server_index = servers.index(ctx.preferences.server)
 
             if source.tabs:
-                message = await ctx.send(embed=source.embed_source(self, ctx, values[index], tab))
+                message = await ctx.send(
+                    embed=source.embed_source(self, ctx, values[index], tab, ctx.preferences.server))
 
-                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + ['◀', '▶']
+                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + ['◀', '▶', '🌐']
 
                 async def callback(emoji):
                     nonlocal tab
                     nonlocal index
+                    nonlocal target_server_index
                     try:
                         emoji_index = emojis.index(emoji)
                         if emoji_index < len(source.tabs):
                             tab = emoji_index
                         elif emoji_index == len(source.tabs):
                             index -= 1
-                        else:
+                        elif emoji_index == len(source.tabs) + 1:
                             index += 1
+                        else:
+                            target_server_index += 1
+                            target_server_index %= len(servers)
 
                         index = min(len(values) - 1, max(0, index))
 
-                        await message.edit(embed=source.embed_source(self, ctx, values[index], tab))
+                        value = values[index]
+                        if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
+                            value = target_server_value
+                            server = servers[target_server_index]
+                        else:
+                            server = ctx.preferences.server
+
+                        await message.edit(embed=source.embed_source(self, ctx, value, tab, server))
                     except ValueError:
                         pass
 
                 asyncio.create_task(run_reaction_message(ctx, message, emojis, callback))
             else:
-                message = await ctx.send(embed=source.embed_source(self, ctx, values[index]))
+                message = await ctx.send(embed=source.embed_source(self, ctx, values[index], ctx.preferences.server))
 
-                emojis = ['◀', '▶']
+                emojis = ['◀', '▶', '🌐']
 
                 async def callback(emoji):
                     nonlocal index
+                    nonlocal target_server_index
                     try:
                         if emoji == '◀':
                             index -= 1
-                        else:
+                        elif emoji == '▶':
                             index += 1
+                        else:
+                            target_server_index += 1
+                            target_server_index %= len(servers)
 
                         index = min(len(values) - 1, max(0, index))
 
-                        await message.edit(embed=source.embed_source(self, ctx, values[index]))
+                        value = values[index]
+                        if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
+                            value = target_server_value
+                            server = servers[target_server_index]
+                        else:
+                            server = ctx.preferences.server
+
+                        await message.edit(embed=source.embed_source(self, ctx, value, server))
                     except ValueError:
                         pass
 
@@ -492,7 +522,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             else:
                 listing = [source.list_formatter(self, ctx, value) for value in values]
 
-            embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {self.l10n[ctx].format_value(source.list_name or "search")}')
+            embed = discord.Embed(
+                title=f'[{ctx.preferences.server.name}] {self.l10n[ctx].format_value(source.list_name or "search")}')
             asyncio.create_task(run_paged_message(ctx, embed, listing))
 
         return command
@@ -524,8 +555,8 @@ def _get_accessor(f: Union[AnyDataAccessor]) -> DataAttributeAccessor:
 
 
 EmbedSourceCallable = Union[
-    Callable[[MasterFilter, PrefContext, Any], discord.Embed], Callable[
-        [MasterFilter, PrefContext, Any, int], discord.Embed]]
+    Callable[[MasterFilter, PrefContext, Any, Server], discord.Embed], Callable[
+        [MasterFilter, PrefContext, Any, int, Server], discord.Embed]]
 ListFormatterCallable = AnyDataAccessor
 AnyEmoji = Union[int, str, discord.Emoji]
 

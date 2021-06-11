@@ -13,7 +13,7 @@ class StampFilter(MasterFilter[StampMaster]):
                          description='Lists stamps.',
                          help='!stamps'),
                     list_name='stamp-search')
-    def get_stamp_embed(self, ctx, stamp):
+    def get_stamp_embed(self, ctx, stamp, server):
         pass
 
     @get_stamp_embed.list_formatter

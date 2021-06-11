@@ -212,7 +212,7 @@ class CardFilter(MasterFilter[CardMaster]):
                     default_tab=1,
                     suffix_tab_aliases={'untrained': 0, 'trained': 1},
                     list_name='card-search')
-    def get_card_embed(self, ctx, card: CardMaster, limit_break):
+    def get_card_embed(self, ctx, card: CardMaster, limit_break, server):
         l10n = self.l10n[ctx]
 
         if card.rarity_id <= 2:
@@ -221,7 +221,7 @@ class CardFilter(MasterFilter[CardMaster]):
         color_code = card.character.color_code
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 
-        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {self.format_card_name(card)}', color=color)
+        embed = discord.Embed(title=f'[{server.name}] {self.format_card_name(card)}', color=color)
 
         thumb_url = ctx.bot.asset_url + get_asset_filename(card.icon_path(limit_break))
         art_url = ctx.bot.asset_url + get_asset_filename(card.art_path(limit_break))

@@ -221,7 +221,7 @@ class CardFilter(MasterFilter[CardMaster]):
         color_code = card.character.color_code
         color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
 
-        embed = discord.Embed(title=self.format_card_name(card), color=color)
+        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {self.format_card_name(card)}', color=color)
 
         thumb_url = ctx.bot.asset_url + get_asset_filename(card.icon_path(limit_break))
         art_url = ctx.bot.asset_url + get_asset_filename(card.art_path(limit_break))

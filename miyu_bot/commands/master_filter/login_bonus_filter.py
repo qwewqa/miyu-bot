@@ -70,7 +70,7 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
     def get_login_bonus_embed(self, ctx, login_bonus: LoginBonusMaster):
         l10n = self.l10n[ctx]
 
-        embed = discord.Embed(title=login_bonus.title)
+        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {login_bonus.title}')
 
         def fmt_date(date):
             return str(date)

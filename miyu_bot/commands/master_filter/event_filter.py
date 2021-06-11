@@ -142,7 +142,7 @@ class EventFilter(MasterFilter[EventMaster]):
 
         timezone = ctx.preferences.timezone
 
-        embed = discord.Embed(title=event.name)
+        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {event.name}')
 
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(event.logo_path))
 

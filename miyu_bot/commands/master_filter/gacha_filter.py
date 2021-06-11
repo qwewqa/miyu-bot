@@ -118,7 +118,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
     def get_gacha_embed(self, ctx, gacha: GachaMaster):
         l10n = self.l10n[ctx]
 
-        embed = discord.Embed(title=gacha.name)
+        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {gacha.name}')
 
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
 
@@ -183,7 +183,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
     def get_gacha_table_embed(self, ctx, gacha: GachaMaster):
         l10n = self.l10n[ctx]
 
-        embed = discord.Embed(title=gacha.name)
+        embed = discord.Embed(title=f'[{ctx.preferences.server.name}] {gacha.name}')
 
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
 

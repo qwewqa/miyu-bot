@@ -46,6 +46,13 @@ bonus-description =
        *[other] { $both }
     }
 
+parameter-point-bonus = 能力值加成
+
+parameter-point-bonus-description =
+     每 { $parameter-bonus-rate } { $parameter-emoji }
+
+no-parameter-point-bonus = 無加成
+
 event-id = 活動ID: { $event-id }
 
 event-search = 活動搜尋

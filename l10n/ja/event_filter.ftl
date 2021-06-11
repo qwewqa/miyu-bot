@@ -46,6 +46,13 @@ bonus-description =
        *[other] { $both }
     }
 
+parameter-point-bonus = パラメーターボーナス
+
+parameter-point-bonus-description =
+     { $parameter-bonus-rate } { $parameter-emoji } につき 1 ポイント
+
+no-parameter-point-bonus = なし
+
 event-id = イベントID: { $event-id }
 
 event-search = イベント検索

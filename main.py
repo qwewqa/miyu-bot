@@ -57,23 +57,6 @@ bot.load_extension('miyu_bot.commands.cogs.gacha')
 @bot.event
 async def on_ready():
     logging.getLogger(__name__).info(f'Current server count: {len(bot.guilds)}')
-    for guild in bot.guilds:
-        await models.Guild.update_or_create(id=guild.id, defaults={'name': guild.name})
-
-
-@bot.listen()
-async def on_guild_join(guild):
-    await models.Guild.update_or_create(id=guild.id, defaults={'name': guild.name})
-
-
-@bot.listen()
-async def on_guild_remove(guild):
-    await (await models.Guild.get(id=guild.id)).delete()
-
-
-@bot.listen()
-async def on_guild_update(_before, after):
-    await models.Guild.update_or_create(id=after.id, defaults={'name': after.name})
 
 
 @bot.listen()

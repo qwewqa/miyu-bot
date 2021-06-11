@@ -251,3 +251,4 @@ config.json
 assets/
 export/
 scripts.yaml
+miyu_bot/bot/tortoise_config.py

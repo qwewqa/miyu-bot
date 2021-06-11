@@ -198,7 +198,6 @@ server_pref = Preference('server',
 
 class Guild(PreferenceScope):
     id = fields.BigIntField(pk=True)
-    name = fields.CharField(max_length=255)  # Doesn't need to stay up to date. Just for reference.
 
     scope_name = 'Guild'
     timezone = timezone_pref
@@ -210,10 +209,10 @@ class Guild(PreferenceScope):
     async def get_from_context(cls, ctx: commands.Context):
         if not ctx.guild:
             return None
-        return (await cls.get_or_create(id=ctx.guild.id, defaults=dict(name='ctx.guild.name')))[0]
+        return (await cls.get_or_create(id=ctx.guild.id))[0]
 
     def __str__(self):
-        return f'{self.name} ({self.id})'
+        return f'Guild({self.id})'
 
     @staticmethod
     def has_permissions(ctx: commands.Context) -> bool:
@@ -222,7 +221,6 @@ class Guild(PreferenceScope):
 
 class Channel(PreferenceScope):
     id = fields.BigIntField(pk=True)
-    name = fields.CharField(max_length=255)  # Doesn't need to stay up to date. Just for reference.
 
     scope_name = 'Channel'
     timezone = timezone_pref
@@ -233,11 +231,10 @@ class Channel(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.get_or_create(id=ctx.channel.id,
-                                        defaults={'name': getattr(ctx.channel, 'name', 'DM')}))[0]
+        return (await cls.get_or_create(id=ctx.channel.id))[0]
 
     def __str__(self):
-        return f'{self.name} ({self.id})'
+        return f'Channel({self.id})'
 
     @staticmethod
     def has_permissions(ctx: commands.Context) -> bool:
@@ -246,7 +243,6 @@ class Channel(PreferenceScope):
 
 class User(PreferenceScope):
     id = fields.BigIntField(pk=True)
-    name = fields.CharField(max_length=255)  # Doesn't need to stay up to date. Just for reference.
 
     scope_name = 'User'
     timezone = timezone_pref
@@ -257,11 +253,10 @@ class User(PreferenceScope):
 
     @classmethod
     async def get_from_context(cls, ctx: commands.Context):
-        return (await cls.get_or_create(id=ctx.author.id,
-                                        defaults={'name': f'{ctx.author.name}#{ctx.author.discriminator}'}))[0]
+        return (await cls.get_or_create(id=ctx.author.id))[0]
 
     def __str__(self):
-        return f'{self.name} ({self.id})'
+        return f'User({self.id})'
 
 
 class PityCount(Model):

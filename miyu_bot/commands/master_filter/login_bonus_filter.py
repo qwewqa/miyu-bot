@@ -73,7 +73,7 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
         embed = discord.Embed(title=login_bonus.title)
 
         def fmt_date(date):
-            return fluent_date(date, dateStyle='medium', timeStyle='medium')
+            return str(date)
 
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {

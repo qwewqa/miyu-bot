@@ -152,7 +152,7 @@ class EventFilter(MasterFilter[EventMaster]):
         duration_hours = duration_hours if not duration_hours.is_integer() else int(duration_hours)
 
         def fmt_date(date):
-            return fluent_date(date, dateStyle='medium', timeStyle='medium')
+            return str(date)
 
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {

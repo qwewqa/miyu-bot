@@ -201,7 +201,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                 rate_up_rate = max(rates)
 
                 # Exclude tables with no rate up, except those with very few rate ups (mainly for pity pull)
-                if rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05:
+                if total_rate == 0 or (rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05):
                     continue
 
                 rate_up_card_entries = [t for t in table if t.rate == rate_up_rate]

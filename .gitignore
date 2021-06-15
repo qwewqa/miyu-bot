@@ -249,6 +249,7 @@ dmypy.json
 
 config.json
 assets/
+assets_en/
 export/
 scripts.yaml
 miyu_bot/bot/tortoise_config.py

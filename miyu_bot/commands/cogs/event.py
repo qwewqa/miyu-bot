@@ -234,7 +234,7 @@ class Event(commands.Cog):
                                't1k', 't2k', 't5k', 't10k', 't20k', 't30k', 't50k'],
                       description=f'Displays the cutoffs at different tiers.',
                       help='!cutoff 50')
-    async def cutoff(self, ctx: PrefContext, tier: str = ''):
+    async def cutoff(self, ctx: PrefContext, *, tier: str = ''):
         if ctx.invoked_with.endswith('co') and tier == 'conut':
             await ctx.send('🥥')
             return

@@ -3,11 +3,9 @@ from datetime import datetime
 
 import discord
 from d4dj_utils.master.login_bonus_master import LoginBonusMaster
-from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
-from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source
 
 

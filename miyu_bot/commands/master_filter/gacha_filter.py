@@ -7,12 +7,10 @@ from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from d4dj_utils.master.gacha_table_master import GachaTableMaster
 from d4dj_utils.master.gacha_table_rate_master import GachaTableRateMaster
-from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, attribute_emoji_ids_by_attribute_id, grey_emoji_id
-from miyu_bot.commands.common.formatting import format_info
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
     command_source
 

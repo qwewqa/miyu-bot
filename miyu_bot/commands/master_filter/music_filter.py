@@ -10,7 +10,6 @@ from d4dj_utils.master.chart_master import ChartDifficulty
 from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
 from d4dj_utils.master.skill_master import SkillMaster
-from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.bot.servers import Server

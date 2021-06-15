@@ -7,7 +7,6 @@ from PIL import ImageColor
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
 from d4dj_utils.master.skill_master import SkillMaster
-from fluent.runtime.types import fluent_date
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename

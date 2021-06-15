@@ -1,18 +1,13 @@
-import asyncio
 import re
 from datetime import datetime
-from typing import Tuple, Optional
 
 import discord
 from PIL import ImageColor
-from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartDifficulty
 from d4dj_utils.master.common_enums import ChartSectionType
 from d4dj_utils.master.music_master import MusicMaster
-from d4dj_utils.master.skill_master import SkillMaster
 
 from miyu_bot.bot.bot import PrefContext
-from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, grey_emoji_id, difficulty_emoji_ids
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
@@ -25,7 +20,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
 
     def is_released(self, value: MusicMaster) -> bool:
         return value.is_available
-    
+
     @data_attribute('name',
                     aliases=['title'],
                     is_sortable=True)
@@ -101,163 +96,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         else:
             return self.chart_designers_by_name[s.lower()]
 
-    difficulty_short_names = {
-        ChartDifficulty.Easy: 'ES',
-        ChartDifficulty.Normal: 'NM',
-        ChartDifficulty.Hard: 'HD',
-        ChartDifficulty.Expert: 'EX',
-        None: '##'
-    }
-
-    @data_attribute('score30',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score30(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 30, True)[1]
-
-    @score30.formatter
-    def format_score30(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 30, True)
-
-    @data_attribute('score40',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score40(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 40, True)[1]
-
-    @score40.formatter
-    def format_score40(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 40, True)
-
-    @data_attribute('score50',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score50(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 50, True)[1]
-
-    @score50.formatter
-    def format_score50(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 50, True)
-
-    @data_attribute('score60',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score60(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 60, True)[1]
-
-    @score60.formatter
-    def format_score60(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 60, True)
-
-    @data_attribute('score30solo',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score30solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 30, False)[1]
-
-    @score30solo.formatter
-    def format_score30solo(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 30, False)
-
-    @data_attribute('score40solo',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score40solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 40, False)[1]
-
-    @score40solo.formatter
-    def format_score40solo(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 40, False)
-
-    @data_attribute('score50solo',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score50solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 50, False)[1]
-
-    @score50solo.formatter
-    def format_score50solo(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 50, False)
-
-    @data_attribute('score60solo',
-                    is_sortable=True,
-                    is_comparable=True,
-                    reverse_sort=True)
-    def score60solo(self, value: MusicMaster):
-        return self.get_song_score_ratio(value, 60, False)[1]
-
-    @score60solo.formatter
-    def format_score60solo(self, value: MusicMaster):
-        return self.get_song_score_formatted(value, 60, False)
-
-    @score40.init
-    def init_score(self, info):
-        self.score_cache = {
-            (30, False): {},
-            (40, False): {},
-            (50, False): {},
-            (60, False): {},
-            (30, True): {},
-            (40, True): {},
-            (50, True): {},
-            (60, True): {},
-        }
-        self.reference_song = self.bot.assets[Server.JP].music_master[320009]
-        self.bot.loop.create_task(self.preload_song_scores())
-
-    async def preload_song_scores(self):
-        for score in (30, 40, 50, 60):
-            for fever in (True, False):
-                for song in self.bot.assets[Server.JP].music_master.values():
-                    self.get_song_score(song, score, fever)
-                    await asyncio.sleep(0)
-
-    def get_song_score_ratio(self, song, score, fever):
-        diff, song_score = self.get_song_score(song, score, fever)
-        return diff, song_score / self.get_song_score(self.reference_song, score, fever)[1]
-
-    def get_song_score_formatted(self, song, score, fever):
-        diff, ratio = self.get_song_score_ratio(song, score, fever)
-        diff_text = self.difficulty_short_names[diff]
-        percent_text = f'{100 * ratio:.2f}%'
-        return diff_text + ' ' * (8 - len(percent_text)) + percent_text
-
-    def get_song_score(self, song: MusicMaster, score, fever) -> Tuple[Optional[ChartDifficulty], float]:
-        cache = self.score_cache[(score, fever)]
-        if song.id in cache:
-            return cache[song.id]
-        skills = [self.get_dummy_skill(score)] * 5
-        charts = [(diff, calculate_score(chart, 150000, skills, fever))
-                  for diff, chart in song.charts.items()
-                  if diff >= 3]  # Skips easy/norma
-        if not charts or song.id in (2, 3):
-            return None, 0
-        result = max(charts, key=lambda k: k[1])
-        cache[song.id] = result
-        return result
-
-    def get_dummy_skill(self, score):
-        return SkillMaster(
-            self.bot.assets[Server.JP],
-            id=0,
-            min_recovery_value=0,
-            max_recovery_value=0,
-            combo_support_count=0,
-            score_up_rate=score,
-            min_seconds=5,
-            max_seconds=9,
-            perfect_score_up_rate=0,
-        )
-
     @data_attribute('level',
-                    aliases=['difficulty', 'diff'],
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -470,7 +309,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                          help='!song grgr'),
                     list_command_args=
                     dict(name='songs',
-                         aliases=['musics', 'charts'],
+                         aliases=['musics'],
                          description='Lists songs.',
                          help='!songs'),
                     default_sort=date,

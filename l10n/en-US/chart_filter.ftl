@@ -1,0 +1,1 @@
+chart-search = Chart Search

@@ -23,7 +23,7 @@ import miyu_bot.bot.bot
 from miyu_bot.bot.bot import D4DJBot, PrefContext
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
-from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap, romanize
+from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
 from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
@@ -46,6 +46,8 @@ TData = TypeVar('TData', bound=MasterAsset)
 
 
 class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
+    # Note: only works for masters that have an id field
+
     _command_sources: List[CommandSourceInfo]
     _data_attributes: List[DataAttributeInfo]
     command_sources: List[CommandSourceInfo]
@@ -59,10 +61,20 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         self.default_filter = defaultdict(lambda: FuzzyFilteredMap(self.is_released))
         self.unrestricted_filter = defaultdict(lambda: FuzzyFilteredMap())
         for server, manager in bot.assets.items():
-            for master in manager.masters[self.master_name].values():
+            masters = manager.masters[self.master_name]
+            for master in masters.values():
                 alias = self.get_name(master)
                 self.default_filter[server][alias] = master
                 self.unrestricted_filter[server][alias] = master
+        for server, manager in bot.assets.items():
+            masters = manager.masters[self.master_name]
+            for alias_source_server in bot.assets.keys():
+                if alias_source_server == server:
+                    continue
+                for alias, alias_server_value in self.unrestricted_filter[alias_source_server].filtered_items:
+                    if alias_server_value.id in manager.masters[self.master_name]:
+                        self.default_filter[server][alias] = masters[alias_server_value.id]
+                        self.unrestricted_filter[server][alias] = masters[alias_server_value.id]
         self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
         self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
         self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + '.ftl')

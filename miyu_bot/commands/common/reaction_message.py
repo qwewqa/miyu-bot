@@ -158,6 +158,9 @@ async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyE
 
             await callback(emoji)
         except asyncio.TimeoutError:
-            for emoji in emojis:
-                await message.remove_reaction(emoji, ctx.bot.user)
+            try:
+                await message.clear_reactions()
+            except discord.Forbidden:
+                for emoji in emojis:
+                    await message.remove_reaction(emoji, ctx.bot.user)
             break

@@ -14,8 +14,9 @@ from discord.ext import commands, tasks
 from pytz import UnknownTimeZoneError
 
 from miyu_bot.bot import models
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import D4DJBot, PrefContext
 from miyu_bot.bot.models import valid_loop_intervals
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import parse_arguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.reaction_message import run_deletable_message, run_tabbed_message
@@ -233,9 +234,18 @@ class Event(commands.Cog):
                                't1k', 't2k', 't5k', 't10k', 't20k', 't30k', 't50k'],
                       description=f'Displays the cutoffs at different tiers.',
                       help='!cutoff 50')
-    async def cutoff(self, ctx: commands.Context, tier: str = ''):
+    async def cutoff(self, ctx: PrefContext, tier: str = ''):
         if ctx.invoked_with.endswith('co') and tier == 'conut':
             await ctx.send('🥥')
+            return
+
+        args = parse_arguments(tier)
+        await args.update_preferences(ctx)
+        tier = args.text()
+        args.require_all_arguments_used()
+
+        if ctx.preferences.server != Server.JP:
+            await ctx.send('Not supported outside of the JP server.')
             return
 
         def process_tier_arg(tier_arg):

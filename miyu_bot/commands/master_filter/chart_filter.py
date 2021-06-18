@@ -228,27 +228,31 @@ class ChartFilter(MasterFilter[ChartMaster]):
             locals()[_temp_attr_name] = _temp_score_attr
             locals()[f'format_{_temp_attr_name}'] = _temp_format_score_attr
 
-            _temp_attr_name = f'efficiency{_temp_score}{"solo" if not _temp_fever else ""}'
+            for _temp_menuing_time in [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]:
+                _temp_attr_name = f'{_temp_menuing_time}efficiency{_temp_score}{"solo" if not _temp_fever else ""}'
 
-            @data_attribute(_temp_attr_name,
-                            is_sortable=True,
-                            reverse_sort=True)
-            def _temp_score_attr(self, _ctx, value: ChartMaster, score=_temp_score, fever=_temp_fever):
-                return self.get_chart_efficiency(value, score, fever)
+                @data_attribute(_temp_attr_name,
+                                aliases=[f'{_temp_menuing_time}eff{_temp_score}{"solo" if not _temp_fever else ""}'],
+                                is_sortable=True,
+                                reverse_sort=True)
+                def _temp_score_attr(self, _ctx, value: ChartMaster, score=_temp_score, fever=_temp_fever,
+                                     menuing_time=_temp_menuing_time):
+                    return self.get_chart_efficiency(value, score, fever, menuing_time)
 
-            @_temp_score_attr.formatter
-            def _temp_format_score_attr(self, _ctx, value: ChartMaster, score=_temp_score, fever=_temp_fever):
-                return f'{self.get_chart_efficiency_formatted(value, score, fever)}  {self.format_song_duration(value)} '
+                @_temp_score_attr.formatter
+                def _temp_format_score_attr(self, _ctx, value: ChartMaster, score=_temp_score, fever=_temp_fever,
+                                            menuing_time=_temp_menuing_time):
+                    return f'{self.get_chart_efficiency_formatted(value, score, fever, menuing_time)}  {self.format_song_duration(value)} '
 
-            locals()[_temp_attr_name] = _temp_score_attr
-            locals()[f'format_{_temp_attr_name}'] = _temp_format_score_attr
-
+                locals()[_temp_attr_name] = _temp_score_attr
+                locals()[f'format_{_temp_attr_name}'] = _temp_format_score_attr
 
     del _temp_attr_name
     del _temp_score_attr
     del _temp_format_score_attr
     del _temp_score
     del _temp_fever
+    del _temp_menuing_time
 
     async def preload_song_scores(self):
         for score, fever in self.score_cache:
@@ -265,19 +269,18 @@ class ChartFilter(MasterFilter[ChartMaster]):
         cache[chart.id] = score
         return score
 
-    EFFICIENCY_MENUING_TIME = 30
-
     def get_chart_score_formatted(self, chart, score, fever):
         ratio = self.get_chart_score(chart, score, fever) / self.get_chart_score(self.reference_chart, score, fever)
         return f'{100 * ratio:>5.1f}%'
 
-    def get_chart_efficiency(self, chart: ChartMaster, score, fever):
+    def get_chart_efficiency(self, chart: ChartMaster, score, fever, menuing_time):
         if not chart.music.duration:
             return -1
-        return self.get_chart_score(chart, score, fever) / (chart.music.duration + self.EFFICIENCY_MENUING_TIME)
+        return self.get_chart_score(chart, score, fever) / (chart.music.duration + menuing_time)
 
-    def get_chart_efficiency_formatted(self, chart: ChartMaster, score, fever):
-        ratio = self.get_chart_efficiency(chart, score, fever) / self.get_chart_efficiency(self.reference_chart, score, fever)
+    def get_chart_efficiency_formatted(self, chart: ChartMaster, score, fever, menuing_time):
+        ratio = (self.get_chart_efficiency(chart, score, fever, menuing_time) /
+                 self.get_chart_efficiency(self.reference_chart, score, fever, menuing_time))
         return f'{100 * ratio:>5.1f}%'
 
     def get_dummy_skill(self, score):

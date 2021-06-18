@@ -86,6 +86,42 @@ class CardFilter(MasterFilter[CardMaster]):
     def format_power(self, value: CardMaster):
         return str(value.max_power_with_limit_break).rjust(5)
 
+    @data_attribute('heart',
+                    aliases=['hrt'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def heart(self, value: CardMaster):
+        return value.max_parameters_with_limit_break[0]
+
+    @heart.formatter
+    def format_heart(self, value: CardMaster):
+        return str(value.max_parameters_with_limit_break[0]).rjust(5)
+
+    @data_attribute('technique',
+                    aliases=['tech', 'technical'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def technique(self, value: CardMaster):
+        return value.max_parameters_with_limit_break[1]
+
+    @technique.formatter
+    def format_technique(self, value: CardMaster):
+        return str(value.max_parameters_with_limit_break[1]).rjust(5)
+
+    @data_attribute('physical',
+                    aliases=['phys', 'physic', 'physics'],
+                    is_sortable=True,
+                    is_comparable=True,
+                    reverse_sort=True)
+    def physical(self, value: CardMaster):
+        return value.max_parameters_with_limit_break[2]
+
+    @physical.formatter
+    def format_physical(self, value: CardMaster):
+        return str(value.max_parameters_with_limit_break[2]).rjust(5)
+
     @data_attribute('date',
                     aliases=['release', 'recent'],
                     is_sortable=True,

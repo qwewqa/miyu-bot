@@ -265,7 +265,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         if chart.id in cache:
             return cache[chart.id]
         skills = [self.get_dummy_skill(score)] * 5
-        score = calculate_score(chart, 150000, skills, fever)
+        score = self.bot.chart_scorer(chart, 150000, skills, fever)
         cache[chart.id] = score
         return score
 

@@ -14,6 +14,7 @@ from pytz import BaseTzInfo
 from pytz.tzinfo import StaticTzInfo, DstTzInfo
 from tortoise import Tortoise
 
+from miyu_bot.bot.chart_scorer import ChartScorer
 from miyu_bot.bot.common_aliases import CommonAliases
 from miyu_bot.bot.servers import Server
 from miyu_bot.bot.tortoise_config import TORTOISE_ORM
@@ -52,6 +53,7 @@ class D4DJBot(commands.Bot):
         self.extension_names = set()
         self.thread_pool = ThreadPoolExecutor()
         self.scripts_path = None
+        self.chart_scorer = ChartScorer(self.assets[Server.JP].chart_master)
 
     def try_reload_assets(self):
         try:

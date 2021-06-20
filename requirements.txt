@@ -12,7 +12,7 @@ click==7.1.2
 ddlparse==1.9.0
 Deprecated==1.2.12
 dictdiffer==0.8.1
-discord.py==1.7.2
+discord.py==1.7.3
 fluent.runtime==0.3.1
 fluent.syntax==0.18.1
 idna==3.1

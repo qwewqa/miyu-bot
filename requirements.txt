@@ -17,6 +17,7 @@ fluent.runtime==0.3.1
 fluent.syntax==0.18.1
 idna==3.1
 iso8601==0.1.14
+mkdocs==1.2.1
 msgpack==1.0.2
 multidict==5.1.0
 Pillow==8.2.0

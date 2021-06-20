@@ -399,7 +399,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed = discord.Embed(title=f'[{server.name}] {song.name} [{chart.difficulty.name}]', color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
         embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.image_path))
-        chart_data = chart.load_chart_data()
+        chart_data = self.bot.chart_scorer.get_chart(chart.id)
         note_counts = chart_data.get_note_counts()
 
         embed.add_field(name=l10n.format_value('info'),

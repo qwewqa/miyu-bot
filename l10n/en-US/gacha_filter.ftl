@@ -9,6 +9,10 @@ info-desc =
         [None] { none }
        *[other] { $pity-requirement }
     }
+    Select Requirement: { $select-requirement ->
+        [None] { none }
+       *[other] { $select-requirement }
+    }
     Type: { gacha-type }
 
 gacha-type = { $gacha-type ->
@@ -21,11 +25,17 @@ gacha-type = { $gacha-type ->
    *[other] -> Unknown
 }
 
+
 summary = Summary
 featured = Featured
 featured-text = { $featured-text ->
     [None] { none }
    *[other] { $featured-text }
+}
+selectable = Selectable
+selectable-text = { $selectable-text ->
+    [None] { none }
+   *[other] { $selectable-text }
 }
 
 too-many = Too many

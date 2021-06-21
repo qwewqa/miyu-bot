@@ -122,12 +122,16 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
         embed.set_thumbnail(url=thumb_url)
 
-        featured_text = '\n'.join(self.format_card_name_with_emoji(card) for card in gacha.pick_up_cards) or 'None'
+        def get_card_list_text(cards):
+            t = '\n'.join(self.format_card_name_with_emoji(card) for card in cards) or 'None'
+            if len(t) > 1024:
+                t = '\n'.join(self.format_card_name_short(card) for card in cards) or 'None'
+            if len(t) > 1024:
+                t = l10n.format_value('too-many-results')
+            return t
 
-        if len(featured_text) > 1024:
-            featured_text = '\n'.join(self.format_card_name_short(card) for card in gacha.pick_up_cards) or 'None'
-        if len(featured_text) > 1024:
-            featured_text = l10n.format_value('too-many-results')
+        featured_text = get_card_list_text(gacha.pick_up_cards)
+        selectable_text = get_card_list_text(gacha.bonus_selectable_cards)
 
         def fmt_date(date):
             return str(date)
@@ -138,6 +142,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                             'end-date': fmt_date(ctx.convert_tz(gacha.end_datetime)),
                             'event-name': gacha.event.name if gacha.event else 'None',
                             'pity-requirement': gacha.bonus_max_value or 'None',
+                            'select-requirement': gacha.bonus_selectable_cards_max_value or 'None',
                             'gacha-type': gacha.gacha_type.name,
                         }),
                         inline=False)
@@ -146,6 +151,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
                         inline=False)
         embed.add_field(name=l10n.format_value('featured'),
                         value=l10n.format_value('featured-text', {'featured-text': featured_text or 'None'}),
+                        inline=False)
+        embed.add_field(name=l10n.format_value('selectable'),
+                        value=l10n.format_value('selectable-text', {'selectable-text': selectable_text or 'None'}),
                         inline=False)
         embed.add_field(name=l10n.format_value('costs'),
                         value='\n'.join(self.format_draw_data(draw, l10n) for draw in gacha.draw_data))

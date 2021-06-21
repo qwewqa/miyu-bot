@@ -25,7 +25,6 @@ gacha-type = { $gacha-type ->
    *[other] -> Unknown
 }
 
-
 summary = Summary
 featured = Featured
 featured-text = { $featured-text ->

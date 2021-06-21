@@ -9,6 +9,10 @@ info-desc =
         [None] { none }
        *[other] { $pity-requirement }
     }
+    セレクト条件: { $select-requirement ->
+        [None] { none }
+       *[other] { $select-requirement }
+    }
     ガチャ形式: { gacha-type }
 
 gacha-type = { $gacha-type ->
@@ -26,6 +30,11 @@ featured = ピックアップ
 featured-text = { $featured-text ->
     [None] { none }
    *[other] { $featured-text }
+}
+selectable = セレクト
+selectable-text = { $selectable-text ->
+    [None] { none }
+   *[other] { $selectable-text }
 }
 
 too-many = { none }

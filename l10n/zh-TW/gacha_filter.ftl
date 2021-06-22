@@ -9,6 +9,10 @@ info-desc =
         [None] 無保底
        *[other] { $pity-requirement }
     }
+    天井條件: { $select-requirement ->
+        [None] { none }
+       *[other] { $select-requirement }
+    }
     類型: { gacha-type }
 
 gacha-type = { $gacha-type ->
@@ -26,6 +30,11 @@ featured = Pick up
 featured-text = { $featured-text ->
     [None] { no-data }
    *[other] { $featured-text }
+}
+selectable = 可選擇
+selectable-text = { $selectable-text ->
+    [None] { none }
+   *[other] { $selectable-text }
 }
 
 too-many = 太多

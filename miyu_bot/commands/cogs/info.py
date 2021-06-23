@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 
-class Search(commands.Cog):
+class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         bot.master_filters.reload()
@@ -20,4 +20,4 @@ class Search(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Search(bot))
+    bot.add_cog(Info(bot))

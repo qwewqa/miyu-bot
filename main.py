@@ -44,7 +44,7 @@ scripts_path = Path('scripts.yaml').resolve()
 if scripts_path.exists():
     bot.scripts_path = scripts_path
 
-bot.load_extension('miyu_bot.commands.cogs.search')
+bot.load_extension('miyu_bot.commands.cogs.info')
 bot.load_extension('miyu_bot.commands.cogs.card')
 bot.load_extension('miyu_bot.commands.cogs.event')
 bot.load_extension('miyu_bot.commands.cogs.music')

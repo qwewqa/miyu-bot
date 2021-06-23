@@ -21,6 +21,8 @@ login-bonus-type-name = { $login-bonus-type ->
 
 rewards = 獎勵
 
+too-many-results = 結果過多
+
 login-bonus-id = 登入獎勵ID: { $login-bonus-id }
 
 login-bonus-search = 登入獎勵搜尋

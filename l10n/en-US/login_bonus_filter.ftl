@@ -19,6 +19,9 @@ login-bonus-type-name = { $login-bonus-type ->
    *[other] Unknown
 }
 
+too-many-results = Too Many Results
+
+
 rewards = Rewards
 
 login-bonus-id = Login Bonus Id: { $login-bonus-id }

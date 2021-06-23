@@ -95,6 +95,9 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
 
         reward_text = '```' + ('\n'.join(format_login_bonus(item) for item in login_bonus.items) or 'None') + '```'
 
+        if len(reward_text) > 1024:
+            reward_text = l10n.format_value('too-many-results')
+
         embed.add_field(name=l10n.format_value('rewards'),
                         value=reward_text,
                         inline=False)

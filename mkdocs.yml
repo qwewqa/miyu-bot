@@ -1,2 +1,14 @@
 site_name: Miyu Docs
 site_url: https://miyu-docs.qwewqa.xyz/
+repo_url: https://github.com/qwewqa/miyu-bot
+theme:
+  name: material
+plugins:
+  - i18n:
+      default_language: en_US
+      languages:
+        en_US: English
+        zh_TW: 繁體中文
+        ja: 日本語
+markdown_extensions:
+  - admonition

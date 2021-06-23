@@ -166,50 +166,6 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     def get_current(self, ctx) -> Optional[TData]:
         return None
 
-    def get_help_text(self):
-        entries = []
-        for attr in self.data_attributes:
-            text = f'# {attr.name}'
-            if attr.aliases:
-                text += ' (' + ', '.join(attr.aliases) + ')'
-            text += '\n'
-            if attr.is_flag:
-                text += '[Flag]'
-            if attr.is_sortable:
-                text += '[Sortable]'
-            if attr.formatter:
-                text += '[Display]'
-            if attr.is_comparable:
-                text += '[Comparable]'
-            if attr.is_eq:
-                text += '[Filterable]'
-            if attr.is_tag:
-                text += '[Tag]'
-            if attr.is_keyword:
-                text += '[Keyword]'
-            if attr.is_plural:
-                text += '[Plural]'
-            text += '\n'
-            if attr.value_mapping or attr.is_flag:
-                text += 'Tags: '
-                tags = []
-                if attr.is_flag:
-                    tags += [f'${attr.name}'] + [f'${v}' for v in attr.aliases]
-                if attr.is_keyword:
-                    tags += attr.value_mapping.keys()
-                if attr.is_tag:
-                    tags += [f'${v}' for v in attr.value_mapping.keys()]
-                text += ', '.join(tags)
-                text += '\n'
-            if attr.is_comparable or attr.is_eq:
-                if attr.is_comparable:
-                    text += f'{attr.name} (=, ==, !=, >, <, >=, <=) {attr.help_sample_argument or "[value]"}'
-                if attr.is_eq:
-                    text += f'{attr.name} (=, ==, !=) {attr.help_sample_argument or "[value]"}'
-                text += '\n'
-            entries.append(text.strip())
-        return '\n\n'.join(entries)
-
     def get_commands(self, include_self_parameter: bool = False):
         def wrap(f):
             # Note how a default argument used, so that the error propagates properly
@@ -218,30 +174,28 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             return wrapped
 
-        help_text = self.get_help_text()
-
         for cs in self.command_sources:
             if include_self_parameter:
                 if args := cs.command_args:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
-                                                                      'No Description') + '\n\n' + help_text})(
+                                                                      'No Description')})(
                         wrap(self.get_primary_command_function(cs)))
                 if args := cs.list_command_args:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
-                                                                      'No Description') + '\n\n' + help_text})(
+                                                                      'No Description')})(
                         wrap(self.get_list_command_function(cs)))
             else:
                 if args := cs.command_args:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
-                                                                      'No Description') + '\n\n' + help_text})(
+                                                                      'No Description')})(
                         self.get_primary_command_function(cs))
                 if args := cs.list_command_args:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
-                                                                      'No Description') + '\n\n' + help_text})(
+                                                                      'No Description')})(
                         self.get_list_command_function(cs))
 
     def get_primary_command_function(self, source):

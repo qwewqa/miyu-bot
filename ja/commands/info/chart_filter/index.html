@@ -1,0 +1,6094 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://miyu-docs.qwewqa.xyz/ja/commands/info/chart_filter/">
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.8">
+    
+    
+      
+        <title>Chart filter - Miyu Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("../../../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#name" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href="../../../.." title="Miyu Docs" class="md-header__button md-logo" aria-label="Miyu Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Miyu Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Chart filter
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <div class="md-header__option">
+        <div class="md-select">
+          
+          <button class="md-header__button md-icon" aria-label="Select language">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24z"/></svg>
+          </button>
+          <div class="md-select__inner">
+            <ul class="md-select__list">
+              
+                <li class="md-select__item">
+                  <a href="../../../../" hreflang="en_US" class="md-select__link">
+                    English
+                  </a>
+                </li>
+                
+                <li class="md-select__item">
+                  <a href="../../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
+                  </a>
+                </li>
+                
+                <li class="md-select__item">
+                  <a href="../../../" hreflang="ja" class="md-select__link">
+                    日本語
+                  </a>
+                </li>
+                
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/qwewqa/miyu-bot/" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Miyu Docs" class="md-nav__button md-logo" aria-label="Miyu Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Miyu Docs
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/qwewqa/miyu-bot/" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        Miyu Docs
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../privacy-policy/" class="md-nav__link">
+        Privacy Policy
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      <label class="md-nav__link" for="__nav_3">
+        Commands
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Commands
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_1" type="checkbox" id="__nav_3_1" checked>
+      
+      <label class="md-nav__link" for="__nav_3_1">
+        Info
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Info" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_1">
+          <span class="md-nav__icon md-icon"></span>
+          Info
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../card_filter/" class="md-nav__link">
+        Card filter
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Chart filter
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Chart filter
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    date
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unit" class="md-nav__link">
+    unit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chart_designer" class="md-nav__link">
+    chart_designer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#difficulty" class="md-nav__link">
+    difficulty
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#level" class="md-nav__link">
+    level
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#duration" class="md-nav__link">
+    duration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bpm" class="md-nav__link">
+    bpm
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combo" class="md-nav__link">
+    combo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playable" class="md-nav__link">
+    playable
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score0" class="md-nav__link">
+    score0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency0" class="md-nav__link">
+    0efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency0" class="md-nav__link">
+    5efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency0" class="md-nav__link">
+    10efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency0" class="md-nav__link">
+    15efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency0" class="md-nav__link">
+    20efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency0" class="md-nav__link">
+    25efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency0" class="md-nav__link">
+    30efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency0" class="md-nav__link">
+    35efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency0" class="md-nav__link">
+    40efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency0" class="md-nav__link">
+    45efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency0" class="md-nav__link">
+    50efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency0" class="md-nav__link">
+    55efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency0" class="md-nav__link">
+    60efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score0solo" class="md-nav__link">
+    score0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency0solo" class="md-nav__link">
+    0efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency0solo" class="md-nav__link">
+    5efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency0solo" class="md-nav__link">
+    10efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency0solo" class="md-nav__link">
+    15efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency0solo" class="md-nav__link">
+    20efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency0solo" class="md-nav__link">
+    25efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency0solo" class="md-nav__link">
+    30efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency0solo" class="md-nav__link">
+    35efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency0solo" class="md-nav__link">
+    40efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency0solo" class="md-nav__link">
+    45efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency0solo" class="md-nav__link">
+    50efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency0solo" class="md-nav__link">
+    55efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency0solo" class="md-nav__link">
+    60efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score20" class="md-nav__link">
+    score20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency20" class="md-nav__link">
+    0efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency20" class="md-nav__link">
+    5efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency20" class="md-nav__link">
+    10efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency20" class="md-nav__link">
+    15efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency20" class="md-nav__link">
+    20efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency20" class="md-nav__link">
+    25efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency20" class="md-nav__link">
+    30efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency20" class="md-nav__link">
+    35efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency20" class="md-nav__link">
+    40efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency20" class="md-nav__link">
+    45efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency20" class="md-nav__link">
+    50efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency20" class="md-nav__link">
+    55efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency20" class="md-nav__link">
+    60efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score20solo" class="md-nav__link">
+    score20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency20solo" class="md-nav__link">
+    0efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency20solo" class="md-nav__link">
+    5efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency20solo" class="md-nav__link">
+    10efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency20solo" class="md-nav__link">
+    15efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency20solo" class="md-nav__link">
+    20efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency20solo" class="md-nav__link">
+    25efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency20solo" class="md-nav__link">
+    30efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency20solo" class="md-nav__link">
+    35efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency20solo" class="md-nav__link">
+    40efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency20solo" class="md-nav__link">
+    45efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency20solo" class="md-nav__link">
+    50efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency20solo" class="md-nav__link">
+    55efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency20solo" class="md-nav__link">
+    60efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score25" class="md-nav__link">
+    score25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency25" class="md-nav__link">
+    0efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency25" class="md-nav__link">
+    5efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency25" class="md-nav__link">
+    10efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency25" class="md-nav__link">
+    15efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency25" class="md-nav__link">
+    20efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency25" class="md-nav__link">
+    25efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency25" class="md-nav__link">
+    30efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency25" class="md-nav__link">
+    35efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency25" class="md-nav__link">
+    40efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency25" class="md-nav__link">
+    45efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency25" class="md-nav__link">
+    50efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency25" class="md-nav__link">
+    55efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency25" class="md-nav__link">
+    60efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score25solo" class="md-nav__link">
+    score25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency25solo" class="md-nav__link">
+    0efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency25solo" class="md-nav__link">
+    5efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency25solo" class="md-nav__link">
+    10efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency25solo" class="md-nav__link">
+    15efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency25solo" class="md-nav__link">
+    20efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency25solo" class="md-nav__link">
+    25efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency25solo" class="md-nav__link">
+    30efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency25solo" class="md-nav__link">
+    35efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency25solo" class="md-nav__link">
+    40efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency25solo" class="md-nav__link">
+    45efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency25solo" class="md-nav__link">
+    50efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency25solo" class="md-nav__link">
+    55efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency25solo" class="md-nav__link">
+    60efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score30" class="md-nav__link">
+    score30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency30" class="md-nav__link">
+    0efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency30" class="md-nav__link">
+    5efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency30" class="md-nav__link">
+    10efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency30" class="md-nav__link">
+    15efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency30" class="md-nav__link">
+    20efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency30" class="md-nav__link">
+    25efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency30" class="md-nav__link">
+    30efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency30" class="md-nav__link">
+    35efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency30" class="md-nav__link">
+    40efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency30" class="md-nav__link">
+    45efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency30" class="md-nav__link">
+    50efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency30" class="md-nav__link">
+    55efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency30" class="md-nav__link">
+    60efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score30solo" class="md-nav__link">
+    score30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency30solo" class="md-nav__link">
+    0efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency30solo" class="md-nav__link">
+    5efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency30solo" class="md-nav__link">
+    10efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency30solo" class="md-nav__link">
+    15efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency30solo" class="md-nav__link">
+    20efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency30solo" class="md-nav__link">
+    25efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency30solo" class="md-nav__link">
+    30efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency30solo" class="md-nav__link">
+    35efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency30solo" class="md-nav__link">
+    40efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency30solo" class="md-nav__link">
+    45efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency30solo" class="md-nav__link">
+    50efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency30solo" class="md-nav__link">
+    55efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency30solo" class="md-nav__link">
+    60efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score35" class="md-nav__link">
+    score35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency35" class="md-nav__link">
+    0efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency35" class="md-nav__link">
+    5efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency35" class="md-nav__link">
+    10efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency35" class="md-nav__link">
+    15efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency35" class="md-nav__link">
+    20efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency35" class="md-nav__link">
+    25efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency35" class="md-nav__link">
+    30efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency35" class="md-nav__link">
+    35efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency35" class="md-nav__link">
+    40efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency35" class="md-nav__link">
+    45efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency35" class="md-nav__link">
+    50efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency35" class="md-nav__link">
+    55efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency35" class="md-nav__link">
+    60efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score35solo" class="md-nav__link">
+    score35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency35solo" class="md-nav__link">
+    0efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency35solo" class="md-nav__link">
+    5efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency35solo" class="md-nav__link">
+    10efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency35solo" class="md-nav__link">
+    15efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency35solo" class="md-nav__link">
+    20efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency35solo" class="md-nav__link">
+    25efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency35solo" class="md-nav__link">
+    30efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency35solo" class="md-nav__link">
+    35efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency35solo" class="md-nav__link">
+    40efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency35solo" class="md-nav__link">
+    45efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency35solo" class="md-nav__link">
+    50efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency35solo" class="md-nav__link">
+    55efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency35solo" class="md-nav__link">
+    60efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score40" class="md-nav__link">
+    score40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency40" class="md-nav__link">
+    0efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency40" class="md-nav__link">
+    5efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency40" class="md-nav__link">
+    10efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency40" class="md-nav__link">
+    15efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency40" class="md-nav__link">
+    20efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency40" class="md-nav__link">
+    25efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency40" class="md-nav__link">
+    30efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency40" class="md-nav__link">
+    35efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency40" class="md-nav__link">
+    40efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency40" class="md-nav__link">
+    45efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency40" class="md-nav__link">
+    50efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency40" class="md-nav__link">
+    55efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency40" class="md-nav__link">
+    60efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score40solo" class="md-nav__link">
+    score40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency40solo" class="md-nav__link">
+    0efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency40solo" class="md-nav__link">
+    5efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency40solo" class="md-nav__link">
+    10efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency40solo" class="md-nav__link">
+    15efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency40solo" class="md-nav__link">
+    20efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency40solo" class="md-nav__link">
+    25efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency40solo" class="md-nav__link">
+    30efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency40solo" class="md-nav__link">
+    35efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency40solo" class="md-nav__link">
+    40efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency40solo" class="md-nav__link">
+    45efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency40solo" class="md-nav__link">
+    50efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency40solo" class="md-nav__link">
+    55efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency40solo" class="md-nav__link">
+    60efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score45" class="md-nav__link">
+    score45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency45" class="md-nav__link">
+    0efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency45" class="md-nav__link">
+    5efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency45" class="md-nav__link">
+    10efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency45" class="md-nav__link">
+    15efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency45" class="md-nav__link">
+    20efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency45" class="md-nav__link">
+    25efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency45" class="md-nav__link">
+    30efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency45" class="md-nav__link">
+    35efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency45" class="md-nav__link">
+    40efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency45" class="md-nav__link">
+    45efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency45" class="md-nav__link">
+    50efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency45" class="md-nav__link">
+    55efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency45" class="md-nav__link">
+    60efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score45solo" class="md-nav__link">
+    score45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency45solo" class="md-nav__link">
+    0efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency45solo" class="md-nav__link">
+    5efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency45solo" class="md-nav__link">
+    10efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency45solo" class="md-nav__link">
+    15efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency45solo" class="md-nav__link">
+    20efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency45solo" class="md-nav__link">
+    25efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency45solo" class="md-nav__link">
+    30efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency45solo" class="md-nav__link">
+    35efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency45solo" class="md-nav__link">
+    40efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency45solo" class="md-nav__link">
+    45efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency45solo" class="md-nav__link">
+    50efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency45solo" class="md-nav__link">
+    55efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency45solo" class="md-nav__link">
+    60efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score50" class="md-nav__link">
+    score50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency50" class="md-nav__link">
+    0efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency50" class="md-nav__link">
+    5efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency50" class="md-nav__link">
+    10efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency50" class="md-nav__link">
+    15efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency50" class="md-nav__link">
+    20efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency50" class="md-nav__link">
+    25efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency50" class="md-nav__link">
+    30efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency50" class="md-nav__link">
+    35efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency50" class="md-nav__link">
+    40efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency50" class="md-nav__link">
+    45efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency50" class="md-nav__link">
+    50efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency50" class="md-nav__link">
+    55efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency50" class="md-nav__link">
+    60efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score50solo" class="md-nav__link">
+    score50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency50solo" class="md-nav__link">
+    0efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency50solo" class="md-nav__link">
+    5efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency50solo" class="md-nav__link">
+    10efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency50solo" class="md-nav__link">
+    15efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency50solo" class="md-nav__link">
+    20efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency50solo" class="md-nav__link">
+    25efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency50solo" class="md-nav__link">
+    30efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency50solo" class="md-nav__link">
+    35efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency50solo" class="md-nav__link">
+    40efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency50solo" class="md-nav__link">
+    45efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency50solo" class="md-nav__link">
+    50efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency50solo" class="md-nav__link">
+    55efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency50solo" class="md-nav__link">
+    60efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score55" class="md-nav__link">
+    score55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency55" class="md-nav__link">
+    0efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency55" class="md-nav__link">
+    5efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency55" class="md-nav__link">
+    10efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency55" class="md-nav__link">
+    15efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency55" class="md-nav__link">
+    20efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency55" class="md-nav__link">
+    25efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency55" class="md-nav__link">
+    30efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency55" class="md-nav__link">
+    35efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency55" class="md-nav__link">
+    40efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency55" class="md-nav__link">
+    45efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency55" class="md-nav__link">
+    50efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency55" class="md-nav__link">
+    55efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency55" class="md-nav__link">
+    60efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score55solo" class="md-nav__link">
+    score55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency55solo" class="md-nav__link">
+    0efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency55solo" class="md-nav__link">
+    5efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency55solo" class="md-nav__link">
+    10efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency55solo" class="md-nav__link">
+    15efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency55solo" class="md-nav__link">
+    20efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency55solo" class="md-nav__link">
+    25efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency55solo" class="md-nav__link">
+    30efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency55solo" class="md-nav__link">
+    35efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency55solo" class="md-nav__link">
+    40efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency55solo" class="md-nav__link">
+    45efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency55solo" class="md-nav__link">
+    50efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency55solo" class="md-nav__link">
+    55efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency55solo" class="md-nav__link">
+    60efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score60" class="md-nav__link">
+    score60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency60" class="md-nav__link">
+    0efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency60" class="md-nav__link">
+    5efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency60" class="md-nav__link">
+    10efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency60" class="md-nav__link">
+    15efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency60" class="md-nav__link">
+    20efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency60" class="md-nav__link">
+    25efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency60" class="md-nav__link">
+    30efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency60" class="md-nav__link">
+    35efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency60" class="md-nav__link">
+    40efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency60" class="md-nav__link">
+    45efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency60" class="md-nav__link">
+    50efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency60" class="md-nav__link">
+    55efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency60" class="md-nav__link">
+    60efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score60solo" class="md-nav__link">
+    score60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency60solo" class="md-nav__link">
+    0efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency60solo" class="md-nav__link">
+    5efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency60solo" class="md-nav__link">
+    10efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency60solo" class="md-nav__link">
+    15efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency60solo" class="md-nav__link">
+    20efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency60solo" class="md-nav__link">
+    25efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency60solo" class="md-nav__link">
+    30efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency60solo" class="md-nav__link">
+    35efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency60solo" class="md-nav__link">
+    40efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency60solo" class="md-nav__link">
+    45efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency60solo" class="md-nav__link">
+    50efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency60solo" class="md-nav__link">
+    55efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency60solo" class="md-nav__link">
+    60efficiency60solo
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../event_filter/" class="md-nav__link">
+        Event filter
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gacha_filter/" class="md-nav__link">
+        Gacha filter
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../login_bonus_filter/" class="md-nav__link">
+        Login bonus filter
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../music_filter/" class="md-nav__link">
+        Music filter
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stamp_filter/" class="md-nav__link">
+        Stamp filter
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    date
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unit" class="md-nav__link">
+    unit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#chart_designer" class="md-nav__link">
+    chart_designer
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#difficulty" class="md-nav__link">
+    difficulty
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#level" class="md-nav__link">
+    level
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#duration" class="md-nav__link">
+    duration
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bpm" class="md-nav__link">
+    bpm
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combo" class="md-nav__link">
+    combo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#playable" class="md-nav__link">
+    playable
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score0" class="md-nav__link">
+    score0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency0" class="md-nav__link">
+    0efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency0" class="md-nav__link">
+    5efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency0" class="md-nav__link">
+    10efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency0" class="md-nav__link">
+    15efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency0" class="md-nav__link">
+    20efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency0" class="md-nav__link">
+    25efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency0" class="md-nav__link">
+    30efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency0" class="md-nav__link">
+    35efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency0" class="md-nav__link">
+    40efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency0" class="md-nav__link">
+    45efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency0" class="md-nav__link">
+    50efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency0" class="md-nav__link">
+    55efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency0" class="md-nav__link">
+    60efficiency0
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score0solo" class="md-nav__link">
+    score0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency0solo" class="md-nav__link">
+    0efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency0solo" class="md-nav__link">
+    5efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency0solo" class="md-nav__link">
+    10efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency0solo" class="md-nav__link">
+    15efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency0solo" class="md-nav__link">
+    20efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency0solo" class="md-nav__link">
+    25efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency0solo" class="md-nav__link">
+    30efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency0solo" class="md-nav__link">
+    35efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency0solo" class="md-nav__link">
+    40efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency0solo" class="md-nav__link">
+    45efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency0solo" class="md-nav__link">
+    50efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency0solo" class="md-nav__link">
+    55efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency0solo" class="md-nav__link">
+    60efficiency0solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score20" class="md-nav__link">
+    score20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency20" class="md-nav__link">
+    0efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency20" class="md-nav__link">
+    5efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency20" class="md-nav__link">
+    10efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency20" class="md-nav__link">
+    15efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency20" class="md-nav__link">
+    20efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency20" class="md-nav__link">
+    25efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency20" class="md-nav__link">
+    30efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency20" class="md-nav__link">
+    35efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency20" class="md-nav__link">
+    40efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency20" class="md-nav__link">
+    45efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency20" class="md-nav__link">
+    50efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency20" class="md-nav__link">
+    55efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency20" class="md-nav__link">
+    60efficiency20
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score20solo" class="md-nav__link">
+    score20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency20solo" class="md-nav__link">
+    0efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency20solo" class="md-nav__link">
+    5efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency20solo" class="md-nav__link">
+    10efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency20solo" class="md-nav__link">
+    15efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency20solo" class="md-nav__link">
+    20efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency20solo" class="md-nav__link">
+    25efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency20solo" class="md-nav__link">
+    30efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency20solo" class="md-nav__link">
+    35efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency20solo" class="md-nav__link">
+    40efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency20solo" class="md-nav__link">
+    45efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency20solo" class="md-nav__link">
+    50efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency20solo" class="md-nav__link">
+    55efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency20solo" class="md-nav__link">
+    60efficiency20solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score25" class="md-nav__link">
+    score25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency25" class="md-nav__link">
+    0efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency25" class="md-nav__link">
+    5efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency25" class="md-nav__link">
+    10efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency25" class="md-nav__link">
+    15efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency25" class="md-nav__link">
+    20efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency25" class="md-nav__link">
+    25efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency25" class="md-nav__link">
+    30efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency25" class="md-nav__link">
+    35efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency25" class="md-nav__link">
+    40efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency25" class="md-nav__link">
+    45efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency25" class="md-nav__link">
+    50efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency25" class="md-nav__link">
+    55efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency25" class="md-nav__link">
+    60efficiency25
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score25solo" class="md-nav__link">
+    score25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency25solo" class="md-nav__link">
+    0efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency25solo" class="md-nav__link">
+    5efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency25solo" class="md-nav__link">
+    10efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency25solo" class="md-nav__link">
+    15efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency25solo" class="md-nav__link">
+    20efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency25solo" class="md-nav__link">
+    25efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency25solo" class="md-nav__link">
+    30efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency25solo" class="md-nav__link">
+    35efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency25solo" class="md-nav__link">
+    40efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency25solo" class="md-nav__link">
+    45efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency25solo" class="md-nav__link">
+    50efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency25solo" class="md-nav__link">
+    55efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency25solo" class="md-nav__link">
+    60efficiency25solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score30" class="md-nav__link">
+    score30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency30" class="md-nav__link">
+    0efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency30" class="md-nav__link">
+    5efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency30" class="md-nav__link">
+    10efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency30" class="md-nav__link">
+    15efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency30" class="md-nav__link">
+    20efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency30" class="md-nav__link">
+    25efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency30" class="md-nav__link">
+    30efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency30" class="md-nav__link">
+    35efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency30" class="md-nav__link">
+    40efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency30" class="md-nav__link">
+    45efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency30" class="md-nav__link">
+    50efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency30" class="md-nav__link">
+    55efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency30" class="md-nav__link">
+    60efficiency30
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score30solo" class="md-nav__link">
+    score30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency30solo" class="md-nav__link">
+    0efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency30solo" class="md-nav__link">
+    5efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency30solo" class="md-nav__link">
+    10efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency30solo" class="md-nav__link">
+    15efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency30solo" class="md-nav__link">
+    20efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency30solo" class="md-nav__link">
+    25efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency30solo" class="md-nav__link">
+    30efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency30solo" class="md-nav__link">
+    35efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency30solo" class="md-nav__link">
+    40efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency30solo" class="md-nav__link">
+    45efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency30solo" class="md-nav__link">
+    50efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency30solo" class="md-nav__link">
+    55efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency30solo" class="md-nav__link">
+    60efficiency30solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score35" class="md-nav__link">
+    score35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency35" class="md-nav__link">
+    0efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency35" class="md-nav__link">
+    5efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency35" class="md-nav__link">
+    10efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency35" class="md-nav__link">
+    15efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency35" class="md-nav__link">
+    20efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency35" class="md-nav__link">
+    25efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency35" class="md-nav__link">
+    30efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency35" class="md-nav__link">
+    35efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency35" class="md-nav__link">
+    40efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency35" class="md-nav__link">
+    45efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency35" class="md-nav__link">
+    50efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency35" class="md-nav__link">
+    55efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency35" class="md-nav__link">
+    60efficiency35
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score35solo" class="md-nav__link">
+    score35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency35solo" class="md-nav__link">
+    0efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency35solo" class="md-nav__link">
+    5efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency35solo" class="md-nav__link">
+    10efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency35solo" class="md-nav__link">
+    15efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency35solo" class="md-nav__link">
+    20efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency35solo" class="md-nav__link">
+    25efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency35solo" class="md-nav__link">
+    30efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency35solo" class="md-nav__link">
+    35efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency35solo" class="md-nav__link">
+    40efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency35solo" class="md-nav__link">
+    45efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency35solo" class="md-nav__link">
+    50efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency35solo" class="md-nav__link">
+    55efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency35solo" class="md-nav__link">
+    60efficiency35solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score40" class="md-nav__link">
+    score40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency40" class="md-nav__link">
+    0efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency40" class="md-nav__link">
+    5efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency40" class="md-nav__link">
+    10efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency40" class="md-nav__link">
+    15efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency40" class="md-nav__link">
+    20efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency40" class="md-nav__link">
+    25efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency40" class="md-nav__link">
+    30efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency40" class="md-nav__link">
+    35efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency40" class="md-nav__link">
+    40efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency40" class="md-nav__link">
+    45efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency40" class="md-nav__link">
+    50efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency40" class="md-nav__link">
+    55efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency40" class="md-nav__link">
+    60efficiency40
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score40solo" class="md-nav__link">
+    score40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency40solo" class="md-nav__link">
+    0efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency40solo" class="md-nav__link">
+    5efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency40solo" class="md-nav__link">
+    10efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency40solo" class="md-nav__link">
+    15efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency40solo" class="md-nav__link">
+    20efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency40solo" class="md-nav__link">
+    25efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency40solo" class="md-nav__link">
+    30efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency40solo" class="md-nav__link">
+    35efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency40solo" class="md-nav__link">
+    40efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency40solo" class="md-nav__link">
+    45efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency40solo" class="md-nav__link">
+    50efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency40solo" class="md-nav__link">
+    55efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency40solo" class="md-nav__link">
+    60efficiency40solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score45" class="md-nav__link">
+    score45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency45" class="md-nav__link">
+    0efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency45" class="md-nav__link">
+    5efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency45" class="md-nav__link">
+    10efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency45" class="md-nav__link">
+    15efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency45" class="md-nav__link">
+    20efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency45" class="md-nav__link">
+    25efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency45" class="md-nav__link">
+    30efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency45" class="md-nav__link">
+    35efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency45" class="md-nav__link">
+    40efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency45" class="md-nav__link">
+    45efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency45" class="md-nav__link">
+    50efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency45" class="md-nav__link">
+    55efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency45" class="md-nav__link">
+    60efficiency45
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score45solo" class="md-nav__link">
+    score45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency45solo" class="md-nav__link">
+    0efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency45solo" class="md-nav__link">
+    5efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency45solo" class="md-nav__link">
+    10efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency45solo" class="md-nav__link">
+    15efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency45solo" class="md-nav__link">
+    20efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency45solo" class="md-nav__link">
+    25efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency45solo" class="md-nav__link">
+    30efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency45solo" class="md-nav__link">
+    35efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency45solo" class="md-nav__link">
+    40efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency45solo" class="md-nav__link">
+    45efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency45solo" class="md-nav__link">
+    50efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency45solo" class="md-nav__link">
+    55efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency45solo" class="md-nav__link">
+    60efficiency45solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score50" class="md-nav__link">
+    score50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency50" class="md-nav__link">
+    0efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency50" class="md-nav__link">
+    5efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency50" class="md-nav__link">
+    10efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency50" class="md-nav__link">
+    15efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency50" class="md-nav__link">
+    20efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency50" class="md-nav__link">
+    25efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency50" class="md-nav__link">
+    30efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency50" class="md-nav__link">
+    35efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency50" class="md-nav__link">
+    40efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency50" class="md-nav__link">
+    45efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency50" class="md-nav__link">
+    50efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency50" class="md-nav__link">
+    55efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency50" class="md-nav__link">
+    60efficiency50
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score50solo" class="md-nav__link">
+    score50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency50solo" class="md-nav__link">
+    0efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency50solo" class="md-nav__link">
+    5efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency50solo" class="md-nav__link">
+    10efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency50solo" class="md-nav__link">
+    15efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency50solo" class="md-nav__link">
+    20efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency50solo" class="md-nav__link">
+    25efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency50solo" class="md-nav__link">
+    30efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency50solo" class="md-nav__link">
+    35efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency50solo" class="md-nav__link">
+    40efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency50solo" class="md-nav__link">
+    45efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency50solo" class="md-nav__link">
+    50efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency50solo" class="md-nav__link">
+    55efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency50solo" class="md-nav__link">
+    60efficiency50solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score55" class="md-nav__link">
+    score55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency55" class="md-nav__link">
+    0efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency55" class="md-nav__link">
+    5efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency55" class="md-nav__link">
+    10efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency55" class="md-nav__link">
+    15efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency55" class="md-nav__link">
+    20efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency55" class="md-nav__link">
+    25efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency55" class="md-nav__link">
+    30efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency55" class="md-nav__link">
+    35efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency55" class="md-nav__link">
+    40efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency55" class="md-nav__link">
+    45efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency55" class="md-nav__link">
+    50efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency55" class="md-nav__link">
+    55efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency55" class="md-nav__link">
+    60efficiency55
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score55solo" class="md-nav__link">
+    score55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency55solo" class="md-nav__link">
+    0efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency55solo" class="md-nav__link">
+    5efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency55solo" class="md-nav__link">
+    10efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency55solo" class="md-nav__link">
+    15efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency55solo" class="md-nav__link">
+    20efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency55solo" class="md-nav__link">
+    25efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency55solo" class="md-nav__link">
+    30efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency55solo" class="md-nav__link">
+    35efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency55solo" class="md-nav__link">
+    40efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency55solo" class="md-nav__link">
+    45efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency55solo" class="md-nav__link">
+    50efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency55solo" class="md-nav__link">
+    55efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency55solo" class="md-nav__link">
+    60efficiency55solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score60" class="md-nav__link">
+    score60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency60" class="md-nav__link">
+    0efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency60" class="md-nav__link">
+    5efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency60" class="md-nav__link">
+    10efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency60" class="md-nav__link">
+    15efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency60" class="md-nav__link">
+    20efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency60" class="md-nav__link">
+    25efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency60" class="md-nav__link">
+    30efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency60" class="md-nav__link">
+    35efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency60" class="md-nav__link">
+    40efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency60" class="md-nav__link">
+    45efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency60" class="md-nav__link">
+    50efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency60" class="md-nav__link">
+    55efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency60" class="md-nav__link">
+    60efficiency60
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#score60solo" class="md-nav__link">
+    score60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#0efficiency60solo" class="md-nav__link">
+    0efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5efficiency60solo" class="md-nav__link">
+    5efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10efficiency60solo" class="md-nav__link">
+    10efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15efficiency60solo" class="md-nav__link">
+    15efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#20efficiency60solo" class="md-nav__link">
+    20efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#25efficiency60solo" class="md-nav__link">
+    25efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#30efficiency60solo" class="md-nav__link">
+    30efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#35efficiency60solo" class="md-nav__link">
+    35efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#40efficiency60solo" class="md-nav__link">
+    40efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#45efficiency60solo" class="md-nav__link">
+    45efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#50efficiency60solo" class="md-nav__link">
+    50efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#55efficiency60solo" class="md-nav__link">
+    55efficiency60solo
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#60efficiency60solo" class="md-nav__link">
+    60efficiency60solo
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/qwewqa/miyu-bot/edit/master/docs/commands/info/chart_filter.ja.md" title="編集" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Chart filter</h1>
+                
+                <!-- Generated File -->
+<p>chart_filter</p>
+<h2 id="name">name</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable</p>
+</div>
+<h2 id="date">date</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>date (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="unit">unit</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Filterable, Tag</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>happy_around!, peaky_p-key, photon_maiden, merm4id, 燐舞曲, lyrical_lily, スペシャル, その他, rondo, special, other, happyaround, happy_around, hapiara, happy, ha, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk, photonmaiden, photome, photon, pm, mermaid, mmd, m4, lyricallily, riririri, lililili, lily, lili, riri, ll</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>unit (=, ==, !=) [value]</p>
+</div>
+<h2 id="id">id</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>id (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="chart_designer">chart_designer</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Filterable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>chart_designer (=, ==, !=) [value]</p>
+</div>
+<h2 id="difficulty">difficulty</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Comparable, Tag, Keyword</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>expert, hard, normal, easy, expt, norm</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>difficulty (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="level">level</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>level (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="duration">duration</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>duration (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="bpm">bpm</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>bpm (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="combo">combo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Usage</p>
+<p>combo (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+</div>
+<h2 id="playable">playable</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Flag</p>
+</div>
+<h2 id="score0">score0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency0">0efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency0">5efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency0">10efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency0">15efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency0">20efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency0">25efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency0">30efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency0">35efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency0">40efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency0">45efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency0">50efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency0">55efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency0">60efficiency0</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score0solo">score0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency0solo">0efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency0solo">5efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency0solo">10efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency0solo">15efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency0solo">20efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency0solo">25efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency0solo">30efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency0solo">35efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency0solo">40efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency0solo">45efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency0solo">50efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency0solo">55efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency0solo">60efficiency0solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score20">score20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency20">0efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency20">5efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency20">10efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency20">15efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency20">20efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency20">25efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency20">30efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency20">35efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency20">40efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency20">45efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency20">50efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency20">55efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency20">60efficiency20</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score20solo">score20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency20solo">0efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency20solo">5efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency20solo">10efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency20solo">15efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency20solo">20efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency20solo">25efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency20solo">30efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency20solo">35efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency20solo">40efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency20solo">45efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency20solo">50efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency20solo">55efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency20solo">60efficiency20solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score25">score25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency25">0efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency25">5efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency25">10efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency25">15efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency25">20efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency25">25efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency25">30efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency25">35efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency25">40efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency25">45efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency25">50efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency25">55efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency25">60efficiency25</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score25solo">score25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency25solo">0efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency25solo">5efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency25solo">10efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency25solo">15efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency25solo">20efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency25solo">25efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency25solo">30efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency25solo">35efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency25solo">40efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency25solo">45efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency25solo">50efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency25solo">55efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency25solo">60efficiency25solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score30">score30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency30">0efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency30">5efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency30">10efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency30">15efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency30">20efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency30">25efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency30">30efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency30">35efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency30">40efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency30">45efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency30">50efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency30">55efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency30">60efficiency30</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score30solo">score30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency30solo">0efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency30solo">5efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency30solo">10efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency30solo">15efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency30solo">20efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency30solo">25efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency30solo">30efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency30solo">35efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency30solo">40efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency30solo">45efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency30solo">50efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency30solo">55efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency30solo">60efficiency30solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score35">score35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency35">0efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency35">5efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency35">10efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency35">15efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency35">20efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency35">25efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency35">30efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency35">35efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency35">40efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency35">45efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency35">50efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency35">55efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency35">60efficiency35</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score35solo">score35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency35solo">0efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency35solo">5efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency35solo">10efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency35solo">15efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency35solo">20efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency35solo">25efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency35solo">30efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency35solo">35efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency35solo">40efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency35solo">45efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency35solo">50efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency35solo">55efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency35solo">60efficiency35solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score40">score40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency40">0efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency40">5efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency40">10efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency40">15efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency40">20efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency40">25efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency40">30efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency40">35efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency40">40efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency40">45efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency40">50efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency40">55efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency40">60efficiency40</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score40solo">score40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency40solo">0efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency40solo">5efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency40solo">10efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency40solo">15efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency40solo">20efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency40solo">25efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency40solo">30efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency40solo">35efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency40solo">40efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency40solo">45efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency40solo">50efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency40solo">55efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency40solo">60efficiency40solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score45">score45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency45">0efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency45">5efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency45">10efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency45">15efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency45">20efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency45">25efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency45">30efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency45">35efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency45">40efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency45">45efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency45">50efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency45">55efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency45">60efficiency45</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score45solo">score45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency45solo">0efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency45solo">5efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency45solo">10efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency45solo">15efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency45solo">20efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency45solo">25efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency45solo">30efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency45solo">35efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency45solo">40efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency45solo">45efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency45solo">50efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency45solo">55efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency45solo">60efficiency45solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score50">score50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency50">0efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency50">5efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency50">10efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency50">15efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency50">20efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency50">25efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency50">30efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency50">35efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency50">40efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency50">45efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency50">50efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency50">55efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency50">60efficiency50</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score50solo">score50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency50solo">0efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency50solo">5efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency50solo">10efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency50solo">15efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency50solo">20efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency50solo">25efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency50solo">30efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency50solo">35efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency50solo">40efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency50solo">45efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency50solo">50efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency50solo">55efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency50solo">60efficiency50solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score55">score55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency55">0efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency55">5efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency55">10efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency55">15efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency55">20efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency55">25efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency55">30efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency55">35efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency55">40efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency55">45efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency55">50efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency55">55efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency55">60efficiency55</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score55solo">score55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency55solo">0efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency55solo">5efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency55solo">10efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency55solo">15efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency55solo">20efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency55solo">25efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency55solo">30efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency55solo">35efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency55solo">40efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency55solo">45efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency55solo">50efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency55solo">55efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency55solo">60efficiency55solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score60">score60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency60">0efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency60">5efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency60">10efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency60">15efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency60">20efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency60">25efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency60">30efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency60">35efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency60">40efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency60">45efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency60">50efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency60">55efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency60">60efficiency60</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="score60solo">score60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="0efficiency60solo">0efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="5efficiency60solo">5efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="10efficiency60solo">10efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="15efficiency60solo">15efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="20efficiency60solo">20efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="25efficiency60solo">25efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="30efficiency60solo">30efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="35efficiency60solo">35efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="40efficiency60solo">40efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="45efficiency60solo">45efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="50efficiency60solo">50efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="55efficiency60solo">55efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+<h2 id="60efficiency60solo">60efficiency60solo</h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display</p>
+</div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="フッター">
+      
+        
+        <a href="../card_filter/" class="md-footer__link md-footer__link--prev" aria-label="前: Card filter" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                前
+              </span>
+              Card filter
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../event_filter/" class="md-footer__link md-footer__link--next" aria-label="次: Event filter" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                次
+              </span>
+              Event filter
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": [], "translations": {"clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\u3000\u3001\u3002\uff0c\uff0e]+", "search.placeholder": "\u691c\u7d22", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version.title": "Select version"}, "search": "../../../../assets/javascripts/workers/search.b0710199.min.js", "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.76f349be.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -19,7 +19,7 @@ idna==3.1
 iso8601==0.1.14
 mkdocs==1.2.1
 mkdocs-material==7.1.8
-mkdocs-static-i18n=0.17
+mkdocs-static-i18n==0.17
 msgpack==1.0.2
 multidict==5.1.0
 Pillow==8.2.0

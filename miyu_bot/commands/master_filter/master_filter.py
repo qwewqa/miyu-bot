@@ -60,6 +60,17 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         self.master_name = master_name
         self.default_filter = defaultdict(lambda: FuzzyFilteredMap(self.is_released))
         self.unrestricted_filter = defaultdict(lambda: FuzzyFilteredMap())
+        self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
+        self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
+        self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + '.ftl')
+        for d in self.data_attributes:
+            if init_function := d.init_function:
+                init_function(self, d)
+
+        # Skips the more time consuming loading when generating docs
+        if getattr(bot, 'gen_doc', False):
+            return
+
         for server, manager in bot.assets.items():
             masters = manager.masters[self.master_name]
             for master in masters.values():
@@ -75,13 +86,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     if alias_server_value.id in manager.masters[self.master_name]:
                         self.default_filter[server][alias] = masters[alias_server_value.id]
                         self.unrestricted_filter[server][alias] = masters[alias_server_value.id]
-        self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
-        self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
-        self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + '.ftl')
 
-        for d in self.data_attributes:
-            if init_function := d.init_function:
-                init_function(self, d)
 
     def get_asset_source(self, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None):
         if server is None:

@@ -3,6 +3,10 @@ site_url: https://miyu-docs.qwewqa.xyz/
 repo_url: https://github.com/qwewqa/miyu-bot
 theme:
   name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.sections
 plugins:
   - i18n:
       default_language: en_US
@@ -10,5 +14,6 @@ plugins:
         en_US: English
         zh_TW: 繁體中文
         ja: 日本語
+  - awesome-pages
 markdown_extensions:
   - admonition

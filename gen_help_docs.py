@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from miyu_bot.bot.bot import D4DJBot
-from miyu_bot.commands.docs.info_doc_generation import generate_info_command_docs
+from miyu_bot.commands.docs.info_command_docs import generate_info_command_docs
 from timeit import default_timer as timer
 
 if __name__ == '__main__':

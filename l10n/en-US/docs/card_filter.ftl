@@ -1,4 +1,6 @@
-card_filter = Card info commands
+name = Cards
+
+description = Card related commands.
 
 name-desc = Card name.
 

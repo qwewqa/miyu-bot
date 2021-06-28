@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#date" class="md-skip">
+        <a href="#name" class="md-skip">
           Skip to content
         </a>
       
@@ -117,14 +117,14 @@
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../../ja/" hreflang="ja" class="md-select__link">
-                    日本語
+                  <a href="../../../" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
                   </a>
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../" hreflang="zh_TW" class="md-select__link">
-                    繁體中文
+                  <a href="../../../../ja/" hreflang="ja" class="md-select__link">
+                    日本語
                   </a>
                 </li>
                 
@@ -342,6 +342,8 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Event filter
@@ -356,6 +358,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -490,6 +494,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -556,11 +562,11 @@
                   </a>
                 
                 
-                  <h1>Event filter</h1>
-                
-                <!-- Generated File -->
+                <!-- Generated -->
 
-<h2 id="date">date</h2>
+<h1 id="name">name<a class="headerlink" href="#name" title="Permanent link">&para;</a></h1>
+<p>description</p>
+<h2 id="date">date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>release, recent</p>
@@ -569,11 +575,14 @@
 <p class="admonition-title">Type</p>
 <p>Sortable, Display, Comparable</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>date (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="character">character</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=date</code><br />
+<code>sort&lt;date</code><br />
+<code>disp=date</code><br />
+<code>date=[value]</code><br />
+<code>date!=[value]</code><br />
+<code>date&gt;[value]</code></p>
+</details>
+<h2 id="character">character<a class="headerlink" href="#character" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>char, chara</p>
@@ -586,11 +595,18 @@
 <p class="admonition-title">Tags</p>
 <p>rinku, maho, muni, rei, kyoko, shinobu, yuka, esora, saki, ibuki, towa, noa, rika, marika, saori, dalia, tsubaki, nagisa, hiiro, aoi, miyu, haruna, kurumi, miiko, airi, mana, syano, touka, michiru, ryujin, dennojo, ku, haruki, aqua, pekora, fubuki, suisei</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>character (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>character=maho</code><br />
+<code>character!=rika</code><br />
+<code>character=noa,esora,dennojo</code><br />
+<code>character==noa,esora,dennojo</code><br />
+<code>character!=noa,esora,dennojo</code><br />
+<code>$noa $esora $dennojo</code><br />
+<code>$maho $!rika</code></p>
+</details>
+<h2 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="unit">unit</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Filterable, Tag</p>
@@ -599,11 +615,18 @@
 <p class="admonition-title">Tags</p>
 <p>happy_around!, peaky_p-key, photon_maiden, merm4id, 燐舞曲, lyrical_lily, スペシャル, その他, rondo, special, other, happyaround, happy_around, hapiara, happy, ha, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk, photonmaiden, photome, photon, pm, mermaid, mmd, m4, lyricallily, riririri, lililili, lily, lili, riri, ll, mixed</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>unit (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
+<code>sort&lt;unit</code><br />
+<code>unit=hapiara</code><br />
+<code>unit!=merm4id</code><br />
+<code>unit=peaky_p-key,lili,mermaid</code><br />
+<code>$peaky_p-key $lili $mermaid</code><br />
+<code>$hapiara $!merm4id</code></p>
+</details>
+<h2 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="attribute">attribute</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Filterable, Tag</p>
@@ -612,11 +635,18 @@
 <p class="admonition-title">Tags</p>
 <p>street, party, cute, cool, elegant, purple, yellow, orange, pink, red, blue, green</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>attribute (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
+<code>sort&lt;attribute</code><br />
+<code>attribute=red</code><br />
+<code>attribute!=party</code><br />
+<code>attribute=elegant,party,cool</code><br />
+<code>$elegant $party $cool</code><br />
+<code>$red $!party</code></p>
+</details>
+<h2 id="type">type<a class="headerlink" href="#type" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="type">type</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Display, Filterable, Tag</p>
@@ -625,11 +655,16 @@
 <p class="admonition-title">Tags</p>
 <p>nothing, bingo, medley, poker, raid</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>type (=, ==, !=) [value]</p>
-</div>
-<h2 id="parameter">parameter</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=type</code><br />
+<code>sort&lt;type</code><br />
+<code>disp=type</code><br />
+<code>type=nothing</code><br />
+<code>type!=medley</code><br />
+<code>type=medley,poker,nothing</code><br />
+<code>$medley $poker $nothing</code><br />
+<code>$nothing $!medley</code></p>
+</details>
+<h2 id="parameter">parameter<a class="headerlink" href="#parameter" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>param</p>
@@ -642,10 +677,14 @@
 <p class="admonition-title">Tags</p>
 <p>heart, technique, tech, physical, phys, no_parameter, noparameter</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>parameter (=, ==, !=) [value]</p>
-</div>
+<details class="example"><summary>Examples</summary><p><code>sort=parameter</code><br />
+<code>sort&lt;parameter</code><br />
+<code>parameter=heart</code><br />
+<code>parameter!=phys</code><br />
+<code>parameter=physical,heart,phys</code><br />
+<code>$physical $heart $phys</code><br />
+<code>$heart $!phys</code></p>
+</details>
                 
               
               

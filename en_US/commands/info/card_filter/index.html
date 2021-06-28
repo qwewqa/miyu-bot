@@ -63,7 +63,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#name" class="md-skip">
+        <a href="#cards" class="md-skip">
           Skip to content
         </a>
       
@@ -117,14 +117,14 @@
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../../ja/" hreflang="ja" class="md-select__link">
-                    日本語
+                  <a href="../../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
                   </a>
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
-                    繁體中文
+                  <a href="../../../../ja/" hreflang="ja" class="md-select__link">
+                    日本語
                   </a>
                 </li>
                 
@@ -318,6 +318,8 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Card filter
@@ -332,6 +334,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -546,6 +550,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -668,11 +674,11 @@
                   </a>
                 
                 
-                  <h1>Card filter</h1>
-                
-                <!-- Generated File -->
-<p>Card info commands</p>
-<h2 id="name">name</h2>
+                <!-- Generated -->
+
+<h1 id="cards">Cards<a class="headerlink" href="#cards" title="Permanent link">&para;</a></h1>
+<p>Card related commands.</p>
+<h2 id="name">name<a class="headerlink" href="#name" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>title</p>
@@ -685,7 +691,10 @@
 <p class="admonition-title">Description</p>
 <p>Card name.</p>
 </div>
-<h2 id="character">character</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=name</code><br />
+<code>sort&lt;name</code></p>
+</details>
+<h2 id="character">character<a class="headerlink" href="#character" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>char, chara</p>
@@ -702,11 +711,19 @@
 <p class="admonition-title">Tags</p>
 <p>rinku, maho, muni, rei, kyoko, shinobu, yuka, esora, saki, ibuki, towa, noa, rika, marika, saori, dalia, tsubaki, nagisa, hiiro, aoi, miyu, haruna, kurumi, miiko, airi, mana, syano, touka, michiru, ryujin, dennojo, ku, haruki, aqua, pekora, fubuki, suisei</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>character (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=character</code><br />
+<code>sort&lt;character</code><br />
+<code>character=kyoko</code><br />
+<code>character!=rika</code><br />
+<code>character=suisei,saori,dalia</code><br />
+<code>$suisei $saori $dalia</code><br />
+<code>$kyoko $!rika</code><br />
+<code>suisei saori dalia</code></p>
+</details>
+<h2 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="unit">unit</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Filterable, Tag</p>
@@ -719,11 +736,18 @@
 <p class="admonition-title">Tags</p>
 <p>happy_around!, peaky_p-key, photon_maiden, merm4id, 燐舞曲, lyrical_lily, スペシャル, その他, rondo, special, other, happyaround, happy_around, hapiara, happy, ha, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk, photonmaiden, photome, photon, pm, mermaid, mmd, m4, lyricallily, riririri, lililili, lily, lili, riri, ll</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>unit (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
+<code>sort&lt;unit</code><br />
+<code>unit=special</code><br />
+<code>unit!=lili</code><br />
+<code>unit=mmd,lyrical_lily,pkey</code><br />
+<code>$mmd $lyrical_lily $pkey</code><br />
+<code>$special $!lili</code></p>
+</details>
+<h2 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="attribute">attribute</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Filterable, Tag</p>
@@ -736,11 +760,18 @@
 <p class="admonition-title">Tags</p>
 <p>street, party, cute, cool, elegant, purple, yellow, orange, pink, red, blue, green</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>attribute (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
+<code>sort&lt;attribute</code><br />
+<code>attribute=pink</code><br />
+<code>attribute!=orange</code><br />
+<code>attribute=party,elegant,pink</code><br />
+<code>$party $elegant $pink</code><br />
+<code>$pink $!orange</code></p>
+</details>
+<h2 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="id">id</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Display, Comparable</p>
@@ -749,11 +780,14 @@
 <p class="admonition-title">Description</p>
 <p>Card Id.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>id (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="power">power</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=id</code><br />
+<code>sort&lt;id</code><br />
+<code>disp=id</code><br />
+<code>id=[value]</code><br />
+<code>id!=[value]</code><br />
+<code>id&gt;[value]</code></p>
+</details>
+<h2 id="power">power<a class="headerlink" href="#power" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>pow, bp</p>
@@ -766,11 +800,14 @@
 <p class="admonition-title">Description</p>
 <p>Total power at max level.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>power (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="heart">heart</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=power</code><br />
+<code>sort&lt;power</code><br />
+<code>disp=power</code><br />
+<code>power=[value]</code><br />
+<code>power!=[value]</code><br />
+<code>power&gt;[value]</code></p>
+</details>
+<h2 id="heart">heart<a class="headerlink" href="#heart" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>hrt</p>
@@ -783,11 +820,14 @@
 <p class="admonition-title">Description</p>
 <p>Heart stat at max level.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>heart (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="technique">technique</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=heart</code><br />
+<code>sort&lt;heart</code><br />
+<code>disp=heart</code><br />
+<code>heart=[value]</code><br />
+<code>heart!=[value]</code><br />
+<code>heart&gt;[value]</code></p>
+</details>
+<h2 id="technique">technique<a class="headerlink" href="#technique" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>tech, technical</p>
@@ -800,11 +840,14 @@
 <p class="admonition-title">Description</p>
 <p>Technique stat at max level.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>technique (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="physical">physical</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=technique</code><br />
+<code>sort&lt;technique</code><br />
+<code>disp=technique</code><br />
+<code>technique=[value]</code><br />
+<code>technique!=[value]</code><br />
+<code>technique&gt;[value]</code></p>
+</details>
+<h2 id="physical">physical<a class="headerlink" href="#physical" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>phys, physic, physics</p>
@@ -817,11 +860,14 @@
 <p class="admonition-title">Description</p>
 <p>Physical stat at max level.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>physical (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="date">date</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=physical</code><br />
+<code>sort&lt;physical</code><br />
+<code>disp=physical</code><br />
+<code>physical=[value]</code><br />
+<code>physical!=[value]</code><br />
+<code>physical&gt;[value]</code></p>
+</details>
+<h2 id="date">date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>release, recent</p>
@@ -834,11 +880,14 @@
 <p class="admonition-title">Description</p>
 <p>Release date.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>date (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="rarity">rarity</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=date</code><br />
+<code>sort&lt;date</code><br />
+<code>disp=date</code><br />
+<code>date=[value]</code><br />
+<code>date!=[value]</code><br />
+<code>date&gt;[value]</code></p>
+</details>
+<h2 id="rarity">rarity<a class="headerlink" href="#rarity" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>stars</p>
@@ -855,7 +904,11 @@
 <p class="admonition-title">Tags</p>
 <p>4*, 4\*, 3*, 3\*, 2*, 2\*, 1*, 1\*</p>
 </div>
-<h2 id="skill">skill</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=rarity</code><br />
+<code>sort&lt;rarity</code><br />
+<code>4\* 2* 3*</code></p>
+</details>
+<h2 id="skill">skill<a class="headerlink" href="#skill" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>score_up, score</p>
@@ -868,11 +921,14 @@
 <p class="admonition-title">Description</p>
 <p>Card skill.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>skill (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="event">event</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=skill</code><br />
+<code>sort&lt;skill</code><br />
+<code>disp=skill</code><br />
+<code>skill=[value]</code><br />
+<code>skill!=[value]</code><br />
+<code>skill&gt;[value]</code></p>
+</details>
+<h2 id="event">event<a class="headerlink" href="#event" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>event_bonus, eventbonus, bonus</p>
@@ -885,11 +941,18 @@
 <p class="admonition-title">Description</p>
 <p>Related event.</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>event (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>event, event_bonus, eventbonus, bonus</p>
 </div>
-<h2 id="availability">availability</h2>
+<details class="example"><summary>Examples</summary><p><code>$event</code><br />
+<code>sort=event</code><br />
+<code>sort&lt;event</code><br />
+<code>event=[value]</code><br />
+<code>event!=[value]</code><br />
+<code>event&gt;[value]</code></p>
+</details>
+<h2 id="availability">availability<a class="headerlink" href="#availability" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>avail</p>
@@ -902,6 +965,12 @@
 <p class="admonition-title">Tags</p>
 <p>unknown_availability, unavail, navl, permanent, perm, prm, limited, lmtd, lim, collaboration, collab, cllb, clb, birthday, bday, welfare, free, reward, rwrd</p>
 </div>
+<details class="example"><summary>Examples</summary><p><code>sort=availability</code><br />
+<code>sort&lt;availability</code><br />
+<code>disp=availability</code><br />
+<code>$reward $collaboration $bday</code><br />
+<code>$reward $!limited</code></p>
+</details>
                 
               
               

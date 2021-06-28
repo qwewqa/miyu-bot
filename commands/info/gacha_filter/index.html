@@ -117,14 +117,14 @@
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../ja/" hreflang="ja" class="md-select__link">
-                    日本語
+                  <a href="../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
                   </a>
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
-                    繁體中文
+                  <a href="../../../ja/" hreflang="ja" class="md-select__link">
+                    日本語
                   </a>
                 </li>
                 
@@ -354,6 +354,8 @@
       <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           Gacha filter
@@ -369,6 +371,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -377,7 +381,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#name" class="md-nav__link">
+  <a href="#name_1" class="md-nav__link">
     name
   </a>
   
@@ -490,6 +494,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -498,7 +504,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#name" class="md-nav__link">
+  <a href="#name_1" class="md-nav__link">
     name
   </a>
   
@@ -556,11 +562,11 @@
                   </a>
                 
                 
-                  <h1>Gacha filter</h1>
-                
-                <!-- Generated File -->
+                <!-- Generated -->
 
-<h2 id="name">name</h2>
+<h1 id="name">name<a class="headerlink" href="#name" title="Permanent link">&para;</a></h1>
+<p>description</p>
+<h2 id="name_1">name<a class="headerlink" href="#name_1" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>title</p>
@@ -569,7 +575,10 @@
 <p class="admonition-title">Type</p>
 <p>Sortable</p>
 </div>
-<h2 id="date">date</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=name</code><br />
+<code>sort&lt;name</code></p>
+</details>
+<h2 id="date">date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>release, recent</p>
@@ -578,11 +587,14 @@
 <p class="admonition-title">Type</p>
 <p>Sortable, Display, Comparable</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>date (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
-<h2 id="character">character</h2>
+<details class="example"><summary>Examples</summary><p><code>sort=date</code><br />
+<code>sort&lt;date</code><br />
+<code>disp=date</code><br />
+<code>date=[value]</code><br />
+<code>date!=[value]</code><br />
+<code>date&gt;[value]</code></p>
+</details>
+<h2 id="character">character<a class="headerlink" href="#character" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
 <p>char, chara</p>
@@ -595,11 +607,18 @@
 <p class="admonition-title">Tags</p>
 <p>rinku, maho, muni, rei, kyoko, shinobu, yuka, esora, saki, ibuki, towa, noa, rika, marika, saori, dalia, tsubaki, nagisa, hiiro, aoi, miyu, haruna, kurumi, miiko, airi, mana, syano, touka, michiru, ryujin, dennojo, ku, haruki, aqua, pekora, fubuki, suisei</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>character (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>character=nagisa</code><br />
+<code>character!=michiru</code><br />
+<code>character=ku,kurumi,shinobu</code><br />
+<code>character==ku,kurumi,shinobu</code><br />
+<code>character!=ku,kurumi,shinobu</code><br />
+<code>$ku $kurumi $shinobu</code><br />
+<code>$nagisa $!michiru</code></p>
+</details>
+<h2 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="unit">unit</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Filterable, Tag</p>
@@ -608,11 +627,18 @@
 <p class="admonition-title">Tags</p>
 <p>happy_around!, peaky_p-key, photon_maiden, merm4id, 燐舞曲, lyrical_lily, スペシャル, その他, rondo, special, other, happyaround, happy_around, hapiara, happy, ha, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk, photonmaiden, photome, photon, pm, mermaid, mmd, m4, lyricallily, riririri, lililili, lily, lili, riri, ll, mixed</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>unit (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
+<code>sort&lt;unit</code><br />
+<code>unit=pkey</code><br />
+<code>unit!=その他</code><br />
+<code>unit=riririri,mixed,pkpk</code><br />
+<code>$riririri $mixed $pkpk</code><br />
+<code>$pkey $!その他</code></p>
+</details>
+<h2 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="attribute">attribute</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Filterable, Tag</p>
@@ -621,19 +647,29 @@
 <p class="admonition-title">Tags</p>
 <p>street, party, cute, cool, elegant, purple, yellow, orange, pink, red, blue, green</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>attribute (=, ==, !=) [value]</p>
+<details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
+<code>sort&lt;attribute</code><br />
+<code>attribute=cool</code><br />
+<code>attribute!=green</code><br />
+<code>attribute=street,elegant,party</code><br />
+<code>$street $elegant $party</code><br />
+<code>$cool $!green</code></p>
+</details>
+<h2 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
 </div>
-<h2 id="id">id</h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p>Sortable, Display, Comparable</p>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Usage</p>
-<p>id (=, ==, !=, &gt;, &lt;, &gt;=, &lt;=) [value]</p>
-</div>
+<details class="example"><summary>Examples</summary><p><code>sort=id</code><br />
+<code>sort&lt;id</code><br />
+<code>disp=id</code><br />
+<code>id=[value]</code><br />
+<code>id!=[value]</code><br />
+<code>id&gt;[value]</code></p>
+</details>
                 
               
               

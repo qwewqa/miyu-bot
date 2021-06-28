@@ -12,7 +12,7 @@ from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence, Protocol
+from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, Iterator, NamedTuple
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -86,7 +86,6 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     if alias_server_value.id in manager.masters[self.master_name]:
                         self.default_filter[server][alias] = masters[alias_server_value.id]
                         self.unrestricted_filter[server][alias] = masters[alias_server_value.id]
-
 
     def get_asset_source(self, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None):
         if server is None:
@@ -207,116 +206,16 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         if hasattr(source, '_command_source_info'):
             source = source._command_source_info
 
-        flag_data_attributes = [a for a in self.data_attributes if a.is_flag]
-        tag_data_attributes = [a for a in self.data_attributes if a.is_tag]
-        keyword_data_attributes = [a for a in self.data_attributes if a.is_keyword]
-        sortable_data_attributes = [a for a in self.data_attributes if a.is_sortable]
-        comparable_data_attributes = [a for a in self.data_attributes if a.is_comparable]
-
-        # is_comparable already includes the needed behavior (and really, only one of the two should be used).
-        eq_data_attributes = [a for a in self.data_attributes if a.is_eq and not a.is_comparable]
-
-        sort_arguments = {}
-        for info in sortable_data_attributes:
-            sort_arguments[info.name] = info
-            for alias in info.aliases:
-                sort_arguments[alias] = info
+        filter_processor = FilterProcessor(self, source)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            sort = None
-            reverse_sort = arg.tag('reverse')
-            if sortable_data_attributes:
-                sort, sort_op = arg.single_op('sort', None, allowed_operators=['<', '>', '='], converter=sort_arguments)
-                if sort:
-                    reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
-            tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in tag_data_attributes}
-            keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in keyword_data_attributes}
-            flag_arguments = {a: bool(arg.tags([a.name] + a.aliases)) for a in flag_data_attributes}
-            comparable_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                     allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (
-                                         lambda s: float(s))) for a in
-                comparable_data_attributes}
-            eq_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                     allowed_operators=['=', '==', '!='],
-                                     converter=self.wrap_compare_converter(ctx,
-                                                                           a.compare_converter) or a.value_mapping or (
-                                                   lambda s: float(s)))
-                for a in eq_data_attributes}
-            text = arg.text()
-
-            arg.require_all_arguments_used()
-
-            index = 0
-            current = self.get_current(ctx)
-            is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
-            if is_relative_only:
-                text = ''
-            elif re.fullmatch(r'~\d+', text.strip()):
-                index = int(text.strip()[1:]) - 1
-                text = ''
-
-            tab = source.default_tab
-            if source.suffix_tab_aliases:
-                words = text.split()
-                if len(words) >= 1 and words[-1].lower() in source.suffix_tab_aliases:
-                    tab = source.suffix_tab_aliases[words[-1].lower()]
-                    text = ' '.join(words[:-1])
-
-            values = self.get_by_relevance(text, ctx)
-
-            for attr, tags in tag_arguments.items():
-                if tags:
-                    targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_plural:
-                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
-                    else:
-                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
-            for attr, tags in keyword_arguments.items():
-                if tags:
-                    targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_plural:
-                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
-                    else:
-                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
-            for attr, flag_present in flag_arguments.items():
-                if flag_present:
-                    if attr.flag_callback:
-                        callback_value = attr.flag_callback(self, ctx, values)
-                        if callback_value is not None:
-                            values = callback_value
-                    else:
-                        values = [v for v in values if attr.accessor(self, ctx, v)]
-            for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
-                for argument in arguments:
-                    argument_value, operation = argument
-                    if attr.is_plural:
-                        operator = list_to_list_operator_for(operation)
-                    else:
-                        operator = list_operator_for(operation)
-                    values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
-
-            if source.default_sort and not text:
-                values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
-                if source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
-                    values = values[::-1]
-            if sort:
-                values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
-            if reverse_sort:
-                values = values[::-1]
+            values, index, tab, _display = filter_processor.get(arg, ctx, is_list=False)
 
             if not values:
                 await ctx.send('No results.')
                 return
 
-            if is_relative_only and current in values:
-                index = values.index(current)
-                index -= int(arg.original.strip())
-
-            index = min(len(values) - 1, max(0, index))
             servers = list(Server)
             target_server_index = servers.index(ctx.preferences.server)
 
@@ -397,95 +296,11 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         if not source.list_formatter:
             raise ValueError('Command source does not have a list formatter.')
 
-        flag_data_attributes = [a for a in self.data_attributes if a.is_flag]
-        tag_data_attributes = [a for a in self.data_attributes if a.is_tag]
-        keyword_data_attributes = [a for a in self.data_attributes if a.is_keyword]
-        sortable_data_attributes = [a for a in self.data_attributes if a.is_sortable]
-        comparable_data_attributes = [a for a in self.data_attributes if a.is_comparable]
-
-        # is_comparable already includes the needed behavior (and really, only one of the two should be used).
-        eq_data_attributes = [a for a in self.data_attributes if a.is_eq and not a.is_comparable]
-
-        sort_arguments = {}
-        for info in sortable_data_attributes:
-            sort_arguments[info.name] = info
-            for alias in info.aliases:
-                sort_arguments[alias] = info
+        filter_processor = FilterProcessor(self, source)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            sort = None
-            display = None
-            reverse_sort = arg.tag('reverse')
-            if sortable_data_attributes:
-                sort, sort_op = arg.single_op('sort', None, allowed_operators=['<', '>', '='], converter=sort_arguments)
-                if sort:
-                    reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
-                display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
-                                     converter={**sort_arguments, 'none': None})
-            tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in tag_data_attributes}
-            keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in keyword_data_attributes}
-            flag_arguments = {a: bool(arg.tags([a.name] + a.aliases)) for a in flag_data_attributes}
-            comparable_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                     allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                     converter=self.wrap_compare_converter(ctx, a.compare_converter) or (
-                                         lambda s: float(s))) for a in
-                comparable_data_attributes}
-            eq_arguments = {
-                a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                     allowed_operators=['=', '==', '!='],
-                                     converter=self.wrap_compare_converter(ctx,
-                                                                           a.compare_converter) or a.value_mapping or (
-                                                   lambda s: float(s)))
-                for a in eq_data_attributes}
-            text = arg.text()
-
-            arg.require_all_arguments_used()
-
-            values = self.get_by_relevance(text, ctx)
-
-            for attr, tags in tag_arguments.items():
-                if tags:
-                    targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_plural:
-                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
-                    else:
-                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
-            for attr, tags in keyword_arguments.items():
-                if tags:
-                    targets = {attr.value_mapping[t] for t in tags}
-                    if attr.is_plural:
-                        values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
-                    else:
-                        values = [v for v in values if attr.accessor(self, ctx, v) in targets]
-            for attr, flag_present in flag_arguments.items():
-                if flag_present:
-                    if attr.flag_callback:
-                        callback_value = attr.flag_callback(self, ctx, values)
-                        if callback_value is not None:
-                            values = callback_value
-                    else:
-                        values = [v for v in values if attr.accessor(self, ctx, v)]
-            for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
-                for argument in arguments:
-                    argument_value, operation = argument
-                    if attr.is_plural:
-                        operator = list_to_list_operator_for(operation)
-                    else:
-                        operator = list_operator_for(operation)
-                    values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
-
-            display = display or source.default_display
-
-            if source.default_sort and not text:
-                values = sorted(values, key=lambda v: source.default_sort.accessor(self, ctx, v))
-                if source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
-                    values = values[::-1]
-            if sort:
-                values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
-            if reverse_sort:
-                values = values[::-1]
+            values, _index, _tab, display = filter_processor.get(arg, ctx, is_list=True)
 
             if display and display.formatter:
                 listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, ctx, value)}' for value
@@ -508,6 +323,143 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 return functools.partial(f, self)
             else:
                 return functools.partial(f, self, ctx)
+
+
+class FilterProcessor:
+    def __init__(self, master_filter: MasterFilter, source: CommandSourceInfo):
+        self.master_filter = master_filter
+        self.source = source
+        data_attributes = master_filter.data_attributes
+        self.flag_data_attributes = [a for a in data_attributes if a.is_flag]
+        self.tag_data_attributes = [a for a in data_attributes if a.is_tag]
+        self.keyword_data_attributes = [a for a in data_attributes if a.is_keyword]
+        self.sortable_data_attributes = [a for a in data_attributes if a.is_sortable]
+        self.comparable_data_attributes = [a for a in data_attributes if a.is_comparable]
+
+        # is_comparable already includes eq behavior (and really, only one of the two should be used).
+        self.eq_data_attributes = [a for a in data_attributes if a.is_eq and not a.is_comparable]
+
+        sort_arguments = {}
+        for info in self.sortable_data_attributes:
+            sort_arguments[info.name] = info
+            for alias in info.aliases:
+                sort_arguments[alias] = info
+
+        self.sort_arguments = sort_arguments
+
+    def get(self, arg: ParsedArguments, ctx, is_list: bool) -> FilterResult:
+        start_index = 0
+        start_tab = 0
+        is_relative_only = False
+        current = None
+        display = None
+        sort = None
+        reverse_sort = arg.tag('reverse')
+        if self.sortable_data_attributes:
+            sort, sort_op = arg.single_op('sort', None,
+                                          allowed_operators=['<', '>', '='],
+                                          converter=self.sort_arguments)
+            if sort:
+                reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
+            if is_list:
+                display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
+                                     converter={**self.sort_arguments, 'none': None})
+        tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in self.tag_data_attributes}
+        keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in self.keyword_data_attributes}
+        flag_arguments = {a: bool(arg.tags([a.name] + a.aliases)) for a in self.flag_data_attributes}
+        comparable_arguments = {
+            a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
+                                 allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
+                                 converter=self.master_filter.wrap_compare_converter(ctx, a.compare_converter) or (
+                                     lambda s: float(s))) for a in
+            self.comparable_data_attributes}
+        eq_arguments = {
+            a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
+                                 allowed_operators=['=', '==', '!='],
+                                 converter=self.master_filter.wrap_compare_converter(ctx,
+                                                                                     a.compare_converter) or a.value_mapping or (
+                                               lambda s: float(s)))
+            for a in self.eq_data_attributes}
+        text = arg.text()
+
+        arg.require_all_arguments_used()
+
+        if not is_list:
+            current = self.master_filter.get_current(ctx)
+            is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
+            if is_relative_only:
+                text = ''
+            elif re.fullmatch(r'~\d+', text.strip()):
+                start_index = int(text.strip()[1:]) - 1
+                text = ''
+
+            start_tab = self.source.default_tab
+            if self.source.suffix_tab_aliases:
+                words = text.split()
+                if len(words) >= 1 and words[-1].lower() in self.source.suffix_tab_aliases:
+                    start_tab = self.source.suffix_tab_aliases[words[-1].lower()]
+                    text = ' '.join(words[:-1])
+
+        values = self.master_filter.get_by_relevance(text, ctx)
+
+        for attr, tags in tag_arguments.items():
+            if tags:
+                targets = {attr.value_mapping[t] for t in tags}
+                if attr.is_plural:
+                    values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
+                else:
+                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
+        for attr, tags in keyword_arguments.items():
+            if tags:
+                targets = {attr.value_mapping[t] for t in tags}
+                if attr.is_plural:
+                    values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
+                else:
+                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
+        for attr, flag_present in flag_arguments.items():
+            if flag_present:
+                if attr.flag_callback:
+                    callback_value = attr.flag_callback(self, ctx, values)
+                    if callback_value is not None:
+                        values = callback_value
+                else:
+                    values = [v for v in values if attr.accessor(self, ctx, v)]
+        for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
+            for argument in arguments:
+                argument_value, operation = argument
+                if attr.is_plural:
+                    operator = list_to_list_operator_for(operation)
+                else:
+                    operator = list_operator_for(operation)
+                values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
+
+        if self.source.default_sort and not text:
+            values = sorted(values, key=lambda v: self.source.default_sort.accessor(self, ctx, v))
+            if self.source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
+                values = values[::-1]
+        if sort:
+            values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
+        if reverse_sort:
+            values = values[::-1]
+
+        if is_list:
+            display = display or self.source.default_display
+
+        if not is_list:
+            if is_relative_only and current in values:
+                start_index = values.index(current)
+                start_index -= int(arg.original.strip())
+
+            start_index = min(len(values) - 1, max(0, start_index))
+
+        return FilterResult(values, start_index, start_tab, display)
+
+
+class FilterResult(NamedTuple):
+    values: List
+    start_index: int
+    start_tab: int
+    display: Optional[DataAttributeInfo]
 
 
 DataAttributeAccessor = Callable[[MasterFilter, PrefContext, Any], Any]

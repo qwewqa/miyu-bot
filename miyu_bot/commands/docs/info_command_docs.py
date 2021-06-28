@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 from typing import List
 
@@ -38,7 +39,54 @@ def get_attribute_help_text(attr: DataAttributeInfo, l10n: FluentLocalization) -
         md.admonition('question', 'Description', description)
     if attr.value_mapping:
         md.admonition('note', 'Tags', md.escape_markdown(', '.join(attr.value_mapping.keys())))
+    elif attr.is_flag:
+        md.admonition('note', 'Tags', md.escape_markdown(', '.join([attr.name, *attr.aliases])))
+    if usage_text := get_attribute_usage(attr, l10n):
+        md.admonition('example', 'Examples', usage_text, collapsible=True)
     return md
+
+
+def get_attribute_usage(attr: DataAttributeInfo, l10n: FluentLocalization) -> str:
+    entries = []
+    if attr.is_flag:
+        entries.append(f'${attr.name}')
+        if not attr.flag_callback:
+            entries.append(f'$!{attr.name}')
+    if attr.is_sortable:
+        entries.append(f'sort={attr.name}')
+        entries.append(f'sort<{attr.name}')
+    if attr.formatter:
+        entries.append(f'disp={attr.name}')
+    if attr.value_mapping:
+        values = [*attr.value_mapping.keys()]
+        if len(values) < 2:
+            example_value1 = random.choice(values)
+            example_value2 = example_value1
+        else:
+            example_value1, example_value2 = random.sample(values, 2)
+        example_values = random.sample(values, min(3, len(values)))
+        if attr.is_comparable or attr.is_eq:
+            entries.append(f'{attr.name}={example_value1}')
+            entries.append(f'{attr.name}!={example_value2}')
+            entries.append(f'{attr.name}={",".join(example_values)}')
+            if attr.is_plural:
+                entries.append(f'{attr.name}=={",".join(example_values)}')
+                entries.append(f'{attr.name}!={",".join(example_values)}')
+        if attr.is_comparable:
+            entries.append(f'{attr.name}>{example_value2}')
+        if attr.is_tag:
+            entries.append(' '.join(f'${t}' for t in example_values))
+            entries.append(f'${example_value1} $!{example_value2}')
+        if attr.is_keyword:
+            entries.append(' '.join(f'{t}' for t in example_values))
+    else:
+        example_value = attr.help_sample_argument or '[value]'
+        if attr.is_comparable or attr.is_eq:
+            entries.append(f'{attr.name}={example_value}')
+            entries.append(f'{attr.name}!={example_value}')
+        if attr.is_comparable:
+            entries.append(f'{attr.name}>{example_value}')
+    return '\n'.join(f'`{e}`' for e in entries)
 
 
 def get_attribute_type_description(attr: DataAttributeInfo, l10n: FluentLocalization):

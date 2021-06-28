@@ -1,3 +1,4 @@
+import random
 from pathlib import Path
 
 from miyu_bot.bot.bot import D4DJBot
@@ -18,6 +19,9 @@ if __name__ == '__main__':
     bot.load_extension('miyu_bot.commands.cogs.preferences')
     bot.load_extension('miyu_bot.commands.cogs.audio')
     bot.load_extension('miyu_bot.commands.cogs.gacha')
+
+    random.seed(0)
+
     generate_info_command_docs(bot, Path(__file__).parent / 'docs/commands/info', bot.cogs['Info'].master_filters)
 
     print(f'Generated docs in {timer() - start}s.')

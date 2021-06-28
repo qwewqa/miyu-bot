@@ -24,9 +24,10 @@ class MarkdownDocument:
     def heading(self, level: int, body: str):
         self.add_section(textwrap.indent(body, '#' * level + ' '))
 
-    def admonition(self, style: str, title: str, body: str):
+    def admonition(self, style: str, title: str, body: str, *, collapsible: bool = False):
         title = f' "{title}"' if title is not None else ''
-        self.add_section(f'!!! {style}{title}\n{textwrap.indent(self.replace_newlines(body), self.indent)}')
+        prefix = "???" if collapsible else "!!!"
+        self.add_section(f'{prefix} {style}{title}\n{textwrap.indent(self.replace_newlines(body), self.indent)}')
 
     @staticmethod
     def escape_markdown(text):

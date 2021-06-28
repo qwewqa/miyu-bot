@@ -31,7 +31,8 @@ def generate_master_filter_docs(bot: D4DJBot, docs_path: Path, filter: MasterFil
 def get_attribute_help_text(attr: DataAttributeInfo, l10n: FluentLocalization) -> MarkdownDocument:
     md = MarkdownDocument()
     md.heading(2, attr.name)
-    md.admonition('abstract', 'Aliases', ', '.join(attr.aliases))
+    if attr.aliases:
+        md.admonition('abstract', 'Aliases', ', '.join(attr.aliases))
     md.admonition('info', 'Type', ', '.join(get_attribute_type_description(attr, l10n)))
     description_fluent_id = f'{attr.name}-desc'
     description = l10n.format_value(description_fluent_id)

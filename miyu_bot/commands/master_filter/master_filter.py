@@ -365,8 +365,11 @@ class FilterProcessor:
                 display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
                                      converter={**self.sort_arguments, 'none': None})
         tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in self.tag_data_attributes}
+        inverse_tag_arguments = {a: arg.tags('!' + t for t in a.value_mapping.keys()) for a in self.tag_data_attributes}
         keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in self.keyword_data_attributes}
-        flag_arguments = {a: bool(arg.tags([a.name] + a.aliases)) for a in self.flag_data_attributes}
+        flag_arguments = {a: bool(arg.tags([a.name, *a.aliases])) for a in self.flag_data_attributes}
+        inverse_flag_arguments = {a: bool(arg.tags('!' + t for t in [a.name, *a.aliases]))
+                                  for a in self.flag_data_attributes if not a.flag_callback}
         comparable_arguments = {
             a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
                                  allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
@@ -406,24 +409,35 @@ class FilterProcessor:
             if tags:
                 targets = {attr.value_mapping[t] for t in tags}
                 if attr.is_plural:
-                    values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
+                    values = [v for v in values if targets.issubset(attr.accessor(self.master_filter, ctx, v))]
                 else:
-                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
+                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v) in targets]
+        for attr, tags in inverse_tag_arguments.items():
+            if tags:
+                targets = {attr.value_mapping[t[1:]] for t in tags}
+                if attr.is_plural:
+                    values = [v for v in values if not targets.intersection(attr.accessor(self.master_filter, ctx, v))]
+                else:
+                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v) not in targets]
         for attr, tags in keyword_arguments.items():
             if tags:
                 targets = {attr.value_mapping[t] for t in tags}
                 if attr.is_plural:
-                    values = [v for v in values if targets.issubset(attr.accessor(self, ctx, v))]
+                    values = [v for v in values if targets.issubset(attr.accessor(self.master_filter, ctx, v))]
                 else:
-                    values = [v for v in values if attr.accessor(self, ctx, v) in targets]
+                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v) in targets]
         for attr, flag_present in flag_arguments.items():
             if flag_present:
                 if attr.flag_callback:
-                    callback_value = attr.flag_callback(self, ctx, values)
+                    callback_value = attr.flag_callback(self.master_filter, ctx, values)
                     if callback_value is not None:
                         values = callback_value
                 else:
-                    values = [v for v in values if attr.accessor(self, ctx, v)]
+                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v)]
+        for attr, flag_present in inverse_flag_arguments.items():
+            if flag_present:
+                # Flags with callbacks are excluded
+                values = [v for v in values if not attr.accessor(self.master_filter, ctx, v)]
         for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
             for argument in arguments:
                 argument_value, operation = argument
@@ -431,14 +445,14 @@ class FilterProcessor:
                     operator = list_to_list_operator_for(operation)
                 else:
                     operator = list_operator_for(operation)
-                values = [v for v in values if operator(attr.accessor(self, ctx, v), argument_value)]
+                values = [v for v in values if operator(attr.accessor(self.master_filter, ctx, v), argument_value)]
 
         if self.source.default_sort and not text:
-            values = sorted(values, key=lambda v: self.source.default_sort.accessor(self, ctx, v))
+            values = sorted(values, key=lambda v: self.source.default_sort.accessor(self.master_filter, ctx, v))
             if self.source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
                 values = values[::-1]
         if sort:
-            values = sorted(values, key=lambda v: sort.accessor(self, ctx, v))
+            values = sorted(values, key=lambda v: sort.accessor(self.master_filter, ctx, v))
         if reverse_sort:
             values = values[::-1]
 

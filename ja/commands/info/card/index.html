@@ -1,0 +1,1054 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://miyu-docs.qwewqa.xyz/ja/commands/info/card/">
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.8">
+    
+    
+      
+        <title>Card - Miyu Docs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.ca7ac06f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("../../../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#card" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href="../../../.." title="Miyu Docs" class="md-header__button md-logo" aria-label="Miyu Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Miyu Docs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Card
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <div class="md-header__option">
+        <div class="md-select">
+          
+          <button class="md-header__button md-icon" aria-label="Select language">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m12.87 15.07-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04M18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12m-2.62 7 1.62-4.33L19.12 17h-3.24z"/></svg>
+          </button>
+          <div class="md-select__inner">
+            <ul class="md-select__list">
+              
+                <li class="md-select__item">
+                  <a href="../../../../" hreflang="en_US" class="md-select__link">
+                    English
+                  </a>
+                </li>
+                
+                <li class="md-select__item">
+                  <a href="../../../" hreflang="ja" class="md-select__link">
+                    日本語
+                  </a>
+                </li>
+                
+                <li class="md-select__item">
+                  <a href="../../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
+                  </a>
+                </li>
+                
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/qwewqa/miyu-bot/" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-tabs__inner md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+
+
+  <li class="md-tabs__item">
+    <a href="../../../" class="md-tabs__link">
+      Miyu Docs
+    </a>
+  </li>
+
+      
+        
+  
+  
+    
+  
+
+
+  
+  
+  
+    
+
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../general_usage/" class="md-tabs__link md-tabs__link--active">
+        Commands
+      </a>
+    </li>
+  
+
+  
+
+      
+    </ul>
+  </div>
+</nav>
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Miyu Docs" class="md-nav__button md-logo" aria-label="Miyu Docs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    Miyu Docs
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/qwewqa/miyu-bot/" title="リポジトリへ" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        Miyu Docs
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
+      
+      <label class="md-nav__link" for="__nav_2">
+        Commands
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Commands" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Commands
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_1" type="checkbox" id="__nav_2_1" checked>
+      
+      <label class="md-nav__link" for="__nav_2_1">
+        Info
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Info" data-md-level="2">
+        <label class="md-nav__title" for="__nav_2_1">
+          <span class="md-nav__icon md-icon"></span>
+          Info
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../general_usage/" class="md-nav__link">
+        General Usage
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Card
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Card
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#character" class="md-nav__link">
+    character
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unit" class="md-nav__link">
+    unit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribute" class="md-nav__link">
+    attribute
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#power" class="md-nav__link">
+    power
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heart" class="md-nav__link">
+    heart
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technique" class="md-nav__link">
+    technique
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#physical" class="md-nav__link">
+    physical
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    date
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rarity" class="md-nav__link">
+    rarity
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skill" class="md-nav__link">
+    skill
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event" class="md-nav__link">
+    event
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    availability
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chart/" class="md-nav__link">
+        Chart
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../event/" class="md-nav__link">
+        Event
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gacha/" class="md-nav__link">
+        Gacha
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../login_bonus/" class="md-nav__link">
+        Login bonus
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../music/" class="md-nav__link">
+        Music
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stamp/" class="md-nav__link">
+        Stamp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    name
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#character" class="md-nav__link">
+    character
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unit" class="md-nav__link">
+    unit
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attribute" class="md-nav__link">
+    attribute
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#id" class="md-nav__link">
+    id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#power" class="md-nav__link">
+    power
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heart" class="md-nav__link">
+    heart
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technique" class="md-nav__link">
+    technique
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#physical" class="md-nav__link">
+    physical
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    date
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rarity" class="md-nav__link">
+    rarity
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skill" class="md-nav__link">
+    skill
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#event" class="md-nav__link">
+    event
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#availability" class="md-nav__link">
+    availability
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/qwewqa/miyu-bot/edit/master/docs/commands/info/card.ja.md" title="編集" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <!-- Generated -->
+
+<h1 id="card">Card<a class="headerlink" href="#card" title="Permanent link">&para;</a></h1>
+<p>Card related commands.</p>
+<h2 id="name">name<a class="headerlink" href="#name" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>title</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Card name.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=name</code><br />
+<code>sort&lt;name</code></p>
+</details>
+<h2 id="character">character<a class="headerlink" href="#character" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>char, chara</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Filterable, Tag, Keyword</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Character name.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>rinku, maho, muni, rei, kyoko, shinobu, yuka, esora, saki, ibuki, towa, noa, rika, marika, saori, dalia, tsubaki, nagisa, hiiro, aoi, miyu, haruna, kurumi, miiko, airi, mana, syano, touka, michiru, ryujin, dennojo, ku, haruki, aqua, pekora, fubuki, suisei</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=character</code><br />
+<code>sort&lt;character</code><br />
+<code>character=rika</code><br />
+<code>character=saori,dalia,ibuki</code><br />
+<code>character!=saori,dalia,ibuki</code><br />
+<code>$saori $dalia $ibuki</code><br />
+<code>$!rika $!suisei</code><br />
+<code>saori dalia ibuki</code></p>
+</details>
+<h2 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Filterable, Tag</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Card character unit.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>happy_around!, peaky_p-key, photon_maiden, merm4id, 燐舞曲, lyrical_lily, スペシャル, その他, rondo, special, other, happyaround, happy_around, hapiara, happy, ha, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk, photonmaiden, photome, photon, pm, mermaid, mmd, m4, lyricallily, riririri, lililili, lily, lili, riri, ll</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
+<code>sort&lt;unit</code><br />
+<code>unit=その他</code><br />
+<code>unit=peaky_p-key,photon_maiden,燐舞曲</code><br />
+<code>unit!=peaky_p-key,photon_maiden,燐舞曲</code><br />
+<code>$peaky_p-key $photon_maiden $燐舞曲</code><br />
+<code>$!その他 $!happy_around!</code></p>
+</details>
+<h2 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Filterable, Tag</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Card attribute.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>street, party, cute, cool, elegant, purple, yellow, orange, pink, red, blue, green</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
+<code>sort&lt;attribute</code><br />
+<code>attribute=cool</code><br />
+<code>attribute=cute,elegant,cool</code><br />
+<code>attribute!=cute,elegant,cool</code><br />
+<code>$cute $elegant $cool</code><br />
+<code>$!cool $!street</code></p>
+</details>
+<h2 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Card Id.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=id</code><br />
+<code>sort&lt;id</code><br />
+<code>disp=id</code><br />
+<code>id=[value]</code><br />
+<code>id!=[value]</code><br />
+<code>id&gt;[value]</code></p>
+</details>
+<h2 id="power">power<a class="headerlink" href="#power" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>pow, bp</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Total power at max level.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=power</code><br />
+<code>sort&lt;power</code><br />
+<code>disp=power</code><br />
+<code>power=[value]</code><br />
+<code>power!=[value]</code><br />
+<code>power&gt;[value]</code></p>
+</details>
+<h2 id="heart">heart<a class="headerlink" href="#heart" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>hrt</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Heart stat at max level.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=heart</code><br />
+<code>sort&lt;heart</code><br />
+<code>disp=heart</code><br />
+<code>heart=[value]</code><br />
+<code>heart!=[value]</code><br />
+<code>heart&gt;[value]</code></p>
+</details>
+<h2 id="technique">technique<a class="headerlink" href="#technique" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>tech, technical</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Technique stat at max level.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=technique</code><br />
+<code>sort&lt;technique</code><br />
+<code>disp=technique</code><br />
+<code>technique=[value]</code><br />
+<code>technique!=[value]</code><br />
+<code>technique&gt;[value]</code></p>
+</details>
+<h2 id="physical">physical<a class="headerlink" href="#physical" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>phys, physic, physics</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Physical stat at max level.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=physical</code><br />
+<code>sort&lt;physical</code><br />
+<code>disp=physical</code><br />
+<code>physical=[value]</code><br />
+<code>physical!=[value]</code><br />
+<code>physical&gt;[value]</code></p>
+</details>
+<h2 id="date">date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>release, recent</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Release date.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=date</code><br />
+<code>sort&lt;date</code><br />
+<code>disp=date</code><br />
+<code>date=[value]</code><br />
+<code>date!=[value]</code><br />
+<code>date&gt;[value]</code></p>
+</details>
+<h2 id="rarity">rarity<a class="headerlink" href="#rarity" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>stars</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Keyword</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Star rarity.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>4*, 4\*, 3*, 3\*, 2*, 2\*, 1*, 1\*</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=rarity</code><br />
+<code>sort&lt;rarity</code><br />
+<code>2* 2\* 4*</code></p>
+</details>
+<h2 id="skill">skill<a class="headerlink" href="#skill" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>score_up, score</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Card skill.</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=skill</code><br />
+<code>sort&lt;skill</code><br />
+<code>disp=skill</code><br />
+<code>skill=[value]</code><br />
+<code>skill!=[value]</code><br />
+<code>skill&gt;[value]</code></p>
+</details>
+<h2 id="event">event<a class="headerlink" href="#event" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>event_bonus, eventbonus, bonus</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Special Flag, Sortable, Comparable</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Description</p>
+<p>Related event.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>event, event_bonus, eventbonus, bonus</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>$event</code><br />
+<code>sort=event</code><br />
+<code>sort&lt;event</code><br />
+<code>event=[value]</code><br />
+<code>event!=[value]</code><br />
+<code>event&gt;[value]</code></p>
+</details>
+<h2 id="availability">availability<a class="headerlink" href="#availability" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>avail</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p>Sortable, Display, Tag</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Tags</p>
+<p>unknown_availability, unavail, navl, permanent, perm, prm, limited, lmtd, lim, collaboration, collab, cllb, clb, birthday, bday, welfare, free, reward, rwrd</p>
+</div>
+<details class="example"><summary>Examples</summary><p><code>sort=availability</code><br />
+<code>sort&lt;availability</code><br />
+<code>disp=availability</code><br />
+<code>$birthday $limited $collaboration</code><br />
+<code>$!birthday $!welfare</code></p>
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="フッター">
+      
+        
+        <a href="../general_usage/" class="md-footer__link md-footer__link--prev" aria-label="前: General Usage" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                前
+              </span>
+              General Usage
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../chart/" class="md-footer__link md-footer__link--next" aria-label="次: Chart" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                次
+              </span>
+              Chart
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.tabs", "navigation.sections"], "translations": {"clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\u3000\u3001\u3002\uff0c\uff0e]+", "search.placeholder": "\u691c\u7d22", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version.title": "Select version"}, "search": "../../../../assets/javascripts/workers/search.b0710199.min.js", "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.76f349be.min.js"></script>
+      
+    
+  </body>
+</html>

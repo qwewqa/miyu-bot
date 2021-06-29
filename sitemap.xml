@@ -2,47 +2,52 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/privacy-policy/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/card_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/card/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/chart_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/chart/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/event_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/event/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/gacha_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/gacha/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/login_bonus_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/general_usage/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/music_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/login_bonus/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://miyu-docs.qwewqa.xyz/commands/info/stamp_filter/</loc>
-         <lastmod>2021-06-28</lastmod>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/music/</loc>
+         <lastmod>2021-06-29</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/stamp/</loc>
+         <lastmod>2021-06-29</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

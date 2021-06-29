@@ -25,7 +25,8 @@ def generate_master_filter_docs(bot: D4DJBot, docs_path: Path, filter: MasterFil
         md.heading(1, l10n.format_value('name'))
         md.text(l10n.format_value('description'))
         md.add_all(get_attribute_help_text(attr, l10n) for attr in filter.data_attributes)
-        (docs_path / f'{filter.name}.{locale_filename}.md').write_text(md.get(), encoding='utf-8')
+        filename = filter.name.replace('_filter', '')
+        (docs_path / f'{filename}.{locale_filename}.md').write_text(md.get(), encoding='utf-8')
 
 
 def get_attribute_help_text(attr: DataAttributeInfo, l10n: FluentLocalization) -> MarkdownDocument:
@@ -59,7 +60,7 @@ def get_attribute_usage(attr: DataAttributeInfo, l10n: FluentLocalization) -> st
     if attr.formatter:
         entries.append(f'disp={attr.name}')
     if attr.value_mapping:
-        values = [*attr.value_mapping.keys()]
+        values = [*get_dict_keys_without_repeated_values(attr.value_mapping)]
         if len(values) < 2:
             example_value1 = random.choice(values)
             example_value2 = example_value1
@@ -68,16 +69,15 @@ def get_attribute_usage(attr: DataAttributeInfo, l10n: FluentLocalization) -> st
         example_values = random.sample(values, min(3, len(values)))
         if attr.is_comparable or attr.is_eq:
             entries.append(f'{attr.name}={example_value1}')
-            entries.append(f'{attr.name}!={example_value2}')
             entries.append(f'{attr.name}={",".join(example_values)}')
+            entries.append(f'{attr.name}!={",".join(example_values)}')
             if attr.is_plural:
                 entries.append(f'{attr.name}=={",".join(example_values)}')
-                entries.append(f'{attr.name}!={",".join(example_values)}')
         if attr.is_comparable:
             entries.append(f'{attr.name}>{example_value2}')
         if attr.is_tag:
             entries.append(' '.join(f'${t}' for t in example_values))
-            entries.append(f'${example_value1} $!{example_value2}')
+            entries.append(f'$!{example_value1} $!{example_value2}')
         if attr.is_keyword:
             entries.append(' '.join(f'{t}' for t in example_values))
     else:
@@ -90,10 +90,22 @@ def get_attribute_usage(attr: DataAttributeInfo, l10n: FluentLocalization) -> st
     return '\n'.join(f'`{e}`' for e in entries)
 
 
+def get_dict_keys_without_repeated_values(d: dict):
+    seen = set()
+    for k, v in d.items():
+        if v in seen:
+            continue
+        seen.add(v)
+        yield k
+
+
 def get_attribute_type_description(attr: DataAttributeInfo, l10n: FluentLocalization):
     attr_types = []
     if attr.is_flag:
-        attr_types.append('Flag')
+        if attr.flag_callback:
+            attr_types.append('Special Flag')
+        else:
+            attr_types.append('Flag')
     if attr.is_sortable:
         attr_types.append('Sortable')
     if attr.formatter:

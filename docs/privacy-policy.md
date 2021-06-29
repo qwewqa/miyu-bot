@@ -6,6 +6,8 @@ Data collected includes anonymous usage statistics and logging, as
 well as user preferences, if they are set at any point.
 No data is shared with any 3rd parties outside of Discord and
 the users of the bot as part of normal usage.
+If user preferences are used, the numerical User ID will be collected.
+in order to store preferences
 
 ### Usage Statistics and Logging
 The frequency that each command is used is recorded on a per-server level.

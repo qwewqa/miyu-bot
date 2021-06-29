@@ -1,4 +1,4 @@
-name = Cards
+name = Card
 
 description = Card related commands.
 
@@ -6,9 +6,9 @@ name-desc = Card name.
 
 character-desc = Character name.
 
-unit-desc = Unit.
+unit-desc = Card character unit.
 
-attribute-desc = Attribute.
+attribute-desc = Card attribute.
 
 id-desc = Card Id.
 

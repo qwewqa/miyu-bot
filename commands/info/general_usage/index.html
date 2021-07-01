@@ -117,14 +117,14 @@
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../ja/" hreflang="ja" class="md-select__link">
-                    日本語
+                  <a href="../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
                   </a>
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
-                    繁體中文
+                  <a href="../../../ja/" hreflang="ja" class="md-select__link">
+                    日本語
                   </a>
                 </li>
                 
@@ -360,8 +360,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    
+  <a href="#tags" class="md-nav__link">
+    Tags
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keywords" class="md-nav__link">
+    Keywords
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-argument" class="md-nav__link">
+    Text Argument
   </a>
   
 </li>
@@ -516,8 +530,22 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    
+  <a href="#tags" class="md-nav__link">
+    Tags
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#keywords" class="md-nav__link">
+    Keywords
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-argument" class="md-nav__link">
+    Text Argument
   </a>
   
 </li>
@@ -584,7 +612,36 @@ to allow for specific filtering and display options of search results.</p>
 <p>Some named arguments can be repeated.</p>
 <pre><code>!songs bpm&gt;140 bpm&lt;=160
 </code></pre>
-<h3 id="_1"><a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<h3 id="tags">Tags<a class="headerlink" href="#tags" title="Permanent link">&para;</a></h3>
+<p>Tags start with a <code>$</code> sign.</p>
+<pre><code>!songs $lili
+!events $rinku $kyoko
+</code></pre>
+<p>Some tags can be inverted, excluding results matching them.</p>
+<pre><code>!songs $!other $!special
+</code></pre>
+<p>Invalid tags will cause an error to be returned.</p>
+<h3 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">&para;</a></h3>
+<p>Keyword are like tags, but they do not require a <code>$</code> sign.<br />
+Keywords are used less frequently than tags because there is potential
+for keywords to be unintentionally used, and because invalid keywords are not detected.</p>
+<pre><code>!cards noa saki
+</code></pre>
+<p>Like other types of arguments, the location of a keyword does not matter.</p>
+<pre><code>!card poison esora
+!card esora poison
+</code></pre>
+<p>Many keywords have tag counterparts, allowing them to be used in either fashion.</p>
+<pre><code>!cards $noa $saki
+</code></pre>
+<h3 id="text-argument">Text Argument<a class="headerlink" href="#text-argument" title="Permanent link">&para;</a></h3>
+<p>Anything not falling into any of the above argument types is combined and processed as the text argument.
+The text argument, if present, is used to find search results by name. It allows for shortened or abbreviated names, and can tolerate some errors.</p>
+<pre><code>!song discover universe
+!song du
+!song discover
+!song diiscover umiverse
+</code></pre>
                 
               
               

@@ -123,7 +123,7 @@ def get_attribute_type_description(attr: DataAttributeInfo, l10n: FluentLocaliza
     if attr.is_comparable:
         attr_types.append(f'[{l10n.format_value("attr-type-comparable")}]({usage_page}#comparable)')
     if attr.is_eq:
-        attr_types.append(f'[{l10n.format_value("attr-type-filterable")}]({usage_page}#filterable)')
+        attr_types.append(f'[{l10n.format_value("attr-type-equality")}]({usage_page}#equality)')
     if attr.is_tag:
         attr_types.append(f'[{l10n.format_value("attr-type-tag")}]({usage_page}#tag)')
     if attr.is_keyword:

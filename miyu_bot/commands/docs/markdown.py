@@ -14,12 +14,13 @@ class MarkdownDocument:
     def add(self, doc: 'MarkdownDocument'):
         self.sections.extend(doc.sections)
 
-    def add_all(self, docs: 'Iterator[MarkdownDocument]'):
+    def add_all(self, docs: 'Iterable[MarkdownDocument]'):
         for doc in docs:
             self.add(doc)
 
     def text(self, text: str):
-        self.add_section(self.replace_newlines(text))
+        if text:
+            self.add_section(self.replace_newlines(text))
 
     def heading(self, level: int, body: str):
         self.add_section(textwrap.indent(body, '#' * level + ' '))

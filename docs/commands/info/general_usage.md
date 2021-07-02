@@ -168,3 +168,11 @@ Most list commands have a detail command counterpart.
 ### Detail Commands
 Detail commands usually have a singular name such as `!song` or `!card`.
 Using a detail command brings up details on a single result at a time.
+
+#### Tabs
+Some detail arguments have tabs, which can be specified as the last word in the
+text argument.
+```
+!chart synchro hard
+!card shinobu untrained
+```

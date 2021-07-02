@@ -1,13 +1,14 @@
 import random
 from pathlib import Path
-from typing import List, Dict
-
-from fluent.runtime import FluentLocalization
+from typing import List, Iterable
 
 from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.commands.docs.documentation_fluent_localization import DocumentationFluentLocalization
 from miyu_bot.commands.docs.markdown import MarkdownDocument
 from miyu_bot.commands.master_filter.locales import valid_locales
-from miyu_bot.commands.master_filter.master_filter import MasterFilter, DataAttributeInfo
+from miyu_bot.commands.master_filter.master_filter import MasterFilter, DataAttributeInfo, CommandSourceInfo
+
+USAGE_PAGE = '../general_usage/'
 
 
 def generate_info_command_docs(bot: D4DJBot, docs_path: Path, filters: List[MasterFilter]):
@@ -18,20 +19,56 @@ def generate_info_command_docs(bot: D4DJBot, docs_path: Path, filters: List[Mast
 def generate_master_filter_docs(bot: D4DJBot, docs_path: Path, master_filter: MasterFilter):
     for locale in valid_locales:
         locale_filename = locale.replace('-', '_')  # needed by mkdocs static i18n plugin
-        l10n = FluentLocalization([*{locale, 'en-US'}], [f'docs/{master_filter.name}.ftl', 'docs/common.ftl'],
-                                  bot.fluent_loader)
+        l10n = DocumentationFluentLocalization([*{locale, 'en-US'}],
+                                               [f'docs/{master_filter.name}.ftl', 'docs/common.ftl'],
+                                               bot.fluent_loader)
         md = MarkdownDocument()
         md.text('<!-- Generated -->')
-        md.heading(1, l10n.format_value('name'))
-        md.text(l10n.format_value('description'))
+        md.heading(1, l10n.format_value('name', fallback=master_filter.name))
+        md.text(l10n.format_value('description', fallback=''))
+        md.heading(2, l10n.format_value('heading-commands'))
+        md.add_all(get_command_source_help_texts(master_filter.command_sources, l10n))
+        md.heading(2, l10n.format_value('heading-attributes'))
         md.add_all(get_attribute_help_text(attr, l10n) for attr in master_filter.data_attributes)
         filename = master_filter.name.replace('_filter', '')
         (docs_path / f'{filename}.{locale_filename}.md').write_text(md.get(), encoding='utf-8')
 
 
-def get_attribute_help_text(attr: DataAttributeInfo, l10n: FluentLocalization) -> MarkdownDocument:
+def get_command_source_help_texts(commands: Iterable[CommandSourceInfo],
+                                  l10n: DocumentationFluentLocalization,
+                                  heading_level=3) -> Iterable[MarkdownDocument]:
+    for command in commands:
+        if command.command_args:
+            md = MarkdownDocument()
+            name = command.command_args["name"]
+            localized_name = l10n.format_value(f'command-{name}', fallback=name)
+            md.heading(heading_level,
+                       f'{name}' +
+                       (f' ({localized_name})' if name != localized_name else ''))
+            md.text(f'*[{l10n.format_value("command-type-detail")}]({USAGE_PAGE}#detail-commands)*')
+            md.text(l10n.format_value(f'command-{command.command_args["name"]}-description', fallback=''))
+            if command.suffix_tab_aliases:
+                md.admonition('note', l10n.format_value('command-tab-names'), ', '.join(command.suffix_tab_aliases))
+            yield md
+        if command.list_command_args:
+            md = MarkdownDocument()
+            name = command.list_command_args["name"]
+            localized_name = l10n.format_value(f'command-{name}', fallback=name)
+            md.heading(heading_level,
+                       f'{name}' +
+                       (f' ({localized_name})' if name != localized_name else ''))
+            md.text(f'*[{l10n.format_value("command-type-list")}]({USAGE_PAGE}#list-commands)*')
+            md.text(l10n.format_value(f'command-{command.list_command_args["name"]}-description', fallback=''))
+            yield md
+
+
+def get_attribute_help_text(attr: DataAttributeInfo,
+                            l10n: DocumentationFluentLocalization,
+                            heading_level=3) -> MarkdownDocument:
     md = MarkdownDocument()
-    md.heading(2, attr.name)
+    name = attr.name
+    localized_name = l10n.format_value(f'attr-{name}', fallback=name)
+    md.heading(heading_level, attr.name + (f' ({localized_name})' if name != localized_name else ''))
     if attr.aliases:
         md.admonition('abstract', 'Aliases', ', '.join(attr.aliases))
     md.admonition('info', 'Type', ', '.join(get_attribute_type_description(attr, l10n)))
@@ -57,7 +94,7 @@ def get_tag_groups(tags: dict) -> dict:
     return groups
 
 
-def get_attribute_usage(attr: DataAttributeInfo, l10n: FluentLocalization) -> str:
+def get_attribute_usage(attr: DataAttributeInfo, l10n: DocumentationFluentLocalization) -> str:
     entries = []
     if attr.is_flag:
         entries.append(f'${attr.name}')
@@ -108,26 +145,25 @@ def get_dict_keys_without_repeated_values(d: dict):
         yield k
 
 
-def get_attribute_type_description(attr: DataAttributeInfo, l10n: FluentLocalization):
+def get_attribute_type_description(attr: DataAttributeInfo, l10n: DocumentationFluentLocalization):
     attr_types = []
-    usage_page = '../general_usage/'
     if attr.is_flag:
         if attr.flag_callback:
-            attr_types.append(f'[{l10n.format_value("attr-type-special-flag")}]({usage_page}#flag)')
+            attr_types.append(f'[{l10n.format_value("attr-type-special-flag")}]({USAGE_PAGE}#flag)')
         else:
-            attr_types.append(f'[{l10n.format_value("attr-type-flag")}]({usage_page}#flag)')
+            attr_types.append(f'[{l10n.format_value("attr-type-flag")}]({USAGE_PAGE}#flag)')
     if attr.is_sortable:
-        attr_types.append(f'[{l10n.format_value("attr-type-sortable")}]({usage_page}#sortable)')
+        attr_types.append(f'[{l10n.format_value("attr-type-sortable")}]({USAGE_PAGE}#sortable)')
     if attr.formatter:
-        attr_types.append(f'[{l10n.format_value("attr-type-display")}]({usage_page}#display)')
+        attr_types.append(f'[{l10n.format_value("attr-type-display")}]({USAGE_PAGE}#display)')
     if attr.is_comparable:
-        attr_types.append(f'[{l10n.format_value("attr-type-comparable")}]({usage_page}#comparable)')
+        attr_types.append(f'[{l10n.format_value("attr-type-comparable")}]({USAGE_PAGE}#comparable)')
     if attr.is_eq:
-        attr_types.append(f'[{l10n.format_value("attr-type-equality")}]({usage_page}#equality)')
+        attr_types.append(f'[{l10n.format_value("attr-type-equality")}]({USAGE_PAGE}#equality)')
     if attr.is_tag:
-        attr_types.append(f'[{l10n.format_value("attr-type-tag")}]({usage_page}#tag)')
+        attr_types.append(f'[{l10n.format_value("attr-type-tag")}]({USAGE_PAGE}#tag)')
     if attr.is_keyword:
-        attr_types.append(f'[{l10n.format_value("attr-type-keyword")}]({usage_page}#keyword)')
+        attr_types.append(f'[{l10n.format_value("attr-type-keyword")}]({USAGE_PAGE}#keyword)')
     if attr.is_plural:
-        attr_types.append(f'[{l10n.format_value("attr-type-plural")}]({usage_page}#plural)')
+        attr_types.append(f'[{l10n.format_value("attr-type-plural")}]({USAGE_PAGE}#plural)')
     return attr_types

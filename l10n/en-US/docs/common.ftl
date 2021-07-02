@@ -1,3 +1,10 @@
+heading-commands = Commands
+heading-attributes = Attributes
+
+command-type-detail = Detail Command
+command-type-list = List Command
+command-tab-names = Tab Names
+
 attr-type-special-flag = Special Flag
 attr-type-flag = Flag
 attr-type-sortable = Sortable

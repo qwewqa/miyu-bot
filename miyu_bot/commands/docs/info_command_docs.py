@@ -1,6 +1,6 @@
 import random
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 
 from fluent.runtime import FluentLocalization
 
@@ -15,17 +15,17 @@ def generate_info_command_docs(bot: D4DJBot, docs_path: Path, filters: List[Mast
         generate_master_filter_docs(bot, docs_path, master_filter)
 
 
-def generate_master_filter_docs(bot: D4DJBot, docs_path: Path, filter: MasterFilter):
+def generate_master_filter_docs(bot: D4DJBot, docs_path: Path, master_filter: MasterFilter):
     for locale in valid_locales:
         locale_filename = locale.replace('-', '_')  # needed by mkdocs static i18n plugin
-        l10n = FluentLocalization([*{locale, 'en-US'}], [f'docs/{filter.name}.ftl', 'docs/common.ftl'],
+        l10n = FluentLocalization([*{locale, 'en-US'}], [f'docs/{master_filter.name}.ftl', 'docs/common.ftl'],
                                   bot.fluent_loader)
         md = MarkdownDocument()
         md.text('<!-- Generated -->')
         md.heading(1, l10n.format_value('name'))
         md.text(l10n.format_value('description'))
-        md.add_all(get_attribute_help_text(attr, l10n) for attr in filter.data_attributes)
-        filename = filter.name.replace('_filter', '')
+        md.add_all(get_attribute_help_text(attr, l10n) for attr in master_filter.data_attributes)
+        filename = master_filter.name.replace('_filter', '')
         (docs_path / f'{filename}.{locale_filename}.md').write_text(md.get(), encoding='utf-8')
 
 
@@ -40,12 +40,21 @@ def get_attribute_help_text(attr: DataAttributeInfo, l10n: FluentLocalization) -
     if description != description_fluent_id:
         md.admonition('question', 'Description', description)
     if attr.value_mapping:
-        md.admonition('note', 'Tags', md.escape_markdown(', '.join(attr.value_mapping.keys())))
+        tag_groups = get_tag_groups(attr.value_mapping)
+        tag_group_lines = [' - ' + ', '.join(g) for g in tag_groups.values()]
+        md.admonition('note', 'Tags', md.escape_markdown('\n'.join(tag_group_lines)), collapsible=True)
     elif attr.is_flag:
         md.admonition('note', 'Tags', md.escape_markdown(', '.join([attr.name, *attr.aliases])))
     if usage_text := get_attribute_usage(attr, l10n):
         md.admonition('example', 'Examples', usage_text, collapsible=True)
     return md
+
+
+def get_tag_groups(tags: dict) -> dict:
+    groups = {value: [] for value in tags.values()}
+    for k, v in tags.items():
+        groups[v].append(k)
+    return groups
 
 
 def get_attribute_usage(attr: DataAttributeInfo, l10n: FluentLocalization) -> str:
@@ -101,23 +110,24 @@ def get_dict_keys_without_repeated_values(d: dict):
 
 def get_attribute_type_description(attr: DataAttributeInfo, l10n: FluentLocalization):
     attr_types = []
+    usage_page = '../general_usage/'
     if attr.is_flag:
         if attr.flag_callback:
-            attr_types.append('Special Flag')
+            attr_types.append(f'[{l10n.format_value("attr-type-special-flag")}]({usage_page}#flag)')
         else:
-            attr_types.append('Flag')
+            attr_types.append(f'[{l10n.format_value("attr-type-flag")}]({usage_page}#flag)')
     if attr.is_sortable:
-        attr_types.append('Sortable')
+        attr_types.append(f'[{l10n.format_value("attr-type-sortable")}]({usage_page}#sortable)')
     if attr.formatter:
-        attr_types.append('Display')
+        attr_types.append(f'[{l10n.format_value("attr-type-display")}]({usage_page}#display)')
     if attr.is_comparable:
-        attr_types.append('Comparable')
+        attr_types.append(f'[{l10n.format_value("attr-type-comparable")}]({usage_page}#comparable)')
     if attr.is_eq:
-        attr_types.append('Filterable')
+        attr_types.append(f'[{l10n.format_value("attr-type-filterable")}]({usage_page}#filterable)')
     if attr.is_tag:
-        attr_types.append('Tag')
+        attr_types.append(f'[{l10n.format_value("attr-type-tag")}]({usage_page}#tag)')
     if attr.is_keyword:
-        attr_types.append('Keyword')
+        attr_types.append(f'[{l10n.format_value("attr-type-keyword")}]({usage_page}#keyword)')
     if attr.is_plural:
-        attr_types.append('Plural')
+        attr_types.append(f'[{l10n.format_value("attr-type-plural")}]({usage_page}#plural)')
     return attr_types

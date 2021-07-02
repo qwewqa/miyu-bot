@@ -153,7 +153,7 @@ class CardFilter(MasterFilter[CardMaster]):
                                    r'3*': 3,
                                    r'3\*': 3,
                                    r'2*': 2,
-                                   r'2\*': 1,
+                                   r'2\*': 2,
                                    r'1*': 1,
                                    r'1\*': 1},
                     is_sortable=True,

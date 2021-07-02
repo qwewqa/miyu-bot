@@ -1,0 +1,9 @@
+attr-type-special-flag = Special Flag
+attr-type-flag = Flag
+attr-type-sortable = Sortable
+attr-type-display = Display
+attr-type-comparable = Comparable
+attr-type-filterable = Filterable
+attr-type-tag = Tag
+attr-type-keyword = Keyword
+attr-type-plural = Plural

@@ -697,7 +697,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable</p>
+<p><a href="../general_usage/#sortable">Sortable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -713,71 +713,118 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Filterable, Tag, Keyword</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a>, <a href="../general_usage/#keyword">Keyword</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
 <p>Character name.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Tags</p>
-<p>rinku, maho, muni, rei, kyoko, shinobu, yuka, esora, saki, ibuki, towa, noa, rika, marika, saori, dalia, tsubaki, nagisa, hiiro, aoi, miyu, haruna, kurumi, miiko, airi, mana, syano, touka, michiru, ryujin, dennojo, ku, haruki, aqua, pekora, fubuki, suisei</p>
-</div>
+<details class="note"><summary>Tags</summary><ul>
+<li>rinku  </li>
+<li>maho  </li>
+<li>muni  </li>
+<li>rei  </li>
+<li>kyoko  </li>
+<li>shinobu  </li>
+<li>yuka  </li>
+<li>esora  </li>
+<li>saki  </li>
+<li>ibuki  </li>
+<li>towa  </li>
+<li>noa  </li>
+<li>rika  </li>
+<li>marika  </li>
+<li>saori  </li>
+<li>dalia  </li>
+<li>tsubaki  </li>
+<li>nagisa  </li>
+<li>hiiro  </li>
+<li>aoi  </li>
+<li>miyu  </li>
+<li>haruna  </li>
+<li>kurumi  </li>
+<li>miiko  </li>
+<li>airi  </li>
+<li>mana  </li>
+<li>syano  </li>
+<li>touka  </li>
+<li>michiru  </li>
+<li>ryujin  </li>
+<li>dennojo  </li>
+<li>ku  </li>
+<li>haruki  </li>
+<li>aqua  </li>
+<li>pekora  </li>
+<li>fubuki  </li>
+<li>suisei</li>
+</ul>
+</details>
 <details class="example"><summary>Examples</summary><p><code>sort=character</code><br />
 <code>sort&lt;character</code><br />
-<code>character=rika</code><br />
-<code>character=saori,dalia,ibuki</code><br />
-<code>character!=saori,dalia,ibuki</code><br />
-<code>$saori $dalia $ibuki</code><br />
-<code>$!rika $!suisei</code><br />
-<code>saori dalia ibuki</code></p>
+<code>character=dennojo</code><br />
+<code>character=yuka,kurumi,touka</code><br />
+<code>character!=yuka,kurumi,touka</code><br />
+<code>$yuka $kurumi $touka</code><br />
+<code>$!dennojo $!fubuki</code><br />
+<code>yuka kurumi touka</code></p>
 </details>
 <h2 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Filterable, Tag</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
 <p>Card character unit.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Tags</p>
-<p>happy_around!, peaky_p-key, photon_maiden, merm4id, 燐舞曲, lyrical_lily, スペシャル, その他, rondo, special, other, happyaround, happy_around, hapiara, happy, ha, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk, photonmaiden, photome, photon, pm, mermaid, mmd, m4, lyricallily, riririri, lililili, lily, lili, riri, ll</p>
-</div>
+<details class="note"><summary>Tags</summary><ul>
+<li>happy_around!, happyaround, happy_around, hapiara, happy, ha  </li>
+<li>peaky_p-key, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk  </li>
+<li>photon_maiden, photonmaiden, photome, photon, pm  </li>
+<li>merm4id, mermaid, mmd, m4  </li>
+<li>燐舞曲, rondo  </li>
+<li>lyrical_lily, lyricallily, riririri, lililili, lily, lili, riri, ll  </li>
+<li>スペシャル, special  </li>
+<li>その他, other</li>
+</ul>
+</details>
 <details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=その他</code><br />
-<code>unit=peaky_p-key,photon_maiden,燐舞曲</code><br />
-<code>unit!=peaky_p-key,photon_maiden,燐舞曲</code><br />
-<code>$peaky_p-key $photon_maiden $燐舞曲</code><br />
-<code>$!その他 $!happy_around!</code></p>
+<code>unit=lyrical_lily</code><br />
+<code>unit=merm4id,燐舞曲,その他</code><br />
+<code>unit!=merm4id,燐舞曲,その他</code><br />
+<code>$merm4id $燐舞曲 $その他</code><br />
+<code>$!lyrical_lily $!燐舞曲</code></p>
 </details>
 <h2 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Filterable, Tag</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
 <p>Card attribute.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Tags</p>
-<p>street, party, cute, cool, elegant, purple, yellow, orange, pink, red, blue, green</p>
-</div>
+<details class="note"><summary>Tags</summary><ul>
+<li>street, purple  </li>
+<li>party, yellow, orange  </li>
+<li>cute, pink, red  </li>
+<li>cool, blue  </li>
+<li>elegant, green</li>
+</ul>
+</details>
 <details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
 <code>attribute=cool</code><br />
-<code>attribute=cute,elegant,cool</code><br />
-<code>attribute!=cute,elegant,cool</code><br />
-<code>$cute $elegant $cool</code><br />
-<code>$!cool $!street</code></p>
+<code>attribute=street,elegant,cool</code><br />
+<code>attribute!=street,elegant,cool</code><br />
+<code>$street $elegant $cool</code><br />
+<code>$!cool $!cute</code></p>
 </details>
 <h2 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -797,7 +844,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -817,7 +864,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -837,7 +884,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -857,7 +904,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -877,7 +924,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -897,19 +944,22 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Keyword</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#keyword">Keyword</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
 <p>Star rarity.</p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Tags</p>
-<p>4*, 4\*, 3*, 3\*, 2*, 2\*, 1*, 1\*</p>
-</div>
+<details class="note"><summary>Tags</summary><ul>
+<li>4*, 4\*  </li>
+<li>3*, 3\*  </li>
+<li>2*, 2\*  </li>
+<li>1*, 1\*</li>
+</ul>
+</details>
 <details class="example"><summary>Examples</summary><p><code>sort=rarity</code><br />
 <code>sort&lt;rarity</code><br />
-<code>2* 2\* 4*</code></p>
+<code>4* 2* 3*</code></p>
 </details>
 <h2 id="skill">skill<a class="headerlink" href="#skill" title="Permanent link">&para;</a></h2>
 <div class="admonition abstract">
@@ -918,7 +968,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Comparable</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -938,7 +988,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Special Flag, Sortable, Comparable</p>
+<p><a href="../general_usage/#flag">Special Flag</a>, <a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -962,17 +1012,22 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p>Sortable, Display, Tag</p>
+<p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Tags</p>
-<p>unknown_availability, unavail, navl, permanent, perm, prm, limited, lmtd, lim, collaboration, collab, cllb, clb, birthday, bday, welfare, free, reward, rwrd</p>
-</div>
+<details class="note"><summary>Tags</summary><ul>
+<li>unknown_availability, unavail, navl  </li>
+<li>permanent, perm, prm  </li>
+<li>limited, lmtd, lim  </li>
+<li>collaboration, collab, cllb, clb  </li>
+<li>birthday, bday  </li>
+<li>welfare, free, reward, rwrd</li>
+</ul>
+</details>
 <details class="example"><summary>Examples</summary><p><code>sort=availability</code><br />
 <code>sort&lt;availability</code><br />
 <code>disp=availability</code><br />
-<code>$birthday $limited $collaboration</code><br />
-<code>$!birthday $!welfare</code></p>
+<code>$welfare $limited $unknown_availability</code><br />
+<code>$!limited $!permanent</code></p>
 </details>
                 
               

@@ -43,7 +43,8 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
 
 
 async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
-                            header='', numbered: bool = True, timeout=600, max_tabbed_pages=4, files=None):
+                            header='', numbered: bool = True, timeout=600, max_tabbed_pages=4, start_page: int = 0,
+                            files=None):
     if header:
         header = f'`{header}`\n'
 
@@ -83,9 +84,9 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
     if len(embeds) <= max_tabbed_pages:
         reaction_emoji = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-        await run_tabbed_message(ctx, reaction_emoji[:len(embeds)], embeds, timeout=timeout)
+        await run_tabbed_message(ctx, reaction_emoji[:len(embeds)], embeds, starting_index=start_page, timeout=timeout)
     else:
-        message = await ctx.send(embed=embeds[0], files=files or [])
+        message = await ctx.send(embed=embeds[start_page], files=files or [])
 
         double_left_arrow = '⏪'
         double_right_arrow = '⏩'
@@ -94,7 +95,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
         arrows = [double_left_arrow, left_arrow, right_arrow, double_right_arrow]
 
-        index = 0
+        index = start_page
 
         async def callback(emoji):
             nonlocal index

@@ -7,6 +7,7 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import functools
+import math
 import re
 from abc import abstractmethod, ABCMeta
 from collections import defaultdict
@@ -184,7 +185,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     yield commands.command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
-                        wrap(self.get_primary_command_function(cs)))
+                        wrap(self.get_detail_command_function(cs)))
                 if args := cs.list_command_args:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
@@ -195,14 +196,14 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     yield commands.command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
-                        self.get_primary_command_function(cs))
+                        self.get_detail_command_function(cs))
                 if args := cs.list_command_args:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         self.get_list_command_function(cs))
 
-    def get_primary_command_function(self, source):
+    def get_detail_command_function(self, source):
         if hasattr(source, '_command_source_info'):
             source = source._command_source_info
 
@@ -300,7 +301,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            values, _index, _tab, display = filter_processor.get(arg, ctx, is_list=True)
+            values, index, _tab, display = filter_processor.get(arg, ctx, is_list=True)
 
             if display and display.formatter:
                 listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, ctx, value)}' for value
@@ -310,7 +311,11 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             embed = discord.Embed(
                 title=f'[{ctx.preferences.server.name}] {self.l10n[ctx].format_value(source.list_name or "search")}')
-            asyncio.create_task(run_paged_message(ctx, embed, listing))
+
+            page_size = 15
+            start_page = index // 15
+
+            asyncio.create_task(run_paged_message(ctx, embed, listing, page_size=page_size, start_page=start_page))
 
         return command
 
@@ -350,8 +355,6 @@ class FilterProcessor:
     def get(self, arg: ParsedArguments, ctx, is_list: bool) -> FilterResult:
         start_index = 0
         start_tab = 0
-        is_relative_only = False
-        current = None
         display = None
         sort = None
         reverse_sort = arg.tag('reverse')
@@ -361,9 +364,8 @@ class FilterProcessor:
                                           converter=self.sort_arguments)
             if sort:
                 reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
-            if is_list:
-                display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
-                                     converter={**self.sort_arguments, 'none': None})
+            display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
+                                 converter={**self.sort_arguments, 'none': None})
         tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in self.tag_data_attributes}
         inverse_tag_arguments = {a: arg.tags('!' + t for t in a.value_mapping.keys()) for a in self.tag_data_attributes}
         keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in self.keyword_data_attributes}
@@ -387,15 +389,15 @@ class FilterProcessor:
 
         arg.require_all_arguments_used()
 
-        if not is_list:
-            current = self.master_filter.get_current(ctx)
-            is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
-            if is_relative_only:
-                text = ''
-            elif re.fullmatch(r'~\d+', text.strip()):
-                start_index = int(text.strip()[1:]) - 1
-                text = ''
+        current = self.master_filter.get_current(ctx)
+        is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
+        if is_relative_only:
+            text = ''
+        elif re.fullmatch(r'~\d+', text.strip()):
+            start_index = int(text.strip()[1:]) - 1
+            text = ''
 
+        if not is_list:
             start_tab = self.source.default_tab
             if self.source.suffix_tab_aliases:
                 words = text.split()
@@ -456,15 +458,13 @@ class FilterProcessor:
         if reverse_sort:
             values = values[::-1]
 
-        if is_list:
-            display = display or self.source.default_display
+        display = display or self.source.default_display
 
-        if not is_list:
-            if is_relative_only and current in values:
-                start_index = values.index(current)
-                start_index -= int(arg.original.strip())
+        if is_relative_only and current in values:
+            start_index = values.index(current)
+            start_index -= int(arg.original.strip())
 
-            start_index = min(len(values) - 1, max(0, start_index))
+        start_index = min(len(values) - 1, max(0, start_index))
 
         return FilterResult(values, start_index, start_tab, display)
 
@@ -538,8 +538,8 @@ def command_source(
     Parameters
     ----------
     command_args
-        A dict containing the arguments to supply to the Command constructor for the primary command.
-        If this is not supplied, no primary command will be created.
+        A dict containing the arguments to supply to the Command constructor for the detail command.
+        If this is not supplied, no detail command will be created.
     list_command_args
         A dict containing the arguments to supply to the Command constructor for the list command.
         If this is not supplied, no list command will be created.

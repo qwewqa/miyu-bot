@@ -84,6 +84,15 @@ The text argument, if present, is used to find search results by name. It allows
 !song diiscover umiverse
 ```
 
+If the text argument is `~n` where n is a number, it will skip to the nth result.
+```
+# Goes to the page with the 20th result
+!cards $elegant ~20
+
+# Brings up the 20th result
+!card $elegant ~20
+```
+
 ## Command Groups
 Commands in the Info category are divided into groups.
 For example, the `!song`, `!songs`, and `!chart` commands are all part of the [Music](../music/) group.
@@ -159,12 +168,3 @@ Most list commands have a detail command counterpart.
 ### Detail Commands
 Detail commands usually have a singular name such as `!song` or `!card`.
 Using a detail command brings up details on a single result at a time.
-
-If the text argument of a detail command is `~n` where n is a number,
-it will skip to the nth result.
-```
-!cards $elegant
-
-# Brings up the 5th result
-!card $elegant ~5
-```

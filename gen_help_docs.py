@@ -1,14 +1,14 @@
 import random
 from pathlib import Path
 
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.commands.docs.info_command_docs import generate_info_command_docs
 from timeit import default_timer as timer
 
 if __name__ == '__main__':
     start = timer()
 
-    bot = D4DJBot('assets', command_prefix='!')
+    bot = MiyuBot('assets', command_prefix='!')
     bot.gen_doc = True
 
     bot.load_extension('miyu_bot.commands.cogs.info')

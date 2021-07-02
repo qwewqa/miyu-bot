@@ -3,14 +3,14 @@ import logging
 import discord
 from discord.ext import commands
 
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.emoji import rarity_emoji_ids
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Card(commands.Cog):
-    bot: D4DJBot
+    bot: MiyuBot
 
     def __init__(self, bot):
         self.bot = bot

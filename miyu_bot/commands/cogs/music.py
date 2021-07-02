@@ -16,13 +16,13 @@ from d4dj_utils.master.skill_master import SkillMaster
 from discord import AllowedMentions
 from discord.ext import commands
 
-from miyu_bot.bot.bot import D4DJBot, PrefContext
+from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.commands.common.argument_parsing import parse_arguments, ParsedArguments
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
 class Music(commands.Cog):
-    bot: D4DJBot
+    bot: MiyuBot
     CUSTOM_MIX_MIN_LIFETIME = 3600  # Minimum amount of time in seconds before a custom mix is removed
 
     def __init__(self, bot):

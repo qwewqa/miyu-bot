@@ -14,7 +14,7 @@ from discord.ext import commands, tasks
 from pytz import UnknownTimeZoneError
 
 from miyu_bot.bot import models
-from miyu_bot.bot.bot import D4DJBot, PrefContext
+from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.models import valid_loop_intervals
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import parse_arguments
@@ -24,7 +24,7 @@ from miyu_bot.commands.master_filter.localization_manager import LocalizationMan
 
 
 class Event(commands.Cog):
-    bot: D4DJBot
+    bot: MiyuBot
     EPRATE_RESOLUTION = 2  # Resolution of the Rate/hr reported by endpoint in hours.
 
     def __init__(self, bot):

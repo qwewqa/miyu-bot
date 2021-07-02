@@ -9,7 +9,7 @@ from miyu_bot.bot.models import PreferenceScope, all_preferences
 
 
 class Preferences(commands.Cog):
-    bot: 'miyu_bot.bot.bot.D4DJBot'
+    bot: 'miyu_bot.bot.bot.MiyuBot'
 
     def __init__(self, bot):
         self.bot = bot

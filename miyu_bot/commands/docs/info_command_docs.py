@@ -2,7 +2,7 @@ import random
 from pathlib import Path
 from typing import List, Iterable
 
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.commands.docs.documentation_fluent_localization import DocumentationFluentLocalization
 from miyu_bot.commands.docs.markdown import MarkdownDocument
 from miyu_bot.commands.master_filter.locales import valid_locales
@@ -11,19 +11,19 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, DataAttr
 USAGE_PAGE = '../general_usage/'
 
 
-def generate_info_command_docs(bot: D4DJBot, docs_path: Path, filters: List[MasterFilter]):
+def generate_info_command_docs(bot: MiyuBot, docs_path: Path, filters: List[MasterFilter]):
     for master_filter in filters:
         generate_master_filter_docs(bot, docs_path, master_filter)
 
 
-def generate_master_filter_docs(bot: D4DJBot, docs_path: Path, master_filter: MasterFilter):
+def generate_master_filter_docs(bot: MiyuBot, docs_path: Path, master_filter: MasterFilter):
     for locale in valid_locales:
         locale_filename = locale.replace('-', '_')  # needed by mkdocs static i18n plugin
         l10n = DocumentationFluentLocalization([*{locale, 'en-US'}],
                                                [f'docs/{master_filter.name}.ftl', 'docs/common.ftl'],
                                                bot.fluent_loader)
         md = MarkdownDocument()
-        md.text('<!-- Generated -->')
+        md.text('<!-- Generated Document: Do not edit -->')
         md.heading(1, l10n.format_value('name', fallback=master_filter.name))
         md.text(l10n.format_value('description', fallback=''))
         md.heading(2, l10n.format_value('heading-commands'))

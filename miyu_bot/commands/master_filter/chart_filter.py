@@ -6,7 +6,7 @@ from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartMaster, ChartDifficulty
 from d4dj_utils.master.skill_master import SkillMaster
 
-from miyu_bot.bot.bot import PrefContext, D4DJBot
+from miyu_bot.bot.bot import PrefContext, MiyuBot
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, difficulty_emoji_ids, grey_emoji_id
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
@@ -14,7 +14,7 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_att
 
 
 class ChartFilter(MasterFilter[ChartMaster]):
-    def __init__(self, bot: D4DJBot, master_name: str, name: str):
+    def __init__(self, bot: MiyuBot, master_name: str, name: str):
         super().__init__(bot, master_name, name)
         self.score_cache = {k: {} for k in self._score_cache_keys}
         self.reference_chart = self.bot.assets[Server.JP].chart_master[3200094]

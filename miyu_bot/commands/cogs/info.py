@@ -12,6 +12,7 @@ class Info(commands.Cog):
 
     def load_commands_from_filter(self, master_filter):
         for cmd in master_filter.get_commands(True):
+            cmd.master_filter = master_filter
             self.register_command(cmd)
 
     def register_command(self, command):

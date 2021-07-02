@@ -9,7 +9,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 
 from miyu_bot.bot import models
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.argument_parsing import ArgumentError
 
@@ -20,7 +20,7 @@ with open('config.json') as f:
     bot_token = config['token']
 
 
-async def get_prefix(bot: D4DJBot, message: discord.Message):
+async def get_prefix(bot: MiyuBot, message: discord.Message):
     if message.guild:
         guild = await models.Guild.get_or_none(id=message.guild.id)
         guild_prefix = (guild.prefix or '!') if guild else '!'
@@ -34,7 +34,7 @@ async def get_prefix(bot: D4DJBot, message: discord.Message):
         return '!miyu ', '!'
 
 
-bot = D4DJBot('assets', command_prefix=get_prefix, case_insensitive=True,
+bot = MiyuBot('assets', command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'),
               owner_ids={169163991434788865})
 

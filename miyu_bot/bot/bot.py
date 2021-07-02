@@ -23,7 +23,7 @@ from miyu_bot.commands.common.asset_paths import clear_asset_filename_cache
 from miyu_bot.commands.master_filter.master_filter_manager import MasterFilterManager
 
 
-class D4DJBot(commands.Bot):
+class MiyuBot(commands.Bot):
     assets: Dict[Server, AssetManager]
     master_filters: MasterFilterManager
     aliases: CommonAliases
@@ -54,6 +54,7 @@ class D4DJBot(commands.Bot):
         self.thread_pool = ThreadPoolExecutor()
         self.scripts_path = None
         self.chart_scorer = ChartScorer(self.assets[Server.JP].chart_master)
+        self.help_command = MiyuHelp()
 
     def try_reload_assets(self):
         try:
@@ -79,20 +80,20 @@ class D4DJBot(commands.Bot):
 
     async def login(self, token, *, bot=True):
         await Tortoise.init(TORTOISE_ORM)
-        await super(D4DJBot, self).login(token, bot=bot)
+        await super(MiyuBot, self).login(token, bot=bot)
 
     async def close(self):
         await self.session.close()
         await Tortoise.close_connections()
-        await super(D4DJBot, self).close()
+        await super(MiyuBot, self).close()
 
     def load_extension(self, name):
         self.extension_names.add(name)
-        super(D4DJBot, self).load_extension(name)
+        super(MiyuBot, self).load_extension(name)
 
     def unload_extension(self, name):
         self.extension_names.remove(name)
-        super(D4DJBot, self).unload_extension(name)
+        super(MiyuBot, self).unload_extension(name)
 
     def reload_all_extensions(self):
         for name in self.extension_names:
@@ -107,6 +108,25 @@ class D4DJBot(commands.Bot):
             ctx.preferences = None
             ctx.assets = None
         return ctx
+
+
+class MiyuHelp(commands.DefaultHelpCommand):
+    help_url = 'https://miyu-docs.qwewqa.xyz/'
+    context: 'PrefContext'
+
+    async def send_command_help(self, command):
+        if command.cog_name == 'Info' and hasattr(command, 'master_filter'):
+            channel = self.get_destination()
+            language = {
+                'en-US': '',
+                'zh-TW': 'ja/',
+                'ja': 'zh_TW/',
+            }[self.context.preferences.language]
+            master_filter = command.master_filter
+            filter_name = master_filter.name.replace('_filter', '')
+            await channel.send(f'{self.help_url}{language}commands/info/{filter_name}/#{command.name}')
+        else:
+            await super(MiyuHelp, self).send_command_help(command)
 
 
 class Preferences(SimpleNamespace):

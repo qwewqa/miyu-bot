@@ -21,7 +21,7 @@ from d4dj_utils.master.master_asset import MasterAsset
 from discord.ext import commands
 
 import miyu_bot.bot.bot
-from miyu_bot.bot.bot import D4DJBot, PrefContext
+from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
@@ -55,7 +55,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     data_attributes: List[DataAttributeInfo]
     l10n: LocalizationManager
 
-    def __init__(self, bot: D4DJBot, master_name: str, name: str):
+    def __init__(self, bot: MiyuBot, master_name: str, name: str):
         self.name = name
         self.bot = bot
         self.master_name = master_name

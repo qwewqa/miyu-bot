@@ -7,7 +7,7 @@ import yaml
 from discord.ext import commands
 from tortoise.functions import Count, Sum
 
-from miyu_bot.bot.bot import D4DJBot
+from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
 from miyu_bot.commands.common.reaction_message import run_paged_message
@@ -15,7 +15,7 @@ from miyu_bot.commands.master_filter.localization_manager import LocalizationMan
 
 
 class Utility(commands.Cog):
-    bot: D4DJBot
+    bot: MiyuBot
 
     def __init__(self, bot):
         self.bot = bot

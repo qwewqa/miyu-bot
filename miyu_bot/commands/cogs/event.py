@@ -154,8 +154,7 @@ class Event(commands.Cog):
                                           None,
                                           await self.get_leaderboard_data(),
                                           None)
-        message = await ctx.send(text)
-        asyncio.ensure_future(run_deletable_message(ctx, message))
+        asyncio.ensure_future(run_deletable_message(ctx, content=text))
 
     @commands.command(name='detailed_leaderboard',
                       aliases=['dlb', 'llb', 'lbb', 'llbb'],
@@ -189,7 +188,7 @@ class Event(commands.Cog):
                                       inline=True)
             embeds.append(other_embed)
         if len(embeds) == 1:
-            asyncio.create_task(run_deletable_message(ctx, await ctx.send(embed=embeds[0])))
+            asyncio.create_task(run_deletable_message(ctx, embed=embeds[0]))
         elif len(embeds) == 2:
             asyncio.create_task(run_tabbed_message(ctx, ['🏆', '🏅'], embeds))
 

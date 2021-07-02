@@ -78,9 +78,9 @@ class MiyuBot(commands.Bot):
         clear_asset_filename_cache()
         return True
 
-    async def login(self, token, *, bot=True):
+    async def login(self, token):
         await Tortoise.init(TORTOISE_ORM)
-        await super(MiyuBot, self).login(token, bot=bot)
+        await super(MiyuBot, self).login(token)
 
     async def close(self):
         await self.session.close()

@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Callable, Awaitable, Union
+from typing import List, Callable, Awaitable, Union, Tuple, Dict, Optional
 
 import discord
 from discord import Message, Embed, Emoji, PartialEmoji, RawReactionActionEvent
@@ -13,12 +13,28 @@ async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[
     if len(emojis) != len(embeds):
         raise ValueError('Emojis and embeds must have the same number of elements.')
 
-    message = await ctx.send(files=files, embed=embeds[starting_index])
+    last_emoji = emojis[starting_index]
 
-    async def callback(emoji):
-        await message.edit(embed=embeds[emojis.index(emoji)])
+    async def callback(view: discord.ui.View,
+                       interaction: discord.Interaction,
+                       emoji,
+                       buttons: Dict[AnyEmoji, EmojiButton]):
+        nonlocal last_emoji
+        buttons[last_emoji].disabled = False
+        last_emoji = emoji
+        buttons[emoji].disabled = True
+        await interaction.response.edit_message(embed=embeds[emojis.index(emoji)], view=view)
 
-    await run_reaction_message(ctx, message, emojis, callback, timeout)
+    disabled = [False] * len(emojis)
+    disabled[starting_index] = True
+
+    await ctx.send(embed=embeds[starting_index],
+                   files=files or [],
+                   view=ReactionButtonView(emojis,
+                                           callback,
+                                           allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
+                                           disabled=disabled,
+                                           timeout=timeout))
 
 
 async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[[int], discord.Embed], timeout=600):
@@ -43,7 +59,7 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
 
 
 async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
-                            header='', numbered: bool = True, timeout=600, max_tabbed_pages=4, start_page: int = 0,
+                            header='', numbered: bool = True, timeout=600, max_tabbed_pages=-1, start_page: int = 0,
                             files=None):
     if header:
         header = f'`{header}`\n'
@@ -53,8 +69,7 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
     if not content:
         embed = base_embed.copy().set_footer(text='Page 0/0')
-        message = await ctx.send(embed=embed)
-        await run_deletable_message(ctx, message, timeout)
+        await run_deletable_message(ctx, embed=embed, timeout=timeout)
         return
 
     page_contents = [content[i:i + page_size] for i in range(0, len(content), page_size)]
@@ -77,17 +92,10 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         }).set_footer(text=f'Page {i + 1}/{len(page_contents)}')
         for i, page in enumerate(page_contents)]
 
-    if len(embeds) == 1:
-        message = await ctx.send(embed=embeds[0])
-        await run_deletable_message(ctx, message, timeout)
-        return
-
     if len(embeds) <= max_tabbed_pages:
         reaction_emoji = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
         await run_tabbed_message(ctx, reaction_emoji[:len(embeds)], embeds, starting_index=start_page, timeout=timeout)
     else:
-        message = await ctx.send(embed=embeds[start_page], files=files or [])
-
         double_left_arrow = '⏪'
         double_right_arrow = '⏩'
         left_arrow = '◀'
@@ -97,9 +105,12 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
 
         index = start_page
 
-        async def callback(emoji):
+        async def callback(view: discord.ui.View,
+                           interaction: discord.Interaction,
+                           emoji,
+                           buttons: Dict[AnyEmoji, EmojiButton]):
             nonlocal index
-            start_index = index
+
             if emoji == double_left_arrow:
                 index = 0
             elif emoji == left_arrow:
@@ -110,18 +121,99 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
                 index = len(embeds) - 1
             index = min(len(embeds) - 1, max(0, index))
 
-            if index != start_index:
-                await message.edit(embed=embeds[index])
+            disable_left = index == 0
+            buttons[left_arrow].disabled = disable_left
+            buttons[double_left_arrow].disabled = disable_left
+            disable_right = index == len(embeds) - 1
+            buttons[right_arrow].disabled = disable_right
+            buttons[double_right_arrow].disabled = disable_right
 
-        await run_reaction_message(ctx, message, arrows, callback, timeout)
+            await interaction.response.edit_message(embed=embeds[index], view=view)
+
+        is_single_page = len(embeds) <= 1
+
+        await ctx.send(embed=embeds[start_page],
+                       files=files or [],
+                       view=ReactionButtonView(arrows,
+                                               callback,
+                                               allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
+                                               disabled=[True, True, is_single_page, is_single_page],
+                                               timeout=timeout))
 
 
-async def run_deletable_message(ctx: Context, message: Message, timeout=600):
-    await run_reaction_message(ctx, message, [], _noop, timeout=timeout)
+async def run_deletable_message(ctx: Context,
+                                content: Optional[str] = None,
+                                embed: Optional[discord.Embed] = None,
+                                files: Optional[List] = None,
+                                timeout=600):
+    async def callback(*_):
+        pass
+
+    await ctx.send(content=content,
+                   embed=embed,
+                   files=files or [],
+                   view=ReactionButtonView([],
+                                           callback,
+                                           allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
+                                           timeout=timeout))
 
 
 async def _noop(n):
     return None
+
+
+class CloseButton(discord.ui.Button):
+    def __init__(self, row, allowed_users):
+        self.allowed_users = allowed_users
+        super(CloseButton, self).__init__(style=discord.ButtonStyle.danger, emoji='✖', row=row)
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id not in self.allowed_users:
+            await interaction.response.send_message('This is not your message.', ephemeral=True)
+            return
+        await interaction.message.delete()
+
+
+class EmojiButton(discord.ui.Button):
+    def __init__(self, emoji, row, disabled, callback, allowed_users):
+        self.allowed_users = allowed_users
+        self.original_emoji = emoji
+        super(EmojiButton, self).__init__(style=discord.ButtonStyle.secondary, emoji=emoji, row=row, disabled=disabled)
+        self._callback = callback
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id not in self.allowed_users:
+            await interaction.response.send_message('This is not your message.', ephemeral=True)
+            return
+        await self._callback(self.view, interaction, self.original_emoji, self.view.buttons)
+
+
+class ReactionButtonView(discord.ui.View):
+    def __init__(self,
+                 emojis: List[Union[AnyEmoji, Tuple[AnyEmoji, int]]],
+                 callback: Callable[[discord.ui.View, discord.Interaction, AnyEmoji, Dict[AnyEmoji, EmojiButton]],
+                                    Awaitable[None]],
+                 allowed_users: set,
+                 rows: Optional[List[int]] = None,
+                 disabled: Optional[List[bool]] = None,
+                 close_button_row: int = 0,
+                 timeout=600):
+        super(ReactionButtonView, self).__init__(timeout=timeout)
+        buttons = {}
+        for i, emoji in enumerate(emojis):
+            if rows:
+                row = rows[i]
+            else:
+                row = 0
+            if disabled:
+                disable = disabled[i]
+            else:
+                disable = False
+            button = EmojiButton(emoji, row, disable, callback, allowed_users)
+            self.add_item(button)
+            buttons[emoji] = button
+        self.buttons = buttons
+        self.add_item(CloseButton(row=close_button_row, allowed_users=allowed_users))
 
 
 async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyEmoji],
@@ -142,10 +234,10 @@ async def run_reaction_message(ctx: Context, message: Message, emojis: List[AnyE
             done, pending = await asyncio.wait(tasks, timeout=timeout, return_when=asyncio.FIRST_COMPLETED)
             for task in pending:
                 task.cancel()
-                
+
             if len(done) == 0:
                 raise asyncio.TimeoutError()
-                
+
             emoji = done.pop().result().emoji
 
             if emoji.id:

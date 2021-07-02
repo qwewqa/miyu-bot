@@ -25,7 +25,8 @@ from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
-from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message
+from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message, EmojiButton, \
+    ReactionButtonView
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -221,72 +222,98 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             target_server_index = servers.index(ctx.preferences.server)
 
             if source.tabs:
-                message = await ctx.send(
-                    embed=source.embed_source(self, ctx, values[index], tab, ctx.preferences.server))
-
                 emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + ['◀', '▶', '🌐']
 
-                async def callback(emoji):
+                async def callback(view: discord.ui.View,
+                                   interaction: discord.Interaction,
+                                   emoji,
+                                   buttons: Dict[AnyEmoji, EmojiButton]):
                     nonlocal tab
                     nonlocal index
                     nonlocal target_server_index
-                    try:
-                        emoji_index = emojis.index(emoji)
-                        if emoji_index < len(source.tabs):
-                            tab = emoji_index
-                        elif emoji_index == len(source.tabs):
-                            index -= 1
-                        elif emoji_index == len(source.tabs) + 1:
-                            index += 1
-                        else:
-                            target_server_index += 1
-                            target_server_index %= len(servers)
 
-                        index = min(len(values) - 1, max(0, index))
+                    emoji_index = emojis.index(emoji)
+                    if emoji_index < len(source.tabs):
+                        buttons[emojis[tab]].disabled = False
+                        buttons[emoji].disabled = True
+                        tab = emoji_index
+                    elif emoji_index == len(source.tabs):
+                        index -= 1
+                    elif emoji_index == len(source.tabs) + 1:
+                        index += 1
+                    else:
+                        target_server_index += 1
+                        target_server_index %= len(servers)
 
-                        value = values[index]
-                        if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
-                            value = target_server_value
-                            server = servers[target_server_index]
-                        else:
-                            server = ctx.preferences.server
+                    index = min(len(values) - 1, max(0, index))
 
-                        await message.edit(embed=source.embed_source(self, ctx, value, tab, server))
-                    except ValueError:
-                        pass
+                    value = values[index]
+                    if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
+                        value = target_server_value
+                        server = servers[target_server_index]
+                    else:
+                        server = ctx.preferences.server
 
-                asyncio.create_task(run_reaction_message(ctx, message, emojis, callback))
+                    buttons['◀'].disabled = index == 0
+                    buttons['▶'].disabled = index == len(values) - 1
+
+                    await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, tab, server),
+                                                            view=view)
+
+                disabled_tabs = [False] * len(source.tabs)
+                disabled_tabs[tab] = True
+
+                await ctx.send(embed=source.embed_source(self, ctx, values[index], tab, ctx.preferences.server),
+                               view=ReactionButtonView(emojis,
+                                                       callback,
+                                                       allowed_users={ctx.bot.owner_id,
+                                                                      ctx.author.id,
+                                                                      *ctx.bot.owner_ids},
+                                                       disabled=disabled_tabs +
+                                                                [True, len(values) == 1, False],
+                                                       rows=[0] * len(source.tabs) +
+                                                            [1, 1, 1],
+                                                       close_button_row=1))
             else:
-                message = await ctx.send(embed=source.embed_source(self, ctx, values[index], ctx.preferences.server))
-
                 emojis = ['◀', '▶', '🌐']
 
-                async def callback(emoji):
+                async def callback(view: discord.ui.View,
+                                   interaction: discord.Interaction,
+                                   emoji,
+                                   buttons: Dict[AnyEmoji, EmojiButton]):
                     nonlocal index
                     nonlocal target_server_index
-                    try:
-                        if emoji == '◀':
-                            index -= 1
-                        elif emoji == '▶':
-                            index += 1
-                        else:
-                            target_server_index += 1
-                            target_server_index %= len(servers)
 
-                        index = min(len(values) - 1, max(0, index))
+                    if emoji == '◀':
+                        index -= 1
+                    elif emoji == '▶':
+                        index += 1
+                    else:
+                        target_server_index += 1
+                        target_server_index %= len(servers)
 
-                        value = values[index]
-                        if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
-                            value = target_server_value
-                            server = servers[target_server_index]
-                        else:
-                            server = ctx.preferences.server
+                    index = min(len(values) - 1, max(0, index))
 
-                        await message.edit(embed=source.embed_source(self, ctx, value, server))
-                    except ValueError:
-                        pass
+                    value = values[index]
+                    if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
+                        value = target_server_value
+                        server = servers[target_server_index]
+                    else:
+                        server = ctx.preferences.server
 
-                asyncio.create_task(run_reaction_message(ctx, message, emojis, callback))
+                    buttons['◀'].disabled = index == 0
+                    buttons['▶'].disabled = index == len(values) - 1
+
+                    await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, tab, server),
+                                                            view=view)
+
+                await ctx.send(embed=source.embed_source(self, ctx, values[index], ctx.preferences.server),
+                               view=ReactionButtonView(emojis,
+                                                       callback,
+                                                       allowed_users={ctx.bot.owner_id,
+                                                                      ctx.author.id,
+                                                                      *ctx.bot.owner_ids},
+                                                       disabled=[True, len(values) == 1, False]))
 
         return command
 

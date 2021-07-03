@@ -10,7 +10,7 @@ from tortoise.functions import Count, Sum
 from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.bot.models import CommandUsageCount
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
-from miyu_bot.commands.common.reaction_message import run_paged_message
+from miyu_bot.commands.common.paged_message import run_paged_message
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 

@@ -58,89 +58,6 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
     await run_reaction_message(ctx, message, arrows, callback, timeout)
 
 
-async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: List[str], page_size: int = 15,
-                            header='', numbered: bool = True, timeout=600, max_tabbed_pages=-1, start_page: int = 0,
-                            files=None):
-    if header:
-        header = f'`{header}`\n'
-
-    if max_tabbed_pages > 9:
-        raise ValueError('max_tabbed_pages must be 9 or less.')
-
-    if not content:
-        embed = base_embed.copy().set_footer(text='Page 0/0')
-        await run_deletable_message(ctx, embed=embed, timeout=timeout)
-        return
-
-    page_contents = [content[i:i + page_size] for i in range(0, len(content), page_size)]
-
-    item_number = 0
-    max_item_number_length = len(str(len(content)))
-
-    def format_item(item):
-        nonlocal item_number
-        item_number += 1
-        if numbered:
-            return f'`{item_number}.{" " * (max_item_number_length - len(str(item_number)))} {item}`'
-        else:
-            return f'`{item}`'
-
-    embeds = [
-        base_embed.from_dict({
-            **base_embed.to_dict(),
-            'description': header + '\n'.join((format_item(i) for i in page)),
-        }).set_footer(text=f'Page {i + 1}/{len(page_contents)}')
-        for i, page in enumerate(page_contents)]
-
-    if len(embeds) <= max_tabbed_pages:
-        reaction_emoji = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-        await run_tabbed_message(ctx, reaction_emoji[:len(embeds)], embeds, starting_index=start_page, timeout=timeout)
-    else:
-        double_left_arrow = '<:first:860679908258873344>'
-        double_right_arrow = '<:last:860679908426514465>'
-        left_arrow = '<:prev:860683672382603294>'
-        right_arrow = '<:next:860683672402526238>'
-
-        arrows = [double_left_arrow, left_arrow, right_arrow, double_right_arrow]
-
-        index = start_page
-
-        async def callback(view: discord.ui.View,
-                           interaction: discord.Interaction,
-                           emoji,
-                           buttons: Dict[AnyEmoji, EmojiButton]):
-            nonlocal index
-
-            if emoji == double_left_arrow:
-                index = 0
-            elif emoji == left_arrow:
-                index -= 1
-            elif emoji == right_arrow:
-                index += 1
-            elif emoji == double_right_arrow:
-                index = len(embeds) - 1
-            index = min(len(embeds) - 1, max(0, index))
-
-            disable_left = index == 0
-            buttons[left_arrow].disabled = disable_left
-            buttons[double_left_arrow].disabled = disable_left
-            disable_right = index == len(embeds) - 1
-            buttons[right_arrow].disabled = disable_right
-            buttons[double_right_arrow].disabled = disable_right
-
-            await interaction.response.edit_message(embed=embeds[index], view=view)
-
-        is_single_page = len(embeds) <= 1
-
-        await ctx.send(embed=embeds[start_page],
-                       files=files or [],
-                       view=ReactionButtonView(arrows,
-                                               callback,
-                                               allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
-                                               disabled=[True, True, is_single_page, is_single_page],
-                                               timeout=timeout))
-
-
 async def run_deletable_message(ctx: Context,
                                 content: Optional[str] = None,
                                 embed: Optional[discord.Embed] = None,
@@ -163,9 +80,11 @@ async def _noop(n):
 
 
 class CloseButton(discord.ui.Button):
-    def __init__(self, row, allowed_users):
-        self.allowed_users = allowed_users
-        super(CloseButton, self).__init__(style=discord.ButtonStyle.danger, emoji='<:close:860679908157030430>', row=row)
+    def __init__(self, row=0, allowed_users=None):
+        self.allowed_users = allowed_users or {}
+        super(CloseButton, self).__init__(style=discord.ButtonStyle.danger,
+                                          emoji='<:close:860679908157030430>',
+                                          row=row)
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id not in self.allowed_users:
@@ -178,7 +97,7 @@ class EmojiButton(discord.ui.Button):
     def __init__(self, emoji, row, disabled, style, callback, allowed_users):
         self.allowed_users = allowed_users
         self.original_emoji = emoji
-        super(EmojiButton, self).__init__(style=style, emoji=emoji, row=row, disabled=disabled,)
+        super(EmojiButton, self).__init__(style=style, emoji=emoji, row=row, disabled=disabled, )
         self._callback = callback
 
     async def callback(self, interaction: discord.Interaction):

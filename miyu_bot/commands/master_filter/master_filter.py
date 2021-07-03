@@ -7,13 +7,12 @@ from __future__ import annotations
 import asyncio
 import dataclasses
 import functools
-import math
 import re
 from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, Iterator, NamedTuple
+from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, NamedTuple
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -25,7 +24,8 @@ from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
-from miyu_bot.commands.common.reaction_message import run_reaction_message, run_paged_message, EmojiButton, \
+from miyu_bot.commands.common.paged_message import run_paged_message
+from miyu_bot.commands.common.reaction_message import EmojiButton, \
     ReactionButtonView
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
@@ -343,8 +343,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             embed = discord.Embed(
                 title=f'[{ctx.preferences.server.name}] {self.l10n[ctx].format_value(source.list_name or "search")}')
 
-            page_size = 15
-            start_page = index // 15
+            page_size = 20
+            start_page = index // 20
 
             asyncio.create_task(run_paged_message(ctx, embed, listing, page_size=page_size, start_page=start_page))
 

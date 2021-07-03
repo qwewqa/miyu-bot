@@ -222,7 +222,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             target_server_index = servers.index(ctx.preferences.server)
 
             if source.tabs:
-                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + ['◀', '▶', '🌐']
+                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + ['<:prev:860683672382603294>', '<:next:860683672402526238>', '🌐']
 
                 async def callback(view: discord.ui.View,
                                    interaction: discord.Interaction,
@@ -254,8 +254,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     else:
                         server = ctx.preferences.server
 
-                    buttons['◀'].disabled = index == 0
-                    buttons['▶'].disabled = index == len(values) - 1
+                    buttons['<:prev:860683672382603294>'].disabled = index == 0
+                    buttons['<:next:860683672402526238>'].disabled = index == len(values) - 1
 
                     await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, tab, server),
                                                             view=view)
@@ -273,9 +273,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                                                                 [True, len(values) == 1, False],
                                                        rows=[0] * len(source.tabs) +
                                                             [1, 1, 1],
-                                                       close_button_row=1))
+                                                       close_button_row=0))
             else:
-                emojis = ['◀', '▶', '🌐']
+                emojis = ['<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860680276208254977>']
 
                 async def callback(view: discord.ui.View,
                                    interaction: discord.Interaction,
@@ -284,9 +284,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     nonlocal index
                     nonlocal target_server_index
 
-                    if emoji == '◀':
+                    if emoji == '<:prev:860683672382603294>':
                         index -= 1
-                    elif emoji == '▶':
+                    elif emoji == '<:next:860683672402526238>':
                         index += 1
                     else:
                         target_server_index += 1
@@ -301,10 +301,10 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     else:
                         server = ctx.preferences.server
 
-                    buttons['◀'].disabled = index == 0
-                    buttons['▶'].disabled = index == len(values) - 1
+                    buttons['<:prev:860683672382603294>'].disabled = index == 0
+                    buttons['<:next:860683672402526238>'].disabled = index == len(values) - 1
 
-                    await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, tab, server),
+                    await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, server),
                                                             view=view)
 
                 await ctx.send(embed=source.embed_source(self, ctx, values[index], ctx.preferences.server),

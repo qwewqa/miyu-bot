@@ -38,8 +38,8 @@ async def run_tabbed_message(ctx: Context, emojis: List[AnyEmoji], embeds: List[
 
 
 async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[[int], discord.Embed], timeout=600):
-    left_arrow = '◀'
-    right_arrow = '▶'
+    left_arrow = '<:prev:860683672382603294>'
+    right_arrow = '<:next:860683672402526238>'
     arrows = [left_arrow, right_arrow]
 
     message = await ctx.send(embed=embed_generator(0))
@@ -96,10 +96,10 @@ async def run_paged_message(ctx: Context, base_embed: discord.Embed, content: Li
         reaction_emoji = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
         await run_tabbed_message(ctx, reaction_emoji[:len(embeds)], embeds, starting_index=start_page, timeout=timeout)
     else:
-        double_left_arrow = '⏪'
-        double_right_arrow = '⏩'
-        left_arrow = '◀'
-        right_arrow = '▶'
+        double_left_arrow = '<:first:860679908258873344>'
+        double_right_arrow = '<:last:860679908426514465>'
+        left_arrow = '<:prev:860683672382603294>'
+        right_arrow = '<:next:860683672402526238>'
 
         arrows = [double_left_arrow, left_arrow, right_arrow, double_right_arrow]
 
@@ -165,7 +165,7 @@ async def _noop(n):
 class CloseButton(discord.ui.Button):
     def __init__(self, row, allowed_users):
         self.allowed_users = allowed_users
-        super(CloseButton, self).__init__(style=discord.ButtonStyle.danger, emoji='✖', row=row)
+        super(CloseButton, self).__init__(style=discord.ButtonStyle.danger, emoji='<:close:860679908157030430>', row=row)
 
     async def callback(self, interaction: discord.Interaction):
         if interaction.user.id not in self.allowed_users:

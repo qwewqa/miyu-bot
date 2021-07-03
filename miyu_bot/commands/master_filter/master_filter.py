@@ -223,7 +223,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             if source.tabs:
                 emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + [
-                    '<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860680276208254977>']
+                    '<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860687306889494569>']
 
                 async def callback(view: discord.ui.View,
                                    interaction: discord.Interaction,
@@ -278,7 +278,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                                                               [discord.ButtonStyle.secondary] * 3,
                                                        close_button_row=0))
             else:
-                emojis = ['<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860680276208254977>']
+                emojis = ['<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860687306889494569>']
 
                 async def callback(view: discord.ui.View,
                                    interaction: discord.Interaction,

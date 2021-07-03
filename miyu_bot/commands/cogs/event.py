@@ -19,7 +19,8 @@ from miyu_bot.bot.models import valid_loop_intervals
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import parse_arguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
-from miyu_bot.commands.common.reaction_message import run_deletable_message, run_tabbed_message
+from miyu_bot.commands.common.deletable_message import run_deletable_message
+from miyu_bot.commands.common.reaction_message import run_tabbed_message
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 

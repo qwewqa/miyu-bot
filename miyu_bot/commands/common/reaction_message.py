@@ -58,23 +58,6 @@ async def run_dynamically_paged_message(ctx: Context, embed_generator: Callable[
     await run_reaction_message(ctx, message, arrows, callback, timeout)
 
 
-async def run_deletable_message(ctx: Context,
-                                content: Optional[str] = None,
-                                embed: Optional[discord.Embed] = None,
-                                files: Optional[List] = None,
-                                timeout=600):
-    async def callback(*_):
-        pass
-
-    await ctx.send(content=content,
-                   embed=embed,
-                   files=files or [],
-                   view=ReactionButtonView([],
-                                           callback,
-                                           allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
-                                           timeout=timeout))
-
-
 async def _noop(n):
     return None
 

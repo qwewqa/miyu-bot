@@ -1,10 +1,11 @@
-from typing import List, Iterable, Set, Optional, Callable
+from typing import List, Iterable, Set, Optional
 
 import discord
 from discord import SelectOption, Interaction
 from discord.ext.commands import Context
 
-from miyu_bot.commands.common.reaction_message import run_deletable_message, CloseButton
+from miyu_bot.commands.common.deletable_message import DeleteButton, run_deletable_message
+from miyu_bot.commands.common.user_restricted_view import UserRestrictedView
 
 
 async def run_paged_message(ctx: Context,
@@ -81,20 +82,18 @@ class PageSelect(discord.ui.Select['PagedMessageView']):
         await interaction.response.edit_message(embed=self.view.active_embed, view=self.view)
 
 
-class PagedMessageView(discord.ui.View):
+class PagedMessageView(UserRestrictedView):
     def __init__(self,
                  embeds: List[discord.Embed],
                  *,
                  page_titles: Optional[List[str]] = None,
                  start_index: int = 0,
-                 allowed_users: Set[int],
                  **kwargs):
         super(PagedMessageView, self).__init__(**kwargs)
         self.embeds = embeds
         self.page_titles = page_titles
         self.max_page_index = len(embeds) - 1
         self.max_select_page_index = len(embeds) // 25
-        self.allowed_users = allowed_users
         self.active_embed = embeds[start_index]
         self._page_index = start_index
         self._select_page_index = start_index // 25
@@ -107,7 +106,7 @@ class PagedMessageView(discord.ui.View):
         self.add_item(self.prev_button)
         self.add_item(self.next_button)
         self.add_item(self.last_button)
-        self.add_item(CloseButton(row=0))
+        self.add_item(DeleteButton(row=0))
         self.page_select = PageSelect(placeholder=self.get_select_placeholder(start_index),
                                       options=self.get_select_options(), row=1)
         self.add_item(self.page_select)
@@ -157,9 +156,3 @@ class PagedMessageView(discord.ui.View):
                              value=str(i))
                 for i in range(self.select_page_index * 25,
                                min(self.max_page_index + 1, self.select_page_index * 25 + 25))]
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if interaction.user.id not in self.allowed_users:
-            await interaction.response.send_message('This is not your message.', ephemeral=True)
-            return False
-        return True

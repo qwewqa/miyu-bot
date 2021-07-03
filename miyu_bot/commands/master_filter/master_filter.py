@@ -222,7 +222,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             target_server_index = servers.index(ctx.preferences.server)
 
             if source.tabs:
-                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + ['<:prev:860683672382603294>', '<:next:860683672402526238>', '🌐']
+                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + [
+                    '<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860680276208254977>']
 
                 async def callback(view: discord.ui.View,
                                    interaction: discord.Interaction,
@@ -272,7 +273,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                                                        disabled=disabled_tabs +
                                                                 [True, len(values) == 1, False],
                                                        rows=[0] * len(source.tabs) +
-                                                            [1, 1, 1],
+                                                            [1] * 3,
+                                                       styles=[discord.ButtonStyle.primary] * len(source.tabs) +
+                                                              [discord.ButtonStyle.secondary] * 3,
                                                        close_button_row=0))
             else:
                 emojis = ['<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860680276208254977>']
@@ -313,6 +316,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                                                        allowed_users={ctx.bot.owner_id,
                                                                       ctx.author.id,
                                                                       *ctx.bot.owner_ids},
+                                                       styles=[discord.ButtonStyle.secondary] * 3,
                                                        disabled=[True, len(values) == 1, False]))
 
         return command

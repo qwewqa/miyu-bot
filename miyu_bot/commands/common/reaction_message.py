@@ -175,10 +175,10 @@ class CloseButton(discord.ui.Button):
 
 
 class EmojiButton(discord.ui.Button):
-    def __init__(self, emoji, row, disabled, callback, allowed_users):
+    def __init__(self, emoji, row, disabled, style, callback, allowed_users):
         self.allowed_users = allowed_users
         self.original_emoji = emoji
-        super(EmojiButton, self).__init__(style=discord.ButtonStyle.secondary, emoji=emoji, row=row, disabled=disabled)
+        super(EmojiButton, self).__init__(style=style, emoji=emoji, row=row, disabled=disabled,)
         self._callback = callback
 
     async def callback(self, interaction: discord.Interaction):
@@ -196,6 +196,7 @@ class ReactionButtonView(discord.ui.View):
                  allowed_users: set,
                  rows: Optional[List[int]] = None,
                  disabled: Optional[List[bool]] = None,
+                 styles: Optional[List[discord.ButtonStyle]] = None,
                  close_button_row: int = 0,
                  timeout=600):
         super(ReactionButtonView, self).__init__(timeout=timeout)
@@ -209,7 +210,11 @@ class ReactionButtonView(discord.ui.View):
                 disable = disabled[i]
             else:
                 disable = False
-            button = EmojiButton(emoji, row, disable, callback, allowed_users)
+            if styles:
+                style = styles[i]
+            else:
+                style = discord.ButtonStyle.secondary
+            button = EmojiButton(emoji, row, disable, style, callback, allowed_users)
             self.add_item(button)
             buttons[emoji] = button
         self.buttons = buttons

@@ -18,7 +18,12 @@ def generate_info_command_docs(bot: MiyuBot, docs_path: Path, filters: List[Mast
 
 def generate_master_filter_docs(bot: MiyuBot, docs_path: Path, master_filter: MasterFilter):
     for locale in valid_locales:
-        locale_filename = locale.replace('-', '_')  # needed by mkdocs static i18n plugin
+        # needed by mkdocs static i18n plugin
+        locale_filename = {
+            'en-US': 'en',
+            'zh-TW': 'zh_TW',
+            'ja': 'ja',
+        }[locale]
         l10n = DocumentationFluentLocalization([*{locale, 'en-US'}],
                                                [f'docs/{master_filter.name}.ftl', 'docs/common.ftl'],
                                                bot.fluent_loader)

@@ -9,9 +9,9 @@ theme:
     - navigation.sections
 plugins:
   - i18n:
-      default_language: en_US
+      default_language: en
       languages:
-        en_US: English
+        en: English
         zh_TW: 繁體中文
         ja: 日本語
   - awesome-pages

@@ -88,7 +88,7 @@ class Utility(commands.Cog):
     @commands.is_owner()
     async def shutdown(self, ctx: commands.Context):
         await ctx.send('Shutting down.')
-        await self.bot.logout()
+        await self.bot.close()
 
     @commands.command(hidden=True, aliases=['rld'])
     @commands.is_owner()

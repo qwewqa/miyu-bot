@@ -234,7 +234,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                               start_index=index,
                               tabs=emojis,
                               start_tab=tab,
-                              allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids})
+                              allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
+                              timeout=600)
             await ctx.send(embed=view.active_embed,
                            view=view)
 

@@ -19,7 +19,11 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_att
 class CardFilter(MasterFilter[CardMaster]):
     def get_name(self, value: CardMaster) -> str:
         return f'{value.name} {value.character.first_name_english}'
-    
+
+    def get_select_name(self, value: CardMaster):
+        emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[value.attribute_id])
+        return value.character.full_name_english, value.name, emoji
+
     def is_released(self, value: CardMaster) -> bool:
         return value.is_available
 

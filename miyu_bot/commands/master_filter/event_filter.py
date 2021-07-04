@@ -18,6 +18,9 @@ class EventFilter(MasterFilter[EventMaster]):
     def get_name(self, value: EventMaster) -> str:
         return value.name
 
+    def get_select_name(self, value: EventMaster):
+        return value.event_type.name, value.name, None
+
     def is_released(self, value: EventMaster) -> bool:
         return value.start_datetime < dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=3)
 

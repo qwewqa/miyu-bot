@@ -93,7 +93,7 @@ class PagedMessageView(UserRestrictedView):
         self.embeds = embeds
         self.page_titles = page_titles
         self.max_page_index = len(embeds) - 1
-        self.max_select_page_index = len(embeds) // 25
+        self.max_select_page_index = self.max_page_index // 25
         self.active_embed = embeds[start_index]
         self._page_index = start_index
         self._select_page_index = start_index // 25
@@ -109,7 +109,8 @@ class PagedMessageView(UserRestrictedView):
         self.add_item(DeleteButton(row=0))
         self.page_select = PageSelect(placeholder=self.get_select_placeholder(start_index),
                                       options=self.get_select_options(), row=1)
-        self.add_item(self.page_select)
+        if len(embeds) > 1:
+            self.add_item(self.page_select)
         self.prev_page_select = PageSelectPageChangeButton(-1, emoji='<:prev:860683672382603294>', row=2)
         self.next_page_select = PageSelectPageChangeButton(1, emoji='<:next:860683672402526238>', row=2)
         if self.max_select_page_index > 0:

@@ -12,7 +12,7 @@ from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, NamedTuple
+from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, NamedTuple, Tuple
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -27,6 +27,7 @@ from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
 from miyu_bot.commands.common.paged_message import run_paged_message
 from miyu_bot.commands.common.reaction_message import EmojiButton, \
     ReactionButtonView
+from miyu_bot.commands.master_filter.detail_view import DetailView
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -166,6 +167,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     def get_name(self, value: TData) -> str:
         pass
 
+    def get_select_name(self, value: TData) -> Tuple[str, str, Optional[AnyEmoji]]:
+        raise NotImplementedError
+
     def is_released(self, value: TData) -> bool:
         return value.is_released
 
@@ -218,106 +222,21 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 await ctx.send('No results.')
                 return
 
-            servers = list(Server)
-            target_server_index = servers.index(ctx.preferences.server)
+            emojis = None
+            if source.tabs is not None:
+                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs]
 
-            if source.tabs:
-                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs] + [
-                    '<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860687306889494569>']
-
-                async def callback(view: discord.ui.View,
-                                   interaction: discord.Interaction,
-                                   emoji,
-                                   buttons: Dict[AnyEmoji, EmojiButton]):
-                    nonlocal tab
-                    nonlocal index
-                    nonlocal target_server_index
-
-                    emoji_index = emojis.index(emoji)
-                    if emoji_index < len(source.tabs):
-                        buttons[emojis[tab]].disabled = False
-                        buttons[emoji].disabled = True
-                        tab = emoji_index
-                    elif emoji_index == len(source.tabs):
-                        index -= 1
-                    elif emoji_index == len(source.tabs) + 1:
-                        index += 1
-                    else:
-                        target_server_index += 1
-                        target_server_index %= len(servers)
-
-                    index = min(len(values) - 1, max(0, index))
-
-                    value = values[index]
-                    if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
-                        value = target_server_value
-                        server = servers[target_server_index]
-                    else:
-                        server = ctx.preferences.server
-
-                    buttons['<:prev:860683672382603294>'].disabled = index == 0
-                    buttons['<:next:860683672402526238>'].disabled = index == len(values) - 1
-
-                    await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, tab, server),
-                                                            view=view)
-
-                disabled_tabs = [False] * len(source.tabs)
-                disabled_tabs[tab] = True
-
-                await ctx.send(embed=source.embed_source(self, ctx, values[index], tab, ctx.preferences.server),
-                               view=ReactionButtonView(emojis,
-                                                       callback,
-                                                       allowed_users={ctx.bot.owner_id,
-                                                                      ctx.author.id,
-                                                                      *ctx.bot.owner_ids},
-                                                       disabled=disabled_tabs +
-                                                                [True, len(values) == 1, False],
-                                                       rows=[0] * len(source.tabs) +
-                                                            [1] * 3,
-                                                       styles=[discord.ButtonStyle.primary] * len(source.tabs) +
-                                                              [discord.ButtonStyle.secondary] * 3,
-                                                       close_button_row=0))
-            else:
-                emojis = ['<:prev:860683672382603294>', '<:next:860683672402526238>', '<:globe:860687306889494569>']
-
-                async def callback(view: discord.ui.View,
-                                   interaction: discord.Interaction,
-                                   emoji,
-                                   buttons: Dict[AnyEmoji, EmojiButton]):
-                    nonlocal index
-                    nonlocal target_server_index
-
-                    if emoji == '<:prev:860683672382603294>':
-                        index -= 1
-                    elif emoji == '<:next:860683672402526238>':
-                        index += 1
-                    else:
-                        target_server_index += 1
-                        target_server_index %= len(servers)
-
-                    index = min(len(values) - 1, max(0, index))
-
-                    value = values[index]
-                    if target_server_value := self.get_by_id(value.id, ctx, servers[target_server_index]):
-                        value = target_server_value
-                        server = servers[target_server_index]
-                    else:
-                        server = ctx.preferences.server
-
-                    buttons['<:prev:860683672382603294>'].disabled = index == 0
-                    buttons['<:next:860683672402526238>'].disabled = index == len(values) - 1
-
-                    await interaction.response.edit_message(embed=source.embed_source(self, ctx, value, server),
-                                                            view=view)
-
-                await ctx.send(embed=source.embed_source(self, ctx, values[index], ctx.preferences.server),
-                               view=ReactionButtonView(emojis,
-                                                       callback,
-                                                       allowed_users={ctx.bot.owner_id,
-                                                                      ctx.author.id,
-                                                                      *ctx.bot.owner_ids},
-                                                       styles=[discord.ButtonStyle.secondary] * 3,
-                                                       disabled=[True, len(values) == 1, False]))
+            view = DetailView(self,
+                              ctx,
+                              values,
+                              source.embed_source,
+                              select_names=[self.get_select_name(v) for v in values],
+                              start_index=index,
+                              tabs=emojis,
+                              start_tab=tab,
+                              allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids})
+            await ctx.send(embed=view.active_embed,
+                           view=view)
 
         return command
 

@@ -19,6 +19,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
     def get_name(self, value: GachaMaster) -> str:
         return f'{value.name} {value.id}'
 
+    def get_select_name(self, value: GachaMaster):
+        return value.gacha_type.name, value.name, None
+
     @data_attribute('name',
                     aliases=['title'],
                     is_sortable=True)

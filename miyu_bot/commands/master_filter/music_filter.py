@@ -18,6 +18,9 @@ class MusicFilter(MasterFilter[MusicMaster]):
     def get_name(self, value: MusicMaster) -> str:
         return f'{value.name} {value.special_unit_name}{" (Hidden)" if value.is_hidden else ""}'.strip()
 
+    def get_select_name(self, value: MusicMaster):
+        return value.category.name, value.name, None
+
     def is_released(self, value: MusicMaster) -> bool:
         return value.is_available
 

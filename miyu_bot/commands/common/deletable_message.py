@@ -1,4 +1,3 @@
-from collections import Set
 from typing import Optional, List
 
 import discord

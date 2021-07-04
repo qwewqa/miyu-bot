@@ -36,7 +36,9 @@ class DetailServerChangeButton(discord.ui.Button['DetailView']):
     async def callback(self, interaction: Interaction):
         assert self.view is not None
         self.view.target_server_index += 1
-        await interaction.response.edit_message(embed=self.view.active_embed, view=self.view)
+        await interaction.message.edit(embed=self.view.active_embed, view=self.view)
+        await interaction.response.send_message(f'Target server set to {self.view.target_server.name}.',
+                                                ephemeral=True)
 
 
 class DetailView(UserRestrictedView):
@@ -120,6 +122,10 @@ class DetailView(UserRestrictedView):
         self.next_page_select.disabled = self.select_page_index == self.max_select_page_index
 
     @property
+    def target_server(self):
+        return self.servers[self.target_server_index]
+
+    @property
     def target_server_index(self):
         return self._target_server_index
 
@@ -153,7 +159,7 @@ class DetailView(UserRestrictedView):
 
     def update_embed(self):
         value = self.values[self.page_index]
-        target_server = self.servers[self.target_server_index]
+        target_server = self.target_server
         if target_server_value := self.master_filter.get_by_id(value.id, self.ctx, target_server):
             value = target_server_value
             server = target_server

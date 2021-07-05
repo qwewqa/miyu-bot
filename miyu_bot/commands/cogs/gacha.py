@@ -84,7 +84,7 @@ class Gacha(commands.Cog):
 
     def create_card_image_grid(self, cards: List[CardMaster], row_size: int = 20):
         column_count = math.ceil(len(cards) / row_size)
-        img = Image.new('RGBA', (259 * row_size, 259 * column_count), (255, 255, 255, 0))
+        img = Image.new('RGBA', (259 * row_size, max(1, 259 * column_count)), (255, 255, 255, 0))
 
         for i, card in enumerate(cards):
             icon = self.get_card_icon(card)
@@ -155,7 +155,7 @@ class Gacha(commands.Cog):
         entries = await CollectionEntry.filter(user_id=ctx.author.id)
         card_ids = {e.card_id for e in entries}
         cards = [self.bot.assets[Server.JP].card_master[cid] for cid in card_ids]
-        cards = sorted(cards, key=lambda card: (card.rarity_id, card.start_datetime, card.id))
+        cards = sorted(cards, key=lambda card: (-card.rarity_id, card.start_datetime, card.id))
 
         img = await self.create_card_image_grid_async(cards)
 

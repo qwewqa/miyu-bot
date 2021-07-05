@@ -155,7 +155,7 @@ class Gacha(commands.Cog):
         entries = await CollectionEntry.filter(user_id=ctx.author.id)
         card_ids = {e.card_id for e in entries}
         cards = [self.bot.assets[Server.JP].card_master[cid] for cid in card_ids]
-        cards = sorted(cards, key=lambda card: (-card.rarity_id, card.start_datetime, card.id))
+        cards = sorted(cards, key=lambda card: (-card.rarity_id, -card.start_datetime.timestamp(), card.id))
 
         img = await self.create_card_image_grid_async(cards)
 

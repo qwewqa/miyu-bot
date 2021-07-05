@@ -25,6 +25,10 @@ where it was used.
 Users have the option to save personal preferences using the `!setpref` command.
 Saved preferences may be removed using the `!clearpref` command.
 
+### Other Command Related Data
+Use of some commands may result in data relating to the functionality of the command
+being saved to based on User Id as necessary for the functionality of that command.
+
 ## Contact
 For any questions, concerns, or inquiries, including the removal of collected data
 or opting-out of data collected, the below contact methods may be used.

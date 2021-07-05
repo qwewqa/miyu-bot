@@ -17,7 +17,7 @@ from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
 
 from miyu_bot.bot.bot import MiyuBot, PrefContext
-from miyu_bot.bot.models import PityCount
+from miyu_bot.bot.models import PityCount, CollectionEntry
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -179,7 +179,9 @@ class Gacha(commands.Cog):
                 table_rates = tables_rates[table_index]
                 rng = random.randint(1, table_rates[-1])
                 result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                cards.append(assets.card_master[tables[table_index][result_index].card_id])
+                card = assets.card_master[tables[table_index][result_index].card_id]
+                await self.register_card_pulled(user.id, gacha.id, table_rate.id, card.id)
+                cards.append(card)
 
         bonus = None
         current_pity = None
@@ -199,9 +201,18 @@ class Gacha(commands.Cog):
                 rng = random.randint(1, table_rates[-1])
                 result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                 bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
+                await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id)
             await pity_data.save()
 
         return GachaPullResult(cards, bonus, current_pity)
+
+    async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int):
+        entry, _created = await CollectionEntry.get_or_create(user_id=user_id,
+                                                              gacha_id=gacha_id,
+                                                              table_rate_id=table_rate_id,
+                                                              card_id=card_id)
+        entry.counter += 1
+        await entry.save()
 
     @commands.command(name='card_icon',
                       aliases=['cardicon'],

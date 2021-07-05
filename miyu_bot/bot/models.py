@@ -268,6 +268,17 @@ class PityCount(Model):
         unique_together = (('user_id', 'gacha_id'),)
 
 
+class CollectionEntry(Model):
+    user_id = fields.BigIntField(index=True)
+    gacha_id = fields.IntField()
+    table_rate_id = fields.IntField()
+    card_id = fields.IntField()
+    counter = fields.IntField(default=0)
+
+    class Meta:
+        unique_together = (('user_id', 'gacha_id', 'table_rate_id', 'card_id'),)
+
+
 class CommandUsageCount(Model):
     guild_id = fields.BigIntField()
     name = fields.CharField(max_length=31)

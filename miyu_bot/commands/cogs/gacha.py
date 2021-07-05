@@ -70,16 +70,25 @@ class Gacha(commands.Cog):
         self.images.append(image)
         return image
 
-    def create_pull_image(self, cards: List[CardMaster], bonus: Optional[CardMaster] = None):
+    async def create_pull_image(self, cards: List[CardMaster], bonus: Optional[CardMaster] = None):
         if bonus:
             cards = cards + [bonus]
-        width = min(15, max(5, (len(cards) - 1) // 5 + 4))
-        height = math.ceil(len(cards) / width)
-        img = Image.new('RGBA', (259 * width, 259 * height), (255, 255, 255, 0))
+        row_size = min(15, max(5, (len(cards) - 1) // 5 + 4))
+        return await self.create_card_image_grid_async(cards, row_size)
+
+    async def create_card_image_grid_async(self, cards: List[CardMaster], row_size: int = 16):
+        return await self.bot.loop.run_in_executor(
+            self.bot.thread_pool,
+            functools.partial(self.create_card_image_grid, cards, row_size),
+        )
+
+    def create_card_image_grid(self, cards: List[CardMaster], row_size: int = 20):
+        column_count = math.ceil(len(cards) / row_size)
+        img = Image.new('RGBA', (259 * row_size, 259 * column_count), (255, 255, 255, 0))
 
         for i, card in enumerate(cards):
             icon = self.get_card_icon(card)
-            img.paste(icon, (259 * (i % width), 259 * (i // width)), icon)
+            img.paste(icon, (259 * (i % row_size), 259 * (i // row_size)), icon)
 
         return img
 
@@ -138,16 +147,34 @@ class Gacha(commands.Cog):
 
         await ctx.send(embed=embed, file=file)
 
+    @commands.command(name='pullstats',
+                      aliases=['rollstats'],
+                      description='Returns information about pulled cards.',
+                      help='!pullstats')
+    async def pullstats(self, ctx: PrefContext):
+        entries = await CollectionEntry.filter(user_id=ctx.author.id)
+        card_ids = {e.card_id for e in entries}
+        cards = [self.bot.assets[Server.JP].card_master[cid] for cid in card_ids]
+        cards = sorted(cards, key=lambda card: (card.rarity_id, card.start_datetime, card.id))
+
+        img = await self.create_card_image_grid_async(cards)
+
+        buffer = BytesIO()
+        img.save(buffer, 'png')
+        buffer.seek(0)
+
+        embed = discord.Embed(title='Pull Stats')
+        embed.set_image(url='attachment://cards.png')
+
+        await ctx.send(embed=embed, file=discord.File(fp=buffer, filename='cards.png'))
+
     async def do_gacha_draw_and_get_message_data(self,
                                                  user: Union[discord.User, discord.Member],
                                                  gacha: GachaMaster,
                                                  draw_data: GachaDrawMaster,
                                                  assets: AssetManager) -> Tuple[discord.Embed, discord.File]:
         draw_result = await self.do_gacha_draw(user, gacha, draw_data, assets)
-        img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
-                                                  functools.partial(self.create_pull_image,
-                                                                    draw_result.cards,
-                                                                    draw_result.bonus))
+        img = await self.create_pull_image(draw_result.cards, draw_result.bonus)
 
         buffer = BytesIO()
         img.save(buffer, 'png')
@@ -214,37 +241,6 @@ class Gacha(commands.Cog):
                                                               card_id=card_id)
         entry.counter = F('counter') + 1
         await entry.save()
-
-    @commands.command(name='card_icon',
-                      aliases=['cardicon'],
-                      hidden=True)
-    async def card_icon(self, ctx: commands.Context, *, arg: ParsedArguments):
-        tile = arg.tag('tile')
-        bonus = arg.tag('bonus')
-        name = arg.text()
-        arg.require_all_arguments_used()
-        card = self.bot.master_filters.cards.get(name, ctx)
-
-        if tile:
-            if bonus:
-                img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
-                                                          functools.partial(self.create_pull_image, [card] * 10, card))
-            else:
-                img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
-                                                          functools.partial(self.create_pull_image, [card] * 10))
-        else:
-            if bonus:
-                img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
-                                                          functools.partial(self.create_pull_image, [card], card))
-            else:
-                img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
-                                                          functools.partial(self.create_pull_image, [card]))
-
-        buffer = BytesIO()
-        img.save(buffer, 'png')
-        buffer.seek(0)
-
-        await ctx.send(file=discord.File(fp=buffer, filename='cardicon.png'))
 
 
 class GachaPullResult(typing.NamedTuple):

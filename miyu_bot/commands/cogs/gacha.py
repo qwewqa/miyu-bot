@@ -3,13 +3,16 @@ import itertools
 import logging
 import math
 import random
+import typing
 from io import BytesIO
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple, Union
 
 import discord
 from PIL import Image
+from d4dj_utils.master.asset_manager import AssetManager
 from d4dj_utils.master.card_master import CardMaster
+from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
 
@@ -130,6 +133,40 @@ class Gacha(commands.Cog):
             await ctx.send('Unsupported banner.')
             return
         draw_data = draw_data[0]
+        embed, file = await self.do_gacha_draw_and_get_message_data(ctx.author, gacha, draw_data, ctx.assets)
+
+        await ctx.send(embed=embed, file=file)
+
+    async def do_gacha_draw_and_get_message_data(self,
+                                                 user: Union[discord.User, discord.Member],
+                                                 gacha: GachaMaster,
+                                                 draw_data: GachaDrawMaster,
+                                                 assets: AssetManager) -> Tuple[discord.Embed, discord.File]:
+        draw_result = await self.do_gacha_draw(user, gacha, draw_data, assets)
+        img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
+                                                  functools.partial(self.create_pull_image,
+                                                                    draw_result.cards,
+                                                                    draw_result.bonus))
+
+        buffer = BytesIO()
+        img.save(buffer, 'png')
+        buffer.seek(0)
+
+        embed = discord.Embed(title=gacha.name)
+        thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
+        embed.set_thumbnail(url=thumb_url)
+        embed.set_image(url='attachment://pull.png')
+
+        if draw_result.pity_count is not None:
+            embed.description = f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}'
+
+        return embed, discord.File(fp=buffer, filename='pull.png')
+
+    async def do_gacha_draw(self,
+                            user: Union[discord.User, discord.Member],
+                            gacha: GachaMaster,
+                            draw_data: GachaDrawMaster,
+                            assets: AssetManager) -> 'GachaPullResult':
         tables = gacha.tables
         tables_rates = [list(itertools.accumulate(t.rate for t in table)) for table in tables]
 
@@ -142,13 +179,13 @@ class Gacha(commands.Cog):
                 table_rates = tables_rates[table_index]
                 rng = random.randint(1, table_rates[-1])
                 result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                cards.append(ctx.assets.card_master[tables[table_index][result_index].card_id])
+                cards.append(assets.card_master[tables[table_index][result_index].card_id])
 
         bonus = None
         current_pity = None
 
         if gacha.bonus_max_value:
-            pity_data, _ = await PityCount.get_or_create(user_id=ctx.author.id, gacha_id=gacha.id)
+            pity_data, _ = await PityCount.get_or_create(user_id=user.id, gacha_id=gacha.id)
             pity_data.counter += 10
             current_pity = pity_data.counter
             if pity_data.counter >= gacha.bonus_max_value:
@@ -161,25 +198,10 @@ class Gacha(commands.Cog):
                 table_rates = list(itertools.accumulate(t.rate for t in bonus_tables[table_index]))
                 rng = random.randint(1, table_rates[-1])
                 result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                bonus = ctx.assets.card_master[bonus_tables[table_index][result_index].card_id]
+                bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
             await pity_data.save()
 
-        img = await self.bot.loop.run_in_executor(self.bot.thread_pool,
-                                                  functools.partial(self.create_pull_image, cards, bonus))
-
-        buffer = BytesIO()
-        img.save(buffer, 'png')
-        buffer.seek(0)
-
-        embed = discord.Embed(title=gacha.name)
-        thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
-        embed.set_thumbnail(url=thumb_url)
-        embed.set_image(url='attachment://pull.png')
-
-        if current_pity is not None:
-            embed.description = f'Pity: {current_pity}/{gacha.bonus_max_value}'
-
-        await ctx.send(embed=embed, file=discord.File(fp=buffer, filename='pull.png'))
+        return GachaPullResult(cards, bonus, current_pity)
 
     @commands.command(name='card_icon',
                       aliases=['cardicon'],
@@ -211,6 +233,12 @@ class Gacha(commands.Cog):
         buffer.seek(0)
 
         await ctx.send(file=discord.File(fp=buffer, filename='cardicon.png'))
+
+
+class GachaPullResult(typing.NamedTuple):
+    cards: List[CardMaster]
+    bonus: Optional[CardMaster]
+    pity_count: Optional[int]
 
 
 def setup(bot):

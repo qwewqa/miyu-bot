@@ -146,9 +146,11 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         if name:
             if ctx.preferences.leaks:
-                return id_result + self.unrestricted_filter[ctx.preferences.server].get_sorted(name)
+                return id_result + [v for v in self.unrestricted_filter[ctx.preferences.server].get_sorted(name)
+                                    if v not in id_result]
             else:
-                return id_result + self.default_filter[ctx.preferences.server].get_sorted(name)
+                return id_result + [v for v in self.default_filter[ctx.preferences.server].get_sorted(name)
+                                    if v not in id_result]
         else:
             if ctx.preferences.leaks:
                 return list(self.unrestricted_filter[ctx.preferences.server].values())

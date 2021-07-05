@@ -15,6 +15,7 @@ from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
+from tortoise.expressions import F
 
 from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.models import PityCount, CollectionEntry
@@ -211,7 +212,7 @@ class Gacha(commands.Cog):
                                                               gacha_id=gacha_id,
                                                               table_rate_id=table_rate_id,
                                                               card_id=card_id)
-        entry.counter += 1
+        entry.counter = F('counter') + 1
         await entry.save()
 
     @commands.command(name='card_icon',

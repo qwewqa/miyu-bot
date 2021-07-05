@@ -7,6 +7,7 @@ from pathlib import Path
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
+from tortoise.expressions import F
 
 from miyu_bot.bot import models
 from miyu_bot.bot.bot import MiyuBot
@@ -83,7 +84,7 @@ async def on_command(ctx: commands.Context):
     if not ctx.guild:
         return
     cnt, _ = await CommandUsageCount.get_or_create(guild_id=ctx.guild.id, name=ctx.command.name)
-    cnt.counter += 1
+    cnt.counter = F('counter') + 1
     await cnt.save()
 
 

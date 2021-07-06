@@ -99,7 +99,15 @@ class FilterDetailView(UserRestrictedView):
         if has_list_view:
             self.add_item(DetailToListButton(row=row_offset))
         self.add_item(DeleteButton(row=row_offset))
+        self.large_decr_button = PageChangeButton(-20, label='-20', row=row_offset+1)
+        self.small_decr_button = PageChangeButton(-5, label='-5', row=row_offset+1)
+        self.small_incr_button = PageChangeButton(5, label='+5', row=row_offset+1)
+        self.large_incr_button = PageChangeButton(20, label='+20', row=row_offset+1)
         self.page_display_button = Button(disabled=True, style=discord.ButtonStyle.secondary, row=row_offset + 1)
+        self.add_item(self.large_decr_button)
+        self.add_item(self.small_decr_button)
+        self.add_item(self.small_incr_button)
+        self.add_item(self.large_incr_button)
         self.add_item(self.page_display_button)
 
         # Run setters
@@ -115,7 +123,11 @@ class FilterDetailView(UserRestrictedView):
         self._page_index = max(0, min(value, self.max_page_index))
         self.update_embed()
         self.prev_button.disabled = self._page_index == 0
+        self.large_decr_button.disabled = self._page_index == 0
+        self.small_decr_button.disabled = self._page_index == 0
         self.next_button.disabled = self._page_index == self.max_page_index
+        self.large_incr_button.disabled = self._page_index == self.max_page_index
+        self.small_incr_button.disabled = self._page_index == self.max_page_index
         self.page_display_button.label = f'{self._page_index + 1}/{self.max_page_index + 1}'
 
     @property

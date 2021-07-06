@@ -51,6 +51,11 @@ class FilterDisplayManager:
         if start_tab is None:
             start_tab = self.start_tab
 
+        if not self.values:
+            embed = discord.Embed(title='No Results', description='N/A')
+            view = DeletableMessageView(allowed_users=self.allowed_users)
+            return view, embed
+
         view = FilterDetailView(self,
                                 self.master_filter,
                                 self.ctx,

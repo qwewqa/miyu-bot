@@ -17,7 +17,9 @@ from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
+from tortoise import BaseDBAsyncClient
 from tortoise.expressions import F
+from tortoise.transactions import in_transaction
 
 from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.models import GachaState, CollectionEntry
@@ -198,11 +200,11 @@ class Gacha(commands.Cog):
                             gacha: GachaMaster,
                             draw_data: GachaDrawMaster,
                             assets: AssetManager) -> 'GachaPullResult':
-        async with self.pull_locks[user.id]:
+        async with self.pull_locks[user.id], in_transaction() as conn:
             tables = gacha.tables
             tables_rates = [list(itertools.accumulate(t.rate for t in table)) for table in tables]
 
-            state, _ = await GachaState.get_or_create(user_id=user.id, gacha_id=gacha.id)
+            state, _ = await GachaState.get_or_create(user_id=user.id, gacha_id=gacha.id, using_db=conn)
             state.total_roll_counter += 1
 
             cards = []
@@ -217,7 +219,7 @@ class Gacha(commands.Cog):
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                     card = assets.card_master[tables[table_index][result_index].card_id]
                     await self.register_card_pulled(user.id, gacha.id, table_rate.id, card.id,
-                                                    state.total_counter, state.total_roll_counter)
+                                                    state.total_counter, state.total_roll_counter, conn)
                     cards.append(card)
 
             bonus = None
@@ -239,17 +241,18 @@ class Gacha(commands.Cog):
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                     bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
                     await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id,
-                                                    state.total_counter, state.total_roll_counter)
+                                                    state.total_counter, state.total_roll_counter, conn)
                 await state.save()
 
             return GachaPullResult(cards, bonus, current_pity)
 
     async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int,
-                                   pulled_at: int, pulled_at_roll: int):
+                                   pulled_at: int, pulled_at_roll: int, using_db: BaseDBAsyncClient):
         entry, _created = await CollectionEntry.get_or_create(user_id=user_id,
                                                               gacha_id=gacha_id,
                                                               table_rate_id=table_rate_id,
-                                                              card_id=card_id)
+                                                              card_id=card_id,
+                                                              using_db=using_db)
         entry.counter = F('counter') + 1
         if entry.first_pulled <= 0:
             entry.first_pulled = pulled_at

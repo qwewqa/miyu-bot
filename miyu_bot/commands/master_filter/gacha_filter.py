@@ -165,21 +165,6 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
         return embed
 
-    @get_gacha_embed.list_formatter
-    def format_gacha_name_for_list(self, ctx, gacha):
-        pick_ups = gacha.pick_up_cards
-        units = {card.character.unit.id for card in pick_ups}
-        attributes = {card.attribute.id for card in pick_ups}
-        if len(units) == 1:
-            unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[next(iter(units))])
-        else:
-            unit_emoji = self.bot.get_emoji(grey_emoji_id)
-        if len(attributes) == 1:
-            attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[next(iter(attributes))])
-        else:
-            attribute_emoji = self.bot.get_emoji(grey_emoji_id)
-        return f'`{unit_emoji}`+`{attribute_emoji}` {gacha.name}'
-
     @command_source(command_args=
                     dict(name='banner_rates',
                          aliases=['bannerrates', 'gacha_rates', 'gacharates',
@@ -246,6 +231,22 @@ class GachaFilter(MasterFilter[GachaMaster]):
             embed.description = l10n.format_value("none-or-too-many")
 
         return embed
+
+    @get_gacha_embed.list_formatter
+    @get_gacha_table_embed.list_formatter
+    def format_gacha_name_for_list(self, ctx, gacha):
+        pick_ups = gacha.pick_up_cards
+        units = {card.character.unit.id for card in pick_ups}
+        attributes = {card.attribute.id for card in pick_ups}
+        if len(units) == 1:
+            unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[next(iter(units))])
+        else:
+            unit_emoji = self.bot.get_emoji(grey_emoji_id)
+        if len(attributes) == 1:
+            attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[next(iter(attributes))])
+        else:
+            attribute_emoji = self.bot.get_emoji(grey_emoji_id)
+        return f'`{unit_emoji}`+`{attribute_emoji}` {gacha.name}'
 
     stock_names = {
         1: 'diamond',

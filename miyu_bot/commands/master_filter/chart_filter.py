@@ -193,7 +193,10 @@ class ChartFilter(MasterFilter[ChartMaster]):
                     is_comparable=True,
                     reverse_sort=True)
     def combo(self, value: ChartMaster):
-        return value.note_counts.get(0) or -1
+        if ncm := value.note_counts.get(0):
+            return ncm.count
+        else:
+            return -1
 
     @combo.formatter
     def format_combo(self, value: ChartMaster):

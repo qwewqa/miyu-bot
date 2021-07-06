@@ -1,18 +1,19 @@
-from typing import List, Tuple, Iterable, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 
 import discord
-from discord import SelectOption, Interaction
+from discord import Interaction
+from discord.ui import Button
 
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.deletable_message import DeleteButton
-from miyu_bot.commands.common.paged_message import PageChangeButton, PageSelect, PageSelectPageChangeButton
+from miyu_bot.commands.common.paged_message import PageChangeButton
 from miyu_bot.commands.common.user_restricted_view import UserRestrictedView
 
 if TYPE_CHECKING:
-    from miyu_bot.commands.master_filter.master_filter import EmbedSourceCallable, AnyEmoji
+    from miyu_bot.commands.master_filter.master_filter import EmbedSourceCallable
 
 
-class DetailTabButton(discord.ui.Button['DetailView']):
+class DetailTabButton(discord.ui.Button['FilterDetailView']):
     def __init__(self,
                  tab: int,
                  style=discord.ButtonStyle.primary,
@@ -26,7 +27,7 @@ class DetailTabButton(discord.ui.Button['DetailView']):
         await interaction.response.edit_message(embed=self.view.active_embed, view=self.view)
 
 
-class DetailServerChangeButton(discord.ui.Button['DetailView']):
+class DetailServerChangeButton(discord.ui.Button['FilterDetailView']):
     def __init__(self,
                  style=discord.ButtonStyle.secondary,
                  emoji='<:globe:860687306889494569>',
@@ -41,31 +42,44 @@ class DetailServerChangeButton(discord.ui.Button['DetailView']):
                                                 ephemeral=True)
 
 
-class DetailView(UserRestrictedView):
+class DetailToListButton(discord.ui.Button['FilterDetailView']):
     def __init__(self,
+                 style=discord.ButtonStyle.secondary,
+                 emoji='<:list:861762364764061727> ',
+                 **kwargs):
+        super(DetailToListButton, self).__init__(style=style, emoji=emoji, **kwargs)
+
+    async def callback(self, interaction: Interaction):
+        assert self.view is not None
+        view, embed = self.view.manager.get_list_view(self.view.page_index)
+        await interaction.response.edit_message(embed=embed, view=view)
+        self.view.stop()
+
+
+class FilterDetailView(UserRestrictedView):
+    def __init__(self,
+                 manager,
                  master_filter,
                  ctx,
                  values: List,
                  source: 'EmbedSourceCallable',
+                 has_list_view: bool,
                  *,
-                 select_names: 'Iterable[Tuple[str, str, Optional[AnyEmoji]]]',
                  start_index: int = 0,
                  tabs: Optional[List] = None,
                  start_tab: Optional[int] = None,
                  **kwargs):
-        super(DetailView, self).__init__(**kwargs)
+        super(FilterDetailView, self).__init__(**kwargs)
+        self.manager = manager
         self.master_filter = master_filter
         self.ctx = ctx
         self.values = values
         self.servers = list(Server)
         self._target_server_index = self.servers.index(ctx.preferences.server)
         self.fallback_server = ctx.preferences.server
-        self.select_names = [(f'{i}. {name[0][:19]}', name[1][:50], name[2]) for i, name in enumerate(select_names, 1)]
         self.source = source if tabs is not None else self.wrap_tabless_source(source)
         self._page_index = start_index
         self.max_page_index = len(values) - 1
-        self._select_page_index = start_index // 25
-        self.max_select_page_index = self.max_page_index // 25
         self._tab = start_tab
         self.active_embed = self.source(master_filter, ctx, values[self.page_index], start_tab, ctx.preferences.server)
 
@@ -82,20 +96,14 @@ class DetailView(UserRestrictedView):
         self.add_item(self.prev_button)
         self.add_item(self.next_button)
         self.add_item(DetailServerChangeButton(row=row_offset))
+        if has_list_view:
+            self.add_item(DetailToListButton(row=row_offset))
         self.add_item(DeleteButton(row=row_offset))
-        self.page_select = PageSelect(placeholder=self.get_select_placeholder(start_index),
-                                      options=self.get_select_options(), row=row_offset + 1)
-        if len(values) > 1:
-            self.add_item(self.page_select)
-        self.prev_page_select = PageSelectPageChangeButton(-1, emoji='<:prev:860683672382603294>', row=row_offset + 2)
-        self.next_page_select = PageSelectPageChangeButton(1, emoji='<:next:860683672402526238>', row=row_offset + 2)
-        if self.max_select_page_index > 0:
-            self.add_item(self.prev_page_select)
-            self.add_item(self.next_page_select)
+        self.page_display_button = Button(disabled=True, style=discord.ButtonStyle.secondary, row=row_offset + 1)
+        self.add_item(self.page_display_button)
 
         # Run setters
         self.page_index = start_index
-        self.select_page_index = start_index // 25
         self.tab = start_tab
 
     @property
@@ -108,18 +116,7 @@ class DetailView(UserRestrictedView):
         self.update_embed()
         self.prev_button.disabled = self._page_index == 0
         self.next_button.disabled = self._page_index == self.max_page_index
-
-    @property
-    def select_page_index(self):
-        return self._select_page_index
-
-    @select_page_index.setter
-    def select_page_index(self, value):
-        self._select_page_index = max(0, min(value, self.max_select_page_index))
-        self.page_select.options = self.get_select_options()
-        self.page_select.placeholder = self.get_select_placeholder(self.select_page_index)
-        self.prev_page_select.disabled = self.select_page_index == 0
-        self.next_page_select.disabled = self.select_page_index == self.max_select_page_index
+        self.page_display_button.label = f'{self._page_index + 1}/{self.max_page_index + 1}'
 
     @property
     def target_server(self):
@@ -145,17 +142,6 @@ class DetailView(UserRestrictedView):
             self.tab_buttons[value].disabled = True
         self._tab = value
         self.update_embed()
-
-    def get_select_placeholder(self, select_page_index: int):
-        return f'Entries {select_page_index * 25 + 1}-{min(self.max_page_index + 1, select_page_index * 25 + 25)}'
-
-    def get_select_options(self):
-        return [SelectOption(label=self.select_names[i][0],
-                             description=self.select_names[i][1],
-                             emoji=self.select_names[i][2],
-                             value=str(i))
-                for i in range(self.select_page_index * 25,
-                               min(self.max_page_index + 1, self.select_page_index * 25 + 25))]
 
     def update_embed(self):
         value = self.values[self.page_index]

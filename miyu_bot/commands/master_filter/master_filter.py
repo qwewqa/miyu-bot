@@ -4,7 +4,6 @@ Master filter class and related functions.
 
 from __future__ import annotations
 
-import asyncio
 import dataclasses
 import functools
 import re
@@ -24,10 +23,7 @@ from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
-from miyu_bot.commands.common.paged_message import run_paged_message
-from miyu_bot.commands.common.reaction_message import EmojiButton, \
-    ReactionButtonView
-from miyu_bot.commands.master_filter.detail_view import DetailView
+from miyu_bot.commands.master_filter.filter_display_manager import FilterDisplayManager
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -170,7 +166,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         pass
 
     def get_select_name(self, value: TData) -> Tuple[str, str, Optional[AnyEmoji]]:
-        raise NotImplementedError
+        return 'name', 'desc', None
 
     def is_released(self, value: TData) -> bool:
         return value.is_released
@@ -218,28 +214,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            values, index, tab, _display = filter_processor.get(arg, ctx, is_list=False)
-
-            if not values:
-                await ctx.send('No results.')
-                return
-
-            emojis = None
-            if source.tabs is not None:
-                emojis = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs]
-
-            view = DetailView(self,
-                              ctx,
-                              values,
-                              source.embed_source,
-                              select_names=[self.get_select_name(v) for v in values],
-                              start_index=index,
-                              tabs=emojis,
-                              start_tab=tab,
-                              allowed_users={ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids},
-                              timeout=600)
-            await ctx.send(embed=view.active_embed,
-                           view=view)
+            results = filter_processor.get(arg, ctx, is_list=False)
+            view, embed = FilterDisplayManager(self, ctx, results, source).get_detail_view()
+            await ctx.send(embed=embed, view=view)
 
         return command
 
@@ -254,21 +231,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            values, index, _tab, display = filter_processor.get(arg, ctx, is_list=True)
-
-            if display and display.formatter:
-                listing = [f'{display.formatter(self, ctx, value)} {source.list_formatter(self, ctx, value)}' for value
-                           in values]
-            else:
-                listing = [source.list_formatter(self, ctx, value) for value in values]
-
-            embed = discord.Embed(
-                title=f'[{ctx.preferences.server.name}] {self.l10n[ctx].format_value(source.list_name or "search")}')
-
-            page_size = 20
-            start_page = index // 20
-
-            asyncio.create_task(run_paged_message(ctx, embed, listing, page_size=page_size, start_page=start_page))
+            results = filter_processor.get(arg, ctx, is_list=True)
+            view, embed = FilterDisplayManager(self, ctx, results, source).get_list_view()
+            await ctx.send(embed=embed, view=view)
 
         return command
 
@@ -307,7 +272,6 @@ class FilterProcessor:
 
     def get(self, arg: ParsedArguments, ctx, is_list: bool) -> FilterResult:
         start_index = 0
-        start_tab = 0
         display = None
         sort = None
         reverse_sort = arg.tag('reverse')
@@ -350,6 +314,7 @@ class FilterProcessor:
             start_index = int(text.strip()[1:]) - 1
             text = ''
 
+        start_tab = self.source.default_tab
         if not is_list:
             start_tab = self.source.default_tab
             if self.source.suffix_tab_aliases:

@@ -356,10 +356,6 @@ class MusicFilter(MasterFilter[MusicMaster]):
 
         return embed
 
-    @get_song_embed.list_formatter
-    def format_song_title(self, song):
-        return f'`{self.bot.get_emoji(unit_emoji_ids_by_unit_id.get(song.unit_id, grey_emoji_id))}` {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()
-
     difficulty_names = {
         'expert': 3,
         'hard': 2,
@@ -496,6 +492,12 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed.set_footer(text=l10n.format_value('chart-id', {'chart-id': f'{chart.id:>08}'}))
 
         return embed
+
+    @get_song_embed.list_formatter
+    @get_chart_embed.list_formatter
+    @get_sections_embed.list_formatter
+    def format_song_title(self, song):
+        return f'`{self.bot.get_emoji(unit_emoji_ids_by_unit_id.get(song.unit_id, grey_emoji_id))}` {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()
 
     def format_duration(self, seconds):
         if seconds is None:

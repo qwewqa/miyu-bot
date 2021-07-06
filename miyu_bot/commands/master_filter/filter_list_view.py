@@ -3,6 +3,7 @@ from typing import List
 import discord.ui
 from discord import Interaction, SelectOption
 
+from miyu_bot.bot.models import log_usage
 from miyu_bot.commands.common.paged_message import PagedMessageView
 
 
@@ -12,6 +13,7 @@ class FilterListItemSelect(discord.ui.Select['FilterListView']):
         index = int(self.values[0])
         view, embed = self.view.manager.get_detail_view(index)
         await interaction.response.send_message(embed=embed, view=view)
+        await log_usage('filter_list_item_select')
 
 
 class FilterListView(PagedMessageView):

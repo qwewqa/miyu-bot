@@ -8,7 +8,7 @@ from discord.ext import commands
 from tortoise.functions import Count, Sum
 
 from miyu_bot.bot.bot import MiyuBot
-from miyu_bot.bot.models import CommandUsageCount
+from miyu_bot.bot.models import CommandUsageCount, GeneralUsageCount
 from miyu_bot.commands.common.fuzzy_matching import romanize, FuzzyMatcher
 from miyu_bot.commands.common.paged_message import run_paged_message
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
@@ -217,6 +217,18 @@ class Utility(commands.Cog):
                                               [f'{name}: {count}' for name, count in usage_counts] +
                                               [f'total: {sum(c for _, c in usage_counts)}'],
                                               page_size=40))
+
+    @commands.command(name='getstat',
+                      hidden=True)
+    @commands.is_owner()
+    async def command_usage(self, ctx: commands.Context, name: str):
+        usage = (
+            await GeneralUsageCount
+            .filter(name=name)
+            .annotate(total_count=Sum('counter'))
+            .values('total_count')
+        )[0]
+        await ctx.send(f'{usage["total_count"]}')
 
     @commands.command(name='guild_usage',
                       aliases=['guildusage'],

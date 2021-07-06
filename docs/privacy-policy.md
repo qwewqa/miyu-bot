@@ -10,7 +10,7 @@ If user preferences are used, the numerical User ID will be collected.
 in order to store preferences
 
 ### Usage Statistics and Logging
-The frequency that each command is used is recorded on a per-server level.
+The frequency over time that each command is used is recorded on a per-server level.
 Statistics in direct messages are not collected, and data is not linked
 directly to any user.
 

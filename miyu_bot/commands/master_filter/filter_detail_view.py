@@ -4,6 +4,7 @@ import discord
 from discord import Interaction
 from discord.ui import Button
 
+from miyu_bot.bot.models import log_usage
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.deletable_message import DeleteButton
 from miyu_bot.commands.common.paged_message import PageChangeButton
@@ -40,6 +41,7 @@ class DetailServerChangeButton(discord.ui.Button['FilterDetailView']):
         await interaction.message.edit(embed=self.view.active_embed, view=self.view)
         await interaction.response.send_message(f'Target server set to {self.view.target_server.name}.',
                                                 ephemeral=True)
+        await log_usage('filter_detail_server_change_button')
 
 
 class DetailToListButton(discord.ui.Button['FilterDetailView']):
@@ -54,6 +56,7 @@ class DetailToListButton(discord.ui.Button['FilterDetailView']):
         view, embed = self.view.manager.get_list_view(self.view.page_index)
         await interaction.response.edit_message(embed=embed, view=view)
         self.view.stop()
+        await log_usage('filter_detail_to_list_button')
 
 
 class FilterDetailView(UserRestrictedView):
@@ -91,8 +94,10 @@ class FilterDetailView(UserRestrictedView):
                 self.add_item(tab_button)
 
         row_offset = 1 if tabs is not None else 0
-        self.prev_button = PageChangeButton(-1, emoji='<:prev:860683672382603294>', row=row_offset)
-        self.next_button = PageChangeButton(1, emoji='<:next:860683672402526238>', row=row_offset)
+        self.prev_button = PageChangeButton(-1, log_name='filter_detail_page_change', 
+                                            emoji='<:prev:860683672382603294>', row=row_offset)
+        self.next_button = PageChangeButton(1, log_name='filter_detail_page_change', 
+                                            emoji='<:next:860683672402526238>', row=row_offset)
         self.add_item(self.prev_button)
         self.add_item(self.next_button)
         self.add_item(DetailServerChangeButton(row=row_offset))
@@ -101,10 +106,14 @@ class FilterDetailView(UserRestrictedView):
         if not has_list_view:
             self.detail_to_list_button.disabled = True
         self.add_item(DeleteButton(row=row_offset))
-        self.large_decr_button = PageChangeButton(-20, label='-20', row=row_offset+1)
-        self.small_decr_button = PageChangeButton(-5, label='-5', row=row_offset+1)
-        self.small_incr_button = PageChangeButton(5, label='+5', row=row_offset+1)
-        self.large_incr_button = PageChangeButton(20, label='+20', row=row_offset+1)
+        self.large_decr_button = PageChangeButton(-20, log_name='filter_detail_page_change_extra', 
+                                                  label='-20', row=row_offset+1)
+        self.small_decr_button = PageChangeButton(-5, log_name='filter_detail_page_change_extra',
+                                                  label='-5', row=row_offset+1)
+        self.small_incr_button = PageChangeButton(5, log_name='filter_detail_page_change_extra',
+                                                  label='+5', row=row_offset+1)
+        self.large_incr_button = PageChangeButton(20, log_name='filter_detail_page_change_extra',
+                                                  label='+20', row=row_offset+1)
         self.page_display_button = Button(disabled=True, style=discord.ButtonStyle.secondary, row=row_offset + 1)
         self.add_item(self.large_decr_button)
         self.add_item(self.small_decr_button)

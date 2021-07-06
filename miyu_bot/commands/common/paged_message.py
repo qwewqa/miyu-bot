@@ -4,6 +4,7 @@ import discord
 from discord import SelectOption, Interaction
 from discord.ext.commands import Context
 
+from miyu_bot.bot.models import log_usage
 from miyu_bot.commands.common.deletable_message import DeleteButton, run_deletable_message
 from miyu_bot.commands.common.user_restricted_view import UserRestrictedView
 
@@ -54,32 +55,47 @@ async def run_paged_message(ctx: Context,
 
 
 class PageChangeButton(discord.ui.Button['PagedMessageView']):
-    def __init__(self, change_step: int, style=discord.ButtonStyle.secondary, **kwargs):
+    def __init__(self, change_step: int, style=discord.ButtonStyle.secondary,
+                 log_name: Optional[str] = 'paged_page_change_button', **kwargs):
         self.change_step = change_step
+        self.log_name = log_name
         super(PageChangeButton, self).__init__(style=style, **kwargs)
 
     async def callback(self, interaction: Interaction):
         assert self.view is not None
         self.view.page_index += self.change_step
         await interaction.response.edit_message(embed=self.view.active_embed, view=self.view)
+        if self.log_name is not None:
+            await log_usage(self.log_name)
 
 
 class PageSelectPageChangeButton(discord.ui.Button['PagedMessageView']):
-    def __init__(self, change_step: int, style=discord.ButtonStyle.secondary, **kwargs):
+    def __init__(self, change_step: int,
+                 log_name: Optional[str] = 'paged_page_select_change_button',
+                 style=discord.ButtonStyle.secondary, **kwargs):
         self.change_step = change_step
+        self.log_name = log_name
         super(PageSelectPageChangeButton, self).__init__(style=style, **kwargs)
 
     async def callback(self, interaction: Interaction):
         assert self.view is not None
         self.view.select_page_index += self.change_step
         await interaction.response.edit_message(view=self.view)
+        if self.log_name is not None:
+            await log_usage(self.log_name)
 
 
 class PageSelect(discord.ui.Select['PagedMessageView']):
+    def __init__(self, log_name: Optional[str] = 'paged_page_select', *args, **kwargs):
+        self.log_name = log_name
+        super(PageSelect, self).__init__(*args, **kwargs)
+
     async def callback(self, interaction: Interaction):
         assert self.view is not None
         self.view.page_index = int(self.values[0])
         await interaction.response.edit_message(embed=self.view.active_embed, view=self.view)
+        if self.log_name is not None:
+            await log_usage(self.log_name)
 
 
 class PagedMessageView(UserRestrictedView):

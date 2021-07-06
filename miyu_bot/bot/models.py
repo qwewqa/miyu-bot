@@ -1,10 +1,12 @@
 import copy
+import datetime
 from abc import abstractmethod
 from typing import ClassVar, Callable, Any, Optional, Dict, Type, Tuple, Union
 
 import pytz
 from discord.ext import commands
 from tortoise import Model, fields
+from tortoise.expressions import F
 from tortoise.models import ModelMeta
 
 from miyu_bot.bot.servers import Server, SERVER_NAMES
@@ -287,6 +289,22 @@ class CommandUsageCount(Model):
     guild_id = fields.BigIntField()
     name = fields.CharField(max_length=31)
     counter = fields.IntField(default=0)
+    date = fields.DateField(default=datetime.date(year=2021, month=1, day=1))
 
     class Meta:
-        unique_together = (('guild_id', 'name'),)
+        unique_together = (('guild_id', 'name', 'date'),)
+
+
+class GeneralUsageCount(Model):
+    name = fields.TextField()
+    date = fields.DateField()
+    counter = fields.IntField(default=0)
+
+    class Meta:
+        unique_together = (('name', 'date'),)
+
+
+async def log_usage(name: str):
+    cnt, _ = await GeneralUsageCount.get_or_create(name=name, date=datetime.datetime.utcnow().date())
+    cnt.counter = F('counter') + 1
+    await cnt.save()

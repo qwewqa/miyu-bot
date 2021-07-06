@@ -33,12 +33,15 @@ class FilterDisplayManager:
         if source.tabs is not None:
             self.tabs = [ctx.bot.get_emoji(e) if isinstance(e, int) else e for e in source.tabs]
 
-        if display and display.formatter:
-            self.list_entries = [
-                f'{display.formatter(self.master_filter, ctx, value)} {source.list_formatter(self.master_filter, ctx, value)}'
-                for value in values]
+        if source.list_formatter:
+            if display and display.formatter:
+                self.list_entries = [
+                    f'{display.formatter(self.master_filter, ctx, value)} {source.list_formatter(self.master_filter, ctx, value)}'
+                    for value in values]
+            else:
+                self.list_entries = [source.list_formatter(self.master_filter, ctx, value) for value in values]
         else:
-            self.list_entries = [source.list_formatter(self.master_filter, ctx, value) for value in values]
+            self.list_entries = []
 
         self.base_list_embed = discord.Embed(
             title=f'[{ctx.preferences.server.name}] {self.master_filter.l10n[ctx].format_value(source.list_name or "search")}')

@@ -96,8 +96,10 @@ class FilterDetailView(UserRestrictedView):
         self.add_item(self.prev_button)
         self.add_item(self.next_button)
         self.add_item(DetailServerChangeButton(row=row_offset))
-        if has_list_view:
-            self.add_item(DetailToListButton(row=row_offset))
+        self.detail_to_list_button = DetailToListButton(row=row_offset)
+        self.add_item(self.detail_to_list_button)
+        if not has_list_view:
+            self.detail_to_list_button.disabled = True
         self.add_item(DeleteButton(row=row_offset))
         self.large_decr_button = PageChangeButton(-20, label='-20', row=row_offset+1)
         self.small_decr_button = PageChangeButton(-5, label='-5', row=row_offset+1)

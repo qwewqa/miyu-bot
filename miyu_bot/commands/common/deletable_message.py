@@ -27,6 +27,7 @@ class DeleteButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.message.delete()
+        self.view.stop()
 
 
 class DeletableMessageView(UserRestrictedView):

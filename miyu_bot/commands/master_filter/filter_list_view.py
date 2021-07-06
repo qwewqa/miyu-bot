@@ -11,8 +11,7 @@ class FilterListItemSelect(discord.ui.Select['FilterListView']):
         assert self.view is not None
         index = int(self.values[0])
         view, embed = self.view.manager.get_detail_view(index)
-        await interaction.response.edit_message(embed=embed, view=view)
-        self.view.stop()
+        await interaction.response.send_message(embed=embed, view=view)
 
 
 class FilterListView(PagedMessageView):

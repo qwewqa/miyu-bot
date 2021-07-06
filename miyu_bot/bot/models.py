@@ -259,10 +259,12 @@ class User(PreferenceScope):
         return f'User({self.id})'
 
 
-class PityCount(Model):
+class GachaState(Model):
     user_id = fields.BigIntField()
     gacha_id = fields.IntField()
-    counter = fields.IntField(default=0)
+    pity_counter = fields.IntField(default=0)
+    total_counter = fields.IntField(default=0)
+    total_roll_counter = fields.IntField(default=0)
 
     class Meta:
         unique_together = (('user_id', 'gacha_id'),)
@@ -273,6 +275,8 @@ class CollectionEntry(Model):
     gacha_id = fields.IntField()
     table_rate_id = fields.IntField()
     card_id = fields.IntField()
+    first_pulled = fields.IntField(default=0)
+    first_pulled_roll = fields.IntField(default=0)
     counter = fields.IntField(default=0)
 
     class Meta:

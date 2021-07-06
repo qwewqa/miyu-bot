@@ -1,9 +1,11 @@
+import asyncio
 import functools
 import itertools
 import logging
 import math
 import random
 import typing
+from collections import defaultdict
 from io import BytesIO
 from pathlib import Path
 from typing import List, Optional, Tuple, Union
@@ -18,7 +20,7 @@ from discord.ext import commands
 from tortoise.expressions import F
 
 from miyu_bot.bot.bot import MiyuBot, PrefContext
-from miyu_bot.bot.models import PityCount, CollectionEntry
+from miyu_bot.bot.models import GachaState, CollectionEntry
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import ParsedArguments
 from miyu_bot.commands.common.asset_paths import get_asset_filename
@@ -64,6 +66,7 @@ class Gacha(commands.Cog):
             self.images.append(self.get_card_icon(card))
 
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'gacha.ftl')
+        self.pull_locks = defaultdict(lambda: asyncio.Lock())
 
     def load_image(self, path):
         image = Image.open(self.base_path / path)
@@ -195,51 +198,62 @@ class Gacha(commands.Cog):
                             gacha: GachaMaster,
                             draw_data: GachaDrawMaster,
                             assets: AssetManager) -> 'GachaPullResult':
-        tables = gacha.tables
-        tables_rates = [list(itertools.accumulate(t.rate for t in table)) for table in tables]
+        async with self.pull_locks[user.id]:
+            tables = gacha.tables
+            tables_rates = [list(itertools.accumulate(t.rate for t in table)) for table in tables]
 
-        cards = []
-        for draw_amount, table_rate in zip(draw_data.draw_amounts, gacha.table_rates):
-            rates = list(itertools.accumulate(table_rate.rates))
-            for _i in range(draw_amount):
-                rng = random.randint(1, rates[-1])
-                table_index = next(i for i, s in enumerate(rates) if rng <= s)
-                table_rates = tables_rates[table_index]
-                rng = random.randint(1, table_rates[-1])
-                result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                card = assets.card_master[tables[table_index][result_index].card_id]
-                await self.register_card_pulled(user.id, gacha.id, table_rate.id, card.id)
-                cards.append(card)
+            state, _ = await GachaState.get_or_create(user_id=user.id, gacha_id=gacha.id)
+            state.total_roll_counter += 1
 
-        bonus = None
-        current_pity = None
+            cards = []
+            for draw_amount, table_rate in zip(draw_data.draw_amounts, gacha.table_rates):
+                rates = list(itertools.accumulate(table_rate.rates))
+                for _i in range(draw_amount):
+                    state.total_counter += 1
+                    rng = random.randint(1, rates[-1])
+                    table_index = next(i for i, s in enumerate(rates) if rng <= s)
+                    table_rates = tables_rates[table_index]
+                    rng = random.randint(1, table_rates[-1])
+                    result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
+                    card = assets.card_master[tables[table_index][result_index].card_id]
+                    await self.register_card_pulled(user.id, gacha.id, table_rate.id, card.id,
+                                                    state.total_counter, state.total_roll_counter)
+                    cards.append(card)
 
-        if gacha.bonus_max_value:
-            pity_data, _ = await PityCount.get_or_create(user_id=user.id, gacha_id=gacha.id)
-            pity_data.counter += 10
-            current_pity = pity_data.counter
-            if pity_data.counter >= gacha.bonus_max_value:
-                bonus_tables = gacha.bonus_tables
-                pity_data.counter -= gacha.bonus_max_value
-                current_pity = pity_data.counter
-                rates = list(itertools.accumulate(gacha.bonus_table_rate.rates))
-                rng = random.randint(1, rates[-1])
-                table_index = next(i for i, s in enumerate(rates) if rng <= s)
-                table_rates = list(itertools.accumulate(t.rate for t in bonus_tables[table_index]))
-                rng = random.randint(1, table_rates[-1])
-                result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
-                await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id)
-            await pity_data.save()
+            bonus = None
+            current_pity = None
 
-        return GachaPullResult(cards, bonus, current_pity)
+            if gacha.bonus_max_value:
+                state.pity_counter += 10
+                current_pity = state.pity_counter
+                if state.pity_counter >= gacha.bonus_max_value:
+                    state.total_counter += 1
+                    bonus_tables = gacha.bonus_tables
+                    state.pity_counter -= gacha.bonus_max_value
+                    current_pity = state.pity_counter
+                    rates = list(itertools.accumulate(gacha.bonus_table_rate.rates))
+                    rng = random.randint(1, rates[-1])
+                    table_index = next(i for i, s in enumerate(rates) if rng <= s)
+                    table_rates = list(itertools.accumulate(t.rate for t in bonus_tables[table_index]))
+                    rng = random.randint(1, table_rates[-1])
+                    result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
+                    bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
+                    await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id,
+                                                    state.total_counter, state.total_roll_counter)
+                await state.save()
 
-    async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int):
+            return GachaPullResult(cards, bonus, current_pity)
+
+    async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int,
+                                   pulled_at: int, pulled_at_roll: int):
         entry, _created = await CollectionEntry.get_or_create(user_id=user_id,
                                                               gacha_id=gacha_id,
                                                               table_rate_id=table_rate_id,
                                                               card_id=card_id)
         entry.counter = F('counter') + 1
+        if entry.first_pulled <= 0:
+            entry.first_pulled = pulled_at
+            entry.first_pulled_roll = pulled_at_roll
         await entry.save()
 
 

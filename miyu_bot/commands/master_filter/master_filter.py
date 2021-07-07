@@ -421,10 +421,13 @@ ESC = TypeVar('ESC', bound=EmbedSourceCallable)
 class AnnotatedEmbedSourceCallable(Protocol[ESC]):
     list_formatter: Callable
 
+    def __call__(self, *args, **kwargs):
+        pass
+
 
 @dataclass
 class CommandSourceInfo:
-    embed_source: EmbedSourceCallable
+    embed_source: Optional[EmbedSourceCallable] = None
     command_args: Optional[Dict[str, Any]] = None
     list_command_args: Optional[Dict[str, Any]] = None
     default_sort: Optional[DataAttributeInfo] = None
@@ -496,6 +499,28 @@ def command_source(
             return f
 
         func.list_formatter = list_formatter
+
+        return func
+
+    return decorator
+
+
+def list_formatter(
+        *,
+        name: str,
+        list_command_args: Optional[Dict[str, Any]],
+        default_sort: Optional[Union[DataAttributeInfo, Callable]] = None,
+        default_display: Optional[Union[DataAttributeInfo, Callable]] = None,
+) -> Callable[[Callable], Callable]:
+    def decorator(func):
+        info = CommandSourceInfo(
+            list_formatter=func,
+            list_command_args=list_command_args,
+            default_sort=getattr(default_sort, '_data_attribute_info', default_sort),
+            default_display=getattr(default_display, '_data_attribute_info', default_display),
+            list_name=name,
+        )
+        func._command_source_info = info
 
         return func
 

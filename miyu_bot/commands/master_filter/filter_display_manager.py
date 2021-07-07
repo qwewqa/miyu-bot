@@ -99,7 +99,7 @@ class FilterDisplayManager:
         view = FilterListView(self,
                               select_option_details=[self.master_filter.get_select_name(v) for v in self.values],
                               page_size=self.page_size,
-                              has_detail_view=self.source.command_args is not None,
+                              has_detail_view=self.source.embed_source is not None,
                               embeds=embeds,
                               page_titles=page_titles,
                               start_index=start_page,

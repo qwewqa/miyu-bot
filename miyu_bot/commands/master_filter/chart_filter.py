@@ -23,6 +23,9 @@ class ChartFilter(MasterFilter[ChartMaster]):
     def get_name(self, value: ChartMaster) -> str:
         return f'{value.music.name} {value.music.special_unit_name}{" (Hidden)" if value.music.is_hidden else ""} {value.difficulty.name.lower()}'.strip()
 
+    def get_select_name(self, value: ChartMaster):
+        return f'{value.difficulty.name}', f'{value.music.name}', None
+
     def is_released(self, value: ChartMaster) -> bool:
         return value.music.is_released
 
@@ -307,7 +310,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
                     default_sort=level,
                     list_name='chart-search')
     def get_chart_embed(self, ctx, chart: ChartMaster, server):
-        pass
+        return self.bot.master_filters.music.get_chart_embed(ctx, chart.music, chart.difficulty - 1, server)
 
     @get_chart_embed.list_formatter
     def format_chart_name(self, chart: ChartMaster):

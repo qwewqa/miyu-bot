@@ -514,7 +514,7 @@ def list_formatter(
 ) -> Callable[[Callable], Callable]:
     def decorator(func):
         info = CommandSourceInfo(
-            list_formatter=func,
+            list_formatter=_get_accessor(func),
             list_command_args=list_command_args,
             default_sort=getattr(default_sort, '_data_attribute_info', default_sort),
             default_display=getattr(default_display, '_data_attribute_info', default_display),

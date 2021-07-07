@@ -156,8 +156,37 @@ class Gacha(commands.Cog):
                       aliases=['rollstats'],
                       description='Returns information about pulled cards.',
                       help='!pullstats')
-    async def pullstats(self, ctx: PrefContext):
-        entries = await CollectionEntry.filter(user_id=ctx.author.id)
+    async def pullstats(self, ctx: PrefContext, banner: Optional[int] = None):
+        if banner is None:
+            await self.send_overall_pulls_message(ctx, ctx.author.id)
+        else:
+            await self.send_banner_pulls_message(ctx, ctx.author.id, banner)
+
+    async def send_banner_pulls_message(self, ctx: PrefContext, user_id: int, gacha_id: int):
+        gacha: GachaMaster = self.bot.master_filters.gacha.get(gacha_id, ctx)
+
+        if not gacha:
+            await ctx.send('Banner not found.')
+            return
+
+        entries = await CollectionEntry.filter(user_id=user_id, gacha_id=gacha_id)
+        card_ids = {e.card_id for e in entries}
+        cards = [self.bot.assets[Server.JP].card_master[cid] for cid in card_ids]
+        cards = sorted(cards, key=lambda card: (-card.rarity_id, -card.start_datetime.timestamp(), card.id))
+
+        img = await self.create_card_image_grid_async(cards)
+
+        buffer = BytesIO()
+        img.save(buffer, 'png')
+        buffer.seek(0)
+
+        embed = discord.Embed(title=f'{gacha.name}')
+        embed.set_image(url='attachment://cards.png')
+
+        await ctx.send(embed=embed, file=discord.File(fp=buffer, filename='cards.png'))
+
+    async def send_overall_pulls_message(self, ctx: PrefContext, user_id: int):
+        entries = await CollectionEntry.filter(user_id=user_id)
         card_ids = {e.card_id for e in entries}
         cards = [self.bot.assets[Server.JP].card_master[cid] for cid in card_ids]
         cards = sorted(cards, key=lambda card: (-card.rarity_id, -card.start_datetime.timestamp(), card.id))

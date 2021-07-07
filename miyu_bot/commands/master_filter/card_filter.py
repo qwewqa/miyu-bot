@@ -82,7 +82,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['pow', 'bp'],
                     is_sortable=True,
                     is_comparable=True,
-                    reverse_sort=True)
+                    reverse_sort=True,
+                    help_sample_argument='27649')
     def power(self, value: CardMaster):
         return value.max_power_with_limit_break
 
@@ -94,7 +95,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['hrt'],
                     is_sortable=True,
                     is_comparable=True,
-                    reverse_sort=True)
+                    reverse_sort=True,
+                    help_sample_argument='9082')
     def heart(self, value: CardMaster):
         return value.max_parameters_with_limit_break[0]
 
@@ -106,7 +108,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['tech', 'technical'],
                     is_sortable=True,
                     is_comparable=True,
-                    reverse_sort=True)
+                    reverse_sort=True,
+                    help_sample_argument='9219')
     def technique(self, value: CardMaster):
         return value.max_parameters_with_limit_break[1]
 
@@ -118,7 +121,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['phys', 'physic', 'physics'],
                     is_sortable=True,
                     is_comparable=True,
-                    reverse_sort=True)
+                    reverse_sort=True,
+                    help_sample_argument='9348')
     def physical(self, value: CardMaster):
         return value.max_parameters_with_limit_break[2]
 
@@ -130,7 +134,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['release', 'recent'],
                     is_sortable=True,
                     is_comparable=True,
-                    reverse_sort=True)
+                    reverse_sort=True,
+                    help_sample_argument='2020/12/31')
     def date(self, ctx, value: CardMaster):
         return ctx.convert_tz(value.start_datetime).date()
 
@@ -169,7 +174,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['score_up', 'score'],
                     is_comparable=True,
                     is_sortable=True,
-                    reverse_sort=True)
+                    reverse_sort=True,
+                    help_sample_argument='50')
     def skill(self, value: CardMaster):
         skill = value.skill
         return skill.score_up_rate + skill.perfect_score_up_rate

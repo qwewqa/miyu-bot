@@ -51,9 +51,10 @@ def get_command_source_help_texts(commands: Iterable[CommandSourceInfo],
                        f'{name}' +
                        (f' ({localized_name})' if name != localized_name else ''))
             md.text(f'*[{l10n.format_value("command-type-detail")}]({USAGE_PAGE}#detail-commands)*')
-            md.text(l10n.format_value(f'command-{command.command_args["name"]}-description', fallback=''))
             if command.suffix_tab_aliases:
                 md.admonition('note', l10n.format_value('command-tab-names'), ', '.join(command.suffix_tab_aliases))
+            if desc := l10n.format_value(f'command-{command.command_args["name"]}-description', fallback=''):
+                md.admonition('question', 'Description', desc)
             yield md
         if command.list_command_args:
             md = MarkdownDocument()
@@ -63,7 +64,8 @@ def get_command_source_help_texts(commands: Iterable[CommandSourceInfo],
                        f'{name}' +
                        (f' ({localized_name})' if name != localized_name else ''))
             md.text(f'*[{l10n.format_value("command-type-list")}]({USAGE_PAGE}#list-commands)*')
-            md.text(l10n.format_value(f'command-{command.list_command_args["name"]}-description', fallback=''))
+            if desc := l10n.format_value(f'command-{command.list_command_args["name"]}-description', fallback=''):
+                md.admonition('question', 'Description', desc)
             yield md
 
 

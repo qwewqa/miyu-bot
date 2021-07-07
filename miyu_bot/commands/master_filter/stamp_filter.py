@@ -5,7 +5,10 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, command_
 
 class StampFilter(MasterFilter[StampMaster]):
     def get_name(self, value: StampMaster) -> str:
-        return f'{value.name + " " + value.quote.replace("～", "ー") if value.quote else value.description}'
+        if value.quote in value.name:
+            return value.name
+        else:
+            return f'{value.name + " " + value.quote.replace("～", "ー") if value.quote else value.description}'
 
     @list_formatter(name='stamp-search',
                     list_command_args=
@@ -14,4 +17,7 @@ class StampFilter(MasterFilter[StampMaster]):
                          description='Lists stamps.',
                          help='!stamps'))
     def format_stamp_name(self, stamp: StampMaster):
-        return f'{stamp.name}: {stamp.quote}'
+        if stamp.quote in stamp.name:
+            return stamp.name
+        else:
+            return f'{stamp.name}: {stamp.quote}'

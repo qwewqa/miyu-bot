@@ -460,7 +460,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
         embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.mix_path))
 
-        note_counts = {k: v if v is not None else '?' for k, v in chart.note_counts.items()}
+        note_counts = {k: v.count if v is not None else '?' for k, v in chart.note_counts.items()}
         mix_info = chart.mix_info
 
         embed.add_field(name=l10n.format_value('info'),

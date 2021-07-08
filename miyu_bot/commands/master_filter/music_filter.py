@@ -460,7 +460,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
         embed.set_image(url=self.bot.asset_url + get_asset_filename(chart.mix_path))
 
-        note_counts = chart.note_counts
+        note_counts = {k: v if v is not None else '?' for k, v in chart.note_counts.items()}
         mix_info = chart.mix_info
 
         embed.add_field(name=l10n.format_value('info'),
@@ -474,19 +474,19 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed.add_field(name=l10n.format_value('section-begin'),
                         value=l10n.format_value('section-desc', {
                             'time': f'{round(mix_info[ChartSectionType.Begin].duration, 2)}s',
-                            'combo': note_counts[ChartSectionType.Begin].count,
+                            'combo': note_counts[ChartSectionType.Begin],
                         }),
                         inline=True)
         embed.add_field(name=l10n.format_value('section-middle'),
                         value=l10n.format_value('section-desc', {
                             'time': f'{round(mix_info[ChartSectionType.Middle].duration, 2)}s',
-                            'combo': note_counts[ChartSectionType.Middle].count,
+                            'combo': note_counts[ChartSectionType.Middle],
                         }),
                         inline=True)
         embed.add_field(name=l10n.format_value('section-end'),
                         value=l10n.format_value('section-desc', {
                             'time': f'{round(mix_info[ChartSectionType.End].duration, 2)}s',
-                            'combo': note_counts[ChartSectionType.End].count,
+                            'combo': note_counts[ChartSectionType.End],
                         }),
                         inline=True)
         embed.set_footer(text=l10n.format_value('chart-id', {'chart-id': f'{chart.id:>08}'}))

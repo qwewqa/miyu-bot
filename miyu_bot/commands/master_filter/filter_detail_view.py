@@ -145,7 +145,9 @@ class FilterDetailView(UserRestrictedView):
 
         self.shortcut_buttons = []
         for shortcut in shortcut_buttons:
-            button = ShortcutButton(function=shortcut.function, check=shortcut.check, emoji=shortcut.emoji, row=3)
+            button = ShortcutButton(function=shortcut.function, check=shortcut.check,
+                                    label=master_filter.l10n[ctx.preferences.language].format_value(shortcut.name),
+                                    emoji=shortcut.emoji, row=3)
             self.shortcut_buttons.append(button)
             self.add_item(button)
 

@@ -2,13 +2,12 @@ import asyncio
 import re
 from datetime import datetime
 
-from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartMaster, ChartDifficulty
 from d4dj_utils.master.skill_master import SkillMaster
 
 from miyu_bot.bot.bot import PrefContext, MiyuBot
 from miyu_bot.bot.servers import Server
-from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, difficulty_emoji_ids, grey_emoji_id
+from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
     command_source
 

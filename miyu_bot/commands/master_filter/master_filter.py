@@ -435,7 +435,8 @@ class AnnotatedEmbedSourceCallable(Protocol[ESC]):
 @dataclass
 class ShortcutButtonInfo:
     function: ShortcutButtonCallable
-    emoji: Union[str, discord.Emoji]
+    emoji: Optional[Union[str, discord.Emoji]] = None
+    name: Optional[str] = None
     check: Callable[[MasterFilter, Any], bool] = lambda self, value: True
 
 
@@ -515,9 +516,9 @@ def command_source(
 
         func.list_formatter = list_formatter
 
-        def shortcut_button(emoji: Union[str, discord.Emoji]):
+        def shortcut_button(*, name: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji]] = None):
             def decorator(func: ShortcutButtonCallable):
-                shortcut_info = ShortcutButtonInfo(func, emoji)
+                shortcut_info = ShortcutButtonInfo(function=func, emoji=emoji, name=name)
                 info.shortcut_buttons.append(shortcut_info)
 
                 def check(f):

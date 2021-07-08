@@ -320,3 +320,13 @@ class CardFilter(MasterFilter[CardMaster]):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
         attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
+
+    @get_card_embed.shortcut_button('<:gacha:862487205179293727>')
+    async def gacha_shortcut(self, ctx, card: CardMaster, server, interaction: discord.Interaction):
+        gacha_filter = ctx.bot.master_filters.gacha
+        view, embed = gacha_filter.get_simple_detail_view(ctx, [card.gacha], server, gacha_filter.get_gacha_embed)
+        await interaction.response.send_message(embed=embed, view=view)
+
+    @gacha_shortcut.check
+    def check_gacha_shortcut(self, card: CardMaster):
+        return card.gacha is not None

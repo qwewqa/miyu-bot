@@ -11,7 +11,7 @@ from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, NamedTuple, Tuple
+from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, NamedTuple, Tuple, Awaitable
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -220,6 +220,11 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         return command
 
+    def get_simple_detail_view(self, ctx, values, server, source) -> Tuple[discord.ui.View, discord.Embed]:
+        if hasattr(source, '_command_source_info'):
+            source = source._command_source_info
+        return FilterDisplayManager(self, ctx, (values, 0, None, None), source, target_server=server).get_detail_view()
+
     def get_list_command_function(self, source):
         if hasattr(source, '_command_source_info'):
             source = source._command_source_info
@@ -412,6 +417,7 @@ def _get_accessor(f: Union[AnyDataAccessor]) -> DataAttributeAccessor:
 EmbedSourceCallable = Union[
     Callable[[MasterFilter, PrefContext, Any, Server], discord.Embed], Callable[
         [MasterFilter, PrefContext, Any, int, Server], discord.Embed]]
+ShortcutButtonCallable = Callable[[MasterFilter, PrefContext, Any, Server, discord.Interaction], Awaitable]
 ListFormatterCallable = AnyDataAccessor
 AnyEmoji = Union[int, str, discord.Emoji]
 
@@ -419,10 +425,18 @@ ESC = TypeVar('ESC', bound=EmbedSourceCallable)
 
 
 class AnnotatedEmbedSourceCallable(Protocol[ESC]):
-    list_formatter: Callable
+    list_formatter: ListFormatterCallable
+    shortcut_button: Callable
 
     def __call__(self, *args, **kwargs):
         pass
+
+
+@dataclass
+class ShortcutButtonInfo:
+    function: ShortcutButtonCallable
+    emoji: Union[str, discord.Emoji]
+    check: Callable[[MasterFilter, Any], bool] = lambda self, value: True
 
 
 @dataclass
@@ -437,6 +451,7 @@ class CommandSourceInfo:
     suffix_tab_aliases: Optional[Dict[str, int]] = None
     list_name: Optional[str] = None
     list_formatter: Optional[ListFormatterCallable] = None
+    shortcut_buttons: List[ShortcutButtonInfo] = dataclasses.field(default_factory=lambda: [])
 
 
 def command_source(
@@ -499,6 +514,22 @@ def command_source(
             return f
 
         func.list_formatter = list_formatter
+
+        def shortcut_button(emoji: Union[str, discord.Emoji]):
+            def decorator(func: ShortcutButtonCallable):
+                shortcut_info = ShortcutButtonInfo(func, emoji)
+                info.shortcut_buttons.append(shortcut_info)
+
+                def check(f):
+                    shortcut_info.check = f
+                    return f
+                func.check = check
+
+                return func
+
+            return decorator
+
+        func.shortcut_button = shortcut_button
 
         return func
 

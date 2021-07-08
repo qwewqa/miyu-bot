@@ -1,4 +1,4 @@
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Union, Callable, Coroutine
 
 import discord
 from discord import Interaction
@@ -59,6 +59,23 @@ class DetailToListButton(discord.ui.Button['FilterDetailView']):
         await log_usage('filter_detail_to_list_button')
 
 
+class ShortcutButton(discord.ui.Button['FilterDetailView']):
+    def __init__(self,
+                 emoji: Union[str, discord.Emoji],
+                 function: Callable,
+                 check: Callable,
+                 style=discord.ButtonStyle.secondary,
+                 **kwargs):
+        self.function = function
+        self.check = check
+        super(ShortcutButton, self).__init__(style=style, emoji=emoji, **kwargs)
+
+    async def callback(self, interaction: Interaction):
+        view = self.view
+        await self.function(view.master_filter, view.ctx, view.values[view.page_index], view.target_server, interaction)
+        await log_usage('filter_detail_shortcut_button')
+
+
 class FilterDetailView(UserRestrictedView):
     def __init__(self,
                  manager,
@@ -67,10 +84,12 @@ class FilterDetailView(UserRestrictedView):
                  values: List,
                  source: 'EmbedSourceCallable',
                  has_list_view: bool,
+                 shortcut_buttons: List,
                  *,
                  start_index: int = 0,
                  tabs: Optional[List] = None,
                  start_tab: Optional[int] = None,
+                 start_target_server: Optional[Server] = None,
                  **kwargs):
         super(FilterDetailView, self).__init__(**kwargs)
         self.manager = manager
@@ -78,7 +97,10 @@ class FilterDetailView(UserRestrictedView):
         self.ctx = ctx
         self.values = values
         self.servers = list(Server)
-        self._target_server_index = self.servers.index(ctx.preferences.server)
+        if start_target_server is not None:
+            self._target_server_index = self.servers.index(start_target_server)
+        else:
+            self._target_server_index = self.servers.index(ctx.preferences.server)
         self.fallback_server = ctx.preferences.server
         self.source = source if tabs is not None else self.wrap_tabless_source(source)
         self._page_index = start_index
@@ -94,32 +116,38 @@ class FilterDetailView(UserRestrictedView):
                 self.add_item(tab_button)
 
         row_offset = 1 if tabs is not None else 0
-        self.prev_button = PageChangeButton(-1, log_name='filter_detail_page_change', 
+        self.prev_button = PageChangeButton(-1, log_name='filter_detail_page_change',
                                             emoji='<:prev:860683672382603294>', row=row_offset)
-        self.next_button = PageChangeButton(1, log_name='filter_detail_page_change', 
+        self.next_button = PageChangeButton(1, log_name='filter_detail_page_change',
                                             emoji='<:next:860683672402526238>', row=row_offset)
         self.add_item(self.prev_button)
         self.add_item(self.next_button)
         self.add_item(DetailServerChangeButton(row=row_offset))
         self.detail_to_list_button = DetailToListButton(row=row_offset)
         self.add_item(self.detail_to_list_button)
-        if not has_list_view:
+        if not has_list_view or len(values) == 1:
             self.detail_to_list_button.disabled = True
         self.add_item(DeleteButton(row=row_offset))
-        self.large_decr_button = PageChangeButton(-20, log_name='filter_detail_page_change_extra', 
-                                                  label='-20', row=row_offset+1)
+        self.large_decr_button = PageChangeButton(-20, log_name='filter_detail_page_change_extra',
+                                                  label='-20', row=row_offset + 1)
         self.small_decr_button = PageChangeButton(-5, log_name='filter_detail_page_change_extra',
-                                                  label='-5', row=row_offset+1)
+                                                  label='-5', row=row_offset + 1)
         self.small_incr_button = PageChangeButton(5, log_name='filter_detail_page_change_extra',
-                                                  label='+5', row=row_offset+1)
+                                                  label='+5', row=row_offset + 1)
         self.large_incr_button = PageChangeButton(20, log_name='filter_detail_page_change_extra',
-                                                  label='+20', row=row_offset+1)
+                                                  label='+20', row=row_offset + 1)
         self.page_display_button = Button(disabled=True, style=discord.ButtonStyle.secondary, row=row_offset + 1)
         self.add_item(self.large_decr_button)
         self.add_item(self.small_decr_button)
         self.add_item(self.small_incr_button)
         self.add_item(self.large_incr_button)
         self.add_item(self.page_display_button)
+
+        self.shortcut_buttons = []
+        for shortcut in shortcut_buttons:
+            button = ShortcutButton(function=shortcut.function, check=shortcut.check, emoji=shortcut.emoji, row=3)
+            self.shortcut_buttons.append(button)
+            self.add_item(button)
 
         # Run setters
         self.page_index = start_index
@@ -175,6 +203,8 @@ class FilterDetailView(UserRestrictedView):
         else:
             server = self.fallback_server
         self.active_embed = self.source(self.master_filter, self.ctx, value, self.tab, server)
+        for shortcut in self.shortcut_buttons:
+            shortcut.disabled = not shortcut.check(self.master_filter, value)
 
     @staticmethod
     def wrap_tabless_source(source: 'EmbedSourceCallable') -> 'EmbedSourceCallable':

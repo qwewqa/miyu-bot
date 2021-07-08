@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Tuple, Optional
 
 import discord
 
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.deletable_message import DeletableMessageView
 from miyu_bot.commands.master_filter.filter_detail_view import FilterDetailView
 from miyu_bot.commands.master_filter.filter_list_view import FilterListView
@@ -17,7 +18,8 @@ class FilterDisplayManager:
                  results,
                  source,
                  *,
-                 page_size: int = 20):
+                 page_size: int = 20,
+                 target_server: Optional[Server] = None):
         values, index, tab, display = results
         self.master_filter = master_filter
         self.ctx = ctx
@@ -27,6 +29,7 @@ class FilterDisplayManager:
         self.page_size = page_size
         self.start_index = index
         self.start_tab = tab
+        self.target_server = target_server
         self.allowed_users = {self.ctx.bot.owner_id, self.ctx.author.id, *self.ctx.bot.owner_ids}
 
         self.tabs = None
@@ -48,11 +51,14 @@ class FilterDisplayManager:
 
     def get_detail_view(self,
                         start_index: Optional[int] = None,
-                        start_tab: Optional[int] = None) -> Tuple[discord.ui.View, discord.Embed]:
+                        start_tab: Optional[int] = None,
+                        target_server: Optional[Server] = None) -> Tuple[discord.ui.View, discord.Embed]:
         if start_index is None:
             start_index = self.start_index
         if start_tab is None:
             start_tab = self.start_tab
+        if target_server is None:
+            target_server = self.target_server
 
         if not self.values:
             embed = discord.Embed(title='No Results', description='N/A')
@@ -64,10 +70,12 @@ class FilterDisplayManager:
                                 self.ctx,
                                 self.values,
                                 self.source.embed_source,
+                                shortcut_buttons=self.source.shortcut_buttons,
                                 has_list_view=self.source.list_formatter is not None,
                                 start_index=start_index,
                                 tabs=self.tabs,
                                 start_tab=start_tab,
+                                start_target_server=target_server,
                                 allowed_users=self.allowed_users)
         return view, view.active_embed
 

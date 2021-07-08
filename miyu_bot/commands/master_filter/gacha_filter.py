@@ -294,3 +294,16 @@ class GachaFilter(MasterFilter[GachaMaster]):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
         attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
         return f'{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}'
+
+    @get_gacha_embed.shortcut_button(name='Pull')
+    async def event_shortcut(self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction):
+        await interaction.response.defer()
+        draw_data = [d for d in gacha.draw_data
+                     if (d.stock_id == 902) or (d.stock_id in (1, 2) and d.stock_amount == 3000)]
+        if len(draw_data) != 1:
+            await ctx.send('Unsupported banner.')
+            return
+        draw_data = draw_data[0]
+        gacha_cog = self.bot.cogs['Gacha']
+        embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(ctx.author, gacha, draw_data, ctx.assets)
+        await ctx.send(embed=embed, file=file)  # response won't allow sending a message

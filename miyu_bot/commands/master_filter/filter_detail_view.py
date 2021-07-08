@@ -64,7 +64,7 @@ class ShortcutButton(discord.ui.Button['FilterDetailView']):
                  emoji: Union[str, discord.Emoji],
                  function: Callable,
                  check: Callable,
-                 style=discord.ButtonStyle.secondary,
+                 style=discord.ButtonStyle.success,
                  **kwargs):
         self.function = function
         self.check = check

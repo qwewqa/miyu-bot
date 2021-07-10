@@ -9,7 +9,7 @@ from miyu_bot.bot.bot import PrefContext, MiyuBot
 from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.emoji import difficulty_emoji_ids
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
-    command_source
+    command_source, list_formatter
 
 
 class ChartFilter(MasterFilter[ChartMaster]):
@@ -128,6 +128,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         return value.difficulty
 
     @data_attribute('level',
+                    is_default_sort=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -301,17 +302,15 @@ class ChartFilter(MasterFilter[ChartMaster]):
             perfect_score_up_rate=0,
         )
 
-    @command_source(command_args=None,
-                    list_command_args=
-                    dict(name='charts',
-                         description='Lists charts.',
-                         help='!charts'),
-                    default_sort=level,
-                    list_name='chart-search')
+    @command_source(command_args=None)
     def get_chart_embed(self, ctx, chart: ChartMaster, server):
         return self.bot.master_filters.music.get_chart_embed(ctx, chart.music, chart.difficulty - 1, server)
 
-    @get_chart_embed.list_formatter
+    @list_formatter(name='chart-search',
+                    command_args=
+                    dict(name='charts',
+                         description='Lists charts.',
+                         help='!charts'))
     def format_chart_name(self, chart: ChartMaster):
         song = chart.music
         song_name = f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()

@@ -83,7 +83,6 @@ class FilterDetailView(UserRestrictedView):
                  ctx,
                  values: List,
                  source: 'EmbedSourceCallable',
-                 has_list_view: bool,
                  shortcut_buttons: List,
                  *,
                  start_index: int = 0,
@@ -125,8 +124,6 @@ class FilterDetailView(UserRestrictedView):
         self.add_item(DetailServerChangeButton(row=row_offset))
         self.detail_to_list_button = DetailToListButton(row=row_offset)
         self.add_item(self.detail_to_list_button)
-        if not has_list_view or len(values) == 1:
-            self.detail_to_list_button.disabled = True
         self.add_item(DeleteButton(row=row_offset))
         self.large_decr_button = PageChangeButton(-20, log_name='filter_detail_page_change_extra',
                                                   label='-20', row=row_offset + 1)

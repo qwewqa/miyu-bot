@@ -6,7 +6,7 @@ from d4dj_utils.master.login_bonus_master import LoginBonusMaster
 
 from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
-from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source
+from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source, list_formatter
 
 
 class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
@@ -24,6 +24,8 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
 
     @data_attribute('date',
                     aliases=['release', 'recent'],
+                    is_default_sort=True,
+                    is_default_display=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -59,15 +61,7 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
                     dict(name='login_bonus',
                          aliases=['loginbonus'],
                          description='Displays login bonus info.',
-                         help='!login_bonus'),
-                    list_command_args=
-                    dict(name='login_bonuses',
-                         aliases=['loginbonuses'],
-                         description='Lists login bonuses.',
-                         help='!login_bonuses'),
-                    default_sort=date,
-                    default_display=date,
-                    list_name='login-bonus-search')
+                         help='!login_bonus'))
     def get_login_bonus_embed(self, ctx, login_bonus: LoginBonusMaster, server):
         l10n = self.l10n[ctx]
 
@@ -111,6 +105,11 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
 
         return embed
 
-    @get_login_bonus_embed.list_formatter
+    @list_formatter(name='login-bonus-search',
+                    command_args=
+                    dict(name='login_bonuses',
+                         aliases=['loginbonuses'],
+                         description='Lists login bonuses.',
+                         help='!login_bonuses'))
     def format_login_bonus_title(self, login_bonus):
         return login_bonus.title

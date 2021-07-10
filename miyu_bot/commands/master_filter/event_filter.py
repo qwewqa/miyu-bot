@@ -11,7 +11,7 @@ from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, attribute_emoji_ids_by_attribute_id, \
     grey_emoji_id, event_point_emoji_id, parameter_bonus_emoji_ids_by_parameter_id
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source, \
-    DataAttributeInfo
+    DataAttributeInfo, list_formatter
 
 
 class EventFilter(MasterFilter[EventMaster]):
@@ -41,6 +41,8 @@ class EventFilter(MasterFilter[EventMaster]):
 
     @data_attribute('date',
                     aliases=['release', 'recent'],
+                    is_default_sort=True,
+                    is_default_display=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -130,14 +132,7 @@ class EventFilter(MasterFilter[EventMaster]):
     @command_source(command_args=
                     dict(name='event',
                          description='Displays event info.',
-                         help='!event cooking'),
-                    list_command_args=
-                    dict(name='events',
-                         description='Lists events.',
-                         help='!events'),
-                    default_sort=date,
-                    default_display=date,
-                    list_name='event-search')
+                         help='!event cooking'))
     def get_event_embed(self, ctx, event: EventMaster, server):
         l10n = self.l10n[ctx]
 
@@ -207,7 +202,11 @@ class EventFilter(MasterFilter[EventMaster]):
 
         return embed
 
-    @get_event_embed.list_formatter
+    @list_formatter(name='event-search',
+                    command_args=
+                    dict(name='events',
+                         description='Lists events.',
+                         help='!events'))
     def format_event_name_for_list(self, ctx, event: EventMaster):
         bonuses = event.bonus.characters
         units = {character.unit.id for character in bonuses}

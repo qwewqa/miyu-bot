@@ -11,7 +11,7 @@ from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, grey_emoji_id, difficulty_emoji_ids
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
-    command_source
+    command_source, list_formatter
 
 
 class MusicFilter(MasterFilter[MusicMaster]):
@@ -32,6 +32,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
 
     @data_attribute('date',
                     aliases=['release', 'recent'],
+                    is_default_sort=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -100,6 +101,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
             return self.chart_designers_by_name[s.lower()]
 
     @data_attribute('level',
+                    is_default_display=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -309,15 +311,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     dict(name='song',
                          aliases=['music'],
                          description='Displays song info.',
-                         help='!song grgr'),
-                    list_command_args=
-                    dict(name='songs',
-                         aliases=['musics'],
-                         description='Lists songs.',
-                         help='!songs'),
-                    default_sort=date,
-                    default_display=level,
-                    list_name='song-search')
+                         help='!song grgr'))
     def get_song_embed(self, ctx, song: MusicMaster, server):
         l10n = self.l10n[ctx]
 
@@ -377,7 +371,6 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     dict(name='chart',
                          description='Displays chart info.',
                          help='!chart grgr'),
-                    default_sort=date,
                     tabs=list(difficulty_emoji_ids.values()),
                     default_tab=3,
                     suffix_tab_aliases=difficulty_names)
@@ -437,7 +430,6 @@ class MusicFilter(MasterFilter[MusicMaster]):
                          aliases=['mixinfo', 'mix_info'],
                          description='Displays chart mix section info.',
                          help='!sections grgr'),
-                    default_sort=date,
                     tabs=list(difficulty_emoji_ids.values()),
                     default_tab=3,
                     suffix_tab_aliases=difficulty_names)
@@ -493,9 +485,12 @@ class MusicFilter(MasterFilter[MusicMaster]):
 
         return embed
 
-    @get_song_embed.list_formatter
-    @get_chart_embed.list_formatter
-    @get_sections_embed.list_formatter
+    @list_formatter(name='song-search',
+                    command_args=
+                    dict(name='songs',
+                         aliases=['musics'],
+                         description='Lists songs.',
+                         help='!songs'))
     def format_song_title(self, song):
         return f'`{self.bot.get_emoji(unit_emoji_ids_by_unit_id.get(song.unit_id, grey_emoji_id))}` {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()
 

@@ -12,7 +12,7 @@ from miyu_bot.bot.bot import PrefContext
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, attribute_emoji_ids_by_attribute_id, grey_emoji_id
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, DataAttributeInfo, \
-    command_source
+    command_source, list_formatter
 
 
 class GachaFilter(MasterFilter[GachaMaster]):
@@ -30,6 +30,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
     @data_attribute('date',
                     aliases=['release', 'recent'],
+                    is_default_sort=True,
+                    is_default_display=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True)
@@ -107,15 +109,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                     dict(name='banner',
                          aliases=['gacha'],
                          description='Displays gacha banner info.',
-                         help='!banner Shiny Smily Scratch'),
-                    list_command_args=
-                    dict(name='banners',
-                         aliases=['gachas'],
-                         description='Lists gacha banners.',
-                         help='!banners'),
-                    default_sort=date,
-                    default_display=date,
-                    list_name='gacha-search')
+                         help='!banner Shiny Smily Scratch'))
     def get_gacha_embed(self, ctx, gacha: GachaMaster, server):
         l10n = self.l10n[ctx]
 
@@ -172,8 +166,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                                   'banner_rate', 'bannerrate', 'gacha_rate', 'gacharate',
                                   'banner_table', 'bannertable', 'gacha_table', 'gachatable'],
                          description='Displays gacha banner rate info.',
-                         help='!banner_rates Shiny Smily Scratch'),
-                    default_sort=date)
+                         help='!banner_rates Shiny Smily Scratch'))
     def get_gacha_table_embed(self, ctx, gacha: GachaMaster, server):
         l10n = self.l10n[ctx]
 
@@ -232,8 +225,12 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
         return embed
 
-    @get_gacha_embed.list_formatter
-    @get_gacha_table_embed.list_formatter
+    @list_formatter(name='gacha-search',
+                    command_args=
+                    dict(name='banners',
+                         aliases=['gachas'],
+                         description='Lists gacha banners.',
+                         help='!banners'))
     def format_gacha_name_for_list(self, ctx, gacha):
         pick_ups = gacha.pick_up_cards
         units = {card.character.unit.id for card in pick_ups}
@@ -305,5 +302,5 @@ class GachaFilter(MasterFilter[GachaMaster]):
             return
         draw_data = draw_data[0]
         gacha_cog = self.bot.cogs['Gacha']
-        embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(ctx.author, gacha, draw_data, ctx.assets)
+        embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(interaction.user, gacha, draw_data, ctx.assets)
         await ctx.send(embed=embed, file=file)  # response won't allow sending a message

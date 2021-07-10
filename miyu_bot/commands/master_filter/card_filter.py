@@ -13,7 +13,7 @@ from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import attribute_emoji_ids_by_attribute_id, unit_emoji_ids_by_unit_id, \
     parameter_bonus_emoji_ids_by_parameter_id, rarity_emoji_ids
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_attribute, command_source, \
-    DataAttributeInfo
+    DataAttributeInfo, list_formatter
 
 
 class CardFilter(MasterFilter[CardMaster]):
@@ -80,6 +80,7 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @data_attribute('power',
                     aliases=['pow', 'bp'],
+                    is_default_display=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True,
@@ -132,6 +133,7 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @data_attribute('date',
                     aliases=['release', 'recent'],
+                    is_default_sort=True,
                     is_sortable=True,
                     is_comparable=True,
                     reverse_sort=True,
@@ -247,16 +249,9 @@ class CardFilter(MasterFilter[CardMaster]):
                     dict(name='card',
                          description='Displays card info.',
                          help='!card secretcage'),
-                    list_command_args=
-                    dict(name='cards',
-                         description='Lists cards.',
-                         help='!cards'),
-                    default_sort=date,
-                    default_display=power,
                     tabs=list(rarity_emoji_ids.values()),
                     default_tab=1,
-                    suffix_tab_aliases={'untrained': 0, 'trained': 1},
-                    list_name='card-search')
+                    suffix_tab_aliases={'untrained': 0, 'trained': 1})
     def get_card_embed(self, ctx, card: CardMaster, limit_break, server):
         l10n = self.l10n[ctx]
 
@@ -315,7 +310,11 @@ class CardFilter(MasterFilter[CardMaster]):
     def format_card_name(self, card):
         return f'{card.rarity_id}★ {card.name} {card.character.full_name_english}'
 
-    @get_card_embed.list_formatter
+    @list_formatter(name='card-search',
+                    command_args=
+                    dict(name='cards',
+                         description='Lists cards.',
+                         help='!cards'))
     def format_card_name_for_list(self, card):
         unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
         attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])

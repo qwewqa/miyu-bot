@@ -7,6 +7,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import re
+import typing
 from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
@@ -29,15 +30,29 @@ from miyu_bot.commands.master_filter.localization_manager import LocalizationMan
 
 class MasterFilterMeta(ABCMeta):
     def __new__(mcs, name, bases, namespace, **kwargs):
+        # Doesn't support subclassing
+        if bases == (typing.Generic,):
+            # Skip for base class
+            return super().__new__(mcs, name, bases, namespace, **kwargs)
         command_sources = []
         data_attributes = []
+        list_formatters = []
         for k, v in namespace.items():
             if data_info := getattr(v, '_data_attribute_info', False):
                 data_attributes.append(data_info)
             if command_info := getattr(v, '_command_source_info', False):
                 command_sources.append(command_info)
+            if command_info := getattr(v, '_list_formatter_info', False):
+                list_formatters.append(command_info)
         namespace['_data_attributes'] = data_attributes
+        if not command_sources:
+            raise ValueError('No command sources found.')
         namespace['_command_sources'] = command_sources
+        if len(list_formatters) > 1:
+            raise ValueError('Multiple list formatters found.')
+        if not list_formatters:
+            raise ValueError('No list formatter found.')
+        namespace['_list_formatter'] = list_formatters[0]
         return super().__new__(mcs, name, bases, namespace, **kwargs)
 
 
@@ -48,9 +63,13 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
     # Note: only works for masters that have an id field
 
     _command_sources: List[CommandSourceInfo]
-    _data_attributes: List[DataAttributeInfo]
     command_sources: List[CommandSourceInfo]
+    _data_attributes: List[DataAttributeInfo]
     data_attributes: List[DataAttributeInfo]
+    _list_formatter: ListFormatterInfo
+    list_formatter: ListFormatterInfo
+    default_sort: Optional[DataAttributeInfo]
+    default_display: Optional[DataAttributeInfo]
     l10n: LocalizationManager
 
     def __init__(self, bot: MiyuBot, master_name: str, name: str):
@@ -61,6 +80,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         self.unrestricted_filter = defaultdict(lambda: FuzzyFilteredMap())
         self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
         self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
+        self.list_formatter = dataclasses.replace(self._list_formatter)
+        self.default_sort = next((da for da in self.data_attributes if da.is_default_sort), None)
+        self.default_display = next((da for da in self.data_attributes if da.is_default_display), None)
         self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + '.ftl')
         for d in self.data_attributes:
             if init_function := d.init_function:
@@ -183,38 +205,41 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             return wrapped
 
         for cs in self.command_sources:
-            if include_self_parameter:
-                if args := cs.command_args:
+            if args := cs.command_args:
+                if include_self_parameter:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         wrap(self.get_detail_command_function(cs)))
-                if args := cs.list_command_args:
-                    yield commands.command(**{**args,
-                                              'description': args.get('description',
-                                                                      'No Description')})(
-                        wrap(self.get_list_command_function(cs)))
-            else:
-                if args := cs.command_args:
+                else:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         self.get_detail_command_function(cs))
-                if args := cs.list_command_args:
+        if self.list_formatter:
+            cs = self.list_formatter
+            if args := cs.command_args:
+                if include_self_parameter:
                     yield commands.command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
-                        self.get_list_command_function(cs))
+                        wrap(self.get_list_command_function()))
+                else:
+
+                    yield commands.command(**{**args,
+                                              'description': args.get('description',
+                                                                      'No Description')})(
+                        wrap(self.get_list_command_function()))
 
     def get_detail_command_function(self, source):
-        if hasattr(source, '_command_source_info'):
-            source = source._command_source_info
+        if hasattr(source, '_list_formatter_info'):
+            source = source._list_formatter_info
 
         filter_processor = FilterProcessor(self, source)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            results = filter_processor.get(arg, ctx, is_list=False)
+            results = filter_processor.get(arg, ctx)
             view, embed = FilterDisplayManager(self, ctx, results, source).get_detail_view()
             await ctx.send(embed=embed, view=view)
 
@@ -225,19 +250,13 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             source = source._command_source_info
         return FilterDisplayManager(self, ctx, (values, 0, None, None), source, target_server=server).get_detail_view()
 
-    def get_list_command_function(self, source):
-        if hasattr(source, '_command_source_info'):
-            source = source._command_source_info
-
-        if not source.list_formatter:
-            raise ValueError('Command source does not have a list formatter.')
-
-        filter_processor = FilterProcessor(self, source)
+    def get_list_command_function(self):
+        filter_processor = FilterProcessor(self)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
-            results = filter_processor.get(arg, ctx, is_list=True)
-            view, embed = FilterDisplayManager(self, ctx, results, source).get_list_view()
+            results = filter_processor.get(arg, ctx)
+            view, embed = FilterDisplayManager(self, ctx, results, self.command_sources[0]).get_list_view()
             await ctx.send(embed=embed, view=view)
 
         return command
@@ -254,7 +273,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
 
 class FilterProcessor:
-    def __init__(self, master_filter: MasterFilter, source: CommandSourceInfo):
+    def __init__(self, master_filter: MasterFilter, source: Optional[CommandSourceInfo] = None):
+        # source is None for the list command
         self.master_filter = master_filter
         self.source = source
         data_attributes = master_filter.data_attributes
@@ -275,7 +295,7 @@ class FilterProcessor:
 
         self.sort_arguments = sort_arguments
 
-    def get(self, arg: ParsedArguments, ctx, is_list: bool) -> FilterResult:
+    def get(self, arg: ParsedArguments, ctx) -> FilterResult:
         start_index = 0
         display = None
         sort = None
@@ -319,8 +339,8 @@ class FilterProcessor:
             start_index = int(text.strip()[1:]) - 1
             text = ''
 
-        start_tab = self.source.default_tab
-        if not is_list:
+        start_tab = 0
+        if self.source:
             start_tab = self.source.default_tab
             if self.source.suffix_tab_aliases:
                 words = text.split()
@@ -372,16 +392,16 @@ class FilterProcessor:
                     operator = list_operator_for(operation)
                 values = [v for v in values if operator(attr.accessor(self.master_filter, ctx, v), argument_value)]
 
-        if self.source.default_sort and not text:
-            values = sorted(values, key=lambda v: self.source.default_sort.accessor(self.master_filter, ctx, v))
-            if self.source.default_sort.reverse_sort ^ bool(sort and reverse_sort):
+        if self.master_filter.default_sort and not text:
+            values = sorted(values, key=lambda v: self.master_filter.default_sort.accessor(self.master_filter, ctx, v))
+            if self.master_filter.default_sort.reverse_sort ^ bool(sort and reverse_sort):
                 values = values[::-1]
         if sort:
             values = sorted(values, key=lambda v: sort.accessor(self.master_filter, ctx, v))
         if reverse_sort:
             values = values[::-1]
 
-        display = display or self.source.default_display
+        display = display or self.master_filter.default_display
 
         if is_relative_only and current in values:
             start_index = values.index(current)
@@ -425,7 +445,6 @@ ESC = TypeVar('ESC', bound=EmbedSourceCallable)
 
 
 class AnnotatedEmbedSourceCallable(Protocol[ESC]):
-    list_formatter: ListFormatterCallable
     shortcut_button: Callable
 
     def __call__(self, *args, **kwargs):
@@ -444,77 +463,48 @@ class ShortcutButtonInfo:
 class CommandSourceInfo:
     embed_source: Optional[EmbedSourceCallable] = None
     command_args: Optional[Dict[str, Any]] = None
-    list_command_args: Optional[Dict[str, Any]] = None
-    default_sort: Optional[DataAttributeInfo] = None
-    default_display: Optional[DataAttributeInfo] = None
     tabs: Optional[Sequence[AnyEmoji]] = None
     default_tab: int = 0
     suffix_tab_aliases: Optional[Dict[str, int]] = None
-    list_name: Optional[str] = None
-    list_formatter: Optional[ListFormatterCallable] = None
     shortcut_buttons: List[ShortcutButtonInfo] = dataclasses.field(default_factory=lambda: [])
+
+    def __call__(self, *args, **kwargs):
+        return self.embed_source(*args, **kwargs)
+
+
+@dataclass
+class ListFormatterInfo:
+    formatter: Optional[ListFormatterCallable]
+    name: Optional[str] = None
+    command_args: Optional[Dict[str, Any]] = None
+
+    def __call__(self, *args, **kwargs):
+        return self.formatter(*args, **kwargs)
 
 
 def command_source(
         *,
         command_args: Optional[Dict[str, Any]] = None,
-        list_command_args: Optional[Dict[str, Any]] = None,
-        default_sort: Optional[Union[DataAttributeInfo, Callable]] = None,
-        default_display: Optional[Union[DataAttributeInfo, Callable]] = None,
         tabs: Optional[Sequence[AnyEmoji]] = None,
         default_tab: int = 0,
         suffix_tab_aliases: Optional[Dict[str, int]] = None,
-        list_name: Optional[str] = None,
 ) -> Callable[[EmbedSourceCallable], AnnotatedEmbedSourceCallable]:
     """A decorator that marks a function as an command source.
 
     The function should have, apart from the self parameter, either two more parameters
     if ``tabs`` is not specified, one for the context and one for the master asset,
     or three more with an additional parameter for the tab index.
-
-    Parameters
-    ----------
-    command_args
-        A dict containing the arguments to supply to the Command constructor for the detail command.
-        If this is not supplied, no detail command will be created.
-    list_command_args
-        A dict containing the arguments to supply to the Command constructor for the list command.
-        If this is not supplied, no list command will be created.
-    default_sort
-        The default ``data_attribute`` to sort by, which should be sortable.
-        If not supplied, default order is preserved.
-    default_display
-        The default ``data_attribute`` to display in lists, if any, which should have a formatter.
-        If not supplied, defaults to no display.
-    tabs
-        A list of emoji and emoji ids to use for tab buttons.
-    default_tab
-        The default tab index if ``tabs`` is specified. Defaults to 0.
-    suffix_tab_aliases
-        A dict mapping potential final search term words with tab indexes.
-    list_name
-        The name to use in the header of the list command.
     """
 
     def decorator(func: EmbedSourceCallable) -> AnnotatedEmbedSourceCallable:
         info = CommandSourceInfo(
             command_args=command_args,
-            list_command_args=list_command_args,
             embed_source=func,
-            default_sort=getattr(default_sort, '_data_attribute_info', default_sort),
-            default_display=getattr(default_display, '_data_attribute_info', default_display),
             tabs=tabs,
             default_tab=default_tab,
             suffix_tab_aliases=suffix_tab_aliases,
-            list_name=list_name,
         )
         func._command_source_info = info
-
-        def list_formatter(f):
-            info.list_formatter = _get_accessor(f)
-            return f
-
-        func.list_formatter = list_formatter
 
         def shortcut_button(*, name: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji]] = None):
             def decorator(func: ShortcutButtonCallable):
@@ -524,6 +514,7 @@ def command_source(
                 def check(f):
                     shortcut_info.check = f
                     return f
+
                 func.check = check
 
                 return func
@@ -540,19 +531,15 @@ def command_source(
 def list_formatter(
         *,
         name: str,
-        list_command_args: Optional[Dict[str, Any]],
-        default_sort: Optional[Union[DataAttributeInfo, Callable]] = None,
-        default_display: Optional[Union[DataAttributeInfo, Callable]] = None,
+        command_args: Optional[Dict[str, Any]],
 ) -> Callable[[Callable], Callable]:
     def decorator(func):
-        info = CommandSourceInfo(
-            list_formatter=_get_accessor(func),
-            list_command_args=list_command_args,
-            default_sort=getattr(default_sort, '_data_attribute_info', default_sort),
-            default_display=getattr(default_display, '_data_attribute_info', default_display),
-            list_name=name,
+        info = ListFormatterInfo(
+            formatter=_get_accessor(func),
+            name=name,
+            command_args=command_args,
         )
-        func._command_source_info = info
+        func._list_formatter_info = info
 
         return func
 
@@ -567,6 +554,8 @@ class DataAttributeInfo:
     accessor: Callable
     formatter: Optional[Callable] = None
     value_mapping: Optional[Dict[str, Any]] = None
+    is_default_sort: bool = False
+    is_default_display: bool = False
     is_flag: bool = False
     flag_callback: Optional[Callable] = None
     is_tag: bool = False
@@ -590,6 +579,8 @@ def data_attribute(
         aliases: Optional[List[str]] = None,
         description: Optional[str] = None,
         value_mapping: Optional[Dict[str, Any]] = None,
+        is_default_sort: bool = False,
+        is_default_display: bool = False,
         is_flag: bool = False,
         is_tag: bool = False,
         is_keyword: bool = False,
@@ -617,6 +608,12 @@ def data_attribute(
     value_mapping
         A dict mapping strings to potential return values.
         Used for keywords, tags, and as eq.
+    is_default_sort
+        Whether this attribute is the default for sort order.
+        Should only be true for one or no attribute.
+    is_default_display
+        Whether this attribute is the default for list display.
+        Should only be true for one or no attribute.
     is_flag
         Marks the attribute as a flag.
         If a flag_callback is declared, it is called instead of using default behavior.
@@ -652,6 +649,8 @@ def data_attribute(
             description=description,
             accessor=_get_accessor(func),
             value_mapping=value_mapping,
+            is_default_sort=is_default_sort,
+            is_default_display=is_default_display,
             is_flag=is_flag,
             is_tag=is_tag,
             is_keyword=is_keyword,

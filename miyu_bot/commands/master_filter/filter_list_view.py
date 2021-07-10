@@ -17,15 +17,14 @@ class FilterListItemSelect(discord.ui.Select['FilterListView']):
 
 
 class FilterListView(PagedMessageView):
-    def __init__(self, manager, select_option_details: List, page_size: int, has_detail_view: bool, *args, **kwargs):
+    def __init__(self, manager, select_option_details: List, page_size: int, *args, **kwargs):
         self.manager = manager
         self.select_option_details = [(f'{i}. {name[0][:19]}', name[1][:50], name[2])
                                       for i, name in enumerate(select_option_details, 1)]
         self.page_size = page_size
         self.item_select = FilterListItemSelect(placeholder='Details', row=3)
         super(FilterListView, self).__init__(*args, **kwargs)
-        if has_detail_view:
-            self.add_item(self.item_select)
+        self.add_item(self.item_select)
 
     @PagedMessageView.page_index.setter
     def page_index(self, value):

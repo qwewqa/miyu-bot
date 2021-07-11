@@ -216,7 +216,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         return value.music.is_released and not value.music.is_hidden and value.music.id > 3
 
     @data_attribute('score[skill%]',
-                    regex=re.compile(r'score(\d{1,7})'),
+                    regex=re.compile(r'score\[?(\d{1,7})%?]?'),
                     is_sortable=True,
                     reverse_sort=True,
                     help_sample_argument='score50')
@@ -232,7 +232,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         return f'{self.get_chart_score_formatted(value, score, fever=True)}  {self.format_song_duration(value)} '
 
     @data_attribute('score[skill%]solo',
-                    regex=re.compile(r'score(\d{1,7})solo'),
+                    regex=re.compile(r'score\[?(\d{1,7})%?]?solo'),
                     is_sortable=True,
                     reverse_sort=True,
                     help_sample_argument='score50solo')

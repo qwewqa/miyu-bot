@@ -45,6 +45,24 @@ class DetailServerChangeButton(discord.ui.Button['FilterDetailView']):
                                                 ephemeral=True)
         await log_usage('filter_detail_server_change_button')
 
+class DetailCommandChangeButton(discord.ui.Button['FilterDetailView']):
+    def __init__(self,
+                 style=discord.ButtonStyle.secondary,
+                 emoji='<:switch:863651880861171733>',
+                 **kwargs):
+        super(DetailCommandChangeButton, self).__init__(style=style, emoji=emoji, **kwargs)
+
+    async def callback(self, interaction: Interaction):
+        assert self.view is not None
+        command_sources = self.view.master_filter.command_sources
+        new_source = command_sources[(command_sources.index(self.view.source_info) + 1) % len(command_sources)]
+        view = FilterDetailView(self.view.master_filter, self.view.ctx, self.view.base_results, source_info=new_source)
+        view.page_index = self.view.page_index
+        embed = view.active_embed
+        await interaction.response.edit_message(embed=embed, view=view)
+        self.view.stop()
+        await log_usage('filter_detail_command_change_button')
+
 
 class DetailToListButton(discord.ui.Button['FilterDetailView']):
     def __init__(self,
@@ -97,7 +115,8 @@ class FilterDetailView(UserRestrictedView):
         self.servers = list(Server)
         self._target_server_index = self.servers.index(ctx.preferences.server)
         self.fallback_server = ctx.preferences.server
-        self.source = source_info.embed_source if source_info.tabs is not None else self.wrap_tabless_source(
+        self.source_info = source_info
+        self.embed_source = source_info.embed_source if source_info.tabs is not None else self.wrap_tabless_source(
             source_info.embed_source)
         self._page_index = results.start_index
         self.max_page_index = len(results.values) - 1
@@ -109,11 +128,11 @@ class FilterDetailView(UserRestrictedView):
                 self._tab = source_info.default_tab
         else:
             self._tab = None
-        self.active_embed = self.source(master_filter,
-                                        ctx,
-                                        self.values[self.page_index],
-                                        self.tab,
-                                        ctx.preferences.server)
+        self.active_embed = self.embed_source(master_filter,
+                                              ctx,
+                                              self.values[self.page_index],
+                                              self.tab,
+                                              ctx.preferences.server)
 
         self.tab_buttons = []
         if (tabs := source_info.tabs) is not None:
@@ -122,26 +141,28 @@ class FilterDetailView(UserRestrictedView):
                 self.tab_buttons.append(tab_button)
                 self.add_item(tab_button)
 
-        row_offset = 1 if tabs is not None else 0
         self.prev_button = PageChangeButton(-1, log_name='filter_detail_page_change',
-                                            emoji='<:prev:860683672382603294>', row=row_offset)
+                                            emoji='<:prev:860683672382603294>', row=1)
         self.next_button = PageChangeButton(1, log_name='filter_detail_page_change',
-                                            emoji='<:next:860683672402526238>', row=row_offset)
+                                            emoji='<:next:860683672402526238>', row=1)
         self.add_item(self.prev_button)
         self.add_item(self.next_button)
-        self.add_item(DetailServerChangeButton(row=row_offset))
-        self.detail_to_list_button = DetailToListButton(row=row_offset)
+        self.detail_to_list_button = DetailToListButton(row=1)
         self.add_item(self.detail_to_list_button)
-        self.add_item(DeleteButton(row=row_offset))
+        self.command_change_button = DetailCommandChangeButton(row=1)
+        self.add_item(self.command_change_button)
+        if len(master_filter.command_sources) <= 1:
+            self.command_change_button.disabled = True
+        self.add_item(DeleteButton(row=1))
         self.large_decr_button = PageChangeButton(-20, log_name='filter_detail_page_change_extra',
-                                                  label='-20', row=row_offset + 1)
+                                                  label='-20', row=2)
         self.small_decr_button = PageChangeButton(-5, log_name='filter_detail_page_change_extra',
-                                                  label='-5', row=row_offset + 1)
+                                                  label='-5', row=2)
         self.small_incr_button = PageChangeButton(5, log_name='filter_detail_page_change_extra',
-                                                  label='+5', row=row_offset + 1)
+                                                  label='+5', row=2)
         self.large_incr_button = PageChangeButton(20, log_name='filter_detail_page_change_extra',
-                                                  label='+20', row=row_offset + 1)
-        self.page_display_button = Button(disabled=True, style=discord.ButtonStyle.secondary, row=row_offset + 1)
+                                                  label='+20', row=2)
+        self.page_display_button = Button(disabled=True, style=discord.ButtonStyle.secondary, row=2)
         self.add_item(self.large_decr_button)
         self.add_item(self.small_decr_button)
         self.add_item(self.small_incr_button)
@@ -213,7 +234,7 @@ class FilterDetailView(UserRestrictedView):
             server = target_server
         else:
             server = self.fallback_server
-        self.active_embed = self.source(self.master_filter, self.ctx, value, self.tab, server)
+        self.active_embed = self.embed_source(self.master_filter, self.ctx, value, self.tab, server)
         for shortcut in self.shortcut_buttons:
             shortcut.disabled = not shortcut.check(self.master_filter, value)
 

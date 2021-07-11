@@ -30,20 +30,34 @@ class DetailTabButton(discord.ui.Button['FilterDetailView']):
         await interaction.response.edit_message(embed=self.view.active_embed, view=self.view)
 
 
-class DetailServerChangeButton(discord.ui.Button['FilterDetailView']):
+SERVER_EMOJI = {
+    Server.JP: '🇯🇵',
+    Server.EN: '🇺🇸',  # AmE
+}
+
+
+class DetailServerShortcutButton(discord.ui.Button['FilterDetailView']):
     def __init__(self,
+                 server: Server,
                  style=discord.ButtonStyle.secondary,
-                 emoji='<:globe:860687306889494569>',
                  **kwargs):
-        super(DetailServerChangeButton, self).__init__(style=style, emoji=emoji, **kwargs)
+        self.server = server
+        emoji = SERVER_EMOJI[server]
+        super(DetailServerShortcutButton, self).__init__(style=style, emoji=emoji, **kwargs)
 
     async def callback(self, interaction: Interaction):
         assert self.view is not None
-        self.view.target_server_index += 1
-        await interaction.message.edit(embed=self.view.active_embed, view=self.view)
-        await interaction.response.send_message(f'Target server set to {self.view.target_server.name}.',
-                                                ephemeral=True)
-        await log_usage('filter_detail_server_change_button')
+        value = self.view.master_filter.get_by_id(self.view.active_value.id, self.view.ctx, self.server)
+        if value is None:
+            await interaction.response.semd_message('Value not available for server.', ephemeral=True)
+            await log_usage('filter_detail_server_shortcut_button')
+        view, embed = self.view.master_filter.get_simple_detail_view(self.view.ctx,
+                                                                     [value],
+                                                                     self.server,
+                                                                     self.view.source_info)
+        await interaction.response.send_message(embed=embed, view=view)
+        await log_usage('filter_detail_server_shortcut_button')
+
 
 class DetailCommandChangeButton(discord.ui.Button['FilterDetailView']):
     def __init__(self,
@@ -94,7 +108,7 @@ class ShortcutButton(discord.ui.Button['FilterDetailView']):
 
     async def callback(self, interaction: Interaction):
         view = self.view
-        await self.function(view.master_filter, view.ctx, view.values[view.page_index], view.target_server, interaction)
+        await self.function(view.master_filter, view.ctx, view.values[view.page_index], view.server, interaction)
         await log_usage('filter_detail_shortcut_button')
 
 
@@ -112,9 +126,7 @@ class FilterDetailView(UserRestrictedView):
         self.ctx = ctx
         self.base_results = results
         self.values = results.values
-        self.servers = list(Server)
-        self._target_server_index = self.servers.index(ctx.preferences.server)
-        self.fallback_server = ctx.preferences.server
+        self.server = results.server
         self.source_info = source_info
         self.embed_source = source_info.embed_source if source_info.tabs is not None else self.wrap_tabless_source(
             source_info.embed_source)
@@ -169,11 +181,17 @@ class FilterDetailView(UserRestrictedView):
         self.add_item(self.large_incr_button)
         self.add_item(self.page_display_button)
 
+        self.server_buttons = []
+        for server in SERVER_EMOJI.keys():
+            server_button = DetailServerShortcutButton(server=server, row=3)
+            self.server_buttons.append(server_button)
+            self.add_item(server_button)
+
         self.shortcut_buttons = []
         for shortcut in source_info.shortcut_buttons:
             button = ShortcutButton(function=shortcut.function, check=shortcut.check,
                                     label=master_filter.l10n[ctx.preferences.language].format_value(shortcut.name),
-                                    emoji=shortcut.emoji, row=3)
+                                    emoji=shortcut.emoji, row=4)
             self.shortcut_buttons.append(button)
             self.add_item(button)
 
@@ -182,37 +200,17 @@ class FilterDetailView(UserRestrictedView):
         self.tab = self.tab
 
     @property
+    def active_value(self):
+        return self.values[self.page_index]
+
+    @property
     def page_index(self):
         return self._page_index
 
     @page_index.setter
     def page_index(self, value):
         self._page_index = max(0, min(value, self.max_page_index))
-        self.update_embed()
-        self.prev_button.disabled = self._page_index == 0
-        self.large_decr_button.disabled = self._page_index == 0
-        self.small_decr_button.disabled = self._page_index == 0
-        self.next_button.disabled = self._page_index == self.max_page_index
-        self.large_incr_button.disabled = self._page_index == self.max_page_index
-        self.small_incr_button.disabled = self._page_index == self.max_page_index
-        self.page_display_button.label = f'{self._page_index + 1}/{self.max_page_index + 1}'
-
-    @property
-    def target_server(self):
-        return self.servers[self.target_server_index]
-
-    @target_server.setter
-    def target_server(self, value):
-        self.target_server_index = self.servers.index(value)
-
-    @property
-    def target_server_index(self):
-        return self._target_server_index
-
-    @target_server_index.setter
-    def target_server_index(self, value):
-        self._target_server_index = value % len(self.servers)
-        self.update_embed()
+        self.update()
 
     @property
     def tab(self):
@@ -224,19 +222,34 @@ class FilterDetailView(UserRestrictedView):
             self.tab_buttons[self._tab].disabled = False
             self.tab_buttons[value].disabled = True
         self._tab = value
-        self.update_embed()
+        self.update()
 
-    def update_embed(self):
+    def server_available(self, server):
+        return self.master_filter.get_by_id(self.active_value.id, self.ctx, server) is not None
+
+    def update(self):
         value = self.values[self.page_index]
-        target_server = self.target_server
-        if target_server_value := self.master_filter.get_by_id(value.id, self.ctx, target_server):
-            value = target_server_value
-            server = target_server
-        else:
-            server = self.fallback_server
-        self.active_embed = self.embed_source(self.master_filter, self.ctx, value, self.tab, server)
-        for shortcut in self.shortcut_buttons:
-            shortcut.disabled = not shortcut.check(self.master_filter, value)
+        self.active_embed = self.embed_source(self.master_filter, self.ctx, value, self.tab, self.server)
+        self.prev_button.disabled = self._page_index == 0
+        self.large_decr_button.disabled = self._page_index == 0
+        self.small_decr_button.disabled = self._page_index == 0
+        self.next_button.disabled = self._page_index == self.max_page_index
+        self.large_incr_button.disabled = self._page_index == self.max_page_index
+        self.small_incr_button.disabled = self._page_index == self.max_page_index
+        self.page_display_button.label = f'{self._page_index + 1}/{self.max_page_index + 1}'
+        for server_button in self.server_buttons:
+            if server_button.server == self.server:
+                server_button.style = discord.ButtonStyle.success
+                server_button.disabled = True
+            else:
+                if self.server_available(server_button.server):
+                    server_button.style = discord.ButtonStyle.success
+                    server_button.disabled = False
+                else:
+                    server_button.style = discord.ButtonStyle.secondary
+                    server_button.disabled = True
+        for shortcut_button in self.shortcut_buttons:
+            shortcut_button.disabled = not shortcut_button.check(self.master_filter, value)
 
     @staticmethod
     def wrap_tabless_source(source: 'EmbedSourceCallable') -> 'EmbedSourceCallable':

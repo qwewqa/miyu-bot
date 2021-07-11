@@ -2,6 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import List, Optional, TYPE_CHECKING
 
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.argument_parsing import list_to_list_operator_for, list_operator_for, ParsedArguments
 
 if TYPE_CHECKING:
@@ -13,9 +14,11 @@ class FilterResults:
     master_filter: 'MasterFilter'
     command_source_info: Optional['CommandSourceInfo']
     values: List
+    server: Server
     start_index: int = 0
     start_tab_name: Optional[str] = None
     display: Optional['DataAttributeInfo'] = None
+
 
 class FilterProcessor:
     def __init__(self, master_filter: 'MasterFilter', source: Optional['CommandSourceInfo'] = None):
@@ -154,4 +157,10 @@ class FilterProcessor:
 
         start_index = min(len(values) - 1, max(0, start_index))
 
-        return FilterResults(self.master_filter, self.source, values, start_index, start_tab, display)
+        return FilterResults(master_filter=self.master_filter,
+                             command_source_info=self.source,
+                             values=values,
+                             server=ctx.preferences.server,
+                             start_index=start_index,
+                             start_tab_name=start_tab,
+                             display=display)

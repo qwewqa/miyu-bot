@@ -71,6 +71,7 @@ class FilterListView(PagedMessageView):
                                              *args,
                                              **kwargs)
         self.add_item(self.item_select)
+        self.set_item_index(results.start_index)
 
     def set_item_index(self, value):
         self.page_index = value // self.page_size

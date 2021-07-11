@@ -177,3 +177,24 @@ text argument.
 !chart synchro hard
 !card shinobu untrained
 ```
+
+## Common arguments
+All *Info* commands share the following common arguments.
+
+### Sort
+Sets sort order. See [Sortable](#sortable).
+```
+!cards sort=power
+```
+
+### Display
+Sets list display. See [Display](#display).
+```
+!songs disp=bpm
+```
+
+### Start
+Sets the starting value, by name.
+```
+!song start=wondertrip
+```

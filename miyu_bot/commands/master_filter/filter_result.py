@@ -98,6 +98,9 @@ class FilterProcessor:
                                                                                      a.compare_converter) or a.value_mapping or (
                                                lambda s: float(s)))
             for a in self.eq_data_attributes}
+
+        start = arg.single(['start'], None)
+
         text = arg.text()
 
         arg.require_all_arguments_used()
@@ -179,6 +182,24 @@ class FilterProcessor:
         if is_relative_only and current in values:
             start_index = values.index(current)
             start_index -= int(arg.original.strip())
+
+        if start is not None:
+            if text:
+                raise ArgumentError('The start argument cannot be combined with a non-keyword text argument.')
+            start_values = self.master_filter.get_by_relevance(start, ctx)
+            if not start_values:
+                raise ArgumentError('Starting value not found.')
+            new_start_index = None
+            for start_value in start_values[:5]:  # Limit to trying first 5 results
+                try:
+                    new_start_index = values.index(start_value)
+                    break
+                except ValueError:
+                    continue
+            if new_start_index is None:
+                raise ArgumentError('Starting value not found in results.')
+            else:
+                start_index = new_start_index
 
         start_index = min(len(values) - 1, max(0, start_index))
 

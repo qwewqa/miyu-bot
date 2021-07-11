@@ -6,6 +6,8 @@ import discord
 class UserRestrictedView(discord.ui.View):
     def __init__(self, allowed_users: Iterable[int], **kwargs):
         self.allowed_users = {*allowed_users}
+        if 'timeout' not in kwargs:  # Set a higher default timeout
+            kwargs['timeout'] = 1200
         super(UserRestrictedView, self).__init__(**kwargs)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:

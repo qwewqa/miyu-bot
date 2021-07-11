@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import dataclasses
 import functools
+import re
 import typing
 from abc import abstractmethod, ABCMeta
 from collections import defaultdict
@@ -295,9 +296,15 @@ AnyDataAccessor = Union[DataAttributeAccessor, ContextlessDataAttributeAccessor]
 
 
 def _get_accessor(f: Union[AnyDataAccessor]) -> DataAttributeAccessor:
-    if len(getfullargspec(f).args) == 2:
+    args = getfullargspec(f).args
+    if len(args) == 2:
         def accessor(self, ctx, value):
             return f(self, value)
+
+        return accessor
+    elif len(args) == 3 and 'match' in args:
+        def accessor(self, ctx, value, match):
+            return f(self, value, match)
 
         return accessor
     else:
@@ -438,6 +445,7 @@ class DataAttributeInfo:
     compare_converter: Optional[Callable] = None
     init_function: Optional[Callable] = None
     help_sample_argument: Optional[str] = None
+    regex: Optional[Union[str, re.Pattern]] = None
 
     def __hash__(self):
         return self.name.__hash__()
@@ -460,6 +468,7 @@ def data_attribute(
         is_comparable: bool = False,
         is_eq: bool = False,
         help_sample_argument: Optional[str] = None,
+        regex: Optional[Union[str, re.Pattern]] = None,
 ):
     """Marks a function as a data attribute.
 
@@ -510,6 +519,10 @@ def data_attribute(
         with equality operators. Should not be used with ``is_comparable``.
     help_sample_argument
         An example argument value to use in command help.
+    regex
+        The regex to match for search or display.
+        If present, the function should have an additional argument called "match",
+        where the matched regex will be passed.
     """
 
     def decorator(func):
@@ -530,6 +543,7 @@ def data_attribute(
             is_comparable=is_comparable,
             is_eq=is_eq,
             help_sample_argument=help_sample_argument,
+            regex=regex,
         )
         func._data_attribute_info = info
 

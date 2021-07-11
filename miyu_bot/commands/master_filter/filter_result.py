@@ -1,9 +1,12 @@
+import dataclasses
+import functools
 import re
 from dataclasses import dataclass
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Callable
 
 from miyu_bot.bot.servers import Server
-from miyu_bot.commands.common.argument_parsing import list_to_list_operator_for, list_operator_for, ParsedArguments
+from miyu_bot.commands.common.argument_parsing import list_to_list_operator_for, list_operator_for, ParsedArguments, \
+    ArgumentError
 
 if TYPE_CHECKING:
     from miyu_bot.commands.master_filter.master_filter import DataAttributeInfo, MasterFilter, CommandSourceInfo
@@ -17,7 +20,7 @@ class FilterResults:
     server: Server
     start_index: int = 0
     start_tab_name: Optional[str] = None
-    display: Optional['DataAttributeInfo'] = None
+    display_formatter: Optional['Callable'] = None
 
 
 class FilterProcessor:
@@ -35,13 +38,31 @@ class FilterProcessor:
         # is_comparable already includes eq behavior (and really, only one of the two should be used).
         self.eq_data_attributes = [a for a in data_attributes if a.is_eq and not a.is_comparable]
 
-        sort_arguments = {}
+        normal_sort_arguments = {}
+        regex_sort_arguments = {}
         for info in self.sortable_data_attributes:
-            sort_arguments[info.name] = info
-            for alias in info.aliases:
-                sort_arguments[alias] = info
+            if info.regex:
+                regex_sort_arguments[info.regex] = info
+            else:
+                normal_sort_arguments[info.name] = info
+                for alias in info.aliases:
+                    normal_sort_arguments[alias] = info
 
-        self.sort_arguments = sort_arguments
+        self.normal_sort_arguments = normal_sort_arguments
+        self.regex_sort_arguments = regex_sort_arguments
+
+    def convert_sort_argument(self, arg: str):
+        if arg is None or arg.lower() == 'none':
+            return None
+        if arg in self.normal_sort_arguments:
+            return self.normal_sort_arguments[arg]
+        for pattern, attr in self.regex_sort_arguments.items():
+            if match := re.fullmatch(pattern, arg):
+                attr = dataclasses.replace(attr,
+                                           accessor=functools.partial(attr.accessor, match=match),
+                                           formatter=functools.partial(attr.formatter, match=match))
+                return attr
+        raise ArgumentError(f'Invalid sort or display argument: {arg}.')
 
     def get(self, arg: ParsedArguments, ctx) -> FilterResults:
         start_index = 0
@@ -50,12 +71,14 @@ class FilterProcessor:
         reverse_sort = arg.tag('reverse')
         if self.sortable_data_attributes:
             sort, sort_op = arg.single_op('sort', None,
-                                          allowed_operators=['<', '>', '='],
-                                          converter=self.sort_arguments)
+                                          allowed_operators=['<', '>', '='])
+            sort = self.convert_sort_argument(sort)
             if sort:
                 reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
-            display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
-                                 converter={**self.sort_arguments, 'none': None})
+            display = arg.single(['display', 'disp'], None)
+            display = self.convert_sort_argument(display)
+            if display is None:
+                display = sort
         tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in self.tag_data_attributes}
         inverse_tag_arguments = {a: arg.tags('!' + t for t in a.value_mapping.keys()) for a in self.tag_data_attributes}
         keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in self.keyword_data_attributes}
@@ -150,6 +173,8 @@ class FilterProcessor:
             values = values[::-1]
 
         display = display or self.master_filter.default_display
+        if display:
+            display = display.formatter
 
         if is_relative_only and current in values:
             start_index = values.index(current)
@@ -163,4 +188,4 @@ class FilterProcessor:
                              server=ctx.preferences.server,
                              start_index=start_index,
                              start_tab_name=start_tab,
-                             display=display)
+                             display_formatter=display)

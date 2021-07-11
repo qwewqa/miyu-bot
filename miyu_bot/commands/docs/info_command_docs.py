@@ -135,6 +135,11 @@ def get_attribute_usage(attr: DataAttributeInfo, l10n: DocumentationFluentLocali
             entries.append(' '.join(f'{t}' for t in example_values))
     else:
         example_value = attr.help_sample_argument or '[value]'
+        if attr.regex:
+            entries.append(f'sort={example_value}')
+            entries.append(f'sort<{example_value}')
+            if attr.formatter:
+                entries.append(f'disp={example_value}')
         if attr.is_comparable or attr.is_eq:
             entries.append(f'{attr.name}={example_value}')
             entries.append(f'{attr.name}!={example_value}')

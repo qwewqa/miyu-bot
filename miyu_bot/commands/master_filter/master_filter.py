@@ -6,13 +6,12 @@ from __future__ import annotations
 
 import dataclasses
 import functools
-import re
 import typing
 from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, NamedTuple, Tuple, Awaitable
+from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, Tuple, Awaitable
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -22,9 +21,11 @@ from discord.ext import commands
 import miyu_bot.bot.bot
 from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.servers import Server
-from miyu_bot.commands.common.argument_parsing import ParsedArguments, list_operator_for, list_to_list_operator_for
+from miyu_bot.commands.common.argument_parsing import ParsedArguments
 from miyu_bot.commands.common.fuzzy_matching import FuzzyFilteredMap
-from miyu_bot.commands.master_filter.filter_display_manager import FilterDisplayManager
+from miyu_bot.commands.master_filter.filter_detail_view import FilterDetailView
+from miyu_bot.commands.master_filter.filter_list_view import FilterListView
+from miyu_bot.commands.master_filter.filter_result import FilterProcessor, FilterResults
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -240,15 +241,20 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
             results = filter_processor.get(arg, ctx)
-            view, embed = FilterDisplayManager(self, ctx, results, source).get_detail_view()
-            await ctx.send(embed=embed, view=view)
+            view = FilterDetailView(self, ctx, results)
+            await ctx.send(embed=view.active_embed, view=view)
 
         return command
 
     def get_simple_detail_view(self, ctx, values, server, source) -> Tuple[discord.ui.View, discord.Embed]:
         if hasattr(source, '_command_source_info'):
             source = source._command_source_info
-        return FilterDisplayManager(self, ctx, (values, 0, None, None), source, target_server=server).get_detail_view()
+        results = FilterResults(master_filter=self,
+                                command_source_info=source,
+                                values=values)
+        view = FilterDetailView(self, ctx, results)
+        view.target_server = server
+        return view, view.active_embed
 
     def get_list_command_function(self):
         filter_processor = FilterProcessor(self)
@@ -256,8 +262,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
             results = filter_processor.get(arg, ctx)
-            view, embed = FilterDisplayManager(self, ctx, results, self.command_sources[0]).get_list_view()
-            await ctx.send(embed=embed, view=view)
+            view = FilterListView(self, ctx, results)
+            await ctx.send(embed=view.active_embed, view=view)
 
         return command
 
@@ -270,153 +276,6 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 return functools.partial(f, self)
             else:
                 return functools.partial(f, self, ctx)
-
-
-class FilterProcessor:
-    def __init__(self, master_filter: MasterFilter, source: Optional[CommandSourceInfo] = None):
-        # source is None for the list command
-        self.master_filter = master_filter
-        self.source = source
-        data_attributes = master_filter.data_attributes
-        self.flag_data_attributes = [a for a in data_attributes if a.is_flag]
-        self.tag_data_attributes = [a for a in data_attributes if a.is_tag]
-        self.keyword_data_attributes = [a for a in data_attributes if a.is_keyword]
-        self.sortable_data_attributes = [a for a in data_attributes if a.is_sortable]
-        self.comparable_data_attributes = [a for a in data_attributes if a.is_comparable]
-
-        # is_comparable already includes eq behavior (and really, only one of the two should be used).
-        self.eq_data_attributes = [a for a in data_attributes if a.is_eq and not a.is_comparable]
-
-        sort_arguments = {}
-        for info in self.sortable_data_attributes:
-            sort_arguments[info.name] = info
-            for alias in info.aliases:
-                sort_arguments[alias] = info
-
-        self.sort_arguments = sort_arguments
-
-    def get(self, arg: ParsedArguments, ctx) -> FilterResult:
-        start_index = 0
-        display = None
-        sort = None
-        reverse_sort = arg.tag('reverse')
-        if self.sortable_data_attributes:
-            sort, sort_op = arg.single_op('sort', None,
-                                          allowed_operators=['<', '>', '='],
-                                          converter=self.sort_arguments)
-            if sort:
-                reverse_sort ^= (sort_op == '<') ^ sort.reverse_sort
-            display = arg.single(['display', 'disp'], sort if sort and sort.formatter else None,
-                                 converter={**self.sort_arguments, 'none': None})
-        tag_arguments = {a: arg.tags(a.value_mapping.keys()) for a in self.tag_data_attributes}
-        inverse_tag_arguments = {a: arg.tags('!' + t for t in a.value_mapping.keys()) for a in self.tag_data_attributes}
-        keyword_arguments = {a: arg.words(a.value_mapping.keys()) for a in self.keyword_data_attributes}
-        flag_arguments = {a: bool(arg.tags([a.name, *a.aliases])) for a in self.flag_data_attributes}
-        inverse_flag_arguments = {a: bool(arg.tags('!' + t for t in [a.name, *a.aliases]))
-                                  for a in self.flag_data_attributes if not a.flag_callback}
-        comparable_arguments = {
-            a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                 allowed_operators=['=', '==', '!=', '>', '<', '>=', '<='],
-                                 converter=self.master_filter.wrap_compare_converter(ctx, a.compare_converter) or (
-                                     lambda s: float(s))) for a in
-            self.comparable_data_attributes}
-        eq_arguments = {
-            a: arg.repeatable_op([a.name] + a.aliases, is_list=True,
-                                 allowed_operators=['=', '==', '!='],
-                                 converter=self.master_filter.wrap_compare_converter(ctx,
-                                                                                     a.compare_converter) or a.value_mapping or (
-                                               lambda s: float(s)))
-            for a in self.eq_data_attributes}
-        text = arg.text()
-
-        arg.require_all_arguments_used()
-
-        current = self.master_filter.get_current(ctx)
-        is_relative_only = re.fullmatch(r'[+-]\d+', arg.original.strip()) and current
-        if is_relative_only:
-            text = ''
-        elif re.fullmatch(r'~\d+', text.strip()):
-            start_index = int(text.strip()[1:]) - 1
-            text = ''
-
-        start_tab = 0
-        if self.source:
-            start_tab = self.source.default_tab
-            if self.source.suffix_tab_aliases:
-                words = text.split()
-                if len(words) >= 1 and words[-1].lower() in self.source.suffix_tab_aliases:
-                    start_tab = self.source.suffix_tab_aliases[words[-1].lower()]
-                    text = ' '.join(words[:-1])
-
-        values = self.master_filter.get_by_relevance(text, ctx)
-
-        for attr, tags in tag_arguments.items():
-            if tags:
-                targets = {attr.value_mapping[t] for t in tags}
-                if attr.is_plural:
-                    values = [v for v in values if targets.issubset(attr.accessor(self.master_filter, ctx, v))]
-                else:
-                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v) in targets]
-        for attr, tags in inverse_tag_arguments.items():
-            if tags:
-                targets = {attr.value_mapping[t[1:]] for t in tags}
-                if attr.is_plural:
-                    values = [v for v in values if not targets.intersection(attr.accessor(self.master_filter, ctx, v))]
-                else:
-                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v) not in targets]
-        for attr, tags in keyword_arguments.items():
-            if tags:
-                targets = {attr.value_mapping[t] for t in tags}
-                if attr.is_plural:
-                    values = [v for v in values if targets.issubset(attr.accessor(self.master_filter, ctx, v))]
-                else:
-                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v) in targets]
-        for attr, flag_present in flag_arguments.items():
-            if flag_present:
-                if attr.flag_callback:
-                    callback_value = attr.flag_callback(self.master_filter, ctx, values)
-                    if callback_value is not None:
-                        values = callback_value
-                else:
-                    values = [v for v in values if attr.accessor(self.master_filter, ctx, v)]
-        for attr, flag_present in inverse_flag_arguments.items():
-            if flag_present:
-                # Flags with callbacks are excluded
-                values = [v for v in values if not attr.accessor(self.master_filter, ctx, v)]
-        for attr, arguments in {**comparable_arguments, **eq_arguments}.items():
-            for argument in arguments:
-                argument_value, operation = argument
-                if attr.is_plural:
-                    operator = list_to_list_operator_for(operation)
-                else:
-                    operator = list_operator_for(operation)
-                values = [v for v in values if operator(attr.accessor(self.master_filter, ctx, v), argument_value)]
-
-        if self.master_filter.default_sort and not text:
-            values = sorted(values, key=lambda v: self.master_filter.default_sort.accessor(self.master_filter, ctx, v))
-            if self.master_filter.default_sort.reverse_sort ^ bool(sort and reverse_sort):
-                values = values[::-1]
-        if sort:
-            values = sorted(values, key=lambda v: sort.accessor(self.master_filter, ctx, v))
-        if reverse_sort:
-            values = values[::-1]
-
-        display = display or self.master_filter.default_display
-
-        if is_relative_only and current in values:
-            start_index = values.index(current)
-            start_index -= int(arg.original.strip())
-
-        start_index = min(len(values) - 1, max(0, start_index))
-
-        return FilterResult(values, start_index, start_tab, display)
-
-
-class FilterResult(NamedTuple):
-    values: List
-    start_index: int
-    start_tab: int
-    display: Optional[DataAttributeInfo]
 
 
 DataAttributeAccessor = Callable[[MasterFilter, PrefContext, Any], Any]

@@ -492,7 +492,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                          description='Lists songs.',
                          help='!songs'))
     def format_song_title(self, song):
-        return f'`{self.bot.get_emoji(unit_emoji_ids_by_unit_id.get(song.unit_id, grey_emoji_id))}` {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()
+        return f'`{unit_emoji_ids_by_unit_id.get(song.unit_id, grey_emoji_id)}` {song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()
 
     def format_duration(self, seconds):
         if seconds is None:

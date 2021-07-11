@@ -1,4 +1,4 @@
-from typing import List, Optional, TYPE_CHECKING, Union, Callable, Coroutine
+from typing import List, Optional, TYPE_CHECKING, Union, Callable, Coroutine, Set
 
 import discord
 from discord import Interaction
@@ -9,9 +9,11 @@ from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.deletable_message import DeleteButton
 from miyu_bot.commands.common.paged_message import PageChangeButton
 from miyu_bot.commands.common.user_restricted_view import UserRestrictedView
+from miyu_bot.commands.master_filter import filter_list_view
+from miyu_bot.commands.master_filter.filter_result import FilterResults
 
 if TYPE_CHECKING:
-    from miyu_bot.commands.master_filter.master_filter import EmbedSourceCallable
+    from miyu_bot.commands.master_filter.master_filter import CommandSourceInfo, EmbedSourceCallable, MasterFilter
 
 
 class DetailTabButton(discord.ui.Button['FilterDetailView']):
@@ -53,7 +55,9 @@ class DetailToListButton(discord.ui.Button['FilterDetailView']):
 
     async def callback(self, interaction: Interaction):
         assert self.view is not None
-        view, embed = self.view.manager.get_list_view(self.view.page_index)
+        view = filter_list_view.FilterListView(self.view.master_filter, self.view.ctx, self.view.base_results)
+        view.set_item_index(self.view.page_index)
+        embed = view.active_embed
         await interaction.response.edit_message(embed=embed, view=view)
         self.view.stop()
         await log_usage('filter_detail_to_list_button')
@@ -78,37 +82,41 @@ class ShortcutButton(discord.ui.Button['FilterDetailView']):
 
 class FilterDetailView(UserRestrictedView):
     def __init__(self,
-                 manager,
-                 master_filter,
+                 master_filter: 'MasterFilter',
                  ctx,
-                 values: List,
-                 source: 'EmbedSourceCallable',
-                 shortcut_buttons: List,
-                 *,
-                 start_index: int = 0,
-                 tabs: Optional[List] = None,
-                 start_tab: Optional[int] = None,
-                 start_target_server: Optional[Server] = None,
+                 results: FilterResults,
+                 source_info: Optional['CommandSourceInfo'] = None,
                  **kwargs):
-        super(FilterDetailView, self).__init__(**kwargs)
-        self.manager = manager
+        allowed_users = {ctx.bot.owner_id, ctx.author.id, *ctx.bot.owner_ids}
+        super(FilterDetailView, self).__init__(allowed_users=allowed_users, **kwargs)
+        source_info = source_info or results.command_source_info or master_filter.command_sources[0]
         self.master_filter = master_filter
         self.ctx = ctx
-        self.values = values
+        self.base_results = results
+        self.values = results.values
         self.servers = list(Server)
-        if start_target_server is not None:
-            self._target_server_index = self.servers.index(start_target_server)
-        else:
-            self._target_server_index = self.servers.index(ctx.preferences.server)
+        self._target_server_index = self.servers.index(ctx.preferences.server)
         self.fallback_server = ctx.preferences.server
-        self.source = source if tabs is not None else self.wrap_tabless_source(source)
-        self._page_index = start_index
-        self.max_page_index = len(values) - 1
-        self._tab = start_tab
-        self.active_embed = self.source(master_filter, ctx, values[self.page_index], start_tab, ctx.preferences.server)
+        self.source = source_info.embed_source if source_info.tabs is not None else self.wrap_tabless_source(
+            source_info.embed_source)
+        self._page_index = results.start_index
+        self.max_page_index = len(results.values) - 1
+        if source_info.tabs is not None:
+            # The original results might have been with a source that had different tabs
+            if results.start_tab_name in source_info.suffix_tab_aliases:
+                self._tab = source_info.suffix_tab_aliases[results.start_tab_name]
+            else:
+                self._tab = source_info.default_tab
+        else:
+            self._tab = None
+        self.active_embed = self.source(master_filter,
+                                        ctx,
+                                        self.values[self.page_index],
+                                        self.tab,
+                                        ctx.preferences.server)
 
         self.tab_buttons = []
-        if tabs is not None:
+        if (tabs := source_info.tabs) is not None:
             for i, tab_emoji in enumerate(tabs):
                 tab_button = DetailTabButton(i, emoji=tab_emoji, row=0)
                 self.tab_buttons.append(tab_button)
@@ -141,7 +149,7 @@ class FilterDetailView(UserRestrictedView):
         self.add_item(self.page_display_button)
 
         self.shortcut_buttons = []
-        for shortcut in shortcut_buttons:
+        for shortcut in source_info.shortcut_buttons:
             button = ShortcutButton(function=shortcut.function, check=shortcut.check,
                                     label=master_filter.l10n[ctx.preferences.language].format_value(shortcut.name),
                                     emoji=shortcut.emoji, row=3)
@@ -149,8 +157,8 @@ class FilterDetailView(UserRestrictedView):
             self.add_item(button)
 
         # Run setters
-        self.page_index = start_index
-        self.tab = start_tab
+        self.page_index = self.page_index
+        self.tab = self.tab
 
     @property
     def page_index(self):
@@ -171,6 +179,10 @@ class FilterDetailView(UserRestrictedView):
     @property
     def target_server(self):
         return self.servers[self.target_server_index]
+
+    @target_server.setter
+    def target_server(self, value):
+        self.target_server_index = self.servers.index(value)
 
     @property
     def target_server_index(self):

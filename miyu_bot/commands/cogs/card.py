@@ -17,10 +17,6 @@ class Card(commands.Cog):
         self.logger = logging.getLogger(__name__)
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'card.ftl')
 
-    @property
-    def rarity_emoji(self):
-        return [self.bot.get_emoji(eid) for eid in rarity_emoji_ids.values()]
-
     @commands.command(name='cardexp',
                       aliases=['card_exp', 'cdexp'],
                       description='Displays card exp totals or the difference between levels.',

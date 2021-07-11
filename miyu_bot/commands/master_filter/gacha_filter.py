@@ -236,13 +236,13 @@ class GachaFilter(MasterFilter[GachaMaster]):
         units = {card.character.unit.id for card in pick_ups}
         attributes = {card.attribute.id for card in pick_ups}
         if len(units) == 1:
-            unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[next(iter(units))])
+            unit_emoji = unit_emoji_ids_by_unit_id[next(iter(units))]
         else:
-            unit_emoji = self.bot.get_emoji(grey_emoji_id)
+            unit_emoji = grey_emoji_id
         if len(attributes) == 1:
-            attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[next(iter(attributes))])
+            attribute_emoji = attribute_emoji_ids_by_attribute_id[next(iter(attributes))]
         else:
-            attribute_emoji = self.bot.get_emoji(grey_emoji_id)
+            attribute_emoji = grey_emoji_id
         return f'`{unit_emoji}`+`{attribute_emoji}` {gacha.name}'
 
     stock_names = {
@@ -280,16 +280,16 @@ class GachaFilter(MasterFilter[GachaMaster]):
             })
 
     def format_card_name_for_list(self, card):
-        unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
-        attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
+        unit_emoji = unit_emoji_ids_by_unit_id[card.character.unit_id]
+        attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     def format_card_name_short(self, card):
         return f'{card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     def format_card_name_with_emoji(self, card):
-        unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
-        attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
+        unit_emoji = unit_emoji_ids_by_unit_id[card.character.unit_id]
+        attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f'{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     @get_gacha_embed.shortcut_button(name='Pull')

@@ -314,4 +314,4 @@ class ChartFilter(MasterFilter[ChartMaster]):
     def format_chart_name(self, chart: ChartMaster):
         song = chart.music
         song_name = f'{song.name}{" (" + song.special_unit_name + ")" if song.special_unit_name else ""}{" (Hidden)" if song.is_hidden else ""}'.strip()
-        return f'{self.format_level(chart)}  {self.difficulty_short_names[chart.difficulty]}`{self.bot.get_emoji(difficulty_emoji_ids[chart.difficulty])}`  {song_name}'
+        return f'{self.format_level(chart)}  {self.difficulty_short_names[chart.difficulty]}`{difficulty_emoji_ids[chart.difficulty]}`  {song_name}'

@@ -21,7 +21,7 @@ class CardFilter(MasterFilter[CardMaster]):
         return f'{value.name} {value.character.first_name_english}'
 
     def get_select_name(self, value: CardMaster):
-        emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[value.attribute_id])
+        emoji = attribute_emoji_ids_by_attribute_id[value.attribute_id]
         return value.character.full_name_english, value.name, emoji
 
     def is_released(self, value: CardMaster) -> bool:
@@ -273,8 +273,8 @@ class CardFilter(MasterFilter[CardMaster]):
                         value=l10n.format_value('info-desc', {
                             'rarity': f'{card.rarity_id}★',
                             'character': f'{card.character.full_name_english}',
-                            'attribute': f'{ctx.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])} {card.attribute.en_name.capitalize()}',
-                            'unit': f'{ctx.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])} {card.character.unit.name}',
+                            'attribute': f'{attribute_emoji_ids_by_attribute_id[card.attribute_id]} {card.attribute.en_name.capitalize()}',
+                            'unit': f'{unit_emoji_ids_by_unit_id[card.character.unit_id]} {card.character.unit.name}',
                             'release-date': str(ctx.convert_tz(card.start_datetime)),
                             'event': f'{card.event.name if card.event else "None"}',
                             'gacha': f'{card.gacha.name if card.gacha else "None"}',
@@ -287,9 +287,9 @@ class CardFilter(MasterFilter[CardMaster]):
                             'heart': card.max_parameters_with_limit_break[0],
                             'technique': card.max_parameters_with_limit_break[1],
                             'physical': card.max_parameters_with_limit_break[2],
-                            'heart-emoji': str(ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[1])),
-                            'technique-emoji': str(ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[2])),
-                            'physical-emoji': str(ctx.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[3])),
+                            'heart-emoji': str(parameter_bonus_emoji_ids_by_parameter_id[1]),
+                            'technique-emoji': str(parameter_bonus_emoji_ids_by_parameter_id[2]),
+                            'physical-emoji': str(parameter_bonus_emoji_ids_by_parameter_id[3]),
                         }),
                         inline=True)
         skill: SkillMaster = card.skill
@@ -316,8 +316,8 @@ class CardFilter(MasterFilter[CardMaster]):
                          description='Lists cards.',
                          help='!cards'))
     def format_card_name_for_list(self, card):
-        unit_emoji = self.bot.get_emoji(unit_emoji_ids_by_unit_id[card.character.unit_id])
-        attribute_emoji = self.bot.get_emoji(attribute_emoji_ids_by_attribute_id[card.attribute_id])
+        unit_emoji = unit_emoji_ids_by_unit_id[card.character.unit_id]
+        attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     @get_card_embed.shortcut_button(name='Gacha')

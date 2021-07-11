@@ -32,17 +32,17 @@ def generate_master_filter_docs(bot: MiyuBot, docs_path: Path, master_filter: Ma
         md.heading(1, l10n.format_value('name', fallback=master_filter.name))
         md.text(l10n.format_value('description', fallback=''))
         md.heading(2, l10n.format_value('heading-commands'))
-        md.add_all(get_command_source_help_texts(master_filter.command_sources, l10n))
+        md.add_all(get_command_source_help_texts(master_filter, l10n))
         md.heading(2, l10n.format_value('heading-attributes'))
         md.add_all(get_attribute_help_text(attr, l10n) for attr in master_filter.data_attributes)
         filename = master_filter.name.replace('_filter', '')
         (docs_path / f'{filename}.{locale_filename}.md').write_text(md.get(), encoding='utf-8')
 
 
-def get_command_source_help_texts(commands: Iterable[CommandSourceInfo],
+def get_command_source_help_texts(master_filter: MasterFilter,
                                   l10n: DocumentationFluentLocalization,
                                   heading_level=3) -> Iterable[MarkdownDocument]:
-    for command in commands:
+    for command in master_filter.command_sources:
         if command.command_args:
             md = MarkdownDocument()
             name = command.command_args["name"]
@@ -56,17 +56,17 @@ def get_command_source_help_texts(commands: Iterable[CommandSourceInfo],
             if desc := l10n.format_value(f'command-{command.command_args["name"]}-description', fallback=''):
                 md.admonition('question', 'Description', desc)
             yield md
-        if command.list_command_args:
-            md = MarkdownDocument()
-            name = command.list_command_args["name"]
-            localized_name = l10n.format_value(f'command-{name}', fallback=name)
-            md.heading(heading_level,
-                       f'{name}' +
-                       (f' ({localized_name})' if name != localized_name else ''))
-            md.text(f'*[{l10n.format_value("command-type-list")}]({USAGE_PAGE}#list-commands)*')
-            if desc := l10n.format_value(f'command-{command.list_command_args["name"]}-description', fallback=''):
-                md.admonition('question', 'Description', desc)
-            yield md
+    if master_filter.list_formatter:
+        md = MarkdownDocument()
+        name = master_filter.list_formatter.command_args["name"]
+        localized_name = l10n.format_value(f'command-{name}', fallback=name)
+        md.heading(heading_level,
+                   f'{name}' +
+                   (f' ({localized_name})' if name != localized_name else ''))
+        md.text(f'*[{l10n.format_value("command-type-list")}]({USAGE_PAGE}#list-commands)*')
+        if desc := l10n.format_value(f'command-{master_filter.list_formatter.command_args["name"]}-description', fallback=''):
+            md.admonition('question', 'Description', desc)
+        yield md
 
 
 def get_attribute_help_text(attr: DataAttributeInfo,
@@ -160,9 +160,15 @@ def get_attribute_type_description(attr: DataAttributeInfo, l10n: DocumentationF
         else:
             attr_types.append(f'[{l10n.format_value("attr-type-flag")}]({USAGE_PAGE}#flag)')
     if attr.is_sortable:
-        attr_types.append(f'[{l10n.format_value("attr-type-sortable")}]({USAGE_PAGE}#sortable)')
+        if attr.is_default_sort:
+            attr_types.append(f'[{l10n.format_value("attr-type-sortable-default")}]({USAGE_PAGE}#sortable)')
+        else:
+            attr_types.append(f'[{l10n.format_value("attr-type-sortable")}]({USAGE_PAGE}#sortable)')
     if attr.formatter:
-        attr_types.append(f'[{l10n.format_value("attr-type-display")}]({USAGE_PAGE}#display)')
+        if attr.is_default_display:
+            attr_types.append(f'[{l10n.format_value("attr-type-display-default")}]({USAGE_PAGE}#display)')
+        else:
+            attr_types.append(f'[{l10n.format_value("attr-type-display")}]({USAGE_PAGE}#display)')
     if attr.is_comparable:
         attr_types.append(f'[{l10n.format_value("attr-type-comparable")}]({USAGE_PAGE}#comparable)')
     if attr.is_eq:

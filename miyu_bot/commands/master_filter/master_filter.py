@@ -241,6 +241,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
             results = filter_processor.get(arg, ctx)
+            if not results.values:
+                await ctx.send('No results.')
+                return
             view = FilterDetailView(self, ctx, results)
             await ctx.send(embed=view.active_embed, view=view)
 
@@ -267,6 +270,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         async def command(ctx, *, arg: Optional[ParsedArguments]):
             arg = arg or await ParsedArguments.convert(ctx, '')
             results = filter_processor.get(arg, ctx)
+            if not results.values:
+                await ctx.send('No results.')
+                return
             view = FilterListView(self, ctx, results)
             await ctx.send(embed=view.active_embed, view=view)
 

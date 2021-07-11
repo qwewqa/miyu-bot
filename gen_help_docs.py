@@ -15,7 +15,8 @@ if __name__ == '__main__':
     bot.load_extension('miyu_bot.commands.cogs.card')
     bot.load_extension('miyu_bot.commands.cogs.event')
     bot.load_extension('miyu_bot.commands.cogs.music')
-    bot.load_extension('miyu_bot.commands.cogs.utility')
+    # Other cog will not have generated docs
+    # bot.load_extension('miyu_bot.commands.cogs.other')
     bot.load_extension('miyu_bot.commands.cogs.preferences')
     bot.load_extension('miyu_bot.commands.cogs.audio')
     bot.load_extension('miyu_bot.commands.cogs.gacha')

@@ -14,7 +14,7 @@ from miyu_bot.commands.common.paged_message import run_paged_message
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
-class Utility(commands.Cog):
+class Other(commands.Cog):
     bot: MiyuBot
 
     def __init__(self, bot):
@@ -251,4 +251,4 @@ class Utility(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Utility(bot))
+    bot.add_cog(Other(bot))

@@ -1,6 +1,8 @@
 # General Usage
+Commands fit broadly into two categories: *Info* and *Utility*.
+This is the *Info* category, which means these commands bring up data from the game.
 
-Commands in the Info category support special argument types
+Commands in the Info category support a common set of argument types
 to allow for specific filtering and display options of search results.
 
 ## Argument Types
@@ -163,7 +165,6 @@ Special flag attributes do not support an inverted (`$!`) tag.
 ### List Commands
 List commands usually have a plural name such as `!songs` or `!cards`.
 Using a list command brings up a list of results.
-Most list commands have a detail command counterpart.
 
 ### Detail Commands
 Detail commands usually have a singular name such as `!song` or `!card`.

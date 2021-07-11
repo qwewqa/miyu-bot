@@ -1,5 +1,6 @@
 # Miyu Docs
-Miyu Bot is a discord bot dedicated to providing information about Japanese rhythm game D4DJ.
+Miyu Bot is a discord bot dedicated to providing information about Japanese rhythm game D4DJ.  
+Usage and command information can be found under [Commands](./commands/info/general_usage.md)
 
 ## Information
 

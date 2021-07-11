@@ -174,7 +174,7 @@ class Utility(commands.Cog):
                       help='!info')
     async def info(self, ctx: commands.Context):
         embed = discord.Embed(title='Miyu Bot', description='A utility bot for mobile rhythm game D4DJ.')
-        embed.set_thumbnail(url=self.bot.user.avatar_url)
+        embed.set_thumbnail(url=self.bot.user.avatar.url)
         embed.add_field(name='Developer', value='qwewqa#3948', inline=False)
         embed.add_field(name='Donate', value='https://ko-fi.com/qwewqa', inline=False)
         embed.add_field(name='Server', value='https://discord.gg/TThMwrAZTR', inline=False)

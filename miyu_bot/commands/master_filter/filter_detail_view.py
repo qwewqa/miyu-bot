@@ -249,7 +249,12 @@ class FilterDetailView(UserRestrictedView):
                     server_button.style = discord.ButtonStyle.secondary
                     server_button.disabled = True
         for shortcut_button in self.shortcut_buttons:
-            shortcut_button.disabled = not shortcut_button.check(self.master_filter, value)
+            if shortcut_button.check(self.master_filter, value):
+                shortcut_button.disabled = False
+                shortcut_button.style = discord.ButtonStyle.success
+            else:
+                shortcut_button.disabled = True
+                shortcut_button.style = discord.ButtonStyle.secondary
 
     @staticmethod
     def wrap_tabless_source(source: 'EmbedSourceCallable') -> 'EmbedSourceCallable':

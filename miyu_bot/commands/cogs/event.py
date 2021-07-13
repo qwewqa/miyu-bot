@@ -105,7 +105,7 @@ class Event(commands.Cog):
             date_heading = 'End Date'
             date_value = event.end_datetime
 
-        date_value = date_value.astimezone(timezone)
+        date_value = discord.utils.format_dt(date_value)
 
         embed.add_field(name=time_delta_heading,
                         value=self.format_timedelta(delta),

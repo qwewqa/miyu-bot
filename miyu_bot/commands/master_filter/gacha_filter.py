@@ -130,13 +130,10 @@ class GachaFilter(MasterFilter[GachaMaster]):
         featured_text = get_card_list_text(gacha.pick_up_cards)
         selectable_text = get_card_list_text(gacha.bonus_selectable_cards)
 
-        def fmt_date(date):
-            return str(date)
-
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {
-                            'start-date': fmt_date(ctx.convert_tz(gacha.start_datetime)),
-                            'end-date': fmt_date(ctx.convert_tz(gacha.end_datetime)),
+                            'start-date': discord.utils.format_dt(gacha.start_datetime),
+                            'end-date': discord.utils.format_dt(gacha.end_datetime),
                             'event-name': gacha.event.name if gacha.event else 'None',
                             'pity-requirement': gacha.bonus_max_value or 'None',
                             'select-requirement': gacha.bonus_selectable_cards_max_value or 'None',

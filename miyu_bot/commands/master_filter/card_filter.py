@@ -275,7 +275,7 @@ class CardFilter(MasterFilter[CardMaster]):
                             'character': f'{card.character.full_name_english}',
                             'attribute': f'{attribute_emoji_ids_by_attribute_id[card.attribute_id]} {card.attribute.en_name.capitalize()}',
                             'unit': f'{unit_emoji_ids_by_unit_id[card.character.unit_id]} {card.character.unit.name}',
-                            'release-date': str(ctx.convert_tz(card.start_datetime)),
+                            'release-date': discord.utils.format_dt(card.start_datetime),
                             'event': f'{card.event.name if card.event else "None"}',
                             'gacha': f'{card.gacha.name if card.gacha else "None"}',
                             'availability': card.availability.name,

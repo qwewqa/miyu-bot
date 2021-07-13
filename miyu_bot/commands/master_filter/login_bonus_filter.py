@@ -67,13 +67,10 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
 
         embed = discord.Embed(title=f'[{server.name}] {login_bonus.title}')
 
-        def fmt_date(date):
-            return str(date)
-
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {
-                            'start-date': fmt_date(ctx.convert_tz(login_bonus.start_datetime)),
-                            'end-date': fmt_date(ctx.convert_tz(login_bonus.end_datetime)),
+                            'start-date': discord.utils.format_dt(login_bonus.start_datetime),
+                            'end-date': discord.utils.format_dt(login_bonus.end_datetime),
                             'login-bonus-type': login_bonus.login_bonus_type.name,
                             'loop': login_bonus.loop,
                         }),

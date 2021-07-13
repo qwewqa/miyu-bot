@@ -147,20 +147,17 @@ class EventFilter(MasterFilter[EventMaster]):
         duration_hours = round((event.duration.days * 24 + event.duration.seconds / 3600), 2)
         duration_hours = duration_hours if not duration_hours.is_integer() else int(duration_hours)
 
-        def fmt_date(date):
-            return str(date)
-
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {
                             'duration-days': event.duration.days,
                             'duration-hours': duration_hour_part,
                             'duration-total-hours': duration_hours,
-                            'start-date': fmt_date(event.start_datetime.astimezone(timezone)),
-                            'close-date': fmt_date(event.reception_close_datetime.astimezone(timezone)),
-                            'rank-fix-date': fmt_date(event.rank_fix_start_datetime.astimezone(timezone)),
-                            'results-date': fmt_date(event.result_announcement_datetime.astimezone(timezone)),
-                            'end-date': fmt_date(event.end_datetime.astimezone(timezone)),
-                            'story-unlock-date': fmt_date(event.story_unlock_datetime.astimezone(timezone)),
+                            'start-date': discord.utils.format_dt(event.start_datetime),
+                            'close-date': discord.utils.format_dt(event.reception_close_datetime),
+                            'rank-fix-date': discord.utils.format_dt(event.rank_fix_start_datetime),
+                            'results-date': discord.utils.format_dt(event.result_announcement_datetime),
+                            'end-date': discord.utils.format_dt(event.end_datetime),
+                            'story-unlock-date': discord.utils.format_dt(event.story_unlock_datetime),
                             'status': event.state().name,
                         }),
                         inline=False)

@@ -340,7 +340,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                             'levels': ', '.join(c.display_level for c in song.charts.values()),
                             'chart-designers': ', '.join(
                                 {f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
-                            'release-date': str(ctx.convert_tz(song.start_datetime)),
+                            'release-date': discord.utils.format_dt(song.start_datetime),
                             'hidden': song.is_hidden,
                             'fair-use': song.can_fair_use,
                         }),

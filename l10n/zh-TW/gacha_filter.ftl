@@ -22,7 +22,7 @@ gacha-type = { $gacha-type ->
     [Birthday] 生日限定
     [Special] 新手池
     [Revival] 復刻
-   *[other] -> Unknown
+   *[other] Unknown
 }
 
 summary = 結果

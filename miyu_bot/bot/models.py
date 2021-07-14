@@ -265,6 +265,7 @@ class GachaState(Model):
     user_id = fields.BigIntField()
     gacha_id = fields.IntField()
     pity_counter = fields.IntField(default=0)
+    sub_pity_counter = fields.IntField(default=0)
     total_counter = fields.IntField(default=0)
     total_roll_counter = fields.IntField(default=0)
 

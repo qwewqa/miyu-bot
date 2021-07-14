@@ -9,6 +9,10 @@ info-desc =
         [None] { none }
        *[other] { $pity-requirement }
     }
+    Sub-Pity Requirement: { $sub-pity-requirement ->
+        [None] { none }
+       *[other] { $pity-requirement }
+    }
     Select Requirement: { $select-requirement ->
         [None] { none }
        *[other] { $select-requirement }
@@ -22,7 +26,7 @@ gacha-type = { $gacha-type ->
     [Birthday] Birthday
     [Special] Special
     [Revival] Revival
-   *[other] -> Unknown
+   *[other] Unknown
 }
 
 summary = Summary

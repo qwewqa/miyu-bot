@@ -75,9 +75,14 @@ class Gacha(commands.Cog):
         self.images.append(image)
         return image
 
-    async def create_pull_image(self, cards: List[CardMaster], bonus: Optional[CardMaster] = None):
+    async def create_pull_image(self,
+                                cards: List[CardMaster],
+                                bonus: Optional[CardMaster] = None,
+                                sub_bonus: Optional[CardMaster] = None):
         if bonus:
             cards = cards + [bonus]
+        if sub_bonus:
+            cards = cards + [sub_bonus]
         row_size = min(15, max(5, (len(cards) - 1) // 5 + 4))
         return await self.create_card_image_grid_async(cards, row_size)
 
@@ -208,7 +213,7 @@ class Gacha(commands.Cog):
                                                  draw_data: GachaDrawMaster,
                                                  assets: AssetManager) -> Tuple[discord.Embed, discord.File]:
         draw_result = await self.do_gacha_draw(user, gacha, draw_data, assets)
-        img = await self.create_pull_image(draw_result.cards, draw_result.bonus)
+        img = await self.create_pull_image(draw_result.cards, draw_result.bonus, draw_result.sub_bonus)
 
         buffer = BytesIO()
         img.save(buffer, 'png')
@@ -219,8 +224,13 @@ class Gacha(commands.Cog):
         embed.set_thumbnail(url=thumb_url)
         embed.set_image(url='attachment://pull.png')
 
+        desc = ''
         if draw_result.pity_count is not None:
-            embed.description = f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}'
+            desc += f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}\n'
+        if draw_result.pity_count is not None:
+            desc += f'Sub-Pity: {draw_result.sub_pity_count}/{gacha.sub_bonus_max_value}\n'
+        if desc:
+            embed.description = desc
 
         return embed, discord.File(fp=buffer, filename='pull.png')
 
@@ -271,9 +281,31 @@ class Gacha(commands.Cog):
                     bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
                     await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id,
                                                     state.total_counter, state.total_roll_counter, conn)
-                await state.save()
 
-            return GachaPullResult(cards, bonus, current_pity)
+            sub_bonus = None
+            current_sub_pity = None
+
+            if gacha.sub_bonus_max_value:
+                state.sub_pity_counter += 10
+                current_sub_pity = state.sub_pity_counter
+                if state.sub_pity_counter >= gacha.sub_bonus_max_value:
+                    state.total_counter += 1
+                    sub_bonus_tables = gacha.sub_bonus_tables
+                    state.sub_pity_counter -= gacha.sub_bonus_max_value
+                    current_sub_pity = state.sub_pity_counter
+                    rates = list(itertools.accumulate(gacha.sub_bonus_table_rate.rates))
+                    rng = random.randint(1, rates[-1])
+                    table_index = next(i for i, s in enumerate(rates) if rng <= s)
+                    table_rates = list(itertools.accumulate(t.rate for t in sub_bonus_tables[table_index]))
+                    rng = random.randint(1, table_rates[-1])
+                    result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
+                    sub_bonus = assets.card_master[sub_bonus_tables[table_index][result_index].card_id]
+                    await self.register_card_pulled(user.id, gacha.id, gacha.sub_bonus_table_rate.id, sub_bonus.id,
+                                                    state.total_counter, state.total_roll_counter, conn)
+
+            await state.save()
+
+            return GachaPullResult(cards, bonus, sub_bonus, current_pity, current_sub_pity)
 
     async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int,
                                    pulled_at: int, pulled_at_roll: int, using_db: BaseDBAsyncClient):
@@ -292,7 +324,9 @@ class Gacha(commands.Cog):
 class GachaPullResult(typing.NamedTuple):
     cards: List[CardMaster]
     bonus: Optional[CardMaster]
+    sub_bonus: Optional[CardMaster]
     pity_count: Optional[int]
+    sub_pity_count: Optional[int]
 
 
 def setup(bot):

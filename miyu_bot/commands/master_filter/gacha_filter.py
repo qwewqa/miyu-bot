@@ -136,6 +136,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                             'end-date': discord.utils.format_dt(gacha.end_datetime),
                             'event-name': gacha.event.name if gacha.event else 'None',
                             'pity-requirement': gacha.bonus_max_value or 'None',
+                            'sub-pity-requirement': gacha.sub_bonus_max_value or 'None',
                             'select-requirement': gacha.bonus_selectable_cards_max_value or 'None',
                             'gacha-type': gacha.gacha_type.name,
                         }),
@@ -180,6 +181,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
             for table_normalized_rate, table in zip(table_rate.normalized_rates, tables):
                 if table_normalized_rate == 0:
                     continue
+                if not table:  # Just in case it's not in data yet
+                    return
                 rates = [t.rate for t in table]
                 total_rate = sum(rates)
                 rate_up_rate = max(rates)
@@ -216,6 +219,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
         if gacha.bonus_tables:
             add_table_field(gacha.bonus_table_rate, gacha.bonus_tables)
+
+        if gacha.sub_bonus_tables:
+            add_table_field(gacha.sub_bonus_table_rate, gacha.sub_bonus_tables)
 
         if not embed.fields:
             embed.description = l10n.format_value("none-or-too-many")

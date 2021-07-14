@@ -176,7 +176,7 @@ class EventFilter(MasterFilter[EventMaster]):
                         inline=True)
         embed.add_field(name=l10n.format_value('parameter-point-bonus'),
                         value=l10n.format_value('parameter-point-bonus-description', {
-                            'parameter-emoji': f'{self.bot.get_emoji(parameter_bonus_emoji_ids_by_parameter_id[event.bonus.event_point_parameter_bonus_id + 1])}',
+                            'parameter-emoji': parameter_bonus_emoji_ids_by_parameter_id[event.bonus.event_point_parameter_bonus_id + 1],
                             'parameter-bonus-rate': event.bonus.event_point_parameter_bonus_rate
                         }) if event.bonus.event_point_parameter_bonus_rate else
                         l10n.format_value('no-parameter-point-bonus'),

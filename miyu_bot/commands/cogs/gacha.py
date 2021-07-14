@@ -303,7 +303,7 @@ class Gacha(commands.Cog):
                     await self.register_card_pulled(user.id, gacha.id, gacha.sub_bonus_table_rate.id, sub_bonus.id,
                                                     state.total_counter, state.total_roll_counter, conn)
 
-            await state.save()
+            await state.save(using_db=conn)
 
             return GachaPullResult(cards, bonus, sub_bonus, current_pity, current_sub_pity)
 

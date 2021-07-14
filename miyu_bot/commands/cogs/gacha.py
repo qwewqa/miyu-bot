@@ -227,7 +227,7 @@ class Gacha(commands.Cog):
         desc = ''
         if draw_result.pity_count is not None:
             desc += f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}\n'
-        if draw_result.pity_count is not None:
+        if draw_result.sub_pity_count is not None:
             desc += f'Sub-Pity: {draw_result.sub_pity_count}/{gacha.sub_bonus_max_value}\n'
         if desc:
             embed.description = desc

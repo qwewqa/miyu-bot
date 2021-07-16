@@ -227,8 +227,8 @@ class Gacha(commands.Cog):
         desc = ''
         if draw_result.pity_count is not None:
             desc += f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}\n'
-        if draw_result.sub_pity_count is not None:
-            desc += f'Sub-Pity: {draw_result.sub_pity_count}/{gacha.sub_bonus_max_value}\n'
+        if draw_result.pity_count is not None and gacha.sub_bonus_max_value:
+            desc += f'Sub-Pity: {draw_result.pity_count}/{gacha.sub_bonus_max_value}\n'
         if desc:
             embed.description = desc
 
@@ -262,12 +262,26 @@ class Gacha(commands.Cog):
                     cards.append(card)
 
             bonus = None
+            sub_bonus = None
             current_pity = None
 
             if gacha.bonus_max_value:
+                prev_pity = state.pity_counter
                 state.pity_counter += 10
                 current_pity = state.pity_counter
-                if state.pity_counter >= gacha.bonus_max_value:
+                if prev_pity < gacha.sub_bonus_max_value and current_pity >= gacha.sub_bonus_max_value:
+                    state.total_counter += 1
+                    sub_bonus_tables = gacha.sub_bonus_tables
+                    rates = list(itertools.accumulate(gacha.sub_bonus_table_rate.rates))
+                    rng = random.randint(1, rates[-1])
+                    table_index = next(i for i, s in enumerate(rates) if rng <= s)
+                    table_rates = list(itertools.accumulate(t.rate for t in sub_bonus_tables[table_index]))
+                    rng = random.randint(1, table_rates[-1])
+                    result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
+                    sub_bonus = assets.card_master[sub_bonus_tables[table_index][result_index].card_id]
+                    await self.register_card_pulled(user.id, gacha.id, gacha.sub_bonus_table_rate.id, sub_bonus.id,
+                                                    state.total_counter, state.total_roll_counter, conn)
+                if current_pity >= gacha.bonus_max_value:
                     state.total_counter += 1
                     bonus_tables = gacha.bonus_tables
                     state.pity_counter -= gacha.bonus_max_value
@@ -282,30 +296,9 @@ class Gacha(commands.Cog):
                     await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id,
                                                     state.total_counter, state.total_roll_counter, conn)
 
-            sub_bonus = None
-            current_sub_pity = None
-
-            if gacha.sub_bonus_max_value:
-                state.sub_pity_counter += 10
-                current_sub_pity = state.sub_pity_counter
-                if state.sub_pity_counter >= gacha.sub_bonus_max_value:
-                    state.total_counter += 1
-                    sub_bonus_tables = gacha.sub_bonus_tables
-                    state.sub_pity_counter -= gacha.sub_bonus_max_value
-                    current_sub_pity = state.sub_pity_counter
-                    rates = list(itertools.accumulate(gacha.sub_bonus_table_rate.rates))
-                    rng = random.randint(1, rates[-1])
-                    table_index = next(i for i, s in enumerate(rates) if rng <= s)
-                    table_rates = list(itertools.accumulate(t.rate for t in sub_bonus_tables[table_index]))
-                    rng = random.randint(1, table_rates[-1])
-                    result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                    sub_bonus = assets.card_master[sub_bonus_tables[table_index][result_index].card_id]
-                    await self.register_card_pulled(user.id, gacha.id, gacha.sub_bonus_table_rate.id, sub_bonus.id,
-                                                    state.total_counter, state.total_roll_counter, conn)
-
             await state.save(using_db=conn)
 
-            return GachaPullResult(cards, bonus, sub_bonus, current_pity, current_sub_pity)
+            return GachaPullResult(cards, bonus, sub_bonus, current_pity)
 
     async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int,
                                    pulled_at: int, pulled_at_roll: int, using_db: BaseDBAsyncClient):
@@ -326,7 +319,6 @@ class GachaPullResult(typing.NamedTuple):
     bonus: Optional[CardMaster]
     sub_bonus: Optional[CardMaster]
     pity_count: Optional[int]
-    sub_pity_count: Optional[int]
 
 
 def setup(bot):

@@ -153,9 +153,9 @@ class Gacha(commands.Cog):
             await ctx.send('Unsupported banner.')
             return
         draw_data = draw_data[0]
-        embed, file = await self.do_gacha_draw_and_get_message_data(ctx.author, gacha, draw_data, ctx.assets)
+        view, embed, file = await self.do_gacha_draw_and_get_message_data(ctx.author, gacha, draw_data, ctx.assets)
 
-        await ctx.send(embed=embed, file=file)
+        await ctx.send(view=view, embed=embed, file=file)
 
     @commands.command(name='pullstats',
                       aliases=['rollstats'],
@@ -211,7 +211,8 @@ class Gacha(commands.Cog):
                                                  user: Union[discord.User, discord.Member],
                                                  gacha: GachaMaster,
                                                  draw_data: GachaDrawMaster,
-                                                 assets: AssetManager) -> Tuple[discord.Embed, discord.File]:
+                                                 assets: AssetManager,
+                                                 ) -> Tuple[discord.ui.View, discord.Embed, discord.File]:
         draw_result = await self.do_gacha_draw(user, gacha, draw_data, assets)
         img = await self.create_pull_image(draw_result.cards, draw_result.bonus, draw_result.sub_bonus)
 
@@ -232,7 +233,9 @@ class Gacha(commands.Cog):
         if desc:
             embed.description = desc
 
-        return embed, discord.File(fp=buffer, filename='pull.png')
+        view = GachaPullView(self, GachaPullInvokeData(user, gacha, draw_data, assets))
+
+        return view, embed, discord.File(fp=buffer, filename='pull.png')
 
     async def do_gacha_draw(self,
                             user: Union[discord.User, discord.Member],
@@ -319,6 +322,28 @@ class GachaPullResult(typing.NamedTuple):
     bonus: Optional[CardMaster]
     sub_bonus: Optional[CardMaster]
     pity_count: Optional[int]
+
+
+class GachaPullInvokeData(typing.NamedTuple):
+    user: Union[discord.User, discord.Member]
+    gacha: GachaMaster
+    draw_data: GachaDrawMaster
+    assets: AssetManager
+
+
+class GachaPullAgainButton(discord.ui.Button['GachaPullView']):
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        view, embed, file = await self.view.cog.do_gacha_draw_and_get_message_data(*self.view.data)
+        await interaction.channel.send(view=view, embed=embed, file=file)
+
+
+class GachaPullView(discord.ui.View):
+    def __init__(self, cog: Gacha, data: GachaPullInvokeData, *args, **kwargs):
+        self.cog = cog
+        self.data = data
+        super(GachaPullView, self).__init__(*args, **kwargs)
+        self.add_item(GachaPullAgainButton(label='Pull Again', style=discord.ButtonStyle.success))
 
 
 def setup(bot):

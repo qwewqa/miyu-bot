@@ -352,5 +352,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
             return
         draw_data = draw_data[0]
         gacha_cog = self.bot.cogs['Gacha']
-        embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(interaction.user, gacha, draw_data, ctx.assets)
-        await ctx.send(embed=embed, file=file)  # response won't allow sending a message
+        view, embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(interaction.user,
+                                                                               gacha,
+                                                                               draw_data,
+                                                                               ctx.assets)
+        await ctx.send(view=view, embed=embed, file=file)  # response won't allow sending a file

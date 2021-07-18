@@ -1,8 +1,10 @@
+import functools
 import re
 from datetime import datetime
-from typing import Sequence
+from typing import Sequence, List
 
 import discord
+from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from d4dj_utils.master.gacha_table_master import GachaTableMaster
@@ -295,8 +297,53 @@ class GachaFilter(MasterFilter[GachaMaster]):
         attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f'{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
+    @functools.lru_cache()
+    def get_gacha_rateup_cards(self, gacha: GachaMaster) -> List[CardMaster]:
+        results = set()
+
+        def add_table(table_rate: GachaTableRateMaster, tables: Sequence[Sequence[GachaTableMaster]]):
+            # A bit redundant with the gacha tables embed source
+
+            for table_normalized_rate, table in zip(table_rate.normalized_rates, tables):
+                if table_normalized_rate == 0:
+                    continue
+                if not table:  # Just in case it's not in data yet
+                    return
+                rates = [t.rate for t in table]
+                total_rate = sum(rates)
+                rate_up_rate = max(rates)
+
+                # Exclude tables with no rate up, except those with very few rate ups (mainly for pity pull)
+                if total_rate == 0 or (rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05):
+                    continue
+
+                results.update(t.card for t in table if t.rate == rate_up_rate)
+
+        for table_rate in gacha.table_rates:
+            add_table(table_rate, gacha.tables)
+
+        if gacha.bonus_tables:
+            add_table(gacha.bonus_table_rate, gacha.bonus_tables)
+
+        if gacha.sub_bonus_tables:
+            add_table(gacha.sub_bonus_table_rate, gacha.sub_bonus_tables)
+
+        return sorted(results, key=lambda c: (-c.rarity_id, c.id))
+
+    @get_gacha_embed.shortcut_button(name='Cards')
+    @get_gacha_table_embed.shortcut_button(name='Cards')
+    async def cards_shortcut(self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction):
+        f = ctx.bot.master_filters.cards
+        view, embed = f.get_simple_list_view(ctx, self.get_gacha_rateup_cards(gacha), server)
+        await interaction.response.send_message(embed=embed, view=view)
+
+    @cards_shortcut.check
+    def check_gacha_shortcut(self, gacha: GachaMaster):
+        return bool(self.get_gacha_rateup_cards(gacha))
+
     @get_gacha_embed.shortcut_button(name='Pull')
-    async def event_shortcut(self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction):
+    @get_gacha_table_embed.shortcut_button(name='Pull')
+    async def pull_shortcut(self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction):
         await interaction.response.defer()
         draw_data = [d for d in gacha.draw_data
                      if (d.stock_id == 902) or (d.stock_id in (1, 2) and d.stock_amount == 3000)]

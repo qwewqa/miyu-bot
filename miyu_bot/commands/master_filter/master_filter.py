@@ -254,7 +254,8 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                                ctx: PrefContext,
                                values: List,
                                server: Server,
-                               source: Union[EmbedSourceCallable]) -> Tuple[discord.ui.View, discord.Embed]:
+                               source: [EmbedSourceCallable, CommandSourceInfo]) -> Tuple[
+        discord.ui.View, discord.Embed]:
         if hasattr(source, '_command_source_info'):
             source = source._command_source_info
         results = FilterResults(master_filter=self,
@@ -262,7 +263,17 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                                 server=server,
                                 values=values)
         view = FilterDetailView(self, ctx, results)
-        view.target_server = server
+        return view, view.active_embed
+
+    def get_simple_list_view(self,
+                             ctx: PrefContext,
+                             values: List,
+                             server: Server) -> Tuple[discord.ui.View, discord.Embed]:
+        results = FilterResults(master_filter=self,
+                                command_source_info=None,
+                                server=server,
+                                values=values)
+        view = FilterListView(self, ctx, results)
         return view, view.active_embed
 
     def get_list_command_function(self):

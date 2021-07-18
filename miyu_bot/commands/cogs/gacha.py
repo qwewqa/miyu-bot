@@ -64,8 +64,7 @@ class Gacha(commands.Cog):
             1: self.load_image('CharaIcon_RarityIcon_Evolution.png'),
         }
 
-        for card in self.bot.assets[Server.JP].card_master.values():
-            self.images.append(self.get_card_icon(card))
+        self.bot.loop.create_task(self.preload_card_icons())
 
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'gacha.ftl')
         self.pull_locks = defaultdict(lambda: asyncio.Lock())
@@ -74,6 +73,11 @@ class Gacha(commands.Cog):
         image = Image.open(self.base_path / path)
         self.images.append(image)
         return image
+
+    async def preload_card_icons(self):
+        for card in self.bot.assets[Server.JP].card_master.values():
+            self.get_card_icon(card)
+            await asyncio.sleep(0)
 
     async def create_pull_image(self,
                                 cards: List[CardMaster],

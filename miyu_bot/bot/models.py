@@ -263,17 +263,19 @@ class User(PreferenceScope):
 
 class GachaState(Model):
     user_id = fields.BigIntField()
+    server_id = fields.IntField()
     gacha_id = fields.IntField()
     pity_counter = fields.IntField(default=0)
     total_counter = fields.IntField(default=0)
     total_roll_counter = fields.IntField(default=0)
 
     class Meta:
-        unique_together = (('user_id', 'gacha_id'),)
+        unique_together = (('user_id', 'server_id', 'gacha_id'),)
 
 
 class CollectionEntry(Model):
     user_id = fields.BigIntField(index=True)
+    server_id = fields.IntField()
     gacha_id = fields.IntField()
     table_rate_id = fields.IntField()
     card_id = fields.IntField()
@@ -282,7 +284,7 @@ class CollectionEntry(Model):
     counter = fields.IntField(default=0)
 
     class Meta:
-        unique_together = (('user_id', 'gacha_id', 'table_rate_id', 'card_id'),)
+        unique_together = (('user_id', 'server_id', 'gacha_id', 'table_rate_id', 'card_id'),)
 
 
 class CommandUsageCount(Model):

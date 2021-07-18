@@ -322,10 +322,10 @@ class GachaFilter(MasterFilter[GachaMaster]):
         for table_rate in gacha.table_rates:
             add_table(table_rate, gacha.tables)
 
-        if gacha.bonus_tables:
+        if gacha.bonus_max_value:
             add_table(gacha.bonus_table_rate, gacha.bonus_tables)
 
-        if gacha.sub_bonus_tables:
+        if gacha.sub_bonus_max_value:
             add_table(gacha.sub_bonus_table_rate, gacha.sub_bonus_tables)
 
         return sorted(results, key=lambda c: (-c.rarity_id, c.id))
@@ -355,5 +355,6 @@ class GachaFilter(MasterFilter[GachaMaster]):
         view, embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(interaction.user,
                                                                                gacha,
                                                                                draw_data,
-                                                                               ctx.assets)
+                                                                               ctx.assets,
+                                                                               server)
         await ctx.send(view=view, embed=embed, file=file)  # response won't allow sending a file

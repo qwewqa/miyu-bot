@@ -142,6 +142,7 @@ class Gacha(commands.Cog):
         if not arg:
             await ctx.send('A gacha id must be given (can be found using the !banner command and checking the footer).')
             return
+        await arg.update_preferences(ctx)
         name = arg.text()
         arg.require_all_arguments_used()
         if not name.isnumeric():
@@ -157,7 +158,11 @@ class Gacha(commands.Cog):
             await ctx.send('Unsupported banner.')
             return
         draw_data = draw_data[0]
-        view, embed, file = await self.do_gacha_draw_and_get_message_data(ctx.author, gacha, draw_data, ctx.assets)
+        view, embed, file = await self.do_gacha_draw_and_get_message_data(ctx.author,
+                                                                          gacha,
+                                                                          draw_data,
+                                                                          ctx.assets,
+                                                                          ctx.preferences.server)
 
         await ctx.send(view=view, embed=embed, file=file)
 
@@ -216,15 +221,16 @@ class Gacha(commands.Cog):
                                                  gacha: GachaMaster,
                                                  draw_data: GachaDrawMaster,
                                                  assets: AssetManager,
+                                                 server: Server,
                                                  ) -> Tuple[discord.ui.View, discord.Embed, discord.File]:
-        draw_result = await self.do_gacha_draw(user, gacha, draw_data, assets)
+        draw_result = await self.do_gacha_draw(user, gacha, draw_data, assets, server)
         img = await self.create_pull_image(draw_result.cards, draw_result.bonus, draw_result.sub_bonus)
 
         buffer = BytesIO()
         img.save(buffer, 'png')
         buffer.seek(0)
 
-        embed = discord.Embed(title=gacha.name)
+        embed = discord.Embed(title=f'[{server.name}] {gacha.name}')
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
         embed.set_thumbnail(url=thumb_url)
         embed.set_image(url='attachment://pull.png')
@@ -238,7 +244,7 @@ class Gacha(commands.Cog):
         if desc:
             embed.description = desc
 
-        view = GachaPullView(self, GachaPullInvokeData(user, gacha, draw_data, assets))
+        view = GachaPullView(self, GachaPullInvokeData(user, gacha, draw_data, assets, server))
 
         return view, embed, discord.File(fp=buffer, filename='pull.png')
 
@@ -246,12 +252,16 @@ class Gacha(commands.Cog):
                             user: Union[discord.User, discord.Member],
                             gacha: GachaMaster,
                             draw_data: GachaDrawMaster,
-                            assets: AssetManager) -> 'GachaPullResult':
+                            assets: AssetManager,
+                            server: Server) -> 'GachaPullResult':
         async with self.pull_locks[user.id], in_transaction() as conn:
             tables = gacha.tables
             tables_rates = [list(itertools.accumulate(t.rate for t in table)) for table in tables]
 
-            state, _ = await GachaState.get_or_create(user_id=user.id, gacha_id=gacha.id, using_db=conn)
+            state, _ = await GachaState.get_or_create(user_id=user.id,
+                                                      server_id=int(server),
+                                                      gacha_id=gacha.id,
+                                                      using_db=conn)
             state.total_roll_counter += 1
 
             cards = []
@@ -265,7 +275,7 @@ class Gacha(commands.Cog):
                     rng = random.randint(1, table_rates[-1])
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                     card = assets.card_master[tables[table_index][result_index].card_id]
-                    await self.register_card_pulled(user.id, gacha.id, table_rate.id, card.id,
+                    await self.register_card_pulled(user.id, int(server), gacha.id, table_rate.id, card.id,
                                                     state.total_counter, state.total_roll_counter, conn)
                     cards.append(card)
 
@@ -287,8 +297,8 @@ class Gacha(commands.Cog):
                     rng = random.randint(1, table_rates[-1])
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                     sub_bonus = assets.card_master[sub_bonus_tables[table_index][result_index].card_id]
-                    await self.register_card_pulled(user.id, gacha.id, gacha.sub_bonus_table_rate.id, sub_bonus.id,
-                                                    state.total_counter, state.total_roll_counter, conn)
+                    await self.register_card_pulled(user.id, int(server), gacha.id, gacha.sub_bonus_table_rate.id,
+                                                    sub_bonus.id, state.total_counter, state.total_roll_counter, conn)
                 if current_pity >= gacha.bonus_max_value:
                     state.total_counter += 1
                     bonus_tables = gacha.bonus_tables
@@ -301,16 +311,17 @@ class Gacha(commands.Cog):
                     rng = random.randint(1, table_rates[-1])
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                     bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
-                    await self.register_card_pulled(user.id, gacha.id, gacha.bonus_table_rate.id, bonus.id,
+                    await self.register_card_pulled(user.id, int(server), gacha.id, gacha.bonus_table_rate.id, bonus.id,
                                                     state.total_counter, state.total_roll_counter, conn)
 
             await state.save(using_db=conn)
 
             return GachaPullResult(cards, bonus, sub_bonus, current_pity)
 
-    async def register_card_pulled(self, user_id: int, gacha_id: int, table_rate_id: int, card_id: int,
+    async def register_card_pulled(self, user_id: int, server_id: int, gacha_id: int, table_rate_id: int, card_id: int,
                                    pulled_at: int, pulled_at_roll: int, using_db: BaseDBAsyncClient):
         entry, _created = await CollectionEntry.get_or_create(user_id=user_id,
+                                                              server_id=server_id,
                                                               gacha_id=gacha_id,
                                                               table_rate_id=table_rate_id,
                                                               card_id=card_id,
@@ -334,6 +345,7 @@ class GachaPullInvokeData(typing.NamedTuple):
     gacha: GachaMaster
     draw_data: GachaDrawMaster
     assets: AssetManager
+    server: Server
 
 
 class GachaPullAgainButton(discord.ui.Button['GachaPullView']):

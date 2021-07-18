@@ -35,8 +35,9 @@ class MiyuBot(commands.Bot):
     config: dict
     scripts_path: Optional[Path]
 
-    def __init__(self, asset_path, *args, **kwargs):
+    def __init__(self, asset_path, gen_doc: bool = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.gen_doc = gen_doc
         self.asset_path = Path(asset_path)
         self.assets = {
             Server.JP: AssetManager(self.asset_path,

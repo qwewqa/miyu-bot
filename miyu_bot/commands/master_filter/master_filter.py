@@ -91,7 +91,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 init_function(self, d)
 
         # Skips the more time consuming loading when generating docs
-        if getattr(bot, 'gen_doc', False):
+        if bot.gen_doc:
             return
 
         for server, manager in bot.assets.items():

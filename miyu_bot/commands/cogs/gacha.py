@@ -142,7 +142,6 @@ class Gacha(commands.Cog):
         if not arg:
             await ctx.send('A gacha id must be given (can be found using the !banner command and checking the footer).')
             return
-        await arg.update_preferences(ctx)
         name = arg.text()
         arg.require_all_arguments_used()
         if not name.isnumeric():

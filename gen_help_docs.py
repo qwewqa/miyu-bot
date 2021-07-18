@@ -8,7 +8,7 @@ from timeit import default_timer as timer
 if __name__ == '__main__':
     start = timer()
 
-    bot = MiyuBot('assets', command_prefix='!')
+    bot = MiyuBot('assets', gen_doc=True, command_prefix='!')
     bot.gen_doc = True
 
     bot.load_extension('miyu_bot.commands.cogs.info')

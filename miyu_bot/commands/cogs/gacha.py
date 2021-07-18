@@ -335,7 +335,8 @@ class GachaPullInvokeData(typing.NamedTuple):
 class GachaPullAgainButton(discord.ui.Button['GachaPullView']):
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        view, embed, file = await self.view.cog.do_gacha_draw_and_get_message_data(*self.view.data)
+        invoke_data = self.view.data._replace(user=interaction.user)
+        view, embed, file = await self.view.cog.do_gacha_draw_and_get_message_data(*invoke_data)
         await interaction.channel.send(view=view, embed=embed, file=file)
 
 

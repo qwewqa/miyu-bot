@@ -224,8 +224,9 @@ class Gacha(commands.Cog):
         thumb_url = self.bot.asset_url + get_asset_filename(gacha.banner_path)
         embed.set_thumbnail(url=thumb_url)
         embed.set_image(url='attachment://pull.png')
+        embed.set_footer(text=str(gacha.id))
 
-        desc = ''
+        desc = f'{user.mention}\n'
         if draw_result.pity_count is not None:
             desc += f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}\n'
         if draw_result.pity_count is not None and gacha.sub_bonus_max_value:

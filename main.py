@@ -38,7 +38,8 @@ async def get_prefix(bot: MiyuBot, message: discord.Message):
 
 bot = MiyuBot('assets', command_prefix=get_prefix, case_insensitive=True,
               activity=discord.Game(name='https://discord.gg/TThMwrAZTR'),
-              owner_ids={169163991434788865})
+              owner_ids={169163991434788865},
+              allowed_mentions=discord.AllowedMentions.none())
 
 bot.config = config
 

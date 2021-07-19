@@ -117,14 +117,14 @@
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../ja/" hreflang="ja" class="md-select__link">
-                    日本語
+                  <a href="../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
+                    繁體中文
                   </a>
                 </li>
                 
                 <li class="md-select__item">
-                  <a href="../../../zh_TW/" hreflang="zh_TW" class="md-select__link">
-                    繁體中文
+                  <a href="../../../ja/" hreflang="ja" class="md-select__link">
+                    日本語
                   </a>
                 </li>
                 
@@ -953,12 +953,12 @@
 </details>
 <details class="example"><summary>Examples</summary><p><code>sort=character</code><br />
 <code>sort&lt;character</code><br />
-<code>character=airi</code><br />
-<code>character=muni,tsubaki,haruki</code><br />
-<code>character!=muni,tsubaki,haruki</code><br />
-<code>$muni $tsubaki $haruki</code><br />
-<code>$!airi $!syano</code><br />
-<code>muni tsubaki haruki</code></p>
+<code>character=dennojo</code><br />
+<code>character=yuka,kurumi,touka</code><br />
+<code>character!=yuka,kurumi,touka</code><br />
+<code>$yuka $kurumi $touka</code><br />
+<code>$!dennojo $!fubuki</code><br />
+<code>yuka kurumi touka</code></p>
 </details>
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -982,11 +982,11 @@
 </details>
 <details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=その他</code><br />
-<code>unit=燐舞曲,merm4id,photon_maiden</code><br />
-<code>unit!=燐舞曲,merm4id,photon_maiden</code><br />
-<code>$燐舞曲 $merm4id $photon_maiden</code><br />
-<code>$!その他 $!merm4id</code></p>
+<code>unit=lyrical_lily</code><br />
+<code>unit=merm4id,燐舞曲,その他</code><br />
+<code>unit!=merm4id,燐舞曲,その他</code><br />
+<code>$merm4id $燐舞曲 $その他</code><br />
+<code>$!lyrical_lily $!燐舞曲</code></p>
 </details>
 <h3 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1007,11 +1007,11 @@
 </details>
 <details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
-<code>attribute=elegant</code><br />
-<code>attribute=elegant,party,cool</code><br />
-<code>attribute!=elegant,party,cool</code><br />
-<code>$elegant $party $cool</code><br />
-<code>$!elegant $!party</code></p>
+<code>attribute=cool</code><br />
+<code>attribute=street,elegant,cool</code><br />
+<code>attribute!=street,elegant,cool</code><br />
+<code>$street $elegant $cool</code><br />
+<code>$!cool $!cute</code></p>
 </details>
 <h3 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1151,7 +1151,7 @@
 </details>
 <details class="example"><summary>Examples</summary><p><code>sort=rarity</code><br />
 <code>sort&lt;rarity</code><br />
-<code>2* 1* 4*</code></p>
+<code>4* 2* 3*</code></p>
 </details>
 <h3 id="skill">skill<a class="headerlink" href="#skill" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
@@ -1218,8 +1218,8 @@
 <details class="example"><summary>Examples</summary><p><code>sort=availability</code><br />
 <code>sort&lt;availability</code><br />
 <code>disp=availability</code><br />
-<code>$welfare $unknown_availability $limited</code><br />
-<code>$!limited $!unknown_availability</code></p>
+<code>$welfare $limited $unknown_availability</code><br />
+<code>$!limited $!permanent</code></p>
 </details>
                 
               

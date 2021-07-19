@@ -120,8 +120,8 @@ class MiyuHelp(commands.DefaultHelpCommand):
         channel = self.get_destination()
         language = {
             'en-US': '',
-            'zh-TW': 'ja/',
-            'ja': 'zh_TW/',
+            'zh-TW': 'zh_TW/',
+            'ja': 'ja/',
         }[self.context.preferences.language]
         if command.hidden:
             return

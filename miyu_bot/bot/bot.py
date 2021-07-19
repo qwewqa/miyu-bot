@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from typing import Optional, Union, Dict
 
 import aiohttp
+import discord.ext.commands
 import pytz
 from d4dj_utils.master.asset_manager import AssetManager
 from discord.ext import commands
@@ -115,19 +116,24 @@ class MiyuHelp(commands.DefaultHelpCommand):
     help_url = 'https://miyu-docs.qwewqa.xyz/'
     context: 'PrefContext'
 
-    async def send_command_help(self, command):
+    async def send_command_help(self, command: discord.ext.commands.Command):
+        channel = self.get_destination()
+        language = {
+            'en-US': '',
+            'zh-TW': 'ja/',
+            'ja': 'zh_TW/',
+        }[self.context.preferences.language]
+        if command.hidden:
+            return
         if command.cog_name == 'Info' and hasattr(command, 'master_filter'):
-            channel = self.get_destination()
-            language = {
-                'en-US': '',
-                'zh-TW': 'ja/',
-                'ja': 'zh_TW/',
-            }[self.context.preferences.language]
             master_filter = command.master_filter
             filter_name = master_filter.name.replace('_filter', '')
-            await channel.send(f'{self.help_url}{language}commands/info/{filter_name}/#{command.name}')
+            url = f'{self.help_url}{language}commands/info/{filter_name}/#{command.name}'.replace(' ', '-')
+            await channel.send(url)
         else:
-            await super(MiyuHelp, self).send_command_help(command)
+            cog_name = command.cog.qualified_name.lower()
+            url = f'{self.help_url}{language}commands/utility/{cog_name}/#{command.qualified_name}'.replace(' ', '-')
+            await channel.send(url)
 
 
 class Preferences(SimpleNamespace):

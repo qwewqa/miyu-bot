@@ -1,9 +1,10 @@
 # General Usage
 Commands fit broadly into two categories: *Info* and *Utility*.
-This is the *Info* category, which means these commands bring up data from the game.
 
-Commands in the Info category support a common set of argument types
-to allow for specific filtering and display options of search results.
+Commands in the *Utility* category vary in usage, and details can be found in a per-command basis.
+
+Commands in the *Info* category are organized into groups, which each have their own set
+of accepted arguments which fall under the below types.
 
 ## Argument Types
 

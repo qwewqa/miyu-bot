@@ -5,6 +5,8 @@ from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.commands.docs.info_command_docs import generate_info_command_docs
 from timeit import default_timer as timer
 
+from miyu_bot.commands.docs.utility_command_docs import generate_utility_command_docs
+
 if __name__ == '__main__':
     start = timer()
 
@@ -24,5 +26,6 @@ if __name__ == '__main__':
     random.seed(0)
 
     generate_info_command_docs(bot, Path(__file__).parent / 'docs/commands/info', bot.cogs['Info'].master_filters)
+    generate_utility_command_docs(bot, Path(__file__).parent / 'docs/commands/utility')
 
     print(f'Generated docs in {timer() - start}s.')

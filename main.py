@@ -85,7 +85,7 @@ async def on_command_error(context: commands.Context, exception):
 async def on_command(ctx: commands.Context):
     if not ctx.guild:
         return
-    cnt, _ = await CommandUsageCount.get_or_create(guild_id=ctx.guild.id, name=ctx.command.name,
+    cnt, _ = await CommandUsageCount.get_or_create(guild_id=ctx.guild.id, name=ctx.command.qualified_name,
                                                    date=datetime.datetime.utcnow().date())
     cnt.counter = F('counter') + 1
     await cnt.save()

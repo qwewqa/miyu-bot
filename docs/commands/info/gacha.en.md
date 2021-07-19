@@ -94,12 +94,12 @@
      - suisei
 
 ??? example "Examples"
-    `character=saki`  
-    `character=muni,shinobu,pekora`  
-    `character!=muni,shinobu,pekora`  
-    `character==muni,shinobu,pekora`  
-    `$muni $shinobu $pekora`  
-    `$!saki $!ibuki`
+    `character=ku`  
+    `character=shinobu,miyu,esora`  
+    `character!=shinobu,miyu,esora`  
+    `character==shinobu,miyu,esora`  
+    `$shinobu $miyu $esora`  
+    `$!ku $!kurumi`
 
 ### unit
 
@@ -120,11 +120,11 @@
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=スペシャル`  
-    `unit=mixed,merm4id,スペシャル`  
-    `unit!=mixed,merm4id,スペシャル`  
-    `$mixed $merm4id $スペシャル`  
-    `$!スペシャル $!燐舞曲`
+    `unit=その他`  
+    `unit=merm4id,mixed,happy_around!`  
+    `unit!=merm4id,mixed,happy_around!`  
+    `$merm4id $mixed $happy_around!`  
+    `$!その他 $!lyrical_lily`
 
 ### attribute
 
@@ -141,11 +141,11 @@
 ??? example "Examples"
     `sort=attribute`  
     `sort<attribute`  
-    `attribute=party`  
-    `attribute=elegant,cute,party`  
-    `attribute!=elegant,cute,party`  
-    `$elegant $cute $party`  
-    `$!party $!cool`
+    `attribute=cute`  
+    `attribute=party,cute,street`  
+    `attribute!=party,cute,street`  
+    `$party $cute $street`  
+    `$!cute $!street`
 
 ### id
 

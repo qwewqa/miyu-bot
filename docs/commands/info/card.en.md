@@ -93,12 +93,12 @@ Card related commands.
 ??? example "Examples"
     `sort=character`  
     `sort<character`  
-    `character=dennojo`  
-    `character=yuka,kurumi,touka`  
-    `character!=yuka,kurumi,touka`  
-    `$yuka $kurumi $touka`  
-    `$!dennojo $!fubuki`  
-    `yuka kurumi touka`
+    `character=rika`  
+    `character=saori,dalia,ibuki`  
+    `character!=saori,dalia,ibuki`  
+    `$saori $dalia $ibuki`  
+    `$!rika $!suisei`  
+    `saori dalia ibuki`
 
 ### unit
 
@@ -121,11 +121,11 @@ Card related commands.
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=lyrical_lily`  
-    `unit=merm4id,燐舞曲,その他`  
-    `unit!=merm4id,燐舞曲,その他`  
-    `$merm4id $燐舞曲 $その他`  
-    `$!lyrical_lily $!燐舞曲`
+    `unit=その他`  
+    `unit=peaky_p-key,photon_maiden,燐舞曲`  
+    `unit!=peaky_p-key,photon_maiden,燐舞曲`  
+    `$peaky_p-key $photon_maiden $燐舞曲`  
+    `$!その他 $!happy_around!`
 
 ### attribute
 
@@ -146,10 +146,10 @@ Card related commands.
     `sort=attribute`  
     `sort<attribute`  
     `attribute=cool`  
-    `attribute=street,elegant,cool`  
-    `attribute!=street,elegant,cool`  
-    `$street $elegant $cool`  
-    `$!cool $!cute`
+    `attribute=cute,elegant,cool`  
+    `attribute!=cute,elegant,cool`  
+    `$cute $elegant $cool`  
+    `$!cool $!street`
 
 ### id
 
@@ -282,7 +282,7 @@ Card related commands.
 ??? example "Examples"
     `sort=rarity`  
     `sort<rarity`  
-    `4* 2* 3*`
+    `2* 1* 4*`
 
 ### skill
 
@@ -345,5 +345,5 @@ Card related commands.
     `sort=availability`  
     `sort<availability`  
     `disp=availability`  
-    `$welfare $limited $unknown_availability`  
-    `$!limited $!permanent`
+    `$birthday $limited $collaboration`  
+    `$!birthday $!welfare`

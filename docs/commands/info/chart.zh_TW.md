@@ -56,11 +56,11 @@
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=スペシャル`  
-    `unit=happy_around!,peaky_p-key,merm4id`  
-    `unit!=happy_around!,peaky_p-key,merm4id`  
-    `$happy_around! $peaky_p-key $merm4id`  
-    `$!スペシャル $!その他`
+    `unit=lyrical_lily`  
+    `unit=merm4id,peaky_p-key,lyrical_lily`  
+    `unit!=merm4id,peaky_p-key,lyrical_lily`  
+    `$merm4id $peaky_p-key $lyrical_lily`  
+    `$!lyrical_lily $!peaky_p-key`
 
 ### id
 
@@ -107,13 +107,13 @@
 ??? example "Examples"
     `sort=difficulty`  
     `sort<difficulty`  
-    `difficulty=expert`  
-    `difficulty=hard,easy,normal`  
-    `difficulty!=hard,easy,normal`  
+    `difficulty=easy`  
+    `difficulty=easy,expert,hard`  
+    `difficulty!=easy,expert,hard`  
     `difficulty>hard`  
-    `$hard $easy $normal`  
-    `$!expert $!hard`  
-    `hard easy normal`
+    `$easy $expert $hard`  
+    `$!easy $!hard`  
+    `easy expert hard`
 
 ### level
 

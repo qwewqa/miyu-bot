@@ -78,12 +78,12 @@
      - suisei
 
 ??? example "Examples"
-    `character=suisei`  
-    `character=marika,rei,towa`  
-    `character!=marika,rei,towa`  
-    `character==marika,rei,towa`  
-    `$marika $rei $towa`  
-    `$!suisei $!towa`
+    `character=dennojo`  
+    `character=rei,maho,pekora`  
+    `character!=rei,maho,pekora`  
+    `character==rei,maho,pekora`  
+    `$rei $maho $pekora`  
+    `$!dennojo $!marika`
 
 ### unit
 
@@ -104,11 +104,11 @@
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=photon_maiden`  
-    `unit=mixed,燐舞曲,happy_around!`  
-    `unit!=mixed,燐舞曲,happy_around!`  
-    `$mixed $燐舞曲 $happy_around!`  
-    `$!photon_maiden $!lyrical_lily`
+    `unit=スペシャル`  
+    `unit=燐舞曲,peaky_p-key,その他`  
+    `unit!=燐舞曲,peaky_p-key,その他`  
+    `$燐舞曲 $peaky_p-key $その他`  
+    `$!スペシャル $!peaky_p-key`
 
 ### attribute
 
@@ -125,11 +125,11 @@
 ??? example "Examples"
     `sort=attribute`  
     `sort<attribute`  
-    `attribute=elegant`  
-    `attribute=party,street,elegant`  
-    `attribute!=party,street,elegant`  
-    `$party $street $elegant`  
-    `$!elegant $!cool`
+    `attribute=street`  
+    `attribute=cute,cool,street`  
+    `attribute!=cute,cool,street`  
+    `$cute $cool $street`  
+    `$!street $!cute`
 
 ### type
 
@@ -147,11 +147,11 @@
     `sort=type`  
     `sort<type`  
     `disp=type`  
-    `type=poker`  
-    `type=medley,poker,raid`  
-    `type!=medley,poker,raid`  
-    `$medley $poker $raid`  
-    `$!poker $!medley`
+    `type=nothing`  
+    `type=nothing,raid,medley`  
+    `type!=nothing,raid,medley`  
+    `$nothing $raid $medley`  
+    `$!nothing $!poker`
 
 ### parameter
 
@@ -170,8 +170,8 @@
 ??? example "Examples"
     `sort=parameter`  
     `sort<parameter`  
-    `parameter=physical`  
-    `parameter=heart,technique,no_parameter`  
-    `parameter!=heart,technique,no_parameter`  
-    `$heart $technique $no_parameter`  
-    `$!physical $!heart`
+    `parameter=no_parameter`  
+    `parameter=physical,technique,no_parameter`  
+    `parameter!=physical,technique,no_parameter`  
+    `$physical $technique $no_parameter`  
+    `$!no_parameter $!heart`

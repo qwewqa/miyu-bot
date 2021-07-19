@@ -35,7 +35,7 @@ def generate_master_filter_docs(bot: MiyuBot, docs_path: Path, master_filter: Ma
         md.add_all(get_command_source_help_texts(master_filter, l10n))
         md.heading(2, l10n.format_value('heading-attributes'))
         md.add_all(get_attribute_help_text(attr, l10n) for attr in master_filter.data_attributes)
-        filename = master_filter.name.replace('_filter', '')
+        filename = master_filter.name.replace('_filter', '').replace('_', '-')
         (docs_path / f'{filename}.{locale_filename}.md').write_text(md.get(), encoding='utf-8')
 
 

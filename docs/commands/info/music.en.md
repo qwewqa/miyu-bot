@@ -74,11 +74,11 @@
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=photon_maiden`  
-    `unit=その他,photon_maiden,燐舞曲`  
-    `unit!=その他,photon_maiden,燐舞曲`  
-    `$その他 $photon_maiden $燐舞曲`  
-    `$!photon_maiden $!peaky_p-key`
+    `unit=燐舞曲`  
+    `unit=lyrical_lily,燐舞曲,その他`  
+    `unit!=lyrical_lily,燐舞曲,その他`  
+    `$lyrical_lily $燐舞曲 $その他`  
+    `$!燐舞曲 $!lyrical_lily`
 
 ### id
 

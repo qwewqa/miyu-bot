@@ -116,6 +116,16 @@ class MiyuHelp(commands.DefaultHelpCommand):
     help_url = 'https://miyu-docs.qwewqa.xyz/'
     context: 'PrefContext'
 
+    async def send_bot_help(self, mapping):
+        channel = self.get_destination()
+        language = {
+            'en-US': '',
+            'zh-TW': 'zh_TW/',
+            'ja': 'ja/',
+        }[self.context.preferences.language]
+        url = f'{self.help_url}{language}'
+        await channel.send(url)
+
     async def send_command_help(self, command: discord.ext.commands.Command):
         channel = self.get_destination()
         language = {
@@ -133,6 +143,23 @@ class MiyuHelp(commands.DefaultHelpCommand):
         else:
             cog_name = command.cog.qualified_name.lower()
             url = f'{self.help_url}{language}commands/utility/{cog_name}/#{command.qualified_name}'.replace(' ', '-')
+            await channel.send(url)
+
+    async def send_group_help(self, group):
+        await self.send_command_help(group)
+
+    async def send_cog_help(self, cog):
+        channel = self.get_destination()
+        language = {
+            'en-US': '',
+            'zh-TW': 'zh_TW/',
+            'ja': 'ja/',
+        }[self.context.preferences.language]
+        if cog.qualified_name == 'Info':
+            url = f'{self.help_url}{language}commands/general-usage/'
+            await channel.send(url)
+        else:
+            url = f'{self.help_url}{language}commands/utility/{cog.qualified_name.lower()}/'.replace(' ', '-')
             await channel.send(url)
 
 

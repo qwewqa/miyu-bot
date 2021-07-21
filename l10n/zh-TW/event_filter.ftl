@@ -16,7 +16,7 @@ status-name = { $status ->
     [Ranks_Fixed] 等級修正
     [Results] 結算
     [Ended] 已結束
-   *[other] { $event-type }
+   *[other] Unknown
 }
 
 event-type = 活動類型
@@ -25,7 +25,7 @@ event-type-name = { $event-type ->
     [Medley] 組曲
     [Poker] 德州撲克
     [Raid] 討伐
-   *[other] Unknown
+   *[other] { $event-type }
 }
 
 bonus-characters = 加成角色

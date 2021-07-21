@@ -16,7 +16,7 @@ status-name = { $status ->
     [Ranks_Fixed] 等級修正
     [Results] 結算
     [Ended] 已結束
-   *[other] Unknown
+   *[other] { $event-type }
 }
 
 event-type = 活動類型

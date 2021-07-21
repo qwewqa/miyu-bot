@@ -25,7 +25,7 @@ event-type-name = { $event-type ->
     [Medley] メドレー
     [Poker] ポーカー
     [Raid] レイド
-   *[other] Unknown
+   *[other] { $event-type }
 }
 
 bonus-characters = キャラ特攻

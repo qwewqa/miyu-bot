@@ -25,7 +25,8 @@ event-type-name = { $event-type ->
     [Medley] Medley
     [Poker] Poker
     [Raid] Raid
-   *[other] Unknown
+    [Slot] Slot
+   *[other] { $event-type }
 }
 
 bonus-characters = Bonus Characters

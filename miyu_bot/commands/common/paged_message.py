@@ -43,7 +43,8 @@ async def run_paged_message(ctx: Context,
                   .set_footer(text=f'Page {i + 1}/{len(paged_entries)}')
               for i, page in enumerate(paged_entries)]
 
-    page_titles = [f'Page {i + 1}. #{i * 25 + 1}-{i * 25 + len(page)}' for i, page in enumerate(paged_entries)]
+    page_titles = [f'Page {i + 1}. #{i * page_size + 1}-{i * page_size + len(page)}'
+                   for i, page in enumerate(paged_entries)]
 
     await ctx.send(embed=embeds[start_page],
                    files=files,

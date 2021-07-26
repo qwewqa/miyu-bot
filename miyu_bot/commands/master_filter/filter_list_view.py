@@ -61,7 +61,8 @@ class FilterListView(PagedMessageView):
                       .set_footer(text=f'Page {i + 1}/{len(paged_entries)}')
                   for i, page in enumerate(paged_entries)]
 
-        page_titles = [f'Page {i + 1}. #{i * 25 + 1}-{i * 25 + len(page)}' for i, page in enumerate(paged_entries)]
+        page_titles = [f'Page {i + 1}. #{i * self.page_size + 1}-{i * self.page_size + len(page)}'
+                       for i, page in enumerate(paged_entries)]
 
         self.item_select = FilterListItemSelect(placeholder='Details', row=3)
         super(FilterListView, self).__init__(embeds=embeds,

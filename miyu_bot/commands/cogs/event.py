@@ -152,9 +152,9 @@ class Event(commands.Cog):
                       help='!leaderboard')
     async def leaderboard(self, ctx: commands.Context):
         text = self.get_leaderboard_text(self.bot.master_filters.events.get_latest_event(ctx),
-                                          None,
-                                          await self.get_leaderboard_data(),
-                                          None)
+                                         None,
+                                         await self.get_leaderboard_data(),
+                                         None)
         asyncio.ensure_future(run_deletable_message(ctx, content=text))
 
     @commands.command(name='detailed_leaderboard',

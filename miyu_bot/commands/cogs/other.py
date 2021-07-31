@@ -179,7 +179,7 @@ class Other(commands.Cog):
         embed.add_field(name='Donate', value='https://ko-fi.com/qwewqa', inline=False)
         embed.add_field(name='Server', value='https://discord.gg/TThMwrAZTR', inline=False)
         embed.add_field(name='Bot Invite',
-                        value='https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=379968&scope=bot',
+                        value='https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=379968&scope=bot+applications.commands',
                         inline=False)
         embed.add_field(name='Acknowledgements',
                         value='Farley#8054 (Mechanics Testing)\n'

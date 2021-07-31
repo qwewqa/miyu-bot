@@ -5,7 +5,7 @@ Usage and command information can be found under [Commands](commands/general-usa
 ## Information
 
 ### Bot
-Invite: <https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=379968&scope=bot>  
+Invite: <https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=379968&scope=bot+applications.commands>  
 Server: <https://discord.gg/TThMwrAZTR>
 
 ### Developer

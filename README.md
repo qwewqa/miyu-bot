@@ -1,6 +1,6 @@
 # Miyu Bot
 A Discord utility bot for mobile rhythm game D4DJ Groovy Mix.
-
+See the [website](https://miyu-docs.qwewqa.xyz/) for more information.
 
 ## Setup
 

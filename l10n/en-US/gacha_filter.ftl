@@ -11,7 +11,7 @@ info-desc =
     }
     Sub-Pity Requirement: { $sub-pity-requirement ->
         [None] { none }
-       *[other] { $pity-requirement }
+       *[other] { $sub-pity-requirement }
     }
     Select Requirement: { $select-requirement ->
         [None] { none }

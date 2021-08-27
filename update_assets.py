@@ -28,7 +28,7 @@ async def main():
 
     revision_manager = RevisionManager(asset_path, base_url)
     await revision_manager.repair_downloads()
-    await revision_manager.update_assets()
+    await revision_manager.update_assets(lambda p: 'plain' not in p)
     manager = AssetManager(asset_path)
     manager.render_charts_by_master()
 

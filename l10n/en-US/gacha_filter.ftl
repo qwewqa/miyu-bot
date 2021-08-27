@@ -18,8 +18,15 @@ info-desc =
        *[other] { $select-requirement }
     }
     Type: { gacha-type }
+    Category: { category }
 
 gacha-type = { $gacha-type ->
+    [Normal] Normal
+    [StepUp] Step Up
+   *[other] Unknown
+}
+
+category = { $category ->
     [Normal] Normal
     [Tutorial] Tutorial
     [Event] Event

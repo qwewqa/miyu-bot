@@ -22,6 +22,7 @@ class Audio(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
+        return
 
         self.live_interaction_paths = [interaction_dir for interaction_dir in
                                        (self.bot.assets[Server.JP].path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if

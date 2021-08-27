@@ -22,7 +22,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
         return f'{value.name} {value.id}'
 
     def get_select_name(self, value: GachaMaster):
-        return value.gacha_type.name, value.name, None
+        return value.category.name, value.name, None
 
     @data_attribute('name',
                     aliases=['title'],
@@ -130,17 +130,18 @@ class GachaFilter(MasterFilter[GachaMaster]):
             return t
 
         featured_text = get_card_list_text(gacha.pick_up_cards)
-        selectable_text = get_card_list_text(gacha.bonus_selectable_cards)
+        selectable_text = get_card_list_text(gacha.select_bonus_cards)
 
         embed.add_field(name=l10n.format_value('info'),
                         value=l10n.format_value('info-desc', {
                             'start-date': discord.utils.format_dt(gacha.start_datetime),
                             'end-date': discord.utils.format_dt(gacha.end_datetime),
                             'event-name': gacha.event.name if gacha.event else 'None',
-                            'pity-requirement': gacha.bonus_max_value or 'None',
-                            'sub-pity-requirement': gacha.sub_bonus_max_value or 'None',
-                            'select-requirement': gacha.bonus_selectable_cards_max_value or 'None',
+                            'pity-requirement': (gacha.bonus and gacha.bonus.max_value) or 'None',
+                            'sub-pity-requirement': (gacha.sub_bonus and gacha.sub_bonus.max_value) or 'None',
+                            'select-requirement': gacha.select_bonus_max_value or 'None',
                             'gacha-type': gacha.gacha_type.name,
+                            'category': gacha.category.name,
                         }),
                         inline=False)
         embed.add_field(name=l10n.format_value('summary'),
@@ -187,7 +188,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
                     return
                 rates = [t.rate for t in table]
                 total_rate = sum(rates)
-                rate_up_rate = max(rates)
+                rate_up_rate = max(t.rate for t in table if t.card_id != 0)
 
                 # Exclude tables with no rate up, except those with very few rate ups (mainly for pity pull)
                 if total_rate == 0 or (rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05):
@@ -219,11 +220,11 @@ class GachaFilter(MasterFilter[GachaMaster]):
         for table_rate in gacha.table_rates:
             add_table_field(table_rate, gacha.tables)
 
-        if gacha.bonus_tables:
-            add_table_field(gacha.bonus_table_rate, gacha.bonus_tables)
+        if gacha.bonus and gacha.bonus.tables:
+            add_table_field(gacha.bonus.table_rate, gacha.bonus.tables)
 
-        if gacha.sub_bonus_tables:
-            add_table_field(gacha.sub_bonus_table_rate, gacha.sub_bonus_tables)
+        if gacha.sub_bonus and gacha.sub_bonus.tables:
+            add_table_field(gacha.sub_bonus.table_rate, gacha.sub_bonus.tables)
 
         if not embed.fields:
             embed.description = l10n.format_value("none-or-too-many")
@@ -285,14 +286,20 @@ class GachaFilter(MasterFilter[GachaMaster]):
             })
 
     def format_card_name_for_list(self, card):
+        if not card:
+            return 'Unknown'
         unit_emoji = unit_emoji_ids_by_unit_id[card.character.unit_id]
         attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     def format_card_name_short(self, card):
+        if not card:
+            return 'Unknown'
         return f'{card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     def format_card_name_with_emoji(self, card):
+        if not card:
+            return 'Unknown'
         unit_emoji = unit_emoji_ids_by_unit_id[card.character.unit_id]
         attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f'{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}'
@@ -322,13 +329,13 @@ class GachaFilter(MasterFilter[GachaMaster]):
         for table_rate in gacha.table_rates:
             add_table(table_rate, gacha.tables)
 
-        if gacha.bonus_max_value:
-            add_table(gacha.bonus_table_rate, gacha.bonus_tables)
+        if gacha.bonus:
+            add_table(gacha.bonus.table_rate, gacha.bonus.tables)
 
-        if gacha.sub_bonus_max_value:
-            add_table(gacha.sub_bonus_table_rate, gacha.sub_bonus_tables)
+        if gacha.sub_bonus:
+            add_table(gacha.sub_bonus.table_rate, gacha.sub_bonus.tables)
 
-        return sorted(results, key=lambda c: (-c.rarity_id, c.id))
+        return sorted([result for result in results if result], key=lambda c: (-c.rarity_id, c.id))
 
     @get_gacha_embed.shortcut_button(name='Cards')
     @get_gacha_table_embed.shortcut_button(name='Cards')

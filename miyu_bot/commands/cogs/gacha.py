@@ -14,6 +14,7 @@ import discord
 from PIL import Image
 from d4dj_utils.master.asset_manager import AssetManager
 from d4dj_utils.master.card_master import CardMaster
+from d4dj_utils.master.common_enums import GachaType
 from d4dj_utils.master.gacha_draw_master import GachaDrawMaster
 from d4dj_utils.master.gacha_master import GachaMaster
 from discord.ext import commands
@@ -151,6 +152,9 @@ class Gacha(commands.Cog):
         if not gacha:
             await ctx.send('Unknown banner.')
             return
+        if gacha.gacha_type != GachaType.Normal:
+            await ctx.send('Unsupported gacha type.')
+            return
         draw_data = [d for d in gacha.draw_data
                      if (d.stock_id == 902) or (d.stock_id in (1, 2) and d.stock_amount == 3000)]
         if len(draw_data) != 1:
@@ -237,9 +241,9 @@ class Gacha(commands.Cog):
 
         desc = f'{user.mention}\n'
         if draw_result.pity_count is not None:
-            desc += f'Pity: {draw_result.pity_count}/{gacha.bonus_max_value}\n'
-        if draw_result.pity_count is not None and gacha.sub_bonus_max_value:
-            desc += f'Sub-Pity: {draw_result.pity_count}/{gacha.sub_bonus_max_value}\n'
+            desc += f'Pity: {draw_result.pity_count}/{gacha.bonus.max_value}\n'
+        if draw_result.pity_count is not None and gacha.sub_bonus:
+            desc += f'Sub-Pity: {draw_result.pity_count}/{gacha.sub_bonus.max_value}\n'
         if desc:
             embed.description = desc
 
@@ -282,35 +286,35 @@ class Gacha(commands.Cog):
             sub_bonus = None
             current_pity = None
 
-            if gacha.bonus_max_value:
+            if gacha.bonus:
                 prev_pity = state.pity_counter
                 state.pity_counter += 10
                 current_pity = state.pity_counter
-                if prev_pity < gacha.sub_bonus_max_value and current_pity >= gacha.sub_bonus_max_value:
+                if gacha.sub_bonus and prev_pity < gacha.sub_bonus.max_value and current_pity >= gacha.sub_bonus.max_value:
                     state.total_counter += 1
-                    sub_bonus_tables = gacha.sub_bonus_tables
-                    rates = list(itertools.accumulate(gacha.sub_bonus_table_rate.rates))
+                    sub_bonus_tables = gacha.sub_bonus.tables
+                    rates = list(itertools.accumulate(gacha.sub_bonus.table_rate.rates))
                     rng = random.randint(1, rates[-1])
                     table_index = next(i for i, s in enumerate(rates) if rng <= s)
                     table_rates = list(itertools.accumulate(t.rate for t in sub_bonus_tables[table_index]))
                     rng = random.randint(1, table_rates[-1])
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
-                    sub_bonus = assets.card_master[sub_bonus_tables[table_index][result_index].card_id]
-                    await self.register_card_pulled(user.id, int(server), gacha.id, gacha.sub_bonus_table_rate.id,
+                    sub_bonus = assets.card_master[sub_bonus.tables[table_index][result_index].card_id]
+                    await self.register_card_pulled(user.id, int(server), gacha.id, gacha.sub_bonus.table_rate.id,
                                                     sub_bonus.id, state.total_counter, state.total_roll_counter, conn)
-                if current_pity >= gacha.bonus_max_value:
+                if gacha.bonus and current_pity >= gacha.bonus.max_value:
                     state.total_counter += 1
-                    bonus_tables = gacha.bonus_tables
-                    state.pity_counter -= gacha.bonus_max_value
+                    bonus_tables = gacha.bonus.tables
+                    state.pity_counter -= gacha.bonus.max_value
                     current_pity = state.pity_counter
-                    rates = list(itertools.accumulate(gacha.bonus_table_rate.rates))
+                    rates = list(itertools.accumulate(gacha.bonus.table_rate.rates))
                     rng = random.randint(1, rates[-1])
                     table_index = next(i for i, s in enumerate(rates) if rng <= s)
                     table_rates = list(itertools.accumulate(t.rate for t in bonus_tables[table_index]))
                     rng = random.randint(1, table_rates[-1])
                     result_index = next(i for i, s in enumerate(table_rates) if rng <= s)
                     bonus = assets.card_master[bonus_tables[table_index][result_index].card_id]
-                    await self.register_card_pulled(user.id, int(server), gacha.id, gacha.bonus_table_rate.id, bonus.id,
+                    await self.register_card_pulled(user.id, int(server), gacha.id, gacha.bonus.table_rate.id, bonus.id,
                                                     state.total_counter, state.total_roll_counter, conn)
 
             await state.save(using_db=conn)

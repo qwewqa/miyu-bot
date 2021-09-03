@@ -16,6 +16,7 @@ def get_asset_filename(path):
         _cache[path] = 'unknown.png'
         return 'unknown.png'
     with path.open('rb') as f:
-        result = f'{hashlib.sha256(f.read()).hexdigest()}{path.suffix}'
+        result = f'{path.parent.relative_to(Path("assets").resolve()).as_posix()}/{path.stem}.{hashlib.sha256(f.read()).hexdigest()[:8]}{path.suffix}'
+        result = result.split("/", 1)[1]
         _cache[path] = result
         return result

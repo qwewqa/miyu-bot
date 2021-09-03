@@ -31,7 +31,7 @@ class MiyuBot(commands.Bot):
     thread_pool: ThreadPoolExecutor
 
     asset_path: Path
-    asset_url = 'https://qwewqa.github.io/d4dj-dumps/'
+    asset_url = 'https://qwewqa.github.io/miyu-assets/'
 
     config: dict
     scripts_path: Optional[Path]
@@ -41,10 +41,10 @@ class MiyuBot(commands.Bot):
         self.gen_doc = gen_doc
         self.asset_path = Path(asset_path)
         self.assets = {
-            Server.JP: AssetManager(self.asset_path,
+            Server.JP: AssetManager(self.asset_path / 'assets_jp',
                                     timezone=pytz.timezone('Asia/Tokyo'),
                                     drop_extra_fields=True),
-            Server.EN: AssetManager(self.asset_path.with_name(self.asset_path.name + '_en'),
+            Server.EN: AssetManager(self.asset_path / 'assets_en',
                                     timezone=pytz.timezone('UTC'),
                                     drop_extra_fields=True),
         }
@@ -61,10 +61,10 @@ class MiyuBot(commands.Bot):
     def try_reload_assets(self):
         try:
             assets = {
-                Server.JP: AssetManager(self.asset_path,
+                Server.JP: AssetManager(self.asset_path / 'assets_jp',
                                         timezone=pytz.timezone('Asia/Tokyo'),
                                         drop_extra_fields=True),
-                Server.EN: AssetManager(self.asset_path.with_name(self.asset_path.name + '_en'),
+                Server.EN: AssetManager(self.asset_path / 'assets_en',
                                         timezone=pytz.timezone('UTC'),
                                         drop_extra_fields=True),
             }

@@ -76,7 +76,7 @@ combo-desc =
 
 ratings = 譜面要素
 
-chart-id = 譜面ID: { $chart-id }；1行 = 10秒, 技能9秒
+chart-id = 譜面ID: { $chart-id }；1行 = 12秒, 技能9秒
 
 sections-info-desc =
     難度: { $level }

@@ -76,7 +76,7 @@ combo-desc =
 
 ratings = Ratings
 
-chart-id = Chart Id: { $chart-id }; 1 column = 10 seconds, 9 second skills
+chart-id = Chart Id: { $chart-id }; 1 column = 12 seconds, 9 second skills
 
 sections-info-desc =
     Level: { $level }

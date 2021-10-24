@@ -5,10 +5,7 @@ info-desc =
     屬性: { $attribute }
     團體: { $unit }
     實裝日期: { $release-date }
-    活動: { $event }
     卡池: { $gacha }
-    取得方法: { availability-name }
-
 availability-name = { $availability ->
     [Permanent] 恆常
     [Limited] 限定

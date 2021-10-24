@@ -5,9 +5,7 @@ info-desc =
     Attribute: { $attribute }
     Unit: { $unit }
     Release Date: { $release-date }
-    Event: { $event }
     Gacha: { $gacha }
-    Availability: { availability-name }
 
 availability-name = { $availability ->
     [Permanent] Permanent

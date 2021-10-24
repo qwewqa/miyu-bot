@@ -5,9 +5,7 @@ info-desc =
     スタイル: { $attribute }
     ユニット: { $unit }
     初登場: { $release-date }
-    イベント: { $event }
     ガチャ: { $gacha }
-    入手方法: { availability-name }
 
 availability-name = { $availability ->
     [Permanent] 恒常

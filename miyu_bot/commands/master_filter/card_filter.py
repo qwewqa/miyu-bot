@@ -190,61 +190,6 @@ class CardFilter(MasterFilter[CardMaster]):
         else:
             return f'{skill.score_up_rate + skill.perfect_score_up_rate:>2}      '
 
-    @data_attribute('event',
-                    aliases=['event_bonus', 'eventbonus', 'bonus'],
-                    is_comparable=True,
-                    is_sortable=True,
-                    is_flag=True,
-                    reverse_sort=True)
-    def event(self, value: CardMaster):
-        return value.event.id if value.event else -1
-
-    @event.flag_callback
-    def event_flag_callback(self, ctx, values: List[CardMaster]):
-        latest_event = self.bot.master_filters.events.get_latest_event(ctx)
-        bonus: EventSpecificBonusMaster = latest_event.bonus
-        character_ids = {*bonus.character_ids}
-        return [v for v in values if v.character_id in character_ids and v.attribute_id == bonus.attribute_id]
-
-    @data_attribute('availability',
-                    aliases=['avail'],
-                    is_sortable=True,
-                    value_mapping={
-                        'unknown_availability': 1,
-                        'unavail': 1,
-                        'navl': 1,
-                        'permanent': 2,
-                        'perm': 2,
-                        'prm': 2,
-                        'limited': 3,
-                        'lmtd': 3,
-                        'lim': 3,
-                        'collaboration': 4,
-                        'collab': 4,
-                        'cllb': 4,
-                        'clb': 4,
-                        'birthday': 5,
-                        'bday': 5,
-                        'welfare': 6,
-                        'free': 6,
-                        'reward': 6,
-                        'rwrd': 6,
-                    },
-                    is_tag=True)
-    def availability(self, value: CardMaster):
-        return value.availability
-
-    @availability.formatter
-    def format_availability(self, value: CardMaster):
-        return {
-            1: 'Navl',
-            2: 'Perm',
-            3: 'Lmtd',
-            4: 'Cllb',
-            5: 'Bday',
-            6: 'Rwrd',
-        }[value.availability]
-
     @command_source(command_args=
                     dict(name='card',
                          description='Displays card info.',

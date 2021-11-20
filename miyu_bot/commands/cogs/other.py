@@ -195,7 +195,10 @@ class Other(commands.Cog):
                               'oh_that_will#8488\n'
                               'rainyfran#7450\n'
                               'lizardhospital#9358\n'
-                              'winkip#0271',
+                              'winkip#0271\n'
+                              'Sora#2222\n'
+                              'Mirby#5516\n'
+                              'KomanoInu#7107',
                         inline=False)
         await ctx.send(embed=embed)
 

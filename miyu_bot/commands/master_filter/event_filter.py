@@ -1,12 +1,13 @@
 import datetime as dt
 import re
-from typing import Optional
+from typing import Optional, Union
 
 import discord
 from d4dj_utils.master.common_enums import EventType
 from d4dj_utils.master.event_master import EventMaster, EventState
 
 from miyu_bot.bot.bot import PrefContext
+from miyu_bot.bot.servers import Server
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.common.emoji import unit_emoji_ids_by_unit_id, attribute_emoji_ids_by_attribute_id, \
     grey_emoji_id, event_point_emoji_id, parameter_bonus_emoji_ids_by_parameter_id
@@ -24,7 +25,7 @@ class EventFilter(MasterFilter[EventMaster]):
     def is_released(self, value: EventMaster) -> bool:
         return value.start_datetime < dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=3)
 
-    def get_current(self, ctx) -> Optional[EventMaster]:
+    def get_current(self, ctx: Union[PrefContext, Server, None]) -> Optional[EventMaster]:
         """Returns the oldest event that has not ended or the newest event otherwise."""
         try:
             # NY event overlapped with previous event

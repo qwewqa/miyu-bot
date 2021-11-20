@@ -5,7 +5,7 @@ import itertools
 import logging
 import math
 from collections import namedtuple
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import discord
 import pytz
@@ -146,14 +146,23 @@ class Event(commands.Cog):
         minutes, seconds = divmod(rem, 60)
         return f'{days}d {hours}h {minutes}m'
 
+    def leaderboard_url(self, ctx: Union[PrefContext, Server]):
+        if (isinstance(ctx, PrefContext) and ctx.preferences.server == Server.EN) or ctx == Server.EN:
+            return 'http://www.projectdivar.com/eventdata/t20?chart=true&en=true'
+        else:
+            return 'http://www.projectdivar.com/eventdata/t20?chart=true'
+
     @commands.command(name='leaderboard',
                       aliases=['lb'],
                       description='Displays the full leaderboard',
                       help='!leaderboard')
-    async def leaderboard(self, ctx: commands.Context):
+    async def leaderboard(self, ctx: commands.Context, *, arg: str = ''):
+        args = parse_arguments(arg)
+        await args.update_preferences(ctx)
+        args.require_all_arguments_used()
         text = self.get_leaderboard_text(self.bot.master_filters.events.get_latest_event(ctx),
                                          None,
-                                         await self.get_leaderboard_data(),
+                                         await self.get_leaderboard_data(ctx),
                                          None)
         asyncio.ensure_future(run_deletable_message(ctx, content=text))
 
@@ -161,9 +170,12 @@ class Event(commands.Cog):
                       aliases=['dlb', 'llb', 'lbb', 'llbb'],
                       description='Displays a detailed leaderboard.',
                       help='!dlb')
-    async def detailed_leaderboard(self, ctx: commands.Context):
+    async def detailed_leaderboard(self, ctx: commands.Context, *, arg: str = ''):
+        args = parse_arguments(arg)
+        await args.update_preferences(ctx)
+        args.require_all_arguments_used()
         event = self.bot.master_filters.events.get_latest_event(ctx)
-        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+        async with self.bot.session.get(self.leaderboard_url(ctx)) as resp:
             stats = [(int(k), v) for k, v in (await resp.json(encoding='utf-8'))['statistics'].items()]
         for _rank, stat in stats:
             stat['points'] = stat['points'] if isinstance(stat['points'], int) else 0
@@ -199,26 +211,37 @@ class Event(commands.Cog):
     async def leaderboard_loop(self):
         # Storing this on the bot object allows it to persist past bot reloads
         if not hasattr(self.bot, 'last_leaderboard_loop_data'):
-            self.bot.last_leaderboard_loop_data = {}
+            self.bot.last_leaderboard_loop_data = {Server.JP: {}, Server.EN: {}}
         try:
-            event = self.bot.master_filters.events.get_latest_event(None)
-            now = datetime.datetime.now()
-            minutes = now.minute + 60 * now.hour
-            data = await self.get_leaderboard_data()
-            for interval in valid_loop_intervals:
-                if minutes % interval == 0:
-                    if (interval in self.bot.last_leaderboard_loop_data and
-                            self.bot.last_leaderboard_loop_data[interval] == data):
-                        continue
-                    prev = self.bot.last_leaderboard_loop_data.get(interval)
-                    self.bot.last_leaderboard_loop_data[interval] = data
-                    channels = await models.Channel.filter(loop=interval)
-                    for channel_data in channels:
-                        channel = self.bot.get_channel(channel_data.id)
-                        if channel:
-                            await channel.send(self.get_leaderboard_text(event, interval, data, prev))
-                        else:
-                            self.logger.warning(f'Failed to get channel for loop (id: {channel_data.id}).')
+            for server in [Server.JP, Server.EN]:
+                event = self.bot.master_filters.events.get_latest_event(server)
+                now = datetime.datetime.now()
+                minutes = now.minute + 60 * now.hour
+                data = await self.get_leaderboard_data(server)
+                last_loop_data = self.bot.last_leaderboard_loop_data[server]
+                for interval in valid_loop_intervals:
+                    if minutes % interval == 0:
+                        if (interval in last_loop_data and
+                                last_loop_data[interval] == data):
+                            continue
+                        prev = last_loop_data.get(interval)
+                        last_loop_data[interval] = data
+                        channels = await models.Channel.filter(loop=interval)
+                        for channel_data in channels:
+                            channel = self.bot.get_channel(channel_data.id)
+                            guild_data = await models.Channel.get_or_none(id=channel.guild.id)
+                            if channel_data.preference_set('server'):
+                                channel_server = channel_data.get_preference('server')
+                            elif guild_data.preference_set('server'):
+                                channel_server = guild_data.get_preference('server')
+                            else:
+                                channel_server = Server.JP
+                            if channel_server != server:
+                                continue
+                            if channel:
+                                await channel.send(self.get_leaderboard_text(event, interval, data, prev))
+                            else:
+                                self.logger.warning(f'Failed to get channel for loop (id: {channel_data.id}).')
         except Exception as e:
             self.logger.warning(f'Error in leaderboard loop: {getattr(e, "message", repr(e))}')
 
@@ -244,10 +267,6 @@ class Event(commands.Cog):
         tier = args.text()
         args.require_all_arguments_used()
 
-        if ctx.preferences.server != Server.JP:
-            await ctx.send('Not supported outside of the JP server.')
-            return
-
         def process_tier_arg(tier_arg):
             tier_arg = tier_arg.lower()
             if tier_arg[0] == 't':
@@ -264,7 +283,7 @@ class Event(commands.Cog):
         else:
             tier = process_tier_arg(ctx.invoked_with)
 
-        embed = await self.get_tier_embed(tier, self.bot.master_filters.events.get_latest_event(ctx))
+        embed = await self.get_tier_embed(ctx.preferences.server, tier, self.bot.master_filters.events.get_latest_event(ctx))
 
         if embed:
             await ctx.send(embed=embed)
@@ -273,8 +292,8 @@ class Event(commands.Cog):
 
     LBStatistic = namedtuple('LBStatistic', 'rank points name')
 
-    async def get_leaderboard_data(self):
-        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+    async def get_leaderboard_data(self, ctx: Union[PrefContext, Server]):
+        async with self.bot.session.get(self.leaderboard_url(ctx)) as resp:
             return [self.LBStatistic(int(k), v['points'] if isinstance(v['points'], int) else 0, v['name']) for k, v in
                     (await resp.json(encoding='utf-8'))['statistics'].items()]
 
@@ -301,8 +320,8 @@ class Event(commands.Cog):
                          for d, p in itertools.zip_longest(data, prev))
         return f'```{header}{body}```'
 
-    async def get_tier_embed(self, tier: str, event: EventMaster):
-        async with self.bot.session.get('http://www.projectdivar.com/eventdata/t20?chart=true') as resp:
+    async def get_tier_embed(self, server, tier: str, event: EventMaster):
+        async with self.bot.session.get(self.leaderboard_url(server)) as resp:
             leaderboard = await resp.json(encoding='utf-8')
 
         data = leaderboard['statistics'].get(tier)

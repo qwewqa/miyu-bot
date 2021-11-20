@@ -177,7 +177,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             else:
                 return list(self.default_filter[ctx.preferences.server].values())
 
-    def values(self, ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+    def values(self, ctx: Optional[Union[miyu_bot.bot.bot.PrefContext, Server]]):
+        if isinstance(ctx, Server):
+            return self.default_filter[ctx].values()
         if ctx is not None and ctx.preferences.leaks:
             return self.unrestricted_filter[ctx.preferences.server].values()
         elif ctx:

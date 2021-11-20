@@ -232,7 +232,7 @@ class Event(commands.Cog):
                             guild_data = await models.Channel.get_or_none(id=channel.guild.id)
                             if channel_data.preference_set('server'):
                                 channel_server = channel_data.get_preference('server')
-                            elif guild_data.preference_set('server'):
+                            elif guild_data and guild_data.preference_set('server'):
                                 channel_server = guild_data.get_preference('server')
                             else:
                                 channel_server = Server.JP

@@ -229,6 +229,8 @@ class Event(commands.Cog):
                         channels = await models.Channel.filter(loop=interval)
                         for channel_data in channels:
                             channel = self.bot.get_channel(channel_data.id)
+                            if not channel:
+                                continue
                             guild_data = await models.Channel.get_or_none(id=channel.guild.id)
                             if channel_data.preference_set('server'):
                                 channel_server = channel_data.get_preference('server')

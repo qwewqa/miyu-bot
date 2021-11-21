@@ -228,22 +228,24 @@ class Event(commands.Cog):
                         last_loop_data[interval] = data
                         channels = await models.Channel.filter(loop=interval)
                         for channel_data in channels:
-                            channel = self.bot.get_channel(channel_data.id)
-                            if not channel:
-                                continue
-                            guild_data = await models.Channel.get_or_none(id=channel.guild.id)
-                            if channel_data.preference_set('server'):
-                                channel_server = channel_data.get_preference('server')
-                            elif guild_data and guild_data.preference_set('server'):
-                                channel_server = guild_data.get_preference('server')
-                            else:
-                                channel_server = Server.JP
-                            if channel_server != server:
-                                continue
-                            if channel:
+                            try:
+                                channel = self.bot.get_channel(channel_data.id)
+                                if not channel:
+                                    self.logger.warning(f'Failed to get channel for loop (id: {channel_data.id}).')
+                                    continue
+                                guild_data = await models.Channel.get_or_none(id=channel.guild.id)
+                                if channel_data.preference_set('server'):
+                                    channel_server = channel_data.get_preference('server')
+                                elif guild_data and guild_data.preference_set('server'):
+                                    channel_server = guild_data.get_preference('server')
+                                else:
+                                    channel_server = Server.JP
+                                if channel_server != server:
+                                    continue
                                 await channel.send(self.get_leaderboard_text(event, interval, data, prev))
-                            else:
-                                self.logger.warning(f'Failed to get channel for loop (id: {channel_data.id}).')
+                            except discord.Forbidden:
+                                self.logger.warning(f'Failed send for loop (id: {channel_data.id}).')
+                                continue
         except Exception as e:
             self.logger.warning(f'Error in leaderboard loop: {getattr(e, "message", repr(e))}')
 

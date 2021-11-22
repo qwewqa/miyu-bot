@@ -162,40 +162,40 @@ class EventFilter(MasterFilter[EventMaster]):
                             'status': event.state().name,
                         }),
                         inline=False)
-        embed.add_field(name=l10n.format_value('event-type'),
-                        value=l10n.format_value('event-type-name', {'event-type': event.event_type.name}),
-                        inline=True)
-        embed.add_field(name=l10n.format_value('bonus-characters'),
-                        value='\n'.join(
-                            f'{unit_emoji_ids_by_unit_id[char.unit_id]} {char.full_name_english}'
-                            for char in event.bonus.characters
-                        ),
-                        inline=True)
-        embed.add_field(name=l10n.format_value('bonus-attribute'),
-                        value=f'{attribute_emoji_ids_by_attribute_id[event.bonus.attribute_id]} '
-                              f'{event.bonus.attribute.en_name.capitalize()}' if event.bonus.attribute else 'None',
-                        inline=True)
-        embed.add_field(name=l10n.format_value('parameter-point-bonus'),
-                        value=l10n.format_value('parameter-point-bonus-description', {
-                            'parameter-emoji': parameter_bonus_emoji_ids_by_parameter_id[event.bonus.event_point_parameter_bonus_id + 1],
-                            'parameter-bonus-rate': event.bonus.event_point_parameter_bonus_rate
-                        }) if event.bonus.event_point_parameter_bonus_rate else
-                        l10n.format_value('no-parameter-point-bonus'),
-                        inline=False)
-        embed.add_field(name=l10n.format_value('point-bonus'),
-                        value=l10n.format_value('bonus-description', {
-                            'attribute': f'{event_point_emoji_id} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
-                            'character': f'{event_point_emoji_id} +{event.bonus.character_match_point_bonus_value}%' if event.bonus.character_match_point_bonus_value else 'None',
-                            'both': f'{event_point_emoji_id} +{event.bonus.all_match_point_bonus_value}%' if event.bonus.all_match_point_bonus_value else 'None',
-                        }),
-                        inline=True)
-        embed.add_field(name=l10n.format_value('parameter-bonus'),
-                        value=l10n.format_value('bonus-description', {
-                            'attribute': f'{parameter_bonus_emoji_ids_by_parameter_id[event.bonus.attribute_match_parameter_bonus_id]} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
-                            'character': f'{parameter_bonus_emoji_ids_by_parameter_id[event.bonus.character_match_parameter_bonus_id]} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
-                            'both': f'{parameter_bonus_emoji_ids_by_parameter_id[event.bonus.all_match_parameter_bonus_id]} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
-                        }),
-                        inline=True)
+        # embed.add_field(name=l10n.format_value('event-type'),
+        #                 value=l10n.format_value('event-type-name', {'event-type': event.event_type.name}),
+        #                 inline=True)
+        # embed.add_field(name=l10n.format_value('bonus-characters'),
+        #                 value='\n'.join(
+        #                     f'{unit_emoji_ids_by_unit_id[char.unit_id]} {char.full_name_english}'
+        #                     for char in event.bonus.characters
+        #                 ),
+        #                 inline=True)
+        # embed.add_field(name=l10n.format_value('bonus-attribute'),
+        #                 value=f'{attribute_emoji_ids_by_attribute_id[event.bonus.attribute_id]} '
+        #                       f'{event.bonus.attribute.en_name.capitalize()}' if event.bonus.attribute else 'None',
+        #                 inline=True)
+        # embed.add_field(name=l10n.format_value('parameter-point-bonus'),
+        #                 value=l10n.format_value('parameter-point-bonus-description', {
+        #                     'parameter-emoji': parameter_bonus_emoji_ids_by_parameter_id[event.bonus.event_point_parameter_bonus_id + 1],
+        #                     'parameter-bonus-rate': event.bonus.event_point_parameter_bonus_rate
+        #                 }) if event.bonus.event_point_parameter_bonus_rate else
+        #                 l10n.format_value('no-parameter-point-bonus'),
+        #                 inline=False)
+        # embed.add_field(name=l10n.format_value('point-bonus'),
+        #                 value=l10n.format_value('bonus-description', {
+        #                     'attribute': f'{event_point_emoji_id} +{event.bonus.attribute_match_point_bonus_value}%' if event.bonus.attribute_match_point_bonus_value else 'None',
+        #                     'character': f'{event_point_emoji_id} +{event.bonus.character_match_point_bonus_value}%' if event.bonus.character_match_point_bonus_value else 'None',
+        #                     'both': f'{event_point_emoji_id} +{event.bonus.all_match_point_bonus_value}%' if event.bonus.all_match_point_bonus_value else 'None',
+        #                 }),
+        #                 inline=True)
+        # embed.add_field(name=l10n.format_value('parameter-bonus'),
+        #                 value=l10n.format_value('bonus-description', {
+        #                     'attribute': f'{parameter_bonus_emoji_ids_by_parameter_id[event.bonus.attribute_match_parameter_bonus_id]} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
+        #                     'character': f'{parameter_bonus_emoji_ids_by_parameter_id[event.bonus.character_match_parameter_bonus_id]} +{event.bonus.attribute_match_parameter_bonus_value}%' if event.bonus.attribute_match_parameter_bonus_value else 'None',
+        #                     'both': f'{parameter_bonus_emoji_ids_by_parameter_id[event.bonus.all_match_parameter_bonus_id]} +{event.bonus.all_match_parameter_bonus_value}%' if event.bonus.all_match_parameter_bonus_value else 'None',
+        #                 }),
+        #                 inline=True)
         embed.set_footer(text=l10n.format_value('event-id', {'event-id': event.id}))
 
         return embed
@@ -206,16 +206,16 @@ class EventFilter(MasterFilter[EventMaster]):
                          description='Lists events.',
                          help='!events'))
     def format_event_name_for_list(self, ctx, event: EventMaster):
-        bonuses = event.bonus.characters
-        units = {character.unit.id for character in bonuses}
-        if len(units) == 1:
-            unit_emoji = unit_emoji_ids_by_unit_id[next(iter(units))]
-        else:
-            unit_emoji = grey_emoji_id
-        attribute_emoji = attribute_emoji_ids_by_attribute_id.get(event.bonus.attribute_id, grey_emoji_id)
-        if event.bonus.event_point_parameter_bonus_rate:
-            parameter_emoji = parameter_bonus_emoji_ids_by_parameter_id.get(event.bonus.event_point_parameter_bonus_id + 1,
-                                                              grey_emoji_id)
-        else:
-            parameter_emoji = grey_emoji_id
-        return f'`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {event.name}'
+        # bonuses = event.bonus.characters
+        # units = {character.unit.id for character in bonuses}
+        # if len(units) == 1:
+        #     unit_emoji = unit_emoji_ids_by_unit_id[next(iter(units))]
+        # else:
+        #     unit_emoji = grey_emoji_id
+        # attribute_emoji = attribute_emoji_ids_by_attribute_id.get(event.bonus.attribute_id, grey_emoji_id)
+        # if event.bonus.event_point_parameter_bonus_rate:
+        #     parameter_emoji = parameter_bonus_emoji_ids_by_parameter_id.get(event.bonus.event_point_parameter_bonus_id + 1,
+        #                                                       grey_emoji_id)
+        # else:
+        #     parameter_emoji = grey_emoji_id
+        return f'{event.name}'

@@ -31,7 +31,7 @@ class MiyuBot(commands.Bot):
     thread_pool: ThreadPoolExecutor
 
     asset_path: Path
-    asset_url = 'https://qwewqa.github.io/miyu-assets/'
+    asset_url = 'https://qwewqa.github.io/miyu-data/'
 
     config: dict
     scripts_path: Optional[Path]

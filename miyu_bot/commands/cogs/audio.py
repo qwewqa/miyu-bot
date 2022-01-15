@@ -22,18 +22,6 @@ class Audio(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-
-        self.live_interaction_paths = [interaction_dir for interaction_dir in
-                                       (self.bot.assets[Server.JP].path / 'plain' / 'voice' / 'ondemand' / 'live').iterdir() if
-                                       interaction_dir.is_dir() and not interaction_dir.name.startswith('live_general')]
-        live_interaction_path_characters = defaultdict(lambda: set())
-        live_audio_re = re.compile(r'.*([1-6][1-4])\.hca\.wav')
-        for interaction_path in self.live_interaction_paths:
-            for path in interaction_path.iterdir():
-                if match := live_audio_re.fullmatch(path.name):
-                    character_id = int(match.groups()[0])
-                    live_interaction_path_characters[interaction_path].add(character_id)
-        self.live_interaction_path_characters = live_interaction_path_characters
         self.queues = defaultdict(lambda: AudioQueue())
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'audio.ftl')
 
@@ -109,58 +97,6 @@ class Audio(commands.Cog):
             return
         stamp = stamp[0]
         self.queues[ctx.guild.id].enqueue(str(stamp.audio_path))
-
-    @play.command(name='interactions',
-                  aliases=['live', 'interact'],
-                  description='Plays live interaction audio.'
-                              'Giving one character as an argument restricts to interactions including that character.'
-                              'Giving multiple characters as arguments restricts to interactions only including the given characters.',
-                  help='!play interactions')
-    async def play_interactions(self, ctx: commands.Context, *allowed_characters):
-        if allowed_characters:
-            allowed_cids = set()
-            for character_name in allowed_characters:
-                if chr := self.bot.aliases.characters_by_name.get(character_name.lower()):
-                    allowed_cids.add(chr.id)
-                else:
-                    await ctx.send('Unknown character.')
-                    return
-        else:
-            allowed_cids = None
-
-        if source := self.get_live_interaction_audio_source(allowed_cids):
-            self.queues[ctx.guild.id].set_queue_source(source)
-            await ctx.send('Playing live interactions.')
-        else:
-            await ctx.send('No results for given filters.')
-
-    def get_live_interaction_audio_source(self, allowed_character_ids):
-        if not allowed_character_ids:
-            paths = self.live_interaction_paths
-        elif len(allowed_character_ids) == 1:
-            allowed_character_id = next(iter(allowed_character_ids))
-            paths = [p for p in self.live_interaction_paths
-                     if allowed_character_id in self.live_interaction_path_characters[p]]
-        else:
-            paths = [p for p in self.live_interaction_paths
-                     if all(cid in allowed_character_ids for cid in self.live_interaction_path_characters[p])]
-
-        if not paths:
-            return
-
-        queue = []
-
-        async def source():
-            if not queue:
-                while not queue:
-                    interaction = random.choice(paths)
-                    queue.extend(sorted(a for a in interaction.iterdir() if a.suffix == '.wav')[::-1])
-                await asyncio.sleep(random.randint(8, 12))
-            else:
-                await asyncio.sleep(0.5)
-            return queue.pop()
-
-        return source
 
     @play.before_invoke
     async def ensure_voice(self, ctx: commands.Context):

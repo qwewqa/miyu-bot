@@ -41,10 +41,10 @@ class MiyuBot(commands.Bot):
         self.gen_doc = gen_doc
         self.asset_path = Path(asset_path)
         self.assets = {
-            Server.JP: AssetManager(self.asset_path / 'assets_jp',
+            Server.JP: AssetManager(self.asset_path / 'jp',
                                     timezone=pytz.timezone('Asia/Tokyo'),
                                     drop_extra_fields=True),
-            Server.EN: AssetManager(self.asset_path / 'assets_en',
+            Server.EN: AssetManager(self.asset_path / 'en',
                                     timezone=pytz.timezone('UTC'),
                                     drop_extra_fields=True),
         }

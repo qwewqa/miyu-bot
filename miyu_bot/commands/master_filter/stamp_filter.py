@@ -6,7 +6,7 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, command_
 
 class StampFilter(MasterFilter[StampMaster]):
     def get_name(self, value: StampMaster) -> str:
-        if value.quote in value.name:
+        if value.quote is not None and value.quote in value.name:
             return value.name
         else:
             return f'{value.name + " " + value.quote.replace("～", "ー") if value.quote else value.description}'
@@ -23,7 +23,7 @@ class StampFilter(MasterFilter[StampMaster]):
                          description='Lists stamps.',
                          help='!stamps'))
     def format_stamp_name(self, stamp: StampMaster):
-        if stamp.quote in stamp.name:
+        if stamp.quote is not None and stamp.quote in stamp.name:
             return stamp.name
         else:
             return f'{stamp.name}: {stamp.quote}'

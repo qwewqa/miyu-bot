@@ -234,7 +234,7 @@ class CardFilter(MasterFilter[CardMaster]):
             return f'   ---'
 
     @data_attribute('solo_groovy',
-                    aliases=['solo_fever'],
+                    aliases=['solo_fever', 'solo_gt', 'sologroovy', 'solofever', 'sologt'],
                     is_flag=True)
     def solo_groovy(self, value: CardMaster):
         passive_skill = value.passive_skill

@@ -195,7 +195,8 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['groovyscore', 'groovy', 'fever_score', 'feverscore', 'fever',
                              'groovy_score_up', 'groovyscoreup', 'fever_score_up',
                              'feverscoreup', 'feverup', 'groovyup', 'fever_up', 'groovy_up',
-                             'feverboost', 'fever_boost', 'groovyboost', 'groovy_boost'],
+                             'feverboost', 'fever_boost', 'groovyboost', 'groovy_boost',
+                             'gtscore', 'gtscoreup', 'gt_score', 'gt_score_up', 'gtup', 'gt_up'],
                     is_comparable=True,
                     is_sortable=True,
                     reverse_sort=True,
@@ -214,7 +215,7 @@ class CardFilter(MasterFilter[CardMaster]):
             return f'   ---'
 
     @data_attribute('groovy_support',
-                    aliases=['groovysupport', 'fever_support', 'feversupport'],
+                    aliases=['groovysupport', 'fever_support', 'feversupport', 'gtsupport', 'gt_support'],
                     is_comparable=True,
                     is_sortable=True,
                     reverse_sort=True,

@@ -209,7 +209,7 @@ class CardFilter(MasterFilter[CardMaster]):
     @groovy_score.formatter
     def groovy_score_formatter(self, value: CardMaster):
         if self.groovy_score(value) > 0:
-            return f'{self.groovy_score(value):>4.1f}%'
+            return f'{self.groovy_score(value):>5.2f}%'
         else:
             return f'   --'
 
@@ -228,7 +228,7 @@ class CardFilter(MasterFilter[CardMaster]):
     @groovy_support.formatter
     def groovy_support_formatter(self, value: CardMaster):
         if self.groovy_support(value) > 0:
-            return f'{self.groovy_support(value):>4.1f}%'
+            return f'{self.groovy_support(value):>5.2f}%'
         else:
             return f'   --'
 
@@ -255,7 +255,7 @@ class CardFilter(MasterFilter[CardMaster]):
     @constant_score.formatter
     def constant_score_formatter(self, value: CardMaster):
         if self.constant_score(value) > 0:
-            return f'{self.constant_score(value):>4.1f}%'
+            return f'{self.constant_score(value):>5.2f}%'
         else:
             return f'   --'
 
@@ -275,7 +275,7 @@ class CardFilter(MasterFilter[CardMaster]):
     @auto_score.formatter
     def auto_score_formatter(self, value: CardMaster):
         if self.auto_score(value) > 0:
-            return f'{self.auto_score(value):>4.1f}%'
+            return f'{self.auto_score(value):>5.2f}%'
         else:
             return f'   --'
 

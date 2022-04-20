@@ -12,7 +12,7 @@
         <link rel="canonical" href="https://miyu-docs.qwewqa.xyz/ja/commands/info/event/">
       
       <link rel="icon" href="../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.2.1, mkdocs-material-7.1.8">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-7.1.8">
     
     
       
@@ -137,7 +137,7 @@
     
       <div class="md-header__source">
         
-<a href="https://github.com/qwewqa/miyu-bot/" title="リポジトリへ" class="md-source" data-md-component="source">
+<a href="https://github.com/qwewqa/miyu-bot" title="リポジトリへ" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -221,7 +221,7 @@
   
     <div class="md-nav__source">
       
-<a href="https://github.com/qwewqa/miyu-bot/" title="リポジトリへ" class="md-source" data-md-component="source">
+<a href="https://github.com/qwewqa/miyu-bot" title="リポジトリへ" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
@@ -766,7 +766,9 @@
 <p class="admonition-title">Type</p>
 <p><a href="../general_usage/#sortable">Sortable (Default)</a>, <a href="../general_usage/#display">Display (Default)</a>, <a href="../general_usage/#comparable">Comparable</a></p>
 </div>
-<details class="example"><summary>Examples</summary><p><code>sort=date</code><br />
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=date</code><br />
 <code>sort&lt;date</code><br />
 <code>disp=date</code><br />
 <code>date=[value]</code><br />
@@ -782,7 +784,9 @@
 <p class="admonition-title">Type</p>
 <p><a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a>, <a href="../general_usage/#plural">Plural</a></p>
 </div>
-<details class="note"><summary>Tags</summary><ul>
+<details class="note">
+<summary>Tags</summary>
+<ul>
 <li>rinku  </li>
 <li>maho  </li>
 <li>muni  </li>
@@ -809,8 +813,8 @@
 <li>miiko  </li>
 <li>airi  </li>
 <li>mana  </li>
-<li>syano  </li>
-<li>touka  </li>
+<li>shano  </li>
+<li>toka  </li>
 <li>michiru  </li>
 <li>ryujin  </li>
 <li>dennojo  </li>
@@ -819,47 +823,62 @@
 <li>aqua  </li>
 <li>pekora  </li>
 <li>fubuki  </li>
-<li>suisei</li>
+<li>suisei  </li>
+<li>mob1  </li>
+<li>mob2  </li>
+<li>mob3  </li>
+<li>mob4  </li>
+<li>mob5  </li>
+<li>mob6</li>
 </ul>
 </details>
-<details class="example"><summary>Examples</summary><p><code>character=haruna</code><br />
-<code>character=rei,yuka,ibuki</code><br />
-<code>character!=rei,yuka,ibuki</code><br />
-<code>character==rei,yuka,ibuki</code><br />
-<code>$rei $yuka $ibuki</code><br />
-<code>$!haruna $!touka</code></p>
+<details class="example">
+<summary>Examples</summary>
+<p><code>character=mob3</code><br />
+<code>character=ku,mob1,mob4</code><br />
+<code>character!=ku,mob1,mob4</code><br />
+<code>character==ku,mob1,mob4</code><br />
+<code>$ku $mob1 $mob4</code><br />
+<code>$!mob3 $!esora</code></p>
 </details>
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
-<details class="note"><summary>Tags</summary><ul>
+<details class="note">
+<summary>Tags</summary>
+<ul>
 <li>happy_around!, happyaround, happy_around, hapiara, happy, ha  </li>
 <li>peaky_p-key, peakyp-key, peakypkey, peaky, p-key, pkey, pkpk, pk  </li>
 <li>photon_maiden, photonmaiden, photome, photon, pm  </li>
 <li>merm4id, mermaid, mmd, m4  </li>
 <li>燐舞曲, rondo  </li>
 <li>lyrical_lily, lyricallily, riririri, lililili, lily, lili, riri, ll  </li>
+<li>call_of_artemis  </li>
 <li>スペシャル, special  </li>
 <li>その他, other  </li>
 <li>mixed</li>
 </ul>
 </details>
-<details class="example"><summary>Examples</summary><p><code>sort=unit</code><br />
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=merm4id</code><br />
-<code>unit=mixed,peaky_p-key,happy_around!</code><br />
-<code>unit!=mixed,peaky_p-key,happy_around!</code><br />
-<code>$mixed $peaky_p-key $happy_around!</code><br />
-<code>$!merm4id $!happy_around!</code></p>
+<code>unit=lyrical_lily</code><br />
+<code>unit=merm4id,happy_around!,燐舞曲</code><br />
+<code>unit!=merm4id,happy_around!,燐舞曲</code><br />
+<code>$merm4id $happy_around! $燐舞曲</code><br />
+<code>$!lyrical_lily $!merm4id</code></p>
 </details>
 <h3 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
 <p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
-<details class="note"><summary>Tags</summary><ul>
+<details class="note">
+<summary>Tags</summary>
+<ul>
 <li>street, purple  </li>
 <li>party, yellow, orange  </li>
 <li>cute, pink, red  </li>
@@ -867,12 +886,14 @@
 <li>elegant, green</li>
 </ul>
 </details>
-<details class="example"><summary>Examples</summary><p><code>sort=attribute</code><br />
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
 <code>attribute=street</code><br />
-<code>attribute=elegant,street,party</code><br />
-<code>attribute!=elegant,street,party</code><br />
-<code>$elegant $street $party</code><br />
+<code>attribute=cute,party,cool</code><br />
+<code>attribute!=cute,party,cool</code><br />
+<code>$cute $party $cool</code><br />
 <code>$!street $!party</code></p>
 </details>
 <h3 id="type">type<a class="headerlink" href="#type" title="Permanent link">&para;</a></h3>
@@ -880,22 +901,27 @@
 <p class="admonition-title">Type</p>
 <p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#display">Display</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
-<details class="note"><summary>Tags</summary><ul>
+<details class="note">
+<summary>Tags</summary>
+<ul>
 <li>nothing  </li>
 <li>bingo  </li>
 <li>medley  </li>
 <li>poker  </li>
-<li>raid</li>
+<li>raid  </li>
+<li>slot</li>
 </ul>
 </details>
-<details class="example"><summary>Examples</summary><p><code>sort=type</code><br />
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=type</code><br />
 <code>sort&lt;type</code><br />
 <code>disp=type</code><br />
-<code>type=nothing</code><br />
-<code>type=nothing,raid,medley</code><br />
-<code>type!=nothing,raid,medley</code><br />
-<code>$nothing $raid $medley</code><br />
-<code>$!nothing $!medley</code></p>
+<code>type=poker</code><br />
+<code>type=nothing,bingo,raid</code><br />
+<code>type!=nothing,bingo,raid</code><br />
+<code>$nothing $bingo $raid</code><br />
+<code>$!poker $!nothing</code></p>
 </details>
 <h3 id="parameter">parameter<a class="headerlink" href="#parameter" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
@@ -906,20 +932,24 @@
 <p class="admonition-title">Type</p>
 <p><a href="../general_usage/#sortable">Sortable</a>, <a href="../general_usage/#equality">Equality</a>, <a href="../general_usage/#tag">Tag</a></p>
 </div>
-<details class="note"><summary>Tags</summary><ul>
+<details class="note">
+<summary>Tags</summary>
+<ul>
 <li>heart  </li>
 <li>technique, tech  </li>
 <li>physical, phys  </li>
 <li>no_parameter, noparameter</li>
 </ul>
 </details>
-<details class="example"><summary>Examples</summary><p><code>sort=parameter</code><br />
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=parameter</code><br />
 <code>sort&lt;parameter</code><br />
 <code>parameter=heart</code><br />
-<code>parameter=technique,physical,heart</code><br />
-<code>parameter!=technique,physical,heart</code><br />
-<code>$technique $physical $heart</code><br />
-<code>$!heart $!no_parameter</code></p>
+<code>parameter=heart,no_parameter,physical</code><br />
+<code>parameter!=heart,no_parameter,physical</code><br />
+<code>$heart $no_parameter $physical</code><br />
+<code>$!heart $!physical</code></p>
 </details>
                 
               
@@ -991,7 +1021,7 @@
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.tabs", "navigation.sections"], "translations": {"clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\u3000\u3001\u3002\uff0c\uff0e]+", "search.placeholder": "\u691c\u7d22", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version.title": "Select version"}, "search": "../../../../assets/javascripts/workers/search.b0710199.min.js", "version": null}</script>
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.tabs", "navigation.sections"], "search": "../../../../assets/javascripts/workers/search.b0710199.min.js", "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\s\\-\u3000\u3001\u3002\uff0c\uff0e]+", "search.placeholder": "\u691c\u7d22", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version.title": "Select version"}, "version": null}</script>
     
     
       <script src="../../../../assets/javascripts/bundle.76f349be.min.js"></script>

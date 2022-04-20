@@ -211,7 +211,7 @@ class CardFilter(MasterFilter[CardMaster]):
         if self.groovy_score(value) > 0:
             return f'{self.groovy_score(value):>5.2f}%'
         else:
-            return f'   --'
+            return f'   ---'
 
     @data_attribute('groovy_support',
                     aliases=['groovysupport', 'fever_support', 'feversupport'],
@@ -230,7 +230,7 @@ class CardFilter(MasterFilter[CardMaster]):
         if self.groovy_support(value) > 0:
             return f'{self.groovy_support(value):>5.2f}%'
         else:
-            return f'   --'
+            return f'   ---'
 
     @data_attribute('solo_groovy',
                     aliases=['solo_fever'],
@@ -257,7 +257,7 @@ class CardFilter(MasterFilter[CardMaster]):
         if self.constant_score(value) > 0:
             return f'{self.constant_score(value):>5.2f}%'
         else:
-            return f'   --'
+            return f'   ---'
 
     @data_attribute('auto_score',
                     aliases=['autoscore', 'auto_score_up', 'autoscoreup', 'auto_up', 'auto_boost', 'auto_support',
@@ -277,7 +277,7 @@ class CardFilter(MasterFilter[CardMaster]):
         if self.auto_score(value) > 0:
             return f'{self.auto_score(value):>5.2f}%'
         else:
-            return f'   --'
+            return f'   ---'
 
     @command_source(command_args=
                     dict(name='card',

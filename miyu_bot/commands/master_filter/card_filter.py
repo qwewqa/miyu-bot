@@ -203,12 +203,12 @@ class CardFilter(MasterFilter[CardMaster]):
     def groovy_score(self, value: CardMaster):
         passive_skill = value.passive_skill
         if passive_skill.type == PassiveSkillType.FeverBonus:
-            return passive_skill.max_value
+            return passive_skill.max_value * 100
         return 0
 
     @groovy_score.formatter
     def groovy_score_formatter(self, value: CardMaster):
-        return f'{self.groovy_score(value):>5.2f}'
+        return f'{self.groovy_score(value):>4.1f}%'
 
     @data_attribute('groovy_support',
                     aliases=['groovysupport', 'fever_support', 'feversupport'],
@@ -219,12 +219,12 @@ class CardFilter(MasterFilter[CardMaster]):
     def groovy_support(self, value: CardMaster):
         passive_skill = value.passive_skill
         if passive_skill.type == PassiveSkillType.FeverSupport:
-            return passive_skill.max_value
+            return passive_skill.max_value * 100
         return 0
 
     @groovy_support.formatter
     def groovy_support_formatter(self, value: CardMaster):
-        return f'{self.groovy_support(value):>5.2f}'
+        return f'{self.groovy_support(value):>4.1f}%'
 
     @data_attribute('solo_groovy',
                     aliases=['solo_fever'],
@@ -243,12 +243,12 @@ class CardFilter(MasterFilter[CardMaster]):
     def constant_score(self, value: CardMaster):
         passive_skill = value.passive_skill
         if passive_skill.type == PassiveSkillType.ScoreUpWithDamage:
-            return passive_skill.max_value
+            return passive_skill.max_value * 100
         return 0
 
     @constant_score.formatter
     def constant_score_formatter(self, value: CardMaster):
-        return f'{self.constant_score(value):>5.2f}'
+        return f'{self.constant_score(value):>4.1f}%'
 
     @data_attribute('auto_score',
                     aliases=['autoscore', 'auto_score_up', 'autoscoreup', 'auto_up', 'auto_boost', 'auto_support',
@@ -260,12 +260,12 @@ class CardFilter(MasterFilter[CardMaster]):
     def auto_score(self, value: CardMaster):
         passive_skill = value.passive_skill
         if passive_skill.type == PassiveSkillType.AutoScoreUp:
-            return passive_skill.max_value
+            return passive_skill.max_value * 100
         return 0
 
     @auto_score.formatter
     def auto_score_formatter(self, value: CardMaster):
-        return f'{self.auto_score(value):>5.2f}'
+        return f'{self.auto_score(value):>4.1f}%'
 
     @command_source(command_args=
                     dict(name='card',

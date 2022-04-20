@@ -253,9 +253,9 @@ class CardFilter(MasterFilter[CardMaster]):
         embed.add_field(name=l10n.format_value('passive'),
                         value=l10n.format_value('passive-desc', {
                             'type': passive.type.name,
-                            'min-value': passive.min_value,
-                            'max-value': passive.max_value,
-                            'sub-value': passive.sub_value,
+                            'min-value': f'{100 * passive.min_value:.2f}',
+                            'max-value': f'{100 * passive.max_value:.2f}',
+                            'sub-value': f'{100 * passive.sub_value:.2f}',
                         }),
                         inline=True)
         embed.set_footer(text=l10n.format_value('card-id', {'card-id': f'{card.id:0>8}'}))

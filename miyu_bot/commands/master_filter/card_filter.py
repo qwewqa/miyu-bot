@@ -208,7 +208,10 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @groovy_score.formatter
     def groovy_score_formatter(self, value: CardMaster):
-        return f'{self.groovy_score(value):>4.1f}%'
+        if self.groovy_score(value) > 0:
+            return f'{self.groovy_score(value):>4.1f}%'
+        else:
+            return f'   --'
 
     @data_attribute('groovy_support',
                     aliases=['groovysupport', 'fever_support', 'feversupport'],
@@ -224,7 +227,10 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @groovy_support.formatter
     def groovy_support_formatter(self, value: CardMaster):
-        return f'{self.groovy_support(value):>4.1f}%'
+        if self.groovy_support(value) > 0:
+            return f'{self.groovy_support(value):>4.1f}%'
+        else:
+            return f'   --'
 
     @data_attribute('solo_groovy',
                     aliases=['solo_fever'],
@@ -248,7 +254,10 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @constant_score.formatter
     def constant_score_formatter(self, value: CardMaster):
-        return f'{self.constant_score(value):>4.1f}%'
+        if self.constant_score(value) > 0:
+            return f'{self.constant_score(value):>4.1f}%'
+        else:
+            return f'   --'
 
     @data_attribute('auto_score',
                     aliases=['autoscore', 'auto_score_up', 'autoscoreup', 'auto_up', 'auto_boost', 'auto_support',
@@ -265,7 +274,10 @@ class CardFilter(MasterFilter[CardMaster]):
 
     @auto_score.formatter
     def auto_score_formatter(self, value: CardMaster):
-        return f'{self.auto_score(value):>4.1f}%'
+        if self.auto_score(value) > 0:
+            return f'{self.auto_score(value):>4.1f}%'
+        else:
+            return f'   --'
 
     @command_source(command_args=
                     dict(name='card',

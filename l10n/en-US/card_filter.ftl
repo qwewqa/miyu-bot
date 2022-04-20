@@ -39,15 +39,15 @@ passive-desc = { $type ->
    *[other] None
 }
 groovy-bonus-desc =
-    Groovy Score Up: { $min-value }% - { $max-value }%
+    Groovy Score Up: { $min-value }-{ $max-value }%
 groovy-support-desc =
     Solo Groovy
-    Groovy Charge Boost: { $min-value }% - { $max-value }%
+    Groovy Charge Boost: { $min-value }-{ $max-value }%
 life-boost-desc =
     Tension Reduction Up: { $sub-value }%
-    Constant Score Up: { $min-value }% - { $max-value }%
+    Constant Score Up: { $min-value }-{ $max-value }%
 auto-support-desc =
-    Auto Score Up: { $min-value }% - { $max-value }%
+    Auto Score Up: { $min-value }-{ $max-value }%
 
 card-id = Card Id: { $card-id }
 

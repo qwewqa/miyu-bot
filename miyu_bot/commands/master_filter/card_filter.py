@@ -237,7 +237,7 @@ class CardFilter(MasterFilter[CardMaster]):
                             'technique-emoji': str(parameter_bonus_emoji_ids_by_parameter_id[2]),
                             'physical-emoji': str(parameter_bonus_emoji_ids_by_parameter_id[3]),
                         }),
-                        inline=True)
+                        inline=False)
         skill: SkillMaster = card.skill
         embed.add_field(name=l10n.format_value('skill'),
                         value=l10n.format_value('skill-desc', {
@@ -253,9 +253,9 @@ class CardFilter(MasterFilter[CardMaster]):
         embed.add_field(name=l10n.format_value('passive'),
                         value=l10n.format_value('passive-desc', {
                             'type': passive.type.name,
-                            'min-value': f'{100 * passive.min_value:.2f}',
-                            'max-value': f'{100 * passive.max_value:.2f}',
-                            'sub-value': f'{100 * passive.sub_value:.2f}',
+                            'min-value': f'{100 * passive.min_value:.2f}'.rstrip('0').rstrip('.'),
+                            'max-value': f'{100 * passive.max_value:.2f}'.rstrip('0').rstrip('.'),
+                            'sub-value': f'{100 * passive.sub_value:.2f}'.rstrip('0').rstrip('.'),
                         }),
                         inline=True)
         embed.set_footer(text=l10n.format_value('card-id', {'card-id': f'{card.id:0>8}'}))

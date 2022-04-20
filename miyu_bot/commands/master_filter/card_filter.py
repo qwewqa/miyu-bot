@@ -6,6 +6,7 @@ import discord
 from PIL import ImageColor
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
+from d4dj_utils.master.passive_skill_master import PassiveSkillMaster
 from d4dj_utils.master.skill_master import SkillMaster
 
 from miyu_bot.bot.bot import PrefContext
@@ -246,6 +247,15 @@ class CardFilter(MasterFilter[CardMaster]):
                             'heal': (f'{skill.min_recovery_value}-{skill.max_recovery_value}'
                                      if skill.min_recovery_value != skill.max_recovery_value
                                      else str(skill.min_recovery_value))
+                        }),
+                        inline=True)
+        passive: PassiveSkillMaster = card.passive_skill
+        embed.add_field(name=l10n.format_value('passive'),
+                        value=l10n.format_value('passive-desc', {
+                            'type': passive.type.name,
+                            'min-value': passive.min_value,
+                            'max-value': passive.max_value,
+                            'sub-value': passive.sub_value,
                         }),
                         inline=True)
         embed.set_footer(text=l10n.format_value('card-id', {'card-id': f'{card.id:0>8}'}))

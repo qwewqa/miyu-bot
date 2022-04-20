@@ -6,7 +6,7 @@ import discord
 from PIL import ImageColor
 from d4dj_utils.master.card_master import CardMaster
 from d4dj_utils.master.event_specific_bonus_master import EventSpecificBonusMaster
-from d4dj_utils.master.passive_skill_master import PassiveSkillMaster
+from d4dj_utils.master.passive_skill_master import PassiveSkillMaster, PassiveSkillType
 from d4dj_utils.master.skill_master import SkillMaster
 
 from miyu_bot.bot.bot import PrefContext
@@ -190,6 +190,82 @@ class CardFilter(MasterFilter[CardMaster]):
             return f'{skill.score_up_rate + skill.perfect_score_up_rate:>2} ({skill.perfect_score_up_rate:>2}p)'
         else:
             return f'{skill.score_up_rate + skill.perfect_score_up_rate:>2}      '
+
+    @data_attribute('groovy_score',
+                    aliases=['groovyscore', 'groovy', 'fever_score', 'feverscore', 'fever',
+                             'groovy_score_up', 'groovyscoreup', 'fever_score_up',
+                             'feverscoreup', 'feverup', 'groovyup', 'fever_up', 'groovy_up',
+                             'feverboost', 'fever_boost', 'groovyboost', 'groovy_boost'],
+                    is_comparable=True,
+                    is_sortable=True,
+                    reverse_sort=True,
+                    help_sample_argument='10')
+    def groovy_score(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.FeverBonus:
+            return passive_skill.max_value
+        return 0
+
+    @groovy_score.formatter
+    def groovy_score_formatter(self, value: CardMaster):
+        return f'{self.groovy_score(value):>5.2f}'
+
+    @data_attribute('groovy_support',
+                    aliases=['groovysupport', 'fever_support', 'feversupport'],
+                    is_comparable=True,
+                    is_sortable=True,
+                    reverse_sort=True,
+                    help_sample_argument='10')
+    def groovy_support(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.FeverSupport:
+            return passive_skill.max_value
+        return 0
+
+    @groovy_support.formatter
+    def groovy_support_formatter(self, value: CardMaster):
+        return f'{self.groovy_support(value):>5.2f}'
+
+    @data_attribute('solo_groovy',
+                    aliases=['solo_fever'],
+                    is_flag=True)
+    def solo_groovy(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        return passive_skill.type == PassiveSkillType.FeverSupport
+
+    @data_attribute('constant_score',
+                    aliases=['constantscore', 'constant_score_up', 'constantscoreup',
+                             'passive_score', 'passivescore', 'passive_score_up'],
+                    is_comparable=True,
+                    is_sortable=True,
+                    reverse_sort=True,
+                    help_sample_argument='2.5')
+    def constant_score(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.ScoreUpWithDamage:
+            return passive_skill.max_value
+        return 0
+
+    @constant_score.formatter
+    def constant_score_formatter(self, value: CardMaster):
+        return f'{self.constant_score(value):>5.2f}'
+
+    @data_attribute('auto_score',
+                    aliases=['autoscore', 'auto_score_up', 'autoscoreup', 'auto_up', 'auto_boost', 'auto_support',
+                             'autoboost', 'autosupport', 'autoup'],
+                    is_comparable=True,
+                    is_sortable=True,
+                    reverse_sort=True,
+                    help_sample_argument='2.5')
+    def auto_score(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.AutoScoreUp:
+            return passive_skill.max_value
+        return 0
+
+    @auto_score.formatter
+    def auto_score_formatter(self, value: CardMaster):
+        return f'{self.auto_score(value):>5.2f}'
 
     @command_source(command_args=
                     dict(name='card',

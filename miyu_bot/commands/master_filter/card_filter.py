@@ -200,6 +200,7 @@ class CardFilter(MasterFilter[CardMaster]):
                     is_comparable=True,
                     is_sortable=True,
                     reverse_sort=True,
+                    is_flag=True,
                     help_sample_argument='10')
     def groovy_score(self, value: CardMaster):
         passive_skill = value.passive_skill
@@ -219,6 +220,7 @@ class CardFilter(MasterFilter[CardMaster]):
                     is_comparable=True,
                     is_sortable=True,
                     reverse_sort=True,
+                    is_flag=True,
                     help_sample_argument='10')
     def groovy_support(self, value: CardMaster):
         passive_skill = value.passive_skill
@@ -246,6 +248,7 @@ class CardFilter(MasterFilter[CardMaster]):
                     is_comparable=True,
                     is_sortable=True,
                     reverse_sort=True,
+                    is_flag=True,
                     help_sample_argument='2.5')
     def constant_score(self, value: CardMaster):
         passive_skill = value.passive_skill
@@ -266,6 +269,7 @@ class CardFilter(MasterFilter[CardMaster]):
                     is_comparable=True,
                     is_sortable=True,
                     reverse_sort=True,
+                    is_flag=True,
                     help_sample_argument='2.5')
     def auto_score(self, value: CardMaster):
         passive_skill = value.passive_skill

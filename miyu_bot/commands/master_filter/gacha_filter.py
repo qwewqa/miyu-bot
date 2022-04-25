@@ -144,6 +144,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
                             'category': gacha.category.name,
                         }),
                         inline=False)
+        embed.add_field(name=l10n.format_value('summary'),
+                        value=gacha.summary,
+                        inline=False)
         embed.add_field(name=l10n.format_value('featured'),
                         value=l10n.format_value('featured-text', {'featured-text': featured_text or 'None'}),
                         inline=False)

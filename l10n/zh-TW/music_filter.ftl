@@ -25,10 +25,6 @@ song-info-desc =
         [0] { no }
        *[1] { yes }
     }
-    是否適合直播: { $fair-use ->
-        [0] { no }
-       *[1] { yes }
-    }
 
 section-full = 全曲
 section-begin = 開頭

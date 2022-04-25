@@ -36,6 +36,8 @@ passive-desc = { $type ->
     [FeverSupport] { groovy-support-desc }
     [ScoreUpWithDamage] { life-boost-desc }
     [AutoScoreUp] { auto-support-desc }
+    [SupportableScoreUp] { supportable-score-up-desc }
+    [SupportableSkillLonger] { supportable-skill-longer-desc }
    *[other] None
 }
 groovy-bonus-desc =
@@ -48,6 +50,16 @@ life-boost-desc =
     Constant Score Up: { $min-value }-{ $max-value }%
 auto-support-desc =
     Auto Score Up: { $min-value }-{ $max-value }%
+supportable-score-up-desc =
+    Support Available
+    Score Up: { $min-value }-{ $max-value }%
+    Bonus Value: {$sub-value}%
+    Bonus Character: { $bonus-character }
+supportable-skill-longer-desc =
+    Support Available
+    Skill Duration Up: { $min-value }-{ $max-value }%
+    Bonus Value: {$sub-value}%
+    Bonus Character: { $bonus-character }
 
 card-id = Card Id: { $card-id }
 

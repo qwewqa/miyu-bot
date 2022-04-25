@@ -342,7 +342,6 @@ class MusicFilter(MasterFilter[MusicMaster]):
                                 {f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
                             'release-date': discord.utils.format_dt(song.start_datetime),
                             'hidden': song.is_hidden,
-                            'fair-use': song.can_fair_use,
                         }),
                         inline=False)
 

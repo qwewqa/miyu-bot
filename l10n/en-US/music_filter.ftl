@@ -25,10 +25,6 @@ song-info-desc =
         [0] { no }
        *[1] { yes }
     }
-    Fair Use: { $fair-use ->
-        [0] { no }
-       *[1] { yes }
-    }
 
 section-full = Full
 section-begin = Begin

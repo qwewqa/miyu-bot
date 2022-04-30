@@ -13,7 +13,8 @@ class CommonAliases:
     def characters_by_name(self):
         characters_by_name = {}
         for character in self.assets.character_master.values():
-            characters_by_name[character.first_name_english.lower()] = character
+            if any(card.character == character for card in self.assets.card_master.values()):
+                characters_by_name[character.first_name_english.lower()] = character
         return characters_by_name
 
     @cached_property

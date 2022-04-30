@@ -318,6 +318,7 @@ class CardFilter(MasterFilter[CardMaster]):
                             'event': f'{card.event.name if card.event else "None"}',
                             'gacha': f'{card.gacha.name if card.gacha else "None"}',
                             'availability': card.availability.name,
+                            'limited': not (card.gacha_card_attribute & 1),
                         }),
                         inline=False)
         embed.add_field(name=l10n.format_value('parameters'),

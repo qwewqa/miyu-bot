@@ -6,6 +6,7 @@ info-desc =
     Unit: { $unit }
     Release Date: { $release-date }
     Gacha: { $gacha }
+    Limited { $limited }
 
 availability-name = { $availability ->
     [Permanent] Permanent

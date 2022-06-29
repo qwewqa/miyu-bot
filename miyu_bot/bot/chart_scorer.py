@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, Tuple, Union, List
+from typing import Dict, Tuple, Union, List, Optional
 
 from d4dj_utils.chart.chart import Chart
 from d4dj_utils.chart.score_calculator import ChartScoringData, get_chart_scoring_data
@@ -18,15 +18,19 @@ class ChartScorer:
               chart: Union[ChartMaster, Chart],
               power: int,
               skills: List[SkillMaster],
+              fever_multiplier: float = 1.0,
               enable_fever: bool = True,
               accuracy: float = 1.0,
               disable_soflan: bool = False,
               autoplay: bool = False,
-              enable_combo_bonus: bool = True):
+              enable_combo_bonus: bool = True) -> float:
         if isinstance(chart, Chart):
-            scoring_data = get_chart_scoring_data(chart, [s.max_seconds for s in skills])
+            scoring_data = get_chart_scoring_data(chart, [s.max_seconds for s in skills], fever_multiplier)
         else:
-            scoring_data = self.get_scoring_data(chart.id, tuple(s.max_seconds for s in skills))
+            if self.get_chart(chart.id):
+                scoring_data = self.get_scoring_data(chart.id, tuple(s.max_seconds for s in skills), fever_multiplier)
+            else:
+                return 0
         return scoring_data.score(
             power=power,
             skills=skills,
@@ -38,9 +42,12 @@ class ChartScorer:
         )
 
     @functools.lru_cache(maxsize=None)
-    def get_chart(self, cid: int, /) -> Chart:
-        return self.chart_masters[cid].load_chart_data()
+    def get_chart(self, cid: int, /) -> Optional[Chart]:
+        try:
+            return self.chart_masters[cid].load_chart_data()
+        except FileNotFoundError:
+            return None
 
-    @functools.lru_cache(maxsize=1024)
-    def get_scoring_data(self, cid: int, skill_durations: Tuple[float, ...]) -> ChartScoringData:
-        return get_chart_scoring_data(self.get_chart(cid), skill_durations)
+    @functools.lru_cache(maxsize=2048)
+    def get_scoring_data(self, cid: int, skill_durations: Tuple[float, ...], fever_multiplier: float) -> ChartScoringData:
+        return get_chart_scoring_data(self.get_chart(cid), skill_durations, fever_multiplier)

@@ -16,7 +16,6 @@ from miyu_bot.commands.master_filter.master_filter import MasterFilter, data_att
 class ChartFilter(MasterFilter[ChartMaster]):
     def __init__(self, bot: MiyuBot, master_name: str, name: str):
         super().__init__(bot, master_name, name)
-        self.score_cache = {k: {} for k in self._score_cache_keys}
         self.reference_chart = self.bot.assets[Server.JP].chart_master[3200094]
         self.bot.loop.create_task(self.preload_song_scores())
 
@@ -215,60 +214,57 @@ class ChartFilter(MasterFilter[ChartMaster]):
     def playable(self, value: ChartMaster):
         return value.music.is_released and not value.music.is_hidden and value.music.id > 3
 
-    @data_attribute('score[skill%]',
-                    regex=re.compile(r'score\[?(\d{1,7})%?]?'),
+    @data_attribute('score[skill%(*duration)?](groovy[bonus%])?',
+                    regex=re.compile(r'score\[?(\d{1,7})%?(?:\*((?:\d{0,2}[.])?\d{1,3}))?]?(?:(?:fever|groovy)((?:\d{0,2}[.])?\d{1,3}))?'),
                     is_sortable=True,
                     reverse_sort=True,
                     help_sample_argument='score50')
     def score(self, value: ChartMaster, match: re.Match):
-        score, = match.groups()
+        score, skill_duration, fever_score = match.groups()
         score = float(score)
-        return self.get_chart_score(value, score, fever=True)
+        skill_duration = float(skill_duration)
+        fever_score = fever_score and float(fever_score) or 0
+        fever_score = 1 + fever_score / 100
+        return self.get_chart_score(value, score, skill_duration, fever_score, fever=True)
 
     @score.formatter
     def format_score(self, value: ChartMaster, match: re.Match):
-        score, = match.groups()
+        score, skill_duration, fever_score = match.groups()
         score = float(score)
-        return f'{self.get_chart_score_formatted(value, score, fever=True)}  {self.format_song_duration(value)} '
+        skill_duration = float(skill_duration)
+        fever_score = fever_score and float(fever_score) or 0
+        fever_score = 1 + fever_score / 100
+        return f'{self.get_chart_score_formatted(value, score, skill_duration, fever_score, fever=True)}  {self.format_song_duration(value)} '
 
-    @data_attribute('score[skill%]solo',
-                    regex=re.compile(r'score\[?(\d{1,7})%?]?solo'),
+    @data_attribute('score[skill%(*duration)]solo',
+                    regex=re.compile(r'score\[?(\d{1,7})%?(?:\*((?:\d{0,2}[.])?\d{1,3}))?]?solo'),
                     is_sortable=True,
                     reverse_sort=True,
                     help_sample_argument='score50solo')
     def score_solo(self, value: ChartMaster, match: re.Match):
-        score, = match.groups()
+        score, skill_duration = match.groups()
         score = float(score)
-        return self.get_chart_score(value, score, fever=False)
+        skill_duration = float(skill_duration)
+        return self.get_chart_score(value, score, skill_duration, 1.0, fever=False)
 
     @score_solo.formatter
     def format_score_solo(self, value: ChartMaster, match: re.Match):
-        score, = match.groups()
+        score, skill_duration = match.groups()
         score = float(score)
-        return f'{self.get_chart_score_formatted(value, score, fever=False)}  {self.format_song_duration(value)} '
+        skill_duration = float(skill_duration)
+        return f'{self.get_chart_score_formatted(value, score, skill_duration, 1.0, fever=False)}  {self.format_song_duration(value)} '
 
     _score_cache_keys = {*itertools.product([0, 20, 25, 30, 35, 40, 45, 50, 55, 60], [True, False])}
 
     async def preload_song_scores(self):
-        for score, fever in self.score_cache:
-            for chart in self.bot.assets[Server.JP].chart_master.values():
-                self.get_chart_score(chart, score, fever)
-                await asyncio.sleep(0)
+        pass
 
-    def get_chart_score(self, chart: ChartMaster, score, fever) -> float:
-        cache = self.score_cache.get((score, fever))
-        if cache is None:
-            skills = [self.get_dummy_skill(score)] * 5
-            return self.bot.chart_scorer(chart, 150000, skills, fever)
-        if chart.id in cache:
-            return cache[chart.id]
-        skills = [self.get_dummy_skill(score)] * 5
-        score = self.bot.chart_scorer(chart, 150000, skills, fever)
-        cache[chart.id] = score
-        return score
+    def get_chart_score(self, chart: ChartMaster, score, skill_duration, fever_multiplier, fever) -> float:
+        skills = [self.get_dummy_skill(score, skill_duration)] * 5
+        return self.bot.chart_scorer(chart, 150000, skills, fever_multiplier, fever)
 
-    def get_chart_score_formatted(self, chart, score, fever):
-        ratio = self.get_chart_score(chart, score, fever) / self.get_chart_score(self.reference_chart, score, fever)
+    def get_chart_score_formatted(self, chart, score, skill_duration, fever_multiplier, fever):
+        ratio = self.get_chart_score(chart, score, skill_duration, fever_multiplier, fever) / self.get_chart_score(self.reference_chart, score, skill_duration, fever_multiplier, fever)
         return f'{100 * ratio:>5.1f}%'
 
     def get_chart_efficiency(self, chart: ChartMaster, score, fever, menuing_time):
@@ -281,7 +277,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
                  self.get_chart_efficiency(self.reference_chart, score, fever, menuing_time))
         return f'{100 * ratio:>5.1f}%'
 
-    def get_dummy_skill(self, score):
+    def get_dummy_skill(self, score, duration):
         return SkillMaster(
             self.bot.assets[Server.JP],
             id=0,
@@ -290,7 +286,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
             combo_support_count=0,
             score_up_rate=score,
             min_seconds=5,
-            max_seconds=9,
+            max_seconds=duration,
             perfect_score_up_rate=0,
         )
 

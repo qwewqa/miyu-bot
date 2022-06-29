@@ -55,7 +55,7 @@ class MiyuBot(commands.Bot):
         self.extension_names = set()
         self.thread_pool = ThreadPoolExecutor()
         self.scripts_path = None
-        self.chart_scorer = ChartScorer(self.assets[Server.JP].chart_master)
+        self.chart_scorer = ChartScorer(self.assets[Server.EN].chart_master | self.assets[Server.JP].chart_master)
         self.help_command = MiyuHelp()
 
     def try_reload_assets(self):

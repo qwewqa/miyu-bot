@@ -167,7 +167,7 @@ class Music(commands.Cog):
             ('Solo Live (No Combo)', False, False, False),
             ('Solo Live (Autoplay)', False, True, True)
         ]:
-            score = int(self.bot.chart_scorer(chart, power, skills, enable_fever, accuracy, assist,
+            score = int(self.bot.chart_scorer(chart, power, skills, 1.0, enable_fever, accuracy, assist,
                                               autoplay=autoplay, enable_combo_bonus=enable_combo_bonus))
             if not baseline:
                 baseline = score

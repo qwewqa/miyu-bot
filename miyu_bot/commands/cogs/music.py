@@ -68,6 +68,9 @@ class Music(commands.Cog):
         power = arguments.single('power', default=150000, converter=lambda p: int(p))
         accuracy = arguments.single(['acc', 'accuracy'], default=100, converter=lambda a: float(a))
         skill = arguments.single(['skill', 'skills'], default=['40'], is_list=True)
+        skill_duration = arguments.single(['skill_duration', 'sd', 'skilldur'], default=9.0, converter=lambda a: float(a))
+        fever_bonus = arguments.single(['fever_bonus', 'fb'], default=0, converter=lambda a: float(a))
+        fever_multiplier = 1 + fever_bonus / 100
         assist = arguments.tag('assist')
         random_skill_order = arguments.tags(['rng', 'randomorder', 'random_order'])
         if difficulty:
@@ -112,7 +115,7 @@ class Music(commands.Cog):
                 combo_support_count=0,
                 score_up_rate=float(score),
                 min_seconds=5,
-                max_seconds=9,
+                max_seconds=skill_duration,
                 perfect_score_up_rate=float(perfect),
             )
 
@@ -146,7 +149,7 @@ class Music(commands.Cog):
                 combo_support_count=0,
                 score_up_rate=mean_score_up,
                 min_seconds=5,
-                max_seconds=9,
+                max_seconds=skill_duration,
                 perfect_score_up_rate=mean_perfect_score_up,
             )
             skills = [avg_skill] * 4 + [skills[-1]]
@@ -167,7 +170,7 @@ class Music(commands.Cog):
             ('Solo Live (No Combo)', False, False, False),
             ('Solo Live (Autoplay)', False, True, True)
         ]:
-            score = int(self.bot.chart_scorer(chart, power, skills, 1.0, enable_fever, accuracy, assist,
+            score = int(self.bot.chart_scorer(chart, power, skills, fever_multiplier, enable_fever, accuracy, assist,
                                               autoplay=autoplay, enable_combo_bonus=enable_combo_bonus))
             if not baseline:
                 baseline = score

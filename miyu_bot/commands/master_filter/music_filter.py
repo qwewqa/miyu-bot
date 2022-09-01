@@ -316,7 +316,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         l10n = self.l10n[ctx]
 
         color_code = song.unit.main_color_code
-        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else None
 
         embed = discord.Embed(title=f'[{server.name}] {song.name}', color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
@@ -384,7 +384,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
             return embed
 
         color_code = song.unit.main_color_code
-        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else None
 
         chart = song.charts[difficulty]
         embed = discord.Embed(title=f'[{server.name}] {song.name} [{chart.difficulty.name}]', color=color)
@@ -444,7 +444,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
             return embed
 
         color_code = song.unit.main_color_code
-        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else None
 
         chart = song.charts[difficulty]
         embed = discord.Embed(title=f'[{server.name}] Mix: {song.name} [{chart.difficulty.name}]', color=color)

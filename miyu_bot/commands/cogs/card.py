@@ -70,5 +70,5 @@ class Card(commands.Cog):
                 await ctx.send(f'Invalid card exp {arg}')
 
 
-def setup(bot):
-    bot.add_cog(Card(bot))
+async def setup(bot):
+    await bot.add_cog(Card(bot))

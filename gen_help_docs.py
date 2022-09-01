@@ -13,15 +13,15 @@ if __name__ == '__main__':
     bot = MiyuBot('assets', gen_doc=True, command_prefix='!')
     bot.gen_doc = True
 
-    bot.load_extension('miyu_bot.commands.cogs.info')
-    bot.load_extension('miyu_bot.commands.cogs.card')
-    bot.load_extension('miyu_bot.commands.cogs.event')
-    bot.load_extension('miyu_bot.commands.cogs.music')
+    await bot.load_extension('miyu_bot.commands.cogs.info')
+    await bot.load_extension('miyu_bot.commands.cogs.card')
+    await bot.load_extension('miyu_bot.commands.cogs.event')
+    await bot.load_extension('miyu_bot.commands.cogs.music')
     # Other cog will not have generated docs
-    # bot.load_extension('miyu_bot.commands.cogs.other')
-    bot.load_extension('miyu_bot.commands.cogs.preferences')
-    bot.load_extension('miyu_bot.commands.cogs.audio')
-    bot.load_extension('miyu_bot.commands.cogs.gacha')
+    # await bot.load_extension('miyu_bot.commands.cogs.other')
+    await bot.load_extension('miyu_bot.commands.cogs.preferences')
+    await bot.load_extension('miyu_bot.commands.cogs.audio')
+    await bot.load_extension('miyu_bot.commands.cogs.gacha')
 
     random.seed(0)
 

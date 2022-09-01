@@ -50,6 +50,7 @@ class Gacha(commands.Cog):
             4: self.load_image('CharaIcon_DjUnitIcon_MMD.png'),
             5: self.load_image('CharaIcon_DjUnitIcon_LND.png'),
             6: self.load_image('CharaIcon_DjUnitIcon_LL.png'),
+            7: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
             30: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
             50: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
         }
@@ -65,7 +66,7 @@ class Gacha(commands.Cog):
             1: self.load_image('CharaIcon_RarityIcon_Evolution.png'),
         }
 
-        self.bot.loop.create_task(self.preload_card_icons())
+        self.bot.setup_tasks.append(self.preload_card_icons())
 
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'gacha.ftl')
         self.pull_locks = defaultdict(lambda: asyncio.Lock())
@@ -367,5 +368,5 @@ class GachaPullView(discord.ui.View):
         self.add_item(GachaPullAgainButton(label='Pull Again', style=discord.ButtonStyle.success))
 
 
-def setup(bot):
-    bot.add_cog(Gacha(bot))
+async def setup(bot):
+    await bot.add_cog(Gacha(bot))

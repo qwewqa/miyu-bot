@@ -38,6 +38,7 @@ class MiyuBot(commands.Bot):
 
     def __init__(self, asset_path, gen_doc: bool = False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.setup_tasks = []
         self.gen_doc = gen_doc
         self.asset_path = Path(asset_path)
         self.assets = {
@@ -57,6 +58,10 @@ class MiyuBot(commands.Bot):
         self.scripts_path = None
         self.chart_scorer = ChartScorer({**self.assets[Server.EN].chart_master, **self.assets[Server.JP].chart_master})
         self.help_command = MiyuHelp()
+
+    async def setup_hook(self) -> None:
+        for task in self.setup_tasks:
+            await task
 
     def try_reload_assets(self):
         try:
@@ -89,17 +94,17 @@ class MiyuBot(commands.Bot):
         await Tortoise.close_connections()
         await super(MiyuBot, self).close()
 
-    def load_extension(self, name):
+    async def load_extension(self, name):
         self.extension_names.add(name)
-        super(MiyuBot, self).load_extension(name)
+        await super(MiyuBot, self).load_extension(name)
 
-    def unload_extension(self, name):
+    async def unload_extension(self, name):
         self.extension_names.remove(name)
-        super(MiyuBot, self).unload_extension(name)
+        await super(MiyuBot, self).unload_extension(name)
 
-    def reload_all_extensions(self):
+    async def reload_all_extensions(self):
         for name in self.extension_names:
-            self.reload_extension(name)
+            await self.reload_extension(name)
 
     async def get_context(self, message, *, cls=None):
         ctx = await super().get_context(message, cls=PrefContext)

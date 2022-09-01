@@ -3,7 +3,7 @@ aerich==0.5.3
 aiohttp==3.7.4.post0
 aiosqlite==0.16.1
 async-timeout==3.0.1
-asyncpg==0.22.0
+asyncpg==0.26.0
 attrs==21.2.0
 Babel==2.9.1
 cffi==1.14.5
@@ -12,19 +12,19 @@ click==7.1.2
 ddlparse==1.9.0
 Deprecated==1.2.12
 dictdiffer==0.8.1
-# discord.py==2.0
-git+https://github.com/Rapptz/discord.py
+discord.py[voice]==2.0.1
 fluent.runtime==0.3.1
 fluent.syntax==0.18.1
 idna==3.1
 iso8601==0.1.14
+lz4==4.0.2
 mkdocs==1.2.1
 mkdocs-awesome-pages-plugin==2.5.0
 mkdocs-material==7.1.8
 mkdocs-static-i18n==0.17
 msgpack==1.0.2
 multidict==5.1.0
-Pillow==8.2.0
+Pillow==9.2.0
 pycparser==2.20
 pydantic==1.8.2
 pykakasi==2.1.1

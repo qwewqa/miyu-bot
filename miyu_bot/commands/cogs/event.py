@@ -61,10 +61,10 @@ class Event(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='timeleft',
-                      aliases=['tl', 'time_left'],
-                      description='Displays the time left in the current event',
-                      help='!timeleft')
+    @commands.hybrid_command(name='timeleft',
+                             aliases=['tl', 'time_left'],
+                             description='Displays the time left in the current event',
+                             help='!timeleft')
     async def time_left(self, ctx: commands.Context, *, arg: commands.clean_content = ''):
         event, timezone = await self.parse_event_argument(ctx, arg)
 
@@ -152,10 +152,10 @@ class Event(commands.Cog):
         else:
             return 'http://www.projectdivar.com/eventdata/t20?chart=true'
 
-    @commands.command(name='leaderboard',
-                      aliases=['lb'],
-                      description='Displays the full leaderboard',
-                      help='!leaderboard')
+    @commands.hybrid_command(name='leaderboard',
+                             aliases=['lb'],
+                             description='Displays the full leaderboard',
+                             help='!leaderboard')
     async def leaderboard(self, ctx: commands.Context, *, arg: str = ''):
         args = parse_arguments(arg)
         await args.update_preferences(ctx)
@@ -166,10 +166,10 @@ class Event(commands.Cog):
                                          None)
         asyncio.ensure_future(run_deletable_message(ctx, content=text))
 
-    @commands.command(name='detailed_leaderboard',
-                      aliases=['dlb', 'llb', 'lbb', 'llbb'],
-                      description='Displays a detailed leaderboard.',
-                      help='!dlb')
+    @commands.hybrid_command(name='detailed_leaderboard',
+                             aliases=['dlb', 'llb', 'lbb', 'llbb'],
+                             description='Displays a detailed leaderboard.',
+                             help='!dlb')
     async def detailed_leaderboard(self, ctx: commands.Context, *, arg: str = ''):
         args = parse_arguments(arg)
         await args.update_preferences(ctx)
@@ -222,7 +222,7 @@ class Event(commands.Cog):
                 for interval in valid_loop_intervals:
                     if minutes % interval == 0:
                         if (interval in last_loop_data and
-                                last_loop_data[interval] == data):
+                            last_loop_data[interval] == data):
                             continue
                         prev = last_loop_data.get(interval)
                         last_loop_data[interval] = data
@@ -287,7 +287,8 @@ class Event(commands.Cog):
         else:
             tier = process_tier_arg(ctx.invoked_with)
 
-        embed = await self.get_tier_embed(ctx.preferences.server, tier, self.bot.master_filters.events.get_latest_event(ctx))
+        embed = await self.get_tier_embed(ctx.preferences.server, tier,
+                                          self.bot.master_filters.events.get_latest_event(ctx))
 
         if embed:
             await ctx.send(embed=embed)
@@ -374,5 +375,5 @@ class Event(commands.Cog):
         return embed
 
 
-def setup(bot):
-    bot.add_cog(Event(bot))
+async def setup(bot):
+    await bot.add_cog(Event(bot))

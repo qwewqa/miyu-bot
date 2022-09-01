@@ -17,7 +17,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
     def __init__(self, bot: MiyuBot, master_name: str, name: str):
         super().__init__(bot, master_name, name)
         self.reference_chart = self.bot.assets[Server.JP].chart_master[3200094]
-        self.bot.loop.create_task(self.preload_song_scores())
+        self.bot.setup_tasks.append(self.preload_song_scores())
 
     def get_name(self, value: ChartMaster) -> str:
         return f'{value.music.name} {value.music.special_unit_name}{" (Hidden)" if value.music.is_hidden else ""} {value.difficulty.name.lower()}'.strip()

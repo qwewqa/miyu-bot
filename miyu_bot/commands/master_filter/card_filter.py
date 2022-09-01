@@ -298,7 +298,7 @@ class CardFilter(MasterFilter[CardMaster]):
             limit_break = 0
 
         color_code = card.character.color_code
-        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else discord.Embed.Empty
+        color = discord.Colour.from_rgb(*ImageColor.getcolor(color_code, 'RGB')) if color_code else None
 
         embed = discord.Embed(title=f'[{server.name}] {self.format_card_name(card)}', color=color)
 

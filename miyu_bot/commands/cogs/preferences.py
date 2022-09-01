@@ -17,9 +17,9 @@ class Preferences(commands.Cog):
         from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'preferences.ftl')
 
-    @commands.command(name='setpref',
-                      description='',
-                      help='')
+    @commands.hybrid_command(name='setpref',
+                             description='',
+                             help='')
     async def setpref(self, ctx: commands.Context, scope: str, name: str, value: str):
         scope = preference_scope_aliases.get(scope)
         if not scope:
@@ -43,9 +43,9 @@ class Preferences(commands.Cog):
         await entry.save()
         await ctx.send(f'Preference updated.')
 
-    @commands.command(name='getpref',
-                      description='',
-                      help='')
+    @commands.hybrid_command(name='getpref',
+                             description='',
+                             help='')
     async def getpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
@@ -65,9 +65,9 @@ class Preferences(commands.Cog):
                                      for name, pref in scope.preferences.items()
                                      if not pref.is_privileged))
 
-    @commands.command(name='clearpref',
-                      description='',
-                      help='')
+    @commands.hybrid_command(name='clearpref',
+                             description='',
+                             help='')
     async def clearpref(self, ctx: commands.Context, scope: str, name: str = ''):
         scope = preference_scope_aliases.get(scope)
         if not scope:
@@ -119,5 +119,5 @@ async def get_preferences(ctx: commands.Context, toggle_user_prefs: bool = False
     return preference_values
 
 
-def setup(bot):
-    bot.add_cog(Preferences(bot))
+async def setup(bot):
+    await bot.add_cog(Preferences(bot))

@@ -202,21 +202,25 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
     def get_commands(self, include_self_parameter: bool = False):
         def wrap(f):
+            async def sig(ctx, *, arg: ParsedArguments = None):
+                pass
+
             # Note how a default argument used, so that the error propagates properly
-            async def wrapped(self, ctx, *, arg: ParsedArguments = None):
-                return await f(ctx, arg=arg)
+            functools.wraps(sig)
+            async def wrapped(*args, arg: ParsedArguments = None):
+                return await f(args[-1], arg=arg)
 
             return wrapped
 
         for cs in self.command_sources:
             if args := cs.command_args:
                 if include_self_parameter:
-                    yield commands.command(**{**args,
+                    yield commands.hybrid_command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         wrap(self.get_detail_command_function(cs)))
                 else:
-                    yield commands.command(**{**args,
+                    yield commands.hybrid_command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         self.get_detail_command_function(cs))
@@ -224,13 +228,13 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             cs = self.list_formatter
             if args := cs.command_args:
                 if include_self_parameter:
-                    yield commands.command(**{**args,
+                    yield commands.hybrid_command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         wrap(self.get_list_command_function()))
                 else:
 
-                    yield commands.command(**{**args,
+                    yield commands.hybrid_command(**{**args,
                                               'description': args.get('description',
                                                                       'No Description')})(
                         wrap(self.get_list_command_function()))

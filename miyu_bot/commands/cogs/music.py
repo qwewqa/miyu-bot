@@ -48,10 +48,10 @@ class Music(commands.Cog):
         'es': ChartDifficulty.Easy,
     }
 
-    @commands.command(name='score',
-                      aliases=[],
-                      description='Calculates chart score.',
-                      help='!score Cyber Cyber diff=ex power=150000 acc=100 skill=50 $assist')
+    @commands.hybrid_command(name='score',
+                             aliases=[],
+                             description='Calculates chart score.',
+                             help='!score Cyber Cyber diff=ex power=150000 acc=100 skill=50 $assist')
     async def score(self, ctx: PrefContext, *, arguments: ParsedArguments):
         def format_skill(skill):
             if skill.score_up_rate and skill.perfect_score_up_rate:
@@ -68,7 +68,8 @@ class Music(commands.Cog):
         power = arguments.single('power', default=150000, converter=lambda p: int(p))
         accuracy = arguments.single(['acc', 'accuracy'], default=100, converter=lambda a: float(a))
         skill = arguments.single(['skill', 'skills'], default=['40'], is_list=True)
-        skill_duration = arguments.single(['skill_duration', 'sd', 'skilldur'], default=9.0, converter=lambda a: float(a))
+        skill_duration = arguments.single(['skill_duration', 'sd', 'skilldur'], default=9.0,
+                                          converter=lambda a: float(a))
         fever_bonus = arguments.single(['fever_bonus', 'fb'], default=0, converter=lambda a: float(a))
         fever_multiplier = 1 + fever_bonus / 100
         assist = arguments.tag('assist')
@@ -194,10 +195,10 @@ class Music(commands.Cog):
 
     _music_durations = {}
 
-    @commands.command(name='mixorder',
-                      aliases=['ordermix', 'mix_order', 'order_mix'],
-                      description='Finds order of songs when mixed.',
-                      help='!mixorder grgr grgr grgr "cyber cyber"')
+    @commands.hybrid_command(name='mixorder',
+                             aliases=['ordermix', 'mix_order', 'order_mix'],
+                             description='Finds order of songs when mixed.',
+                             help='!mixorder grgr grgr grgr "cyber cyber"')
     async def mix_order(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
         songs = []
         for name in [a, b, c, d]:
@@ -218,29 +219,13 @@ class Music(commands.Cog):
                                           f'Total Duration: {sum(md.duration for md in mix_data):.2f}s```')
         await ctx.send(embed=embed)
 
-    @commands.command(name='mix',
-                      aliases=[],
-                      description='Creates a custom mix.',
-                      help='!mix grgr hard cyber hard puransu expert "cats eye" easy')
-    async def mix(self, ctx: commands.Context, *args: str):
-        if len(args) == 8:
-            a, a_diff, b, b_diff, c, c_diff, d, d_diff = args
-            names = [a, b, c, d]
-            diff_names = [a_diff, b_diff, c_diff, d_diff]
-        elif len(args) == 5:
-            if re.match(r'[1-4]{4}', args[-1]):
-                diff_mapping = {1: 'easy', 2: 'normal', 3: 'hard', 4: 'expert'}
-                names = args[:-1]
-                diff_names = [diff_mapping[int(c)] for c in args[-1]]
-            else:
-                await ctx.send('Invalid difficulty format')
-                return
-        elif len(args) == 4:
-            names = args
-            diff_names = ['ex'] * 4
-        else:
-            await ctx.send('Invalid argument count.')
-            return
+    @commands.hybrid_command(name='mix',
+                             aliases=[],
+                             description='Creates a custom mix.',
+                             help='!mix grgr hard cyber hard puransu expert "cats eye" easy')
+    async def mix(self, ctx: commands.Context, a: str, a_diff: str, b: str, b_diff: str, c: str, c_diff: str, d: str, d_diff: str):
+        names = [a, b, c, d]
+        diff_names = [a_diff, b_diff, c_diff, d_diff]
 
         songs = []
         for name in names:
@@ -394,5 +379,5 @@ class CustomMixData:
     create_time: datetime.datetime
 
 
-def setup(bot):
-    bot.add_cog(Music(bot))
+async def setup(bot):
+    await bot.add_cog(Music(bot))

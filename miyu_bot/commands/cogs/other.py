@@ -4,6 +4,7 @@ import textwrap
 
 import discord
 import yaml
+from discord import app_commands, Interaction
 from discord.ext import commands
 from tortoise.functions import Count, Sum
 
@@ -20,7 +21,7 @@ class Other(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        bot.loop.create_task(self.run_scripts())
+        bot.setup_tasks.append(self.run_scripts())
         self.l10n = LocalizationManager(self.bot.fluent_loader, 'utility.ftl')
 
     async def run_scripts(self):
@@ -84,10 +85,15 @@ class Other(commands.Cog):
     async def similarity_score(self, ctx: commands.Context, source: str, target: str):
         await ctx.send(str(FuzzyMatcher().score(romanize(source), romanize(target))))
 
-    @commands.command(hidden=True)
-    @commands.is_owner()
-    async def shutdown(self, ctx: commands.Context):
-        await ctx.send('Shutting down.')
+    @staticmethod
+    async def is_owner(interaction: Interaction):
+        return await interaction.client.is_owner(interaction.user)
+
+    @app_commands.command()
+    @app_commands.guilds(790033228600705044)
+    @app_commands.check(is_owner)
+    async def shutdown(self, interaction: Interaction):
+        await interaction.response.send_message('Shutting down.')
         await self.bot.close()
 
     @commands.command(hidden=True, aliases=['rld'])
@@ -95,10 +101,10 @@ class Other(commands.Cog):
     async def reload_extension(self, ctx: commands.Context, *, name: str = ''):
         try:
             if name:
-                self.bot.reload_extension(name)
+                await self.bot.reload_extension(name)
                 await ctx.send('Successfully reloaded extension.')
             else:
-                self.bot.reload_all_extensions()
+                await self.bot.reload_all_extensions()
                 await ctx.send('Successfully reloaded all extensions.')
         except:
             await ctx.send('Failed to reload extension.')
@@ -168,10 +174,10 @@ class Other(commands.Cog):
         except Exception as e:
             await ctx.send(f'```{e.__class__.__name__}: {e}\n```')
 
-    @commands.command(name='info',
-                      aliases=['about', 'invite'],
-                      description='Sends bot info.',
-                      help='!info')
+    @commands.hybrid_command(name='info',
+                             aliases=['about', 'invite'],
+                             description='Sends bot info.',
+                             help='!info')
     async def info(self, ctx: commands.Context):
         embed = discord.Embed(title='Miyu Bot', description='A utility bot for mobile rhythm game D4DJ.')
         embed.set_thumbnail(url=self.bot.user.avatar.url)
@@ -209,11 +215,11 @@ class Other(commands.Cog):
     async def command_usage(self, ctx: commands.Context):
         usage_counts = (
             await CommandUsageCount
-                .all()
-                .annotate(use_count=Sum('counter'))
-                .order_by('name')
-                .group_by('name')
-                .values_list('name', 'use_count')
+            .all()
+            .annotate(use_count=Sum('counter'))
+            .order_by('name')
+            .group_by('name')
+            .values_list('name', 'use_count')
         )
         embed = discord.Embed(title='Command Usage')
         asyncio.create_task(run_paged_message(ctx, embed,
@@ -240,11 +246,11 @@ class Other(commands.Cog):
     async def guild_usage(self, ctx: commands.Context):
         usage_counts = (
             await CommandUsageCount
-                .all()
-                .annotate(use_count=Sum('counter'))
-                .order_by('guild_id')
-                .group_by('guild_id')
-                .values_list('guild_id', 'use_count')
+            .all()
+            .annotate(use_count=Sum('counter'))
+            .order_by('guild_id')
+            .group_by('guild_id')
+            .values_list('guild_id', 'use_count')
         )
         embed = discord.Embed(title='Guild Usage')
         asyncio.create_task(run_paged_message(ctx, embed,
@@ -253,5 +259,5 @@ class Other(commands.Cog):
                                               page_size=40))
 
 
-def setup(bot):
-    bot.add_cog(Other(bot))
+async def setup(bot):
+    await bot.add_cog(Other(bot))

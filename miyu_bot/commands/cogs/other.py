@@ -99,7 +99,8 @@ class Other(commands.Cog):
     @app_commands.guilds(790033228600705044, 821445433276629053)
     @app_commands.check(is_owner)
     async def echo(self, interaction: Interaction, *, message: str):
-        await interaction.response.send_message(message)
+        await interaction.response.defer()
+        await interaction.channel.send(message)
 
     @commands.command(hidden=True, aliases=['rld'])
     @commands.is_owner()

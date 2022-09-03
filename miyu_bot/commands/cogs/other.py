@@ -85,7 +85,6 @@ class Other(commands.Cog):
     async def similarity_score(self, ctx: commands.Context, source: str, target: str):
         await ctx.send(str(FuzzyMatcher().score(romanize(source), romanize(target))))
 
-    @staticmethod
     async def is_owner(interaction: Interaction):
         return await interaction.client.is_owner(interaction.user)
 

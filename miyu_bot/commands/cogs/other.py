@@ -90,11 +90,17 @@ class Other(commands.Cog):
         return await interaction.client.is_owner(interaction.user)
 
     @app_commands.command()
-    @app_commands.guilds(790033228600705044)
+    @app_commands.guilds(790033228600705044, 821445433276629053)
     @app_commands.check(is_owner)
     async def shutdown(self, interaction: Interaction):
         await interaction.response.send_message('Shutting down.')
         await self.bot.close()
+
+    @app_commands.command()
+    @app_commands.guilds(790033228600705044, 821445433276629053)
+    @app_commands.check(is_owner)
+    async def echo(self, interaction: Interaction, *, message: str):
+        await interaction.response.send_message(message)
 
     @commands.command(hidden=True, aliases=['rld'])
     @commands.is_owner()

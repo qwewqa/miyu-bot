@@ -85,7 +85,8 @@ async def main():
     async def on_start():
         if config.get('sync'):
             await bot.tree.sync()
-            await bot.tree.sync(guild=await bot.fetch_guild(790033228600705044))
+            for gid in [790033228600705044, 821445433276629053]:
+                await bot.tree.sync(guild=await bot.fetch_guild(gid))
 
     bot.setup_tasks.append(on_start())
 

@@ -23,7 +23,7 @@ class CardFilter(MasterFilter[CardMaster]):
 
     def get_select_name(self, value: CardMaster):
         emoji = attribute_emoji_ids_by_attribute_id[value.attribute_id]
-        return value.character.full_name_english, value.name, emoji
+        return value.name, value.character.full_name_english, emoji
 
     def is_released(self, value: CardMaster) -> bool:
         return value.is_available

@@ -51,6 +51,8 @@ class Gacha(commands.Cog):
             5: self.load_image('CharaIcon_DjUnitIcon_LND.png'),
             6: self.load_image('CharaIcon_DjUnitIcon_LL.png'),
             7: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
+            8: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
+            9: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
             30: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
             50: self.load_image('CharaIcon_DjUnitIcon_Common.png'),
         }

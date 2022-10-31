@@ -31,7 +31,7 @@ skill = Skill
 skill-desc =
     Name: { $name }
     Duration: { $duration }
-    Score Up: { $score-up }
+    Score Up: { $score-up } { $score-up-additional }
     Heal: { $heal }
 
 passive = Passive

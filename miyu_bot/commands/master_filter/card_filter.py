@@ -338,6 +338,7 @@ class CardFilter(MasterFilter[CardMaster]):
                             'name': card.skill_name,
                             'duration': f'{skill.min_seconds}-{skill.max_seconds}s',
                             'score-up': f'{skill.score_up_rate}%' if not skill.perfect_score_up_rate else f'{skill.score_up_rate}% + {skill.perfect_score_up_rate}% perfect',
+                            'score-up-additional': ('(' + ', '.join(f'+{v}%' for v in skill.group_bonus_rates) + ')') if skill.group_bonus_rates else '',
                             'heal': (f'{skill.min_recovery_value}-{skill.max_recovery_value}'
                                      if skill.min_recovery_value != skill.max_recovery_value
                                      else str(skill.min_recovery_value))

@@ -322,7 +322,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
 
         # Just a check for a reasonable value
-        if datetime(2019, 1, 1) <= song.end_datetime <= datetime.utcnow() + timedelta(days=365):
+        if datetime(2019, 1, 1) <= song.end_datetime.replace(tzinfo=None) <= datetime.utcnow() + timedelta(days=365):
             end_date = discord.utils.format_dt(song.end_datetime)
         else:
             end_date = "N/A"

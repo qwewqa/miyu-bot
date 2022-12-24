@@ -1,5 +1,5 @@
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import discord
 from PIL import ImageColor
@@ -321,6 +321,12 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed = discord.Embed(title=f'[{server.name}] {song.name}', color=color)
         embed.set_thumbnail(url=self.bot.asset_url + get_asset_filename(song.jacket_path))
 
+        # Just a check for a reasonable value
+        if datetime(2019, 1, 1) <= song.end_datetime <= datetime.utcnow() + timedelta(days=365):
+            end_date = discord.utils.format_dt(song.end_datetime)
+        else:
+            end_date = "N/A"
+
         embed.add_field(name=l10n.format_value('artist'),
                         value=l10n.format_value('artist-desc', {
                             'lyricist': song.lyricist,
@@ -341,6 +347,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                             'chart-designers': ', '.join(
                                 {f'{c.designer.name} ({c.designer.id})': None for c in song.charts.values()}.keys()),
                             'release-date': discord.utils.format_dt(song.start_datetime),
+                            'end-date': end_date,
                             'hidden': song.is_hidden,
                         }),
                         inline=False)

@@ -21,6 +21,7 @@ song-info-desc =
     Levels: { $levels }
     Chart Designers: { $chart-designers }
     Release Date: { $release-date }
+    End Date: { end-date }
     Hidden: { $hidden ->
         [0] { no }
        *[1] { yes }

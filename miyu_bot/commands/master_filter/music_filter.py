@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import discord
 from PIL import ImageColor
@@ -306,6 +306,11 @@ class MusicFilter(MasterFilter[MusicMaster]):
             return f'{combo:>4}'
         else:
             return ' N/A'
+
+    @data_attribute('expiring',
+                    is_flag=True)
+    def expiring(self, value: MusicMaster):
+        return timedelta(0) < value.end_datetime - datetime.now(timezone.utc) < timedelta(days=62)
 
     @command_source(command_args=
                     dict(name='song',

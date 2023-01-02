@@ -6,11 +6,11 @@
 
 ### login_bonus
 
-*[Detail Command](../general_usage/#detail-commands)*
+*[Detail Command](/commands/general-usage/#detail-commands)*
 
 ### login_bonuses
 
-*[List Command](../general_usage/#list-commands)*
+*[List Command](/commands/general-usage/#list-commands)*
 
 ## Attributes
 
@@ -20,7 +20,7 @@
     title
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable)
+    [Sortable](/commands/general-usage/#sortable)
 
 ??? example "Examples"
     `sort=name`  
@@ -32,7 +32,7 @@
     release, recent
 
 !!! info "Type"
-    [Sortable (Default)](../general_usage/#sortable), [Display (Default)](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable (Default)](/commands/general-usage/#sortable), [Display (Default)](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=date`  
@@ -45,7 +45,7 @@
 ### id
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=id`  

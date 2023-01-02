@@ -40,7 +40,7 @@ async def main():
 
     intents = Intents.default()
     bot = MiyuBot('assets', command_prefix=get_prefix, case_insensitive=True,
-                  activity=discord.Game(name='https://ko-fi.com/qwewqa'),
+                  activity=discord.Game(name='https://miyu-docs.qwewqa.xyz/'),
                   owner_ids={169163991434788865},
                   allowed_mentions=discord.AllowedMentions.none(),
                   intents=intents)

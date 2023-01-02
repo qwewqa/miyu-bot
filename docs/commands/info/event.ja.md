@@ -6,11 +6,11 @@
 
 ### event
 
-*[Detail Command](../general_usage/#detail-commands)*
+*[Detail Command](/commands/general-usage/#detail-commands)*
 
 ### events
 
-*[List Command](../general_usage/#list-commands)*
+*[List Command](/commands/general-usage/#list-commands)*
 
 ## Attributes
 
@@ -20,7 +20,7 @@
     release, recent
 
 !!! info "Type"
-    [Sortable (Default)](../general_usage/#sortable), [Display (Default)](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable (Default)](/commands/general-usage/#sortable), [Display (Default)](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=date`  
@@ -36,7 +36,7 @@
     char, chara
 
 !!! info "Type"
-    [Equality](../general_usage/#equality), [Tag](../general_usage/#tag), [Plural](../general_usage/#plural)
+    [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag), [Plural](/commands/general-usage/#plural)
 
 ??? note "Tags"
      - rinku  
@@ -65,30 +65,29 @@
      - miiko  
      - airi  
      - mana  
-     - syano  
-     - touka  
+     - shano  
+     - toka  
      - michiru  
-     - ryujin  
-     - dennojo  
-     - ku  
-     - haruki  
-     - aqua  
-     - pekora  
-     - fubuki  
-     - suisei
+     - lumina  
+     - kokoa  
+     - hayate  
+     - neo  
+     - sophia  
+     - elsie  
+     - weronika
 
 ??? example "Examples"
-    `character=haruna`  
-    `character=rei,yuka,ibuki`  
-    `character!=rei,yuka,ibuki`  
-    `character==rei,yuka,ibuki`  
-    `$rei $yuka $ibuki`  
-    `$!haruna $!touka`
+    `character=noa`  
+    `character=neo,lumina,muni`  
+    `character!=neo,lumina,muni`  
+    `character==neo,lumina,muni`  
+    `$neo $lumina $muni`  
+    `$!noa $!rei`
 
 ### unit
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - happy_around!, happyaround, happy_around, hapiara, happy, ha  
@@ -97,6 +96,9 @@
      - merm4id, mermaid, mmd, m4  
      - 燐舞曲, rondo  
      - lyrical_lily, lyricallily, riririri, lililili, lily, lili, riri, ll  
+     - call_of_artemis, callofartemis, coa, c.o.a.  
+     - unichørd, unichord, uc, 1c, uni  
+     - abyssmare, am, abyss  
      - スペシャル, special  
      - その他, other  
      - mixed
@@ -104,16 +106,16 @@
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=merm4id`  
-    `unit=mixed,peaky_p-key,happy_around!`  
-    `unit!=mixed,peaky_p-key,happy_around!`  
-    `$mixed $peaky_p-key $happy_around!`  
-    `$!merm4id $!happy_around!`
+    `unit=スペシャル`  
+    `unit=mixed,call_of_artemis,merm4id`  
+    `unit!=mixed,call_of_artemis,merm4id`  
+    `$mixed $call_of_artemis $merm4id`  
+    `$!スペシャル $!peaky_p-key`
 
 ### attribute
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - street, purple  
@@ -125,33 +127,34 @@
 ??? example "Examples"
     `sort=attribute`  
     `sort<attribute`  
-    `attribute=street`  
-    `attribute=elegant,street,party`  
-    `attribute!=elegant,street,party`  
-    `$elegant $street $party`  
-    `$!street $!party`
+    `attribute=cute`  
+    `attribute=cool,party,cute`  
+    `attribute!=cool,party,cute`  
+    `$cool $party $cute`  
+    `$!cute $!elegant`
 
 ### type
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - nothing  
      - bingo  
      - medley  
      - poker  
-     - raid
+     - raid  
+     - slot
 
 ??? example "Examples"
     `sort=type`  
     `sort<type`  
     `disp=type`  
-    `type=nothing`  
-    `type=nothing,raid,medley`  
-    `type!=nothing,raid,medley`  
-    `$nothing $raid $medley`  
-    `$!nothing $!medley`
+    `type=slot`  
+    `type=nothing,bingo,raid`  
+    `type!=nothing,bingo,raid`  
+    `$nothing $bingo $raid`  
+    `$!slot $!bingo`
 
 ### parameter
 
@@ -159,7 +162,7 @@
     param
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - heart  
@@ -170,8 +173,8 @@
 ??? example "Examples"
     `sort=parameter`  
     `sort<parameter`  
-    `parameter=heart`  
-    `parameter=technique,physical,heart`  
-    `parameter!=technique,physical,heart`  
-    `$technique $physical $heart`  
-    `$!heart $!no_parameter`
+    `parameter=physical`  
+    `parameter=physical,heart,technique`  
+    `parameter!=physical,heart,technique`  
+    `$physical $heart $technique`  
+    `$!physical $!no_parameter`

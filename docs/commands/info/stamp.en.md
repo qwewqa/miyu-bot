@@ -6,6 +6,6 @@
 
 ### stamps
 
-*[List Command](../general_usage/#list-commands)*
+*[List Command](/commands/general-usage/#list-commands)*
 
 ## Attributes

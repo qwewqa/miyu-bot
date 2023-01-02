@@ -6,7 +6,7 @@
 
 ### charts
 
-*[List Command](../general_usage/#list-commands)*
+*[List Command](/commands/general-usage/#list-commands)*
 
 ## Attributes
 
@@ -16,7 +16,7 @@
     title
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable)
+    [Sortable](/commands/general-usage/#sortable)
 
 ??? example "Examples"
     `sort=name`  
@@ -28,7 +28,7 @@
     release, recent
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=date`  
@@ -41,7 +41,7 @@
 ### unit
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - happy_around!, happyaround, happy_around, hapiara, happy, ha  
@@ -50,6 +50,9 @@
      - merm4id, mermaid, mmd, m4  
      - 燐舞曲, rondo  
      - lyrical_lily, lyricallily, riririri, lililili, lily, lili, riri, ll  
+     - call_of_artemis, callofartemis, coa, c.o.a.  
+     - unichørd, unichord, uc, 1c, uni  
+     - abyssmare, am, abyss  
      - スペシャル, special  
      - その他, other
 
@@ -57,15 +60,15 @@
     `sort=unit`  
     `sort<unit`  
     `unit=スペシャル`  
-    `unit=happy_around!,peaky_p-key,merm4id`  
-    `unit!=happy_around!,peaky_p-key,merm4id`  
-    `$happy_around! $peaky_p-key $merm4id`  
-    `$!スペシャル $!その他`
+    `unit=その他,lyrical_lily,photon_maiden`  
+    `unit!=その他,lyrical_lily,photon_maiden`  
+    `$その他 $lyrical_lily $photon_maiden`  
+    `$!スペシャル $!燐舞曲`
 
 ### id
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=id`  
@@ -81,7 +84,7 @@
     chartdesigner, designer
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Equality](../general_usage/#equality)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Equality](/commands/general-usage/#equality)
 
 ??? example "Examples"
     `sort=chart_designer`  
@@ -96,7 +99,7 @@
     diff
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Comparable](../general_usage/#comparable), [Tag](../general_usage/#tag), [Keyword](../general_usage/#keyword)
+    [Sortable](/commands/general-usage/#sortable), [Comparable](/commands/general-usage/#comparable), [Tag](/commands/general-usage/#tag), [Keyword](/commands/general-usage/#keyword)
 
 ??? note "Tags"
      - expert, expt  
@@ -107,18 +110,18 @@
 ??? example "Examples"
     `sort=difficulty`  
     `sort<difficulty`  
-    `difficulty=expert`  
-    `difficulty=hard,easy,normal`  
-    `difficulty!=hard,easy,normal`  
+    `difficulty=normal`  
+    `difficulty=easy,normal,expert`  
+    `difficulty!=easy,normal,expert`  
     `difficulty>hard`  
-    `$hard $easy $normal`  
-    `$!expert $!hard`  
-    `hard easy normal`
+    `$easy $normal $expert`  
+    `$!normal $!hard`  
+    `easy normal expert`
 
 ### level
 
 !!! info "Type"
-    [Sortable (Default)](../general_usage/#sortable), [Comparable](../general_usage/#comparable)
+    [Sortable (Default)](/commands/general-usage/#sortable), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=level`  
@@ -133,7 +136,7 @@
     length
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=duration`  
@@ -146,7 +149,7 @@
 ### bpm
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=bpm`  
@@ -162,7 +165,7 @@
     max_combo, maxcombo
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=combo`  
@@ -175,7 +178,7 @@
 ### playable
 
 !!! info "Type"
-    [Flag](../general_usage/#flag)
+    [Flag](/commands/general-usage/#flag)
 
 !!! note "Tags"
     playable
@@ -184,28 +187,28 @@
     `$playable`  
     `$!playable`
 
-### score[skill%]
+### score[skill%(*duration)?](groovy[bonus%])?
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display)
 
 ??? example "Examples"
-    `sort=score[skill%]`  
-    `sort<score[skill%]`  
-    `disp=score[skill%]`  
+    `sort=score[skill%(*duration)?](groovy[bonus%])?`  
+    `sort<score[skill%(*duration)?](groovy[bonus%])?`  
+    `disp=score[skill%(*duration)?](groovy[bonus%])?`  
     `sort=score50`  
     `sort<score50`  
     `disp=score50`
 
-### score[skill%]solo
+### score[skill%(*duration)]solo
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display)
 
 ??? example "Examples"
-    `sort=score[skill%]solo`  
-    `sort<score[skill%]solo`  
-    `disp=score[skill%]solo`  
+    `sort=score[skill%(*duration)]solo`  
+    `sort<score[skill%(*duration)]solo`  
+    `disp=score[skill%(*duration)]solo`  
     `sort=score50solo`  
     `sort<score50solo`  
     `disp=score50solo`

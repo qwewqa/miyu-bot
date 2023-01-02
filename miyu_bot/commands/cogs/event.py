@@ -251,6 +251,8 @@ class Event(commands.Cog):
 
     @leaderboard_loop.before_loop
     async def before_leaderboard_loop(self):
+        if self.bot.gen_doc:
+            return
         await self.bot.wait_until_ready()
         # Sleep until the start of the next minute
         await asyncio.sleep(61 - datetime.datetime.now().second)

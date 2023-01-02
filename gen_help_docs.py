@@ -1,5 +1,8 @@
+import asyncio
 import random
 from pathlib import Path
+
+from discord import Intents
 
 from miyu_bot.bot.bot import MiyuBot
 from miyu_bot.commands.docs.info_command_docs import generate_info_command_docs
@@ -7,10 +10,11 @@ from timeit import default_timer as timer
 
 from miyu_bot.commands.docs.utility_command_docs import generate_utility_command_docs
 
-if __name__ == '__main__':
+
+async def main():
     start = timer()
 
-    bot = MiyuBot('assets', gen_doc=True, command_prefix='!')
+    bot = MiyuBot('assets', gen_doc=True, command_prefix='/', intents=Intents.default())
     bot.gen_doc = True
 
     await bot.load_extension('miyu_bot.commands.cogs.info')
@@ -29,3 +33,7 @@ if __name__ == '__main__':
     generate_utility_command_docs(bot, Path(__file__).parent / 'docs/commands/utility')
 
     print(f'Generated docs in {timer() - start}s.')
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

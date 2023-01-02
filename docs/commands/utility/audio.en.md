@@ -16,8 +16,3 @@
 
 !!! abstract "Aliases"
     sticker
-
-### play interactions
-
-!!! abstract "Aliases"
-    live, interact

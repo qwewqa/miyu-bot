@@ -8,7 +8,7 @@ Card related commands.
 
 ### card
 
-*[Detail Command](../general_usage/#detail-commands)*
+*[Detail Command](/commands/general-usage/#detail-commands)*
 
 !!! note "Tab Names"
     untrained, trained
@@ -18,7 +18,7 @@ Card related commands.
 
 ### cards
 
-*[List Command](../general_usage/#list-commands)*
+*[List Command](/commands/general-usage/#list-commands)*
 
 !!! question "Description"
     Card list.
@@ -31,7 +31,7 @@ Card related commands.
     title
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable)
+    [Sortable](/commands/general-usage/#sortable)
 
 !!! question "Description"
     Card name.
@@ -46,7 +46,7 @@ Card related commands.
     char, chara
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag), [Keyword](../general_usage/#keyword)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag), [Keyword](/commands/general-usage/#keyword)
 
 !!! question "Description"
     Character name.
@@ -78,32 +78,31 @@ Card related commands.
      - miiko  
      - airi  
      - mana  
-     - syano  
-     - touka  
+     - shano  
+     - toka  
      - michiru  
-     - ryujin  
-     - dennojo  
-     - ku  
-     - haruki  
-     - aqua  
-     - pekora  
-     - fubuki  
-     - suisei
+     - lumina  
+     - kokoa  
+     - hayate  
+     - neo  
+     - sophia  
+     - elsie  
+     - weronika
 
 ??? example "Examples"
     `sort=character`  
     `sort<character`  
-    `character=airi`  
-    `character=muni,tsubaki,haruki`  
-    `character!=muni,tsubaki,haruki`  
-    `$muni $tsubaki $haruki`  
-    `$!airi $!syano`  
-    `muni tsubaki haruki`
+    `character=rinku`  
+    `character=haruna,dalia,miyu`  
+    `character!=haruna,dalia,miyu`  
+    `$haruna $dalia $miyu`  
+    `$!rinku $!hayate`  
+    `haruna dalia miyu`
 
 ### unit
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 !!! question "Description"
     Card character unit.
@@ -115,22 +114,25 @@ Card related commands.
      - merm4id, mermaid, mmd, m4  
      - 燐舞曲, rondo  
      - lyrical_lily, lyricallily, riririri, lililili, lily, lili, riri, ll  
+     - call_of_artemis, callofartemis, coa, c.o.a.  
+     - unichørd, unichord, uc, 1c, uni  
+     - abyssmare, am, abyss  
      - スペシャル, special  
      - その他, other
 
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=その他`  
-    `unit=燐舞曲,merm4id,photon_maiden`  
-    `unit!=燐舞曲,merm4id,photon_maiden`  
-    `$燐舞曲 $merm4id $photon_maiden`  
-    `$!その他 $!merm4id`
+    `unit=peaky_p-key`  
+    `unit=スペシャル,merm4id,その他`  
+    `unit!=スペシャル,merm4id,その他`  
+    `$スペシャル $merm4id $その他`  
+    `$!peaky_p-key $!merm4id`
 
 ### attribute
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 !!! question "Description"
     Card attribute.
@@ -145,16 +147,16 @@ Card related commands.
 ??? example "Examples"
     `sort=attribute`  
     `sort<attribute`  
-    `attribute=elegant`  
-    `attribute=elegant,party,cool`  
-    `attribute!=elegant,party,cool`  
-    `$elegant $party $cool`  
-    `$!elegant $!party`
+    `attribute=party`  
+    `attribute=street,elegant,party`  
+    `attribute!=street,elegant,party`  
+    `$street $elegant $party`  
+    `$!party $!cool`
 
 ### id
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Card Id.
@@ -173,7 +175,7 @@ Card related commands.
     pow, bp
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display (Default)](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display (Default)](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Total power at max level.
@@ -192,12 +194,16 @@ Card related commands.
     hrt
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Special Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Heart stat at max level.
 
+!!! note "Tags"
+    heart, hrt
+
 ??? example "Examples"
+    `$heart`  
     `sort=heart`  
     `sort<heart`  
     `disp=heart`  
@@ -211,12 +217,16 @@ Card related commands.
     tech, technical
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Special Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Technique stat at max level.
 
+!!! note "Tags"
+    technique, tech, technical
+
 ??? example "Examples"
+    `$technique`  
     `sort=technique`  
     `sort<technique`  
     `disp=technique`  
@@ -230,12 +240,16 @@ Card related commands.
     phys, physic, physics
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Special Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Physical stat at max level.
 
+!!! note "Tags"
+    physical, phys, physic, physics
+
 ??? example "Examples"
+    `$physical`  
     `sort=physical`  
     `sort<physical`  
     `disp=physical`  
@@ -249,7 +263,7 @@ Card related commands.
     release, recent
 
 !!! info "Type"
-    [Sortable (Default)](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable (Default)](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Release date.
@@ -268,7 +282,7 @@ Card related commands.
     stars
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Keyword](../general_usage/#keyword)
+    [Sortable](/commands/general-usage/#sortable), [Keyword](/commands/general-usage/#keyword)
 
 !!! question "Description"
     Star rarity.
@@ -282,7 +296,7 @@ Card related commands.
 ??? example "Examples"
     `sort=rarity`  
     `sort<rarity`  
-    `2* 1* 4*`
+    `2* 1* 3*`
 
 ### skill
 
@@ -290,7 +304,7 @@ Card related commands.
     score_up, score
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! question "Description"
     Card skill.
@@ -303,47 +317,101 @@ Card related commands.
     `skill!=50`  
     `skill>50`
 
-### event
+### groovy_score
 
 !!! abstract "Aliases"
-    event_bonus, eventbonus, bonus
+    groovyscore, groovy, fever_score, feverscore, fever, groovy_score_up, groovyscoreup, fever_score_up, feverscoreup, feverup, groovyup, fever_up, groovy_up, feverboost, fever_boost, groovyboost, groovy_boost, gtscore, gtscoreup, gt_score, gt_score_up, gtup, gt_up
 
 !!! info "Type"
-    [Special Flag](../general_usage/#flag), [Sortable](../general_usage/#sortable), [Comparable](../general_usage/#comparable)
-
-!!! question "Description"
-    Related event.
+    [Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 !!! note "Tags"
-    event, event_bonus, eventbonus, bonus
+    groovy_score, groovyscore, groovy, fever_score, feverscore, fever, groovy_score_up, groovyscoreup, fever_score_up, feverscoreup, feverup, groovyup, fever_up, groovy_up, feverboost, fever_boost, groovyboost, groovy_boost, gtscore, gtscoreup, gt_score, gt_score_up, gtup, gt_up
 
 ??? example "Examples"
-    `$event`  
-    `sort=event`  
-    `sort<event`  
-    `event=[value]`  
-    `event!=[value]`  
-    `event>[value]`
+    `$groovy_score`  
+    `$!groovy_score`  
+    `sort=groovy_score`  
+    `sort<groovy_score`  
+    `disp=groovy_score`  
+    `groovy_score=10`  
+    `groovy_score!=10`  
+    `groovy_score>10`
 
-### availability
+### groovy_support
 
 !!! abstract "Aliases"
-    avail
+    groovysupport, fever_support, feversupport, gtsupport, gt_support
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Tag](../general_usage/#tag)
+    [Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
-??? note "Tags"
-     - unknown_availability, unavail, navl  
-     - permanent, perm, prm  
-     - limited, lmtd, lim  
-     - collaboration, collab, cllb, clb  
-     - birthday, bday  
-     - welfare, free, reward, rwrd
+!!! note "Tags"
+    groovy_support, groovysupport, fever_support, feversupport, gtsupport, gt_support
 
 ??? example "Examples"
-    `sort=availability`  
-    `sort<availability`  
-    `disp=availability`  
-    `$welfare $unknown_availability $limited`  
-    `$!limited $!unknown_availability`
+    `$groovy_support`  
+    `$!groovy_support`  
+    `sort=groovy_support`  
+    `sort<groovy_support`  
+    `disp=groovy_support`  
+    `groovy_support=10`  
+    `groovy_support!=10`  
+    `groovy_support>10`
+
+### solo_groovy
+
+!!! abstract "Aliases"
+    solo_fever, solo_gt, sologroovy, solofever, sologt
+
+!!! info "Type"
+    [Flag](/commands/general-usage/#flag)
+
+!!! note "Tags"
+    solo_groovy, solo_fever, solo_gt, sologroovy, solofever, sologt
+
+??? example "Examples"
+    `$solo_groovy`  
+    `$!solo_groovy`
+
+### constant_score
+
+!!! abstract "Aliases"
+    constantscore, constant_score_up, constantscoreup, passive_score, passivescore, passive_score_up
+
+!!! info "Type"
+    [Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
+
+!!! note "Tags"
+    constant_score, constantscore, constant_score_up, constantscoreup, passive_score, passivescore, passive_score_up
+
+??? example "Examples"
+    `$constant_score`  
+    `$!constant_score`  
+    `sort=constant_score`  
+    `sort<constant_score`  
+    `disp=constant_score`  
+    `constant_score=2.5`  
+    `constant_score!=2.5`  
+    `constant_score>2.5`
+
+### auto_score
+
+!!! abstract "Aliases"
+    autoscore, auto_score_up, autoscoreup, auto_up, auto_boost, auto_support, autoboost, autosupport, autoup
+
+!!! info "Type"
+    [Flag](/commands/general-usage/#flag), [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
+
+!!! note "Tags"
+    auto_score, autoscore, auto_score_up, autoscoreup, auto_up, auto_boost, auto_support, autoboost, autosupport, autoup
+
+??? example "Examples"
+    `$auto_score`  
+    `$!auto_score`  
+    `sort=auto_score`  
+    `sort<auto_score`  
+    `disp=auto_score`  
+    `auto_score=2.5`  
+    `auto_score!=2.5`  
+    `auto_score>2.5`

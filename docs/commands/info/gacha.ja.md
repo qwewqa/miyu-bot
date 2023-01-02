@@ -6,15 +6,15 @@
 
 ### banner
 
-*[Detail Command](../general_usage/#detail-commands)*
+*[Detail Command](/commands/general-usage/#detail-commands)*
 
 ### banner_rates
 
-*[Detail Command](../general_usage/#detail-commands)*
+*[Detail Command](/commands/general-usage/#detail-commands)*
 
 ### banners
 
-*[List Command](../general_usage/#list-commands)*
+*[List Command](/commands/general-usage/#list-commands)*
 
 ## Attributes
 
@@ -24,7 +24,7 @@
     title
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable)
+    [Sortable](/commands/general-usage/#sortable)
 
 ??? example "Examples"
     `sort=name`  
@@ -36,7 +36,7 @@
     release, recent
 
 !!! info "Type"
-    [Sortable (Default)](../general_usage/#sortable), [Display (Default)](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable (Default)](/commands/general-usage/#sortable), [Display (Default)](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=date`  
@@ -52,7 +52,7 @@
     char, chara
 
 !!! info "Type"
-    [Equality](../general_usage/#equality), [Tag](../general_usage/#tag), [Plural](../general_usage/#plural)
+    [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag), [Plural](/commands/general-usage/#plural)
 
 ??? note "Tags"
      - rinku  
@@ -81,30 +81,29 @@
      - miiko  
      - airi  
      - mana  
-     - syano  
-     - touka  
+     - shano  
+     - toka  
      - michiru  
-     - ryujin  
-     - dennojo  
-     - ku  
-     - haruki  
-     - aqua  
-     - pekora  
-     - fubuki  
-     - suisei
+     - lumina  
+     - kokoa  
+     - hayate  
+     - neo  
+     - sophia  
+     - elsie  
+     - weronika
 
 ??? example "Examples"
-    `character=shinobu`  
-    `character=miyu,suisei,dalia`  
-    `character!=miyu,suisei,dalia`  
-    `character==miyu,suisei,dalia`  
-    `$miyu $suisei $dalia`  
-    `$!shinobu $!airi`
+    `character=sophia`  
+    `character=sophia,dalia,marika`  
+    `character!=sophia,dalia,marika`  
+    `character==sophia,dalia,marika`  
+    `$sophia $dalia $marika`  
+    `$!sophia $!nagisa`
 
 ### unit
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - happy_around!, happyaround, happy_around, hapiara, happy, ha  
@@ -113,6 +112,9 @@
      - merm4id, mermaid, mmd, m4  
      - 燐舞曲, rondo  
      - lyrical_lily, lyricallily, riririri, lililili, lily, lili, riri, ll  
+     - call_of_artemis, callofartemis, coa, c.o.a.  
+     - unichørd, unichord, uc, 1c, uni  
+     - abyssmare, am, abyss  
      - スペシャル, special  
      - その他, other  
      - mixed
@@ -120,16 +122,16 @@
 ??? example "Examples"
     `sort=unit`  
     `sort<unit`  
-    `unit=燐舞曲`  
-    `unit=merm4id,photon_maiden,happy_around!`  
-    `unit!=merm4id,photon_maiden,happy_around!`  
-    `$merm4id $photon_maiden $happy_around!`  
-    `$!燐舞曲 $!photon_maiden`
+    `unit=その他`  
+    `unit=call_of_artemis,スペシャル,燐舞曲`  
+    `unit!=call_of_artemis,スペシャル,燐舞曲`  
+    `$call_of_artemis $スペシャル $燐舞曲`  
+    `$!その他 $!スペシャル`
 
 ### attribute
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Equality](../general_usage/#equality), [Tag](../general_usage/#tag)
+    [Sortable](/commands/general-usage/#sortable), [Equality](/commands/general-usage/#equality), [Tag](/commands/general-usage/#tag)
 
 ??? note "Tags"
      - street, purple  
@@ -141,16 +143,16 @@
 ??? example "Examples"
     `sort=attribute`  
     `sort<attribute`  
-    `attribute=elegant`  
-    `attribute=cool,street,elegant`  
-    `attribute!=cool,street,elegant`  
-    `$cool $street $elegant`  
-    `$!elegant $!cute`
+    `attribute=cool`  
+    `attribute=cute,street,party`  
+    `attribute!=cute,street,party`  
+    `$cute $street $party`  
+    `$!cool $!elegant`
 
 ### id
 
 !!! info "Type"
-    [Sortable](../general_usage/#sortable), [Display](../general_usage/#display), [Comparable](../general_usage/#comparable)
+    [Sortable](/commands/general-usage/#sortable), [Display](/commands/general-usage/#display), [Comparable](/commands/general-usage/#comparable)
 
 ??? example "Examples"
     `sort=id`  

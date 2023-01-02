@@ -8,7 +8,7 @@ from miyu_bot.commands.docs.markdown import MarkdownDocument
 from miyu_bot.commands.master_filter.locales import valid_locales
 from miyu_bot.commands.master_filter.master_filter import MasterFilter, DataAttributeInfo, CommandSourceInfo
 
-USAGE_PAGE = '../general_usage/'
+USAGE_PAGE = '/commands/general-usage/'
 
 
 def generate_info_command_docs(bot: MiyuBot, docs_path: Path, filters: List[MasterFilter]):

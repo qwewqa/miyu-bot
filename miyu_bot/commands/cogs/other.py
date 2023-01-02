@@ -189,6 +189,7 @@ class Other(commands.Cog):
         embed.set_thumbnail(url=self.bot.user.avatar.url)
         embed.add_field(name='Developer', value='qwewqa#3948', inline=False)
         embed.add_field(name='Donate', value='https://ko-fi.com/qwewqa', inline=False)
+        embed.add_field(name='Documentation', value='https://miyu-docs.qwewqa.xyz/', inline=False)
         embed.add_field(name='Server', value='https://discord.gg/TThMwrAZTR', inline=False)
         embed.add_field(name='Bot Invite',
                         value='https://discord.com/api/oauth2/authorize?client_id=789314370999287808&permissions=379968&scope=bot+applications.commands',

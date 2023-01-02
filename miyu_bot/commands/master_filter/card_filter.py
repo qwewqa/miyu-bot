@@ -93,14 +93,23 @@ class CardFilter(MasterFilter[CardMaster]):
     def format_power(self, value: CardMaster):
         return str(value.max_power_with_limit_break).rjust(5)
 
+    @staticmethod
+    def get_highest_parameter(value: CardMaster):
+        return value.max_parameters.index(max(value.max_parameters))
+
     @data_attribute('heart',
                     aliases=['hrt'],
                     is_sortable=True,
                     is_comparable=True,
+                    is_flag=True,
                     reverse_sort=True,
                     help_sample_argument='9082')
     def heart(self, value: CardMaster):
         return value.max_parameters_with_limit_break[0]
+
+    @heart.flag_callback
+    def heart_flag_callback(self, value: CardMaster):
+        return self.get_highest_parameter(value) == 0
 
     @heart.formatter
     def format_heart(self, value: CardMaster):
@@ -110,10 +119,15 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['tech', 'technical'],
                     is_sortable=True,
                     is_comparable=True,
+                    is_flag=True,
                     reverse_sort=True,
                     help_sample_argument='9219')
     def technique(self, value: CardMaster):
         return value.max_parameters_with_limit_break[1]
+
+    @technique.flag_callback
+    def technique_flag_callback(self, value: CardMaster):
+        return self.get_highest_parameter(value) == 1
 
     @technique.formatter
     def format_technique(self, value: CardMaster):
@@ -123,10 +137,15 @@ class CardFilter(MasterFilter[CardMaster]):
                     aliases=['phys', 'physic', 'physics'],
                     is_sortable=True,
                     is_comparable=True,
+                    is_flag=True,
                     reverse_sort=True,
                     help_sample_argument='9348')
     def physical(self, value: CardMaster):
         return value.max_parameters_with_limit_break[2]
+
+    @physical.flag_callback
+    def physical_flag_callback(self, value: CardMaster):
+        return self.get_highest_parameter(value) == 2
 
     @physical.formatter
     def format_physical(self, value: CardMaster):
@@ -372,7 +391,8 @@ class CardFilter(MasterFilter[CardMaster]):
     def format_card_name_for_list(self, card):
         unit_emoji = unit_emoji_ids_by_unit_id[card.character.unit_id]
         attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
-        return f'`{unit_emoji}`+`{attribute_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
+        parameter_emoji = parameter_bonus_emoji_ids_by_parameter_id[self.get_highest_parameter(card) + 1]
+        return f'`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}'
 
     @get_card_embed.shortcut_button(name='Gacha')
     async def gacha_shortcut(self, ctx, card: CardMaster, server, interaction: discord.Interaction):

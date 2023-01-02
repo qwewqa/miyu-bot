@@ -891,7 +891,7 @@
 <h1 id="chart_filter">chart_filter<a class="headerlink" href="#chart_filter" title="Permanent link">&para;</a></h1>
 <h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
 <h3 id="charts">charts<a class="headerlink" href="#charts" title="Permanent link">&para;</a></h3>
-<p><em><a href="/general_usage/#list-commands">List Command</a></em></p>
+<p><em><a href="/commands/general_usage/#list-commands">List Command</a></em></p>
 <h2 id="attributes">Attributes<a class="headerlink" href="#attributes" title="Permanent link">&para;</a></h2>
 <h3 id="name">name<a class="headerlink" href="#name" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
@@ -900,7 +900,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -914,7 +914,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a>, <a href="/general_usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a>, <a href="/commands/general_usage/#comparable">Comparable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -928,7 +928,7 @@
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#equality">Equality</a>, <a href="/general_usage/#tag">Tag</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#equality">Equality</a>, <a href="/commands/general_usage/#tag">Tag</a></p>
 </div>
 <details class="note">
 <summary>Tags</summary>
@@ -950,16 +950,16 @@
 <summary>Examples</summary>
 <p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=unichørd</code><br />
-<code>unit=lyrical_lily,happy_around!,abyssmare</code><br />
-<code>unit!=lyrical_lily,happy_around!,abyssmare</code><br />
-<code>$lyrical_lily $happy_around! $abyssmare</code><br />
-<code>$!unichørd $!peaky_p-key</code></p>
+<code>unit=happy_around!</code><br />
+<code>unit=merm4id,lyrical_lily,photon_maiden</code><br />
+<code>unit!=merm4id,lyrical_lily,photon_maiden</code><br />
+<code>$merm4id $lyrical_lily $photon_maiden</code><br />
+<code>$!happy_around! $!スペシャル</code></p>
 </details>
 <h3 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a>, <a href="/general_usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a>, <a href="/commands/general_usage/#comparable">Comparable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -977,7 +977,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a>, <a href="/general_usage/#equality">Equality</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a>, <a href="/commands/general_usage/#equality">Equality</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -994,7 +994,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#comparable">Comparable</a>, <a href="/general_usage/#tag">Tag</a>, <a href="/general_usage/#keyword">Keyword</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#comparable">Comparable</a>, <a href="/commands/general_usage/#tag">Tag</a>, <a href="/commands/general_usage/#keyword">Keyword</a></p>
 </div>
 <details class="note">
 <summary>Tags</summary>
@@ -1009,18 +1009,18 @@
 <summary>Examples</summary>
 <p><code>sort=difficulty</code><br />
 <code>sort&lt;difficulty</code><br />
-<code>difficulty=normal</code><br />
-<code>difficulty=hard,easy,normal</code><br />
-<code>difficulty!=hard,easy,normal</code><br />
+<code>difficulty=hard</code><br />
+<code>difficulty=easy,hard,normal</code><br />
+<code>difficulty!=easy,hard,normal</code><br />
 <code>difficulty&gt;expert</code><br />
-<code>$hard $easy $normal</code><br />
-<code>$!normal $!expert</code><br />
-<code>hard easy normal</code></p>
+<code>$easy $hard $normal</code><br />
+<code>$!hard $!expert</code><br />
+<code>easy hard normal</code></p>
 </details>
 <h3 id="level">level<a class="headerlink" href="#level" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable (Default)</a>, <a href="/general_usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable (Default)</a>, <a href="/commands/general_usage/#comparable">Comparable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -1037,7 +1037,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a>, <a href="/general_usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a>, <a href="/commands/general_usage/#comparable">Comparable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -1051,7 +1051,7 @@
 <h3 id="bpm">bpm<a class="headerlink" href="#bpm" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a>, <a href="/general_usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a>, <a href="/commands/general_usage/#comparable">Comparable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -1069,7 +1069,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a>, <a href="/general_usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a>, <a href="/commands/general_usage/#comparable">Comparable</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -1083,7 +1083,7 @@
 <h3 id="playable">playable<a class="headerlink" href="#playable" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#flag">Flag</a></p>
+<p><a href="/commands/general_usage/#flag">Flag</a></p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Tags</p>
@@ -1097,7 +1097,7 @@
 <h3 id="scoreskillduration">score<a href="groovy[bonus%]">skill%(*duration)?</a>?<a class="headerlink" href="#scoreskillduration" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>
@@ -1111,7 +1111,7 @@
 <h3 id="scoreskilldurationsolo">score[skill%(*duration)]solo<a class="headerlink" href="#scoreskilldurationsolo" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/general_usage/#sortable">Sortable</a>, <a href="/general_usage/#display">Display</a></p>
+<p><a href="/commands/general_usage/#sortable">Sortable</a>, <a href="/commands/general_usage/#display">Display</a></p>
 </div>
 <details class="example">
 <summary>Examples</summary>

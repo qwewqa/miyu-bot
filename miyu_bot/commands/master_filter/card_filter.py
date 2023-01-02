@@ -108,8 +108,8 @@ class CardFilter(MasterFilter[CardMaster]):
         return value.max_parameters_with_limit_break[0]
 
     @heart.flag_callback
-    def heart_flag_callback(self, value: CardMaster):
-        return self.get_highest_parameter(value) == 0
+    def heart_flag_callback(self, values: List[CardMaster]):
+        return [v for v in values if self.get_highest_parameter(v) == 0]
 
     @heart.formatter
     def format_heart(self, value: CardMaster):
@@ -126,8 +126,8 @@ class CardFilter(MasterFilter[CardMaster]):
         return value.max_parameters_with_limit_break[1]
 
     @technique.flag_callback
-    def technique_flag_callback(self, value: CardMaster):
-        return self.get_highest_parameter(value) == 1
+    def technique_flag_callback(self, values: List[CardMaster]):
+        return [v for v in values if self.get_highest_parameter(v) == 1]
 
     @technique.formatter
     def format_technique(self, value: CardMaster):
@@ -144,8 +144,8 @@ class CardFilter(MasterFilter[CardMaster]):
         return value.max_parameters_with_limit_break[2]
 
     @physical.flag_callback
-    def physical_flag_callback(self, value: CardMaster):
-        return self.get_highest_parameter(value) == 2
+    def physical_flag_callback(self, values: List[CardMaster]):
+        return [v for v in values if self.get_highest_parameter(v) == 2]
 
     @physical.formatter
     def format_physical(self, value: CardMaster):

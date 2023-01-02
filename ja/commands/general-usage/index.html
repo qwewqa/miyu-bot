@@ -994,76 +994,76 @@ of accepted arguments which fall under the below types.</p>
 <h2 id="argument-types">Argument Types<a class="headerlink" href="#argument-types" title="Permanent link">&para;</a></h2>
 <h3 id="named-arguments">Named Arguments<a class="headerlink" href="#named-arguments" title="Permanent link">&para;</a></h3>
 <p>Named arguments have a name, operator, and value.</p>
-<pre><code>!banners disp=id
-!cards power&gt;34000
-!songs bpm&lt;=160
+<pre><code>/banners disp=id
+/cards power&gt;34000
+/songs bpm&lt;=160
 </code></pre>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Values with spaces in them must be quoted.</p>
 <div class="admonition failure">
 <p class="admonition-title">Wrong</p>
-<p><code>!chart designer=MU &amp; Subatos</code></p>
+<p><code>/chart designer=MU &amp; Subatos</code></p>
 </div>
 <div class="admonition success">
 <p class="admonition-title">Correct</p>
-<p><code>!chart designer="MU &amp; Subatos"</code></p>
+<p><code>/chart designer="MU &amp; Subatos"</code></p>
 </div>
 </div>
 <p>Some named arguments allow for multiple argument values.</p>
-<pre><code>!cards attribute=elegant,cool
+<pre><code>/cards attribute=elegant,cool
 </code></pre>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Spaces are not allowed before or after commas in argument lists.</p>
 <div class="admonition failure">
 <p class="admonition-title">Wrong</p>
-<p><code>!songs unit=hapiara, pkpk</code></p>
+<p><code>/songs unit=hapiara, pkpk</code></p>
 </div>
 <div class="admonition success">
 <p class="admonition-title">Correct</p>
-<p><code>!songs unit=hapiara,pkpk</code></p>
+<p><code>/songs unit=hapiara,pkpk</code></p>
 </div>
 </div>
 <p>Some named arguments can be repeated.</p>
-<pre><code>!songs bpm&gt;140 bpm&lt;=160
+<pre><code>/songs bpm&gt;140 bpm&lt;=160
 </code></pre>
 <h3 id="tags">Tags<a class="headerlink" href="#tags" title="Permanent link">&para;</a></h3>
 <p>Tags start with a <code>$</code> sign.</p>
-<pre><code>!songs $lili
-!events $rinku $kyoko
+<pre><code>/songs $lili
+/events $rinku $kyoko
 </code></pre>
 <p>Some tags can be inverted, excluding results matching them.</p>
-<pre><code>!songs $!other $!special
+<pre><code>/songs $!other $!special
 </code></pre>
 <p>Invalid tags will cause an error to be returned.</p>
 <h3 id="keywords">Keywords<a class="headerlink" href="#keywords" title="Permanent link">&para;</a></h3>
 <p>Keyword are like tags, but they do not require a <code>$</code> sign.<br />
 Keywords are used less frequently than tags because there is potential
 for keywords to be unintentionally used, and because invalid keywords are not detected.</p>
-<pre><code>!cards noa saki
+<pre><code>/cards noa saki
 </code></pre>
 <p>Like other types of arguments, the location of a keyword does not matter.</p>
-<pre><code>!card poison esora
-!card esora poison
+<pre><code>/card poison esora
+/card esora poison
 </code></pre>
 <p>Many keywords have tag counterparts, allowing them to be used in either fashion.</p>
-<pre><code>!cards $noa $saki
+<pre><code>/cards $noa $saki
 </code></pre>
 <h3 id="text-argument">Text Argument<a class="headerlink" href="#text-argument" title="Permanent link">&para;</a></h3>
 <p>Anything not falling into any of the above argument types is combined and processed as the text argument.
 The text argument, if present, is used to find search results by name. It allows for shortened or abbreviated names, and can tolerate some errors.</p>
-<pre><code>!song discover universe
-!song du
-!song discover
-!song diiscover umiverse
+<pre><code>/song discover universe
+/song du
+/song discover
+/song diiscover umiverse
 </code></pre>
 <p>If the text argument is <code>~n</code> where n is a number, it will skip to the nth result.</p>
 <pre><code># Goes to the page with the 20th result
-!cards $elegant ~20
+/cards $elegant ~20
 
 # Brings up the 20th result
-!card $elegant ~20
+/card $elegant ~20
 </code></pre>
 <h2 id="command-groups">Command Groups<a class="headerlink" href="#command-groups" title="Permanent link">&para;</a></h2>
 <p>Commands in the Info category are divided into groups.
@@ -1076,12 +1076,12 @@ An attribute can have multiple types such that it can be used in multiple ways.<
 <p>Some attributes have aliases, which allow them to be referenced using a different name.</p>
 <h3 id="sortable">Sortable<a class="headerlink" href="#sortable" title="Permanent link">&para;</a></h3>
 <p>Sortable attributes are valid values for the <code>sort</code> argument.</p>
-<pre><code>!cards sort=power
+<pre><code>/cards sort=power
 </code></pre>
 <h3 id="display">Display<a class="headerlink" href="#display" title="Permanent link">&para;</a></h3>
 <p>Display attributes are valid values for the <code>disp</code> argument in <a href="#list-commands">list commands</a>.
 The <code>disp</code> argument for <a href="#detail-commands">detail commands</a> has no effect.</p>
-<pre><code>!songs disp=bpm
+<pre><code>/songs disp=bpm
 </code></pre>
 <h3 id="tag">Tag<a class="headerlink" href="#tag" title="Permanent link">&para;</a></h3>
 <p>Tag arguments have tags that can be used. See <a href="#tags">tags</a>.</p>
@@ -1089,27 +1089,27 @@ The <code>disp</code> argument for <a href="#detail-commands">detail commands</a
 <p>Keyword arguments have keywords, which usually also appear as tags. See <a href="#keywords">keywords</a>.</p>
 <h3 id="equality">Equality<a class="headerlink" href="#equality" title="Permanent link">&para;</a></h3>
 <p>Equality attributes can be used as named arguments with the <code>=</code> and <code>!=</code> operators.</p>
-<pre><code>!cards unit=pkpk
-!cards unit!=pkpk
+<pre><code>/cards unit=pkpk
+/cards unit!=pkpk
 </code></pre>
 <h3 id="comparable">Comparable<a class="headerlink" href="#comparable" title="Permanent link">&para;</a></h3>
 <p>Comparable attributes are like equality attributes, but also support <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, and <code>&lt;=</code> as operators.</p>
-<pre><code>!song level=12+
-!song level&gt;=13
+<pre><code>/song level=12+
+/song level&gt;=13
 </code></pre>
 <h3 id="plural">Plural<a class="headerlink" href="#plural" title="Permanent link">&para;</a></h3>
 <p>Plural attributes are ones that can have multiple values for a single result.
 The behavior of tags and equality is altered for plural attributes, and the <code>==</code> operator
 is added for equality comparisons.</p>
 <pre><code># Only events with both Noa and Saki.
-!events $noa $saki
-!events char==noa,saki
+/events $noa $saki
+/events char==noa,saki
 
 # Events with at least one of Noa or Saki.
-!events char=noa,saki
+/events char=noa,saki
 
 # Events with neither Noa nor Saki.
-!events char!=noa,saki
+/events char!=noa,saki
 </code></pre>
 <h3 id="flag">Flag<a class="headerlink" href="#flag" title="Permanent link">&para;</a></h3>
 <p>Flag attributes have a single tag, which can be used like other tags.
@@ -1124,22 +1124,22 @@ Using a detail command brings up details on a single result at a time.</p>
 <h4 id="tabs">Tabs<a class="headerlink" href="#tabs" title="Permanent link">&para;</a></h4>
 <p>Some detail arguments have tabs, which can be specified as the last word in the
 text argument.</p>
-<pre><code>!chart synchro hard
-!card shinobu untrained
+<pre><code>/chart synchro hard
+/card shinobu untrained
 </code></pre>
 <h2 id="common-arguments">Common arguments<a class="headerlink" href="#common-arguments" title="Permanent link">&para;</a></h2>
 <p>All <em>Info</em> commands share the following common arguments.</p>
 <h3 id="sort">Sort<a class="headerlink" href="#sort" title="Permanent link">&para;</a></h3>
 <p>Sets sort order. See <a href="#sortable">Sortable</a>.</p>
-<pre><code>!cards sort=power
+<pre><code>/cards sort=power
 </code></pre>
 <h3 id="display_1">Display<a class="headerlink" href="#display_1" title="Permanent link">&para;</a></h3>
 <p>Sets list display. See <a href="#display">Display</a>.</p>
-<pre><code>!songs disp=bpm
+<pre><code>/songs disp=bpm
 </code></pre>
 <h3 id="start">Start<a class="headerlink" href="#start" title="Permanent link">&para;</a></h3>
 <p>Sets the starting value, by name.</p>
-<pre><code>!song start=wondertrip
+<pre><code>/song start=wondertrip
 </code></pre>
 
 

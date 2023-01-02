@@ -27,12 +27,23 @@ unit_emoji_ids = defaultdict(lambda: common_unit_emoji_id, {
     'merm4id': '<:unit_merm4id:792069679874310184>',
     'rondo': '<:unit_rondo:792069679770238976>',
     'lyrical_lily': '<:unit_lyrical_lily:792069679673114644>',
+    'call_of_artemis': '<:unit_call_of_artemis:1059287417590403162>',
+    'unichord': '<:unit_unichord:1059287416483106996>',
 })
 
 common_unit_emoji_id = '<:unit_common:815670436544118785>'
 
 unit_emoji_ids_by_unit_id = defaultdict(lambda: common_unit_emoji_id,
-                                        {i + 1: v for i, v in enumerate(unit_emoji_ids.values())})
+                                        {
+                                            1: unit_emoji_ids['happy_around'],
+                                            2: unit_emoji_ids['peaky_pkey'],
+                                            3: unit_emoji_ids['photon_maiden'],
+                                            4: unit_emoji_ids['merm4id'],
+                                            5: unit_emoji_ids['rondo'],
+                                            6: unit_emoji_ids['lyrical_lily'],
+                                            7: unit_emoji_ids['call_of_artemis'],
+                                            8: unit_emoji_ids['unichord'],
+                                        })
 
 attribute_emoji_ids = {
     'street': '<:type_street:791903477986361345>',

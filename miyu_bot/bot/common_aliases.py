@@ -33,6 +33,7 @@ class CommonAliases:
     def units_by_name(self):
         units_by_name = {unit.name.lower().replace(' ', '_'): unit for unit in self.assets.unit_master.values()}
         units_by_name['rondo'] = self.assets.unit_master[5]
+        units_by_name['unichord'] = self.assets.unit_master[8]
         units_by_name['special'] = self.assets.unit_master[30]
         units_by_name['other'] = self.assets.unit_master[50]
         for alias, value in self.unit_aliases.items():
@@ -66,4 +67,12 @@ class CommonAliases:
         'lili': 'lyrical_lily',
         'riri': 'lyrical_lily',
         'll': 'lyrical_lily',
+        'callofartemis': 'call_of_artemis',
+        'coa': 'call_of_artemis',
+        'c.o.a.': 'call_of_artemis',
+        'uc': 'unichord',
+        '1c': 'unichord',
+        'uni': 'unichord',
+        'am': 'abyssmare',
+        'abyss': 'abyssmare',
     }

@@ -9,7 +9,7 @@ from pathlib import Path
 import discord
 from discord import Intents
 from discord.ext import commands
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, when_mentioned
 from tortoise.expressions import F
 
 from miyu_bot.bot import models
@@ -25,21 +25,8 @@ with open('config.json') as f:
 
 
 async def main():
-    async def get_prefix(bot: MiyuBot, message: discord.Message):
-        if message.guild:
-            guild = await models.Guild.get_or_none(id=message.guild.id)
-            guild_prefix = (guild.prefix or '!') if guild else '!'
-        else:
-            guild_prefix = '!'
-        author = await models.User.get_or_none(id=message.author.id)
-        author_prefix = author.prefix if author else None
-        if author_prefix or guild_prefix:
-            return (prefix for prefix in ['!miyu ', author_prefix, guild_prefix] if prefix)
-        else:
-            return '!miyu ', '!'
-
     intents = Intents.default()
-    bot = MiyuBot('assets', command_prefix=get_prefix, case_insensitive=True,
+    bot = MiyuBot('assets', command_prefix=when_mentioned, case_insensitive=True,
                   activity=discord.Game(name='https://miyu-docs.qwewqa.xyz/'),
                   owner_ids={169163991434788865},
                   allowed_mentions=discord.AllowedMentions.none(),

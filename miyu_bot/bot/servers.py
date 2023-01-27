@@ -7,9 +7,9 @@ class Server(IntEnum):
 
 
 SERVER_NAMES = {
-    'jp': Server.JP,
-    'japanese': Server.JP,
-    'japan': Server.JP,
-    'en': Server.EN,
-    'english': Server.EN,
+    "jp": Server.JP,
+    "japanese": Server.JP,
+    "japan": Server.JP,
+    "en": Server.EN,
+    "english": Server.EN,
 }

@@ -31,7 +31,7 @@ class MiyuBot(commands.Bot):
     thread_pool: ThreadPoolExecutor
 
     asset_path: Path
-    asset_url = 'https://miyu-data.qwewqa.xyz/'
+    asset_url = "https://miyu-data.qwewqa.xyz/"
 
     config: dict
     scripts_path: Optional[Path]
@@ -42,21 +42,30 @@ class MiyuBot(commands.Bot):
         self.gen_doc = gen_doc
         self.asset_path = Path(asset_path)
         self.assets = {
-            Server.JP: AssetManager(self.asset_path / 'jp',
-                                    timezone=pytz.timezone('Asia/Tokyo'),
-                                    drop_extra_fields=True),
-            Server.EN: AssetManager(self.asset_path / 'en',
-                                    timezone=pytz.timezone('UTC'),
-                                    drop_extra_fields=True),
+            Server.JP: AssetManager(
+                self.asset_path / "jp",
+                timezone=pytz.timezone("Asia/Tokyo"),
+                drop_extra_fields=True,
+            ),
+            Server.EN: AssetManager(
+                self.asset_path / "en",
+                timezone=pytz.timezone("UTC"),
+                drop_extra_fields=True,
+            ),
         }
-        self.fluent_loader = FluentResourceLoader('l10n/{locale}')
+        self.fluent_loader = FluentResourceLoader("l10n/{locale}")
         self.aliases = CommonAliases(self.assets)
         self.master_filters = MasterFilterManager(self)
         self.session = aiohttp.ClientSession()
         self.extension_names = set()
         self.thread_pool = ThreadPoolExecutor()
         self.scripts_path = None
-        self.chart_scorer = ChartScorer({**self.assets[Server.EN].chart_master, **self.assets[Server.JP].chart_master})
+        self.chart_scorer = ChartScorer(
+            {
+                **self.assets[Server.EN].chart_master,
+                **self.assets[Server.JP].chart_master,
+            }
+        )
         self.help_command = MiyuHelp()
 
     async def setup_hook(self) -> None:
@@ -66,12 +75,16 @@ class MiyuBot(commands.Bot):
     def try_reload_assets(self):
         try:
             assets = {
-                Server.JP: AssetManager(self.asset_path / 'assets_jp',
-                                        timezone=pytz.timezone('Asia/Tokyo'),
-                                        drop_extra_fields=True),
-                Server.EN: AssetManager(self.asset_path / 'assets_en',
-                                        timezone=pytz.timezone('UTC'),
-                                        drop_extra_fields=True),
+                Server.JP: AssetManager(
+                    self.asset_path / "assets_jp",
+                    timezone=pytz.timezone("Asia/Tokyo"),
+                    drop_extra_fields=True,
+                ),
+                Server.EN: AssetManager(
+                    self.asset_path / "assets_en",
+                    timezone=pytz.timezone("UTC"),
+                    drop_extra_fields=True,
+                ),
             }
             aliases = CommonAliases(assets)
             master_filters = MasterFilterManager(self)
@@ -108,7 +121,7 @@ class MiyuBot(commands.Bot):
 
     async def get_context(self, message, *, cls=None):
         ctx = await super().get_context(message, cls=PrefContext)
-        if ctx.command and not getattr(ctx.command, 'no_preferences', False):
+        if ctx.command and not getattr(ctx.command, "no_preferences", False):
             ctx.preferences = SimpleNamespace(**(await get_preferences(ctx)))
             ctx.assets = self.assets[ctx.preferences.server]
         else:
@@ -118,36 +131,40 @@ class MiyuBot(commands.Bot):
 
 
 class MiyuHelp(commands.DefaultHelpCommand):
-    help_url = 'https://miyu-docs.qwewqa.xyz/'
-    context: 'PrefContext'
+    help_url = "https://miyu-docs.qwewqa.xyz/"
+    context: "PrefContext"
 
     async def send_bot_help(self, mapping):
         channel = self.get_destination()
         language = {
-            'en-US': '',
-            'zh-TW': 'zh_TW/',
-            'ja': 'ja/',
+            "en-US": "",
+            "zh-TW": "zh_TW/",
+            "ja": "ja/",
         }[self.context.preferences.language]
-        url = f'{self.help_url}{language}'
+        url = f"{self.help_url}{language}"
         await channel.send(url)
 
     async def send_command_help(self, command: discord.ext.commands.Command):
         channel = self.get_destination()
         language = {
-            'en-US': '',
-            'zh-TW': 'zh_TW/',
-            'ja': 'ja/',
+            "en-US": "",
+            "zh-TW": "zh_TW/",
+            "ja": "ja/",
         }[self.context.preferences.language]
         if command.hidden:
             return
-        if command.cog_name == 'Info' and hasattr(command, 'master_filter'):
+        if command.cog_name == "Info" and hasattr(command, "master_filter"):
             master_filter = command.master_filter
-            filter_name = master_filter.name.replace('_filter', '')
-            url = f'{self.help_url}{language}commands/info/{filter_name}/#{command.name}'.replace(' ', '-')
+            filter_name = master_filter.name.replace("_filter", "")
+            url = f"{self.help_url}{language}commands/info/{filter_name}/#{command.name}".replace(
+                " ", "-"
+            )
             await channel.send(url)
         else:
             cog_name = command.cog.qualified_name.lower()
-            url = f'{self.help_url}{language}commands/utility/{cog_name}/#{command.qualified_name}'.replace(' ', '-')
+            url = f"{self.help_url}{language}commands/utility/{cog_name}/#{command.qualified_name}".replace(
+                " ", "-"
+            )
             await channel.send(url)
 
     async def send_group_help(self, group):
@@ -156,15 +173,17 @@ class MiyuHelp(commands.DefaultHelpCommand):
     async def send_cog_help(self, cog):
         channel = self.get_destination()
         language = {
-            'en-US': '',
-            'zh-TW': 'zh_TW/',
-            'ja': 'ja/',
+            "en-US": "",
+            "zh-TW": "zh_TW/",
+            "ja": "ja/",
         }[self.context.preferences.language]
-        if cog.qualified_name == 'Info':
-            url = f'{self.help_url}{language}commands/general-usage/'
+        if cog.qualified_name == "Info":
+            url = f"{self.help_url}{language}commands/general-usage/"
             await channel.send(url)
         else:
-            url = f'{self.help_url}{language}commands/utility/{cog.qualified_name.lower()}/'.replace(' ', '-')
+            url = f"{self.help_url}{language}commands/utility/{cog.qualified_name.lower()}/".replace(
+                " ", "-"
+            )
             await channel.send(url)
 
 

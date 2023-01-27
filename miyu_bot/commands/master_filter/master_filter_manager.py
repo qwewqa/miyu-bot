@@ -15,14 +15,27 @@ if TYPE_CHECKING:
 # The list of modules to import/reload.
 # Format is {'module_name': [('class_name', 'master_class_name', 'attribute_name_for_filter_manager', 'name')]}
 _MODULES = {
-    'miyu_bot.commands.master_filter.card_filter': [('CardFilter', 'CardMaster', 'cards', 'card_filter')],
-    'miyu_bot.commands.master_filter.gacha_filter': [('GachaFilter', 'GachaMaster', 'gacha', 'gacha_filter')],
-    'miyu_bot.commands.master_filter.event_filter': [('EventFilter', 'EventMaster', 'events', 'event_filter')],
-    'miyu_bot.commands.master_filter.music_filter': [('MusicFilter', 'MusicMaster', 'music', 'music_filter')],
-    'miyu_bot.commands.master_filter.chart_filter': [('ChartFilter', 'ChartMaster', 'charts', 'chart_filter')],
-    'miyu_bot.commands.master_filter.login_bonus_filter':
-        [('LoginBonusFilter', 'LoginBonusMaster', 'login_bonuses', 'login_bonus_filter')],
-    'miyu_bot.commands.master_filter.stamp_filter': [('StampFilter', 'StampMaster', 'stamps', 'stamp_filter')],
+    "miyu_bot.commands.master_filter.card_filter": [
+        ("CardFilter", "CardMaster", "cards", "card_filter")
+    ],
+    "miyu_bot.commands.master_filter.gacha_filter": [
+        ("GachaFilter", "GachaMaster", "gacha", "gacha_filter")
+    ],
+    "miyu_bot.commands.master_filter.event_filter": [
+        ("EventFilter", "EventMaster", "events", "event_filter")
+    ],
+    "miyu_bot.commands.master_filter.music_filter": [
+        ("MusicFilter", "MusicMaster", "music", "music_filter")
+    ],
+    "miyu_bot.commands.master_filter.chart_filter": [
+        ("ChartFilter", "ChartMaster", "charts", "chart_filter")
+    ],
+    "miyu_bot.commands.master_filter.login_bonus_filter": [
+        ("LoginBonusFilter", "LoginBonusMaster", "login_bonuses", "login_bonus_filter")
+    ],
+    "miyu_bot.commands.master_filter.stamp_filter": [
+        ("StampFilter", "StampMaster", "stamps", "stamp_filter")
+    ],
 }
 
 

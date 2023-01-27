@@ -17,83 +17,81 @@ from miyu_bot.commands.master_filter.localization_manager import LocalizationMan
 
 class Audio(commands.Cog):
     bot: MiyuBot
-    queues: 'Dict[int, AudioQueue]'
+    queues: "Dict[int, AudioQueue]"
 
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
         self.queues = defaultdict(lambda: AudioQueue())
-        self.l10n = LocalizationManager(self.bot.fluent_loader, 'audio.ftl')
+        self.l10n = LocalizationManager(self.bot.fluent_loader, "audio.ftl")
 
     def cog_unload(self):
         for queue in self.queues.values():
             queue.stop()
 
-    @commands.command(name='join',
-                      aliases=[],
-                      description='Joins VC.',
-                      help='!join voice-channel')
+    @commands.command(
+        name="join", aliases=[], description="Joins VC.", help="!join voice-channel"
+    )
     async def join(self, ctx: commands.Context, *, channel: discord.VoiceChannel):
         if ctx.voice_client is not None:
             return await ctx.voice_client.move_to(channel)
         await channel.connect()
 
-    @commands.command(name='leave',
-                      aliases=[],
-                      description='Leaves VC.',
-                      help='!leave')
+    @commands.command(name="leave", aliases=[], description="Leaves VC.", help="!leave")
     async def leave(self, ctx: commands.Context):
         if ctx.voice_client is not None:
             self.queues[ctx.guild.id].stop()
             await ctx.voice_client.disconnect()
 
-    @commands.command(name='stop',
-                      aliases=[],
-                      description='Stops playing audio.',
-                      help='!stop')
+    @commands.command(
+        name="stop", aliases=[], description="Stops playing audio.", help="!stop"
+    )
     async def stop(self, ctx: commands.Context):
         self.queues[ctx.guild.id].stop()
         if ctx.voice_client:
-            await ctx.send('Stopped playback.')
+            await ctx.send("Stopped playback.")
 
-    @commands.group(name='play')
+    @commands.group(name="play")
     async def play(self, ctx: commands.Context):
         if ctx.invoked_subcommand is None:
-            await ctx.send('Invalid play subcommand.')
+            await ctx.send("Invalid play subcommand.")
 
-    @play.command(name='volume',
-                  description='Adjusts or displays volume.',
-                  help='!volume 100')
+    @play.command(
+        name="volume", description="Adjusts or displays volume.", help="!volume 100"
+    )
     async def volume(self, ctx: commands.Context, *, value: Optional[int]):
         if value is None:
-            await ctx.send(f'{self.queues[ctx.guild.id].volume * 100:.0f}%')
+            await ctx.send(f"{self.queues[ctx.guild.id].volume * 100:.0f}%")
         else:
             if 0 <= value <= 200:
                 self.queues[ctx.guild.id].volume = value / 100
-                await ctx.send('Volume changed.')
+                await ctx.send("Volume changed.")
             else:
-                await ctx.send('Volume should be between 0 and 200, inclusive.')
+                await ctx.send("Volume should be between 0 and 200, inclusive.")
 
-    @play.command(name='file',
-                  hidden=True)
+    @play.command(name="file", hidden=True)
     @commands.is_owner()
     async def play_file(self, ctx: commands.Context, *, name: str):
-        file = self.bot.assets[Server.JP].path / 'plain' / name
+        file = self.bot.assets[Server.JP].path / "plain" / name
         if not file.exists():
-            await ctx.send('Does not exist.')
+            await ctx.send("Does not exist.")
             return
         self.queues[ctx.guild.id].enqueue(str(file))
 
-    @play.command(name='stamp',
-                  aliases=['sticker'],
-                  description='Plays stamp audio.',
-                  help='!play stamp')
+    @play.command(
+        name="stamp",
+        aliases=["sticker"],
+        description="Plays stamp audio.",
+        help="!play stamp",
+    )
     async def stamp(self, ctx: commands.Context, *, name: str):
-        stamp = list(stamp
-                     for stamp in self.bot.master_filters.stamps.get_by_relevance(name, ctx)
-                     if stamp.audio_path.exists())
+        stamp = list(
+            stamp
+            for stamp in self.bot.master_filters.stamps.get_by_relevance(name, ctx)
+            if stamp.audio_path.exists()
+        )
         if not stamp:
-            await ctx.send('Stamp not found or no audio.')
+            await ctx.send("Stamp not found or no audio.")
             return
         stamp = stamp[0]
         self.queues[ctx.guild.id].enqueue(str(stamp.audio_path))
@@ -102,7 +100,9 @@ class Audio(commands.Cog):
     async def ensure_voice(self, ctx: commands.Context):
         if ctx.voice_client is None:
             if ctx.author.voice:
-                self.queues[ctx.guild.id].start(await ctx.author.voice.channel.connect())
+                self.queues[ctx.guild.id].start(
+                    await ctx.author.voice.channel.connect()
+                )
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
@@ -136,9 +136,11 @@ class AudioQueue:
             self.client = None
         self.queue = Queue()
 
-    def set_queue_source(self, source: Callable[[], Awaitable[Union[Iterable[str], str]]]):
+    def set_queue_source(
+        self, source: Callable[[], Awaitable[Union[Iterable[str], str]]]
+    ):
         if not self.playback_task:
-            raise RuntimeError('Playback not active.')
+            raise RuntimeError("Playback not active.")
 
         if self.on_empty_task:
             self.on_empty_task.cancel()
@@ -157,7 +159,7 @@ class AudioQueue:
 
     def enqueue(self, audio):
         if not self.playback_task:
-            raise RuntimeError('Playback not active.')
+            raise RuntimeError("Playback not active.")
         self.queue.put_nowait(audio)
 
     async def _playback(self):

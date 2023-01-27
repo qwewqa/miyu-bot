@@ -5,19 +5,19 @@ from miyu_bot.commands.common.asset_paths import get_asset_filename
 
 
 def main():
-    for p in ['assets', 'assets_en']:
+    for p in ["assets", "assets_en"]:
         base_path = Path(p)
-        target_path = Path('export')
+        target_path = Path("export")
 
         asset_paths = [
-            'music_jacket/*.jpg',
-            'ondemand/card_chara/*.jpg',
-            'ondemand/card_icon/*.jpg',
-            'ondemand/chart/*.png',
-            'ondemand/event/*/*.jpg',
-            'ondemand/event/*/*.png',
-            'ondemand/gacha/top/banner/*.png',
-            'ondemand/loginBonus/*.jpg',
+            "music_jacket/*.jpg",
+            "ondemand/card_chara/*.jpg",
+            "ondemand/card_icon/*.jpg",
+            "ondemand/chart/*.png",
+            "ondemand/event/*/*.jpg",
+            "ondemand/event/*/*.png",
+            "ondemand/gacha/top/banner/*.png",
+            "ondemand/loginBonus/*.jpg",
         ]
 
         for asset_path in asset_paths:
@@ -27,5 +27,5 @@ def main():
                     shutil.copy(path, target_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

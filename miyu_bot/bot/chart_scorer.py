@@ -14,21 +14,27 @@ class ChartScorer:
     def __call__(self, *args, **kwargs):
         return self.score(*args, **kwargs)
 
-    def score(self,
-              chart: Union[ChartMaster, Chart],
-              power: int,
-              skills: List[SkillMaster],
-              fever_multiplier: float = 1.0,
-              enable_fever: bool = True,
-              accuracy: float = 1.0,
-              disable_soflan: bool = False,
-              autoplay: bool = False,
-              enable_combo_bonus: bool = True) -> float:
+    def score(
+        self,
+        chart: Union[ChartMaster, Chart],
+        power: int,
+        skills: List[SkillMaster],
+        fever_multiplier: float = 1.0,
+        enable_fever: bool = True,
+        accuracy: float = 1.0,
+        disable_soflan: bool = False,
+        autoplay: bool = False,
+        enable_combo_bonus: bool = True,
+    ) -> float:
         if isinstance(chart, Chart):
-            scoring_data = get_chart_scoring_data(chart, [s.max_seconds for s in skills], fever_multiplier)
+            scoring_data = get_chart_scoring_data(
+                chart, [s.max_seconds for s in skills], fever_multiplier
+            )
         else:
             if self.get_chart(chart.id):
-                scoring_data = self.get_scoring_data(chart.id, tuple(s.max_seconds for s in skills), fever_multiplier)
+                scoring_data = self.get_scoring_data(
+                    chart.id, tuple(s.max_seconds for s in skills), fever_multiplier
+                )
             else:
                 return 0
         return scoring_data.score(
@@ -38,7 +44,7 @@ class ChartScorer:
             accuracy=accuracy,
             disable_soflan=disable_soflan,
             autoplay=autoplay,
-            enable_combo_bonus=enable_combo_bonus
+            enable_combo_bonus=enable_combo_bonus,
         )
 
     @functools.lru_cache(maxsize=None)
@@ -48,6 +54,10 @@ class ChartScorer:
         except FileNotFoundError:
             return None
 
-    @functools.lru_cache(maxsize=2048)
-    def get_scoring_data(self, cid: int, skill_durations: Tuple[float, ...], fever_multiplier: float) -> ChartScoringData:
-        return get_chart_scoring_data(self.get_chart(cid), skill_durations, fever_multiplier)
+    @functools.lru_cache(maxsize=32768)
+    def get_scoring_data(
+        self, cid: int, skill_durations: Tuple[float, ...], fever_multiplier: float
+    ) -> ChartScoringData:
+        return get_chart_scoring_data(
+            self.get_chart(cid), skill_durations, fever_multiplier
+        )

@@ -33,7 +33,9 @@ class FuzzyFilteredMap:
 
     def _update_items(self):
         self._filtered_items = [(k, v) for k, v in self._map.items() if self.filter(v)]
-        self._filtered_out_items = [(k, v) for k, v in self._map.items() if not self.filter(v)]
+        self._filtered_out_items = [
+            (k, v) for k, v in self._map.items() if not self.filter(v)
+        ]
         self._stale = False
 
     def values(self):
@@ -64,13 +66,24 @@ class FuzzyFilteredMap:
             return None
         try:
             matcher = self.matcher
-            result = min(((score, v) for score, v in
-                          ((matcher.score(key, k), v) for k, v in self.filtered_items)
-                          if score <= 0), key=lambda v: v[0])[1]
-            self.logger.info(f'Found key "{key}" in time {timeit.default_timer() - start_time}.')
+            result = min(
+                (
+                    (score, v)
+                    for score, v in (
+                        (matcher.score(key, k), v) for k, v in self.filtered_items
+                    )
+                    if score <= 0
+                ),
+                key=lambda v: v[0],
+            )[1]
+            self.logger.info(
+                f'Found key "{key}" in time {timeit.default_timer() - start_time}.'
+            )
             return result
         except ValueError:
-            self.logger.info(f'Found no results for key "{key}" in time {timeit.default_timer() - start_time}.')
+            self.logger.info(
+                f'Found no results for key "{key}" in time {timeit.default_timer() - start_time}.'
+            )
             return None
 
     def get_sorted(self, key: str):
@@ -79,9 +92,14 @@ class FuzzyFilteredMap:
             self.logger.debug(f'Rejected key "{key}" due to length.')
             return []
         key = romanize(key)
-        values = [v for score, v in
-                  sorted(((self.matcher.score(key, k), v) for k, v in self.filtered_items), key=lambda v: v[0])
-                  if score <= 0]
+        values = [
+            v
+            for score, v in sorted(
+                ((self.matcher.score(key, k), v) for k, v in self.filtered_items),
+                key=lambda v: v[0],
+            )
+            if score <= 0
+        ]
         seen_ids = set()
         unique = []
         for value in values:
@@ -89,7 +107,9 @@ class FuzzyFilteredMap:
                 continue
             unique.append(value)
             seen_ids.add(id(value))
-        self.logger.info(f'Searched key "{key}" in time {timeit.default_timer() - start_time}.')
+        self.logger.info(
+            f'Searched key "{key}" in time {timeit.default_timer() - start_time}.'
+        )
         return unique
 
 
@@ -116,12 +136,14 @@ class FuzzyMatchConfig:
     deletion_weight: float = 1.0
     default_substitution_weight: float = 1.0
     match_weight: float = -0.2
-    special_substitution_weights: Dict[Tuple[str, str], float] = field(default_factory=lambda: {
-        ('v', 'b'): 0.0,
-        ('l', 'r'): 0.0,
-        ('c', 'k'): 0.0,
-        ('y', 'i'): 0.4,
-    })
+    special_substitution_weights: Dict[Tuple[str, str], float] = field(
+        default_factory=lambda: {
+            ("v", "b"): 0.0,
+            ("l", "r"): 0.0,
+            ("c", "k"): 0.0,
+            ("y", "i"): 0.4,
+        }
+    )
     word_match_weight: float = -0.2
     whole_match_weight: float = -0.25
     acronym_match_weight: float = -0.25
@@ -172,42 +194,58 @@ class FuzzyMatcher:
                 a[0][i] = i * insertion_weight
 
         words = target.split()
-        word_bonus = min(word_match_weight * max(sum(a == b for a, b in zip(source, w)) for w in words),
-                         word_match_weight * max(sum(a == b for a, b in
-                                                     zip(source, w[0] + strip_vowels(w[1:]))) for w in
-                                                 words),
-                         whole_match_weight * sum(a == b for a, b in zip(strip_spaces(source), strip_spaces(target))),
-                         acronym_match_weight * sum(
-                             a == b for a, b in zip(source, ''.join(w[0] for w in words))))
+        word_bonus = min(
+            word_match_weight
+            * max(sum(a == b for a, b in zip(source, w)) for w in words),
+            word_match_weight
+            * max(
+                sum(a == b for a, b in zip(source, w[0] + strip_vowels(w[1:])))
+                for w in words
+            ),
+            whole_match_weight
+            * sum(a == b for a, b in zip(strip_spaces(source), strip_spaces(target))),
+            acronym_match_weight
+            * sum(a == b for a, b in zip(source, "".join(w[0] for w in words))),
+        )
 
         threshold -= word_bonus + base_score
 
         for i_src in range(1, l_src + 1):
             for i_tgt in range(1, l_tgt + 1):
-                a[i_src][i_tgt] = min(a[i_src - 1][i_tgt - 1] + ((special_substitution_weights.get(
-                    (source[i_src - 1], target[i_tgt - 1]),
-                    default_substitution_weight
-                )) if source[i_src - 1] != target[i_tgt - 1] else match_weight),
-                                      a[i_src - 1][i_tgt] + deletion_weight,
-                                      a[i_src][i_tgt - 1] + insertion_weight)
+                a[i_src][i_tgt] = min(
+                    a[i_src - 1][i_tgt - 1]
+                    + (
+                        (
+                            special_substitution_weights.get(
+                                (source[i_src - 1], target[i_tgt - 1]),
+                                default_substitution_weight,
+                            )
+                        )
+                        if source[i_src - 1] != target[i_tgt - 1]
+                        else match_weight
+                    ),
+                    a[i_src - 1][i_tgt] + deletion_weight,
+                    a[i_src][i_tgt - 1] + insertion_weight,
+                )
 
             # there are l_scr - i_src source chars remaining
             # each match removes the insertion weight then adds the match weight
             # this is the max difference that can make
             max_additional_score = (l_src - i_src) * (match_weight - insertion_weight)
-            if ((a[i_src][l_tgt] + max_additional_score) > threshold and
-                    (a[i_src][l_tgt - 1] + max_additional_score) > threshold):
+            if (a[i_src][l_tgt] + max_additional_score) > threshold and (
+                a[i_src][l_tgt - 1] + max_additional_score
+            ) > threshold:
                 return 1
 
         return a[l_src][l_tgt] + word_bonus + base_score
 
 
 def strip_spaces(s):
-    return re.sub(' ', '', s)
+    return re.sub(" ", "", s)
 
 
 def strip_vowels(s):
-    return re.sub('[aeoiu]', '', s)
+    return re.sub("[aeoiu]", "", s)
 
 
 _kks = pykakasi.kakasi()
@@ -215,9 +253,9 @@ _kks = pykakasi.kakasi()
 
 def romanize(s: str) -> str:
     s = str(s)
-    s = re.sub('[\'・]', '', s)
-    s = re.sub('[A-Za-z]+', lambda ele: f' {ele[0]} ', s)
-    s = re.sub('[0-9]+', lambda ele: f' {ele[0]} ', s)
-    s = ' '.join(c['hepburn'].strip().lower() for c in _kks.convert(s))
-    s = re.sub(r'[^a-zA-Z0-9_ ]+', '', s)
-    return ' '.join(s.split())
+    s = re.sub("['・]", "", s)
+    s = re.sub("[A-Za-z]+", lambda ele: f" {ele[0]} ", s)
+    s = re.sub("[0-9]+", lambda ele: f" {ele[0]} ", s)
+    s = " ".join(c["hepburn"].strip().lower() for c in _kks.convert(s))
+    s = re.sub(r"[^a-zA-Z0-9_ ]+", "", s)
+    return " ".join(s.split())

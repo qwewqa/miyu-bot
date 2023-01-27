@@ -12,7 +12,17 @@ from abc import abstractmethod, ABCMeta
 from collections import defaultdict
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Any, Optional, Union, Callable, List, Sequence, Protocol, Tuple, Awaitable
+from typing import (
+    Any,
+    Optional,
+    Union,
+    Callable,
+    List,
+    Sequence,
+    Protocol,
+    Tuple,
+    Awaitable,
+)
 from typing import TypeVar, Generic, Dict
 
 import discord
@@ -40,25 +50,25 @@ class MasterFilterMeta(ABCMeta):
         data_attributes = []
         list_formatters = []
         for k, v in namespace.items():
-            if data_info := getattr(v, '_data_attribute_info', False):
+            if data_info := getattr(v, "_data_attribute_info", False):
                 data_attributes.append(data_info)
-            if command_info := getattr(v, '_command_source_info', False):
+            if command_info := getattr(v, "_command_source_info", False):
                 command_sources.append(command_info)
-            if command_info := getattr(v, '_list_formatter_info', False):
+            if command_info := getattr(v, "_list_formatter_info", False):
                 list_formatters.append(command_info)
-        namespace['_data_attributes'] = data_attributes
+        namespace["_data_attributes"] = data_attributes
         if not command_sources:
-            raise ValueError('No command sources found.')
-        namespace['_command_sources'] = command_sources
+            raise ValueError("No command sources found.")
+        namespace["_command_sources"] = command_sources
         if len(list_formatters) > 1:
-            raise ValueError('Multiple list formatters found.')
+            raise ValueError("Multiple list formatters found.")
         if not list_formatters:
-            raise ValueError('No list formatter found.')
-        namespace['_list_formatter'] = list_formatters[0]
+            raise ValueError("No list formatter found.")
+        namespace["_list_formatter"] = list_formatters[0]
         return super().__new__(mcs, name, bases, namespace, **kwargs)
 
 
-TData = TypeVar('TData', bound=MasterAsset)
+TData = TypeVar("TData", bound=MasterAsset)
 
 
 class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
@@ -83,9 +93,13 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         self.command_sources = [dataclasses.replace(c) for c in self._command_sources]
         self.data_attributes = [dataclasses.replace(c) for c in self._data_attributes]
         self.list_formatter = dataclasses.replace(self._list_formatter)
-        self.default_sort = next((da for da in self.data_attributes if da.is_default_sort), None)
-        self.default_display = next((da for da in self.data_attributes if da.is_default_display), None)
-        self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + '.ftl')
+        self.default_sort = next(
+            (da for da in self.data_attributes if da.is_default_sort), None
+        )
+        self.default_display = next(
+            (da for da in self.data_attributes if da.is_default_display), None
+        )
+        self.l10n = LocalizationManager(self.bot.fluent_loader, self.name + ".ftl")
         for d in self.data_attributes:
             if init_function := d.init_function:
                 init_function(self, d)
@@ -105,12 +119,20 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             for alias_source_server in bot.assets.keys():
                 if alias_source_server == server:
                     continue
-                for alias, alias_server_value in self.unrestricted_filter[alias_source_server].filtered_items:
+                for alias, alias_server_value in self.unrestricted_filter[
+                    alias_source_server
+                ].filtered_items:
                     if alias_server_value.id in manager.masters[self.master_name]:
-                        self.default_filter[server][alias] = masters[alias_server_value.id]
-                        self.unrestricted_filter[server][alias] = masters[alias_server_value.id]
+                        self.default_filter[server][alias] = masters[
+                            alias_server_value.id
+                        ]
+                        self.unrestricted_filter[server][alias] = masters[
+                            alias_server_value.id
+                        ]
 
-    def get_asset_source(self, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None):
+    def get_asset_source(
+        self, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None
+    ):
         if server is None:
             if ctx is None:
                 server = Server.JP
@@ -118,7 +140,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                 server = ctx.preferences.server
         return self.bot.assets[server][self.master_name]
 
-    def get(self, name_or_id: Union[str, int], ctx: Optional[miyu_bot.bot.bot.PrefContext]):
+    def get(
+        self, name_or_id: Union[str, int], ctx: Optional[miyu_bot.bot.bot.PrefContext]
+    ):
         if ctx and ctx.preferences.leaks:
             try:
                 return self.get_asset_source(ctx)[int(name_or_id)]
@@ -137,7 +161,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
                     return None
                 return self.default_filter[ctx.preferences.server][name_or_id]
 
-    def get_by_id(self, master_id: int, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None):
+    def get_by_id(
+        self, master_id: int, ctx: Optional[miyu_bot.bot.bot.PrefContext], server=None
+    ):
         if server is None:
             server = ctx.preferences.server
         if ctx and ctx.preferences.leaks:
@@ -158,7 +184,10 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         try:
             master = self.get_asset_source(ctx)[int(name)]
             id_result = [master]
-            if not ctx.preferences.leaks and master not in self.default_filter[ctx.preferences.server].values():
+            if (
+                not ctx.preferences.leaks
+                and master not in self.default_filter[ctx.preferences.server].values()
+            ):
                 if master not in self.default_filter[ctx.preferences.server].values():
                     id_result = []
         except (KeyError, ValueError):
@@ -166,11 +195,21 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
         if name:
             if ctx.preferences.leaks:
-                return id_result + [v for v in self.unrestricted_filter[ctx.preferences.server].get_sorted(name)
-                                    if v not in id_result]
+                return id_result + [
+                    v
+                    for v in self.unrestricted_filter[
+                        ctx.preferences.server
+                    ].get_sorted(name)
+                    if v not in id_result
+                ]
             else:
-                return id_result + [v for v in self.default_filter[ctx.preferences.server].get_sorted(name)
-                                    if v not in id_result]
+                return id_result + [
+                    v
+                    for v in self.default_filter[ctx.preferences.server].get_sorted(
+                        name
+                    )
+                    if v not in id_result
+                ]
         else:
             if ctx.preferences.leaks:
                 return list(self.unrestricted_filter[ctx.preferences.server].values())
@@ -192,7 +231,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         pass
 
     def get_select_name(self, value: TData) -> Tuple[str, str, Optional[AnyEmoji]]:
-        return 'name', 'desc', None
+        return "name", "desc", None
 
     def is_released(self, value: TData) -> bool:
         return value.is_released
@@ -207,6 +246,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
 
             # Note how a default argument used, so that the error propagates properly
             functools.wraps(sig)
+
             async def wrapped(*args, arg: ParsedArguments = None):
                 return await f(args[-1], arg=arg)
 
@@ -215,70 +255,76 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         for cs in self.command_sources:
             if args := cs.command_args:
                 if include_self_parameter:
-                    yield commands.hybrid_command(**{**args,
-                                              'description': args.get('description',
-                                                                      'No Description')})(
-                        wrap(self.get_detail_command_function(cs)))
+                    yield commands.hybrid_command(
+                        **{
+                            **args,
+                            "description": args.get("description", "No Description"),
+                        }
+                    )(wrap(self.get_detail_command_function(cs)))
                 else:
-                    yield commands.hybrid_command(**{**args,
-                                              'description': args.get('description',
-                                                                      'No Description')})(
-                        self.get_detail_command_function(cs))
+                    yield commands.hybrid_command(
+                        **{
+                            **args,
+                            "description": args.get("description", "No Description"),
+                        }
+                    )(self.get_detail_command_function(cs))
         if self.list_formatter:
             cs = self.list_formatter
             if args := cs.command_args:
                 if include_self_parameter:
-                    yield commands.hybrid_command(**{**args,
-                                              'description': args.get('description',
-                                                                      'No Description')})(
-                        wrap(self.get_list_command_function()))
+                    yield commands.hybrid_command(
+                        **{
+                            **args,
+                            "description": args.get("description", "No Description"),
+                        }
+                    )(wrap(self.get_list_command_function()))
                 else:
 
-                    yield commands.hybrid_command(**{**args,
-                                              'description': args.get('description',
-                                                                      'No Description')})(
-                        wrap(self.get_list_command_function()))
+                    yield commands.hybrid_command(
+                        **{
+                            **args,
+                            "description": args.get("description", "No Description"),
+                        }
+                    )(wrap(self.get_list_command_function()))
 
     def get_detail_command_function(self, source):
-        if hasattr(source, '_list_formatter_info'):
+        if hasattr(source, "_list_formatter_info"):
             source = source._list_formatter_info
 
         filter_processor = FilterProcessor(self, source)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
-            arg = arg or await ParsedArguments.convert(ctx, '')
+            arg = arg or await ParsedArguments.convert(ctx, "")
             results = filter_processor.get(arg, ctx)
             if not results.values:
-                await ctx.send('No results.')
+                await ctx.send("No results.")
                 return
             view = FilterDetailView(self, ctx, results)
             await ctx.send(embed=view.active_embed, view=view)
 
         return command
 
-    def get_simple_detail_view(self,
-                               ctx: PrefContext,
-                               values: List,
-                               server: Server,
-                               source: [EmbedSourceCallable, CommandSourceInfo]) -> Tuple[
-        discord.ui.View, discord.Embed]:
-        if hasattr(source, '_command_source_info'):
+    def get_simple_detail_view(
+        self,
+        ctx: PrefContext,
+        values: List,
+        server: Server,
+        source: [EmbedSourceCallable, CommandSourceInfo],
+    ) -> Tuple[discord.ui.View, discord.Embed]:
+        if hasattr(source, "_command_source_info"):
             source = source._command_source_info
-        results = FilterResults(master_filter=self,
-                                command_source_info=source,
-                                server=server,
-                                values=values)
+        results = FilterResults(
+            master_filter=self, command_source_info=source, server=server, values=values
+        )
         view = FilterDetailView(self, ctx, results)
         return view, view.active_embed
 
-    def get_simple_list_view(self,
-                             ctx: PrefContext,
-                             values: List,
-                             server: Server) -> Tuple[discord.ui.View, discord.Embed]:
-        results = FilterResults(master_filter=self,
-                                command_source_info=None,
-                                server=server,
-                                values=values)
+    def get_simple_list_view(
+        self, ctx: PrefContext, values: List, server: Server
+    ) -> Tuple[discord.ui.View, discord.Embed]:
+        results = FilterResults(
+            master_filter=self, command_source_info=None, server=server, values=values
+        )
         view = FilterListView(self, ctx, results)
         return view, view.active_embed
 
@@ -286,10 +332,10 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         filter_processor = FilterProcessor(self)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
-            arg = arg or await ParsedArguments.convert(ctx, '')
+            arg = arg or await ParsedArguments.convert(ctx, "")
             results = filter_processor.get(arg, ctx)
             if not results.values:
-                await ctx.send('No results.')
+                await ctx.send("No results.")
                 return
             view = FilterListView(self, ctx, results)
             await ctx.send(embed=view.active_embed, view=view)
@@ -315,11 +361,13 @@ AnyDataAccessor = Union[DataAttributeAccessor, ContextlessDataAttributeAccessor]
 def _get_accessor(f: Union[AnyDataAccessor]) -> DataAttributeAccessor:
     args = getfullargspec(f).args
     if len(args) == 2:
+
         def accessor(self, ctx, value):
             return f(self, value)
 
         return accessor
-    elif len(args) == 3 and 'match' in args:
+    elif len(args) == 3 and "match" in args:
+
         def accessor(self, ctx, value, match):
             return f(self, value, match)
 
@@ -329,13 +377,16 @@ def _get_accessor(f: Union[AnyDataAccessor]) -> DataAttributeAccessor:
 
 
 EmbedSourceCallable = Union[
-    Callable[[MasterFilter, PrefContext, Any, Server], discord.Embed], Callable[
-        [MasterFilter, PrefContext, Any, int, Server], discord.Embed]]
-ShortcutButtonCallable = Callable[[MasterFilter, PrefContext, Any, Server, discord.Interaction], Awaitable]
+    Callable[[MasterFilter, PrefContext, Any, Server], discord.Embed],
+    Callable[[MasterFilter, PrefContext, Any, int, Server], discord.Embed],
+]
+ShortcutButtonCallable = Callable[
+    [MasterFilter, PrefContext, Any, Server, discord.Interaction], Awaitable
+]
 ListFormatterCallable = AnyDataAccessor
 AnyEmoji = Union[int, str, discord.Emoji]
 
-ESC = TypeVar('ESC', bound=EmbedSourceCallable)
+ESC = TypeVar("ESC", bound=EmbedSourceCallable)
 
 
 class AnnotatedEmbedSourceCallable(Protocol[ESC]):
@@ -360,7 +411,9 @@ class CommandSourceInfo:
     tabs: Optional[Sequence[AnyEmoji]] = None
     default_tab: int = 0
     suffix_tab_aliases: Optional[Dict[str, int]] = None
-    shortcut_buttons: List[ShortcutButtonInfo] = dataclasses.field(default_factory=lambda: [])
+    shortcut_buttons: List[ShortcutButtonInfo] = dataclasses.field(
+        default_factory=lambda: []
+    )
 
     def __call__(self, *args, **kwargs):
         return self.embed_source(*args, **kwargs)
@@ -377,11 +430,11 @@ class ListFormatterInfo:
 
 
 def command_source(
-        *,
-        command_args: Optional[Dict[str, Any]] = None,
-        tabs: Optional[Sequence[AnyEmoji]] = None,
-        default_tab: int = 0,
-        suffix_tab_aliases: Optional[Dict[str, int]] = None,
+    *,
+    command_args: Optional[Dict[str, Any]] = None,
+    tabs: Optional[Sequence[AnyEmoji]] = None,
+    default_tab: int = 0,
+    suffix_tab_aliases: Optional[Dict[str, int]] = None,
 ) -> Callable[[EmbedSourceCallable], AnnotatedEmbedSourceCallable]:
     """A decorator that marks a function as an command source.
 
@@ -400,9 +453,15 @@ def command_source(
         )
         func._command_source_info = info
 
-        def shortcut_button(*, name: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji]] = None):
+        def shortcut_button(
+            *,
+            name: Optional[str] = None,
+            emoji: Optional[Union[str, discord.Emoji]] = None,
+        ):
             def decorator(func: ShortcutButtonCallable):
-                shortcut_info = ShortcutButtonInfo(function=func, emoji=emoji, name=name)
+                shortcut_info = ShortcutButtonInfo(
+                    function=func, emoji=emoji, name=name
+                )
                 info.shortcut_buttons.append(shortcut_info)
 
                 def check(f):
@@ -423,9 +482,9 @@ def command_source(
 
 
 def list_formatter(
-        *,
-        name: str,
-        command_args: Optional[Dict[str, Any]],
+    *,
+    name: str,
+    command_args: Optional[Dict[str, Any]],
 ) -> Callable[[Callable], Callable]:
     def decorator(func):
         info = ListFormatterInfo(
@@ -469,23 +528,23 @@ class DataAttributeInfo:
 
 
 def data_attribute(
-        name: str,
-        *,
-        aliases: Optional[List[str]] = None,
-        description: Optional[str] = None,
-        value_mapping: Optional[Dict[str, Any]] = None,
-        is_default_sort: bool = False,
-        is_default_display: bool = False,
-        is_flag: bool = False,
-        is_tag: bool = False,
-        is_keyword: bool = False,
-        is_plural: bool = False,
-        is_sortable: bool = False,
-        reverse_sort: bool = False,
-        is_comparable: bool = False,
-        is_eq: bool = False,
-        help_sample_argument: Optional[str] = None,
-        regex: Optional[Union[str, re.Pattern]] = None,
+    name: str,
+    *,
+    aliases: Optional[List[str]] = None,
+    description: Optional[str] = None,
+    value_mapping: Optional[Dict[str, Any]] = None,
+    is_default_sort: bool = False,
+    is_default_display: bool = False,
+    is_flag: bool = False,
+    is_tag: bool = False,
+    is_keyword: bool = False,
+    is_plural: bool = False,
+    is_sortable: bool = False,
+    reverse_sort: bool = False,
+    is_comparable: bool = False,
+    is_eq: bool = False,
+    help_sample_argument: Optional[str] = None,
+    regex: Optional[Union[str, re.Pattern]] = None,
 ):
     """Marks a function as a data attribute.
 

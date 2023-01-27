@@ -9,92 +9,101 @@ from miyu_bot.bot.models import PreferenceScope, all_preferences
 
 
 class Preferences(commands.Cog):
-    bot: 'miyu_bot.bot.bot.MiyuBot'
+    bot: "miyu_bot.bot.bot.MiyuBot"
 
     def __init__(self, bot):
         self.bot = bot
         self.logger = logging.getLogger(__name__)
-        from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
-        self.l10n = LocalizationManager(self.bot.fluent_loader, 'preferences.ftl')
+        from miyu_bot.commands.master_filter.localization_manager import (
+            LocalizationManager,
+        )
 
-    @commands.hybrid_command(name='setpref',
-                             description='',
-                             help='')
+        self.l10n = LocalizationManager(self.bot.fluent_loader, "preferences.ftl")
+
+    @commands.hybrid_command(name="setpref", description="", help="")
     async def setpref(self, ctx: commands.Context, scope: str, name: str, value: str):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope.')
+            await ctx.send(f"Invalid scope.")
             return
         if name not in scope.preferences:
-            await ctx.send(f'Invalid preference.')
+            await ctx.send(f"Invalid preference.")
             return
         preference = scope.preferences[name]
-        if not (await ctx.bot.is_owner(ctx.author) or (scope.has_permissions(ctx) and not preference.is_privileged)):
-            await ctx.send(f'Insufficient permissions.')
+        if not (
+            await ctx.bot.is_owner(ctx.author)
+            or (scope.has_permissions(ctx) and not preference.is_privileged)
+        ):
+            await ctx.send(f"Insufficient permissions.")
             return
         if error_message := preference.validate_or_get_error_message(value):
-            await ctx.send(f'Invalid value: {error_message}')
+            await ctx.send(f"Invalid value: {error_message}")
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope not available in current channel.')
+            await ctx.send(f"Scope not available in current channel.")
             return
         entry.set_preference(name, value)
         await entry.save()
-        await ctx.send(f'Preference updated.')
+        await ctx.send(f"Preference updated.")
 
-    @commands.hybrid_command(name='getpref',
-                             description='',
-                             help='')
-    async def getpref(self, ctx: commands.Context, scope: str, name: str = ''):
+    @commands.hybrid_command(name="getpref", description="", help="")
+    async def getpref(self, ctx: commands.Context, scope: str, name: str = ""):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope.')
+            await ctx.send(f"Invalid scope.")
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope not available in current channel.')
+            await ctx.send(f"Scope not available in current channel.")
             return
         if name:
             if name not in scope.preferences:
-                await ctx.send(f'Invalid preference.')
+                await ctx.send(f"Invalid preference.")
                 return
-            await ctx.send(str(getattr(entry, scope.preferences[name].attribute_name) or None))
+            await ctx.send(
+                str(getattr(entry, scope.preferences[name].attribute_name) or None)
+            )
         else:
-            await ctx.send('\n'.join(f'{name}: {getattr(entry, pref.attribute_name)}'
-                                     for name, pref in scope.preferences.items()
-                                     if not pref.is_privileged))
+            await ctx.send(
+                "\n".join(
+                    f"{name}: {getattr(entry, pref.attribute_name)}"
+                    for name, pref in scope.preferences.items()
+                    if not pref.is_privileged
+                )
+            )
 
-    @commands.hybrid_command(name='clearpref',
-                             description='',
-                             help='')
-    async def clearpref(self, ctx: commands.Context, scope: str, name: str = ''):
+    @commands.hybrid_command(name="clearpref", description="", help="")
+    async def clearpref(self, ctx: commands.Context, scope: str, name: str = ""):
         scope = preference_scope_aliases.get(scope)
         if not scope:
-            await ctx.send(f'Invalid scope.')
+            await ctx.send(f"Invalid scope.")
             return
         if name not in scope.preferences:
-            await ctx.send(f'Invalid preference.')
+            await ctx.send(f"Invalid preference.")
             return
         preference = scope.preferences[name]
-        if not (await ctx.bot.is_owner(ctx.author) or (scope.has_permissions(ctx) and not preference.is_privileged)):
-            await ctx.send(f'Insufficient permissions.')
+        if not (
+            await ctx.bot.is_owner(ctx.author)
+            or (scope.has_permissions(ctx) and not preference.is_privileged)
+        ):
+            await ctx.send(f"Insufficient permissions.")
             return
         entry = await scope.get_from_context(ctx)
         if not entry:
-            await ctx.send(f'Scope not available in current channel.')
+            await ctx.send(f"Scope not available in current channel.")
             return
         entry.clear_preference(name)
         await entry.save()
-        await ctx.send(f'Successfully cleared preference.')
+        await ctx.send(f"Successfully cleared preference.")
 
 
 preference_scope_aliases: Dict[str, Type[PreferenceScope]] = {
-    'user': models.User,
-    'self': models.User,
-    'channel': models.Channel,
-    'server': models.Guild,
-    'guild': models.Guild,
+    "user": models.User,
+    "self": models.User,
+    "channel": models.Channel,
+    "server": models.Guild,
+    "guild": models.Guild,
 }
 
 

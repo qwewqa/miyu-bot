@@ -13,25 +13,25 @@ async def main():
     logger = logging.getLogger(__name__)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('version', type=str)
-    parser.add_argument('server', type=str)
+    parser.add_argument("version", type=str)
+    parser.add_argument("server", type=str)
     args = parser.parse_args()
 
-    if args.server == 'jp':
-        asset_path = 'assets'
-        base_url = f'https://resources.d4dj-groovy-mix.com/{args.version}/'
-    elif args.server == 'en':
-        asset_path = 'assets_en'
-        base_url = f'https://resources.en.d4dj-world-groovy-mix.com/{args.version}/'
+    if args.server == "jp":
+        asset_path = "assets"
+        base_url = f"https://resources.d4dj-groovy-mix.com/{args.version}/"
+    elif args.server == "en":
+        asset_path = "assets_en"
+        base_url = f"https://resources.en.d4dj-world-groovy-mix.com/{args.version}/"
     else:
         raise
 
     revision_manager = RevisionManager(asset_path, base_url)
     await revision_manager.repair_downloads()
-    await revision_manager.update_assets(lambda p: 'plain' not in p)
+    await revision_manager.update_assets(lambda p: "plain" not in p)
     manager = AssetManager(asset_path)
     manager.render_charts_by_master()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     asyncio.run(main())

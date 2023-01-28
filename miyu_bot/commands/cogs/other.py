@@ -262,7 +262,7 @@ class Other(commands.Cog):
 
     @commands.command(name="getstat", hidden=True)
     @commands.is_owner()
-    async def command_usage(self, ctx: commands.Context, name: str):
+    async def getstat(self, ctx: commands.Context, name: str):
         usage = (
             await GeneralUsageCount.filter(name=name)
             .annotate(total_count=Sum("counter"))

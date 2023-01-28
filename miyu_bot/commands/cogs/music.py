@@ -1,6 +1,7 @@
 import asyncio
 import datetime
 import enum
+import functools
 import itertools
 import logging
 import re
@@ -54,6 +55,18 @@ class Music(commands.Cog):
         "nm": ChartDifficulty.Normal,
         "es": ChartDifficulty.Easy,
     }
+
+    @functools.cache
+    def reference_chart_score(self):
+        reference_chart = self.bot.assets[Server.JP].chart_master[3200094]
+        return self.bot.chart_scorer.score(
+            chart=reference_chart,
+            power=150_000,
+            skills=[
+                SkillMaster(self.bot.assets[Server.JP], score_up_rate=40, max_seconds=9)
+            ]
+            * 5,
+        )
 
     @commands.hybrid_command(
         name="meta",
@@ -171,7 +184,7 @@ class Music(commands.Cog):
             for skill_perm, weight in weighted_skill_permutations:
                 score = self.bot.chart_scorer.score(
                     chart=chart,
-                    power=450_000,
+                    power=150_000,
                     skills=skill_perm,
                     fever_multiplier=1.0 + groovy_score / 100,
                     enable_fever=not solo,
@@ -184,10 +197,8 @@ class Music(commands.Cog):
         chart_scores = {chart: await score_chart(chart) for chart in charts}
         charts = sorted(charts, key=lambda chart: chart_scores[chart], reverse=True)
 
-        highest_score = chart_scores[charts[0]]
-
         def format_score(_master_filter, _ctx, chart):
-            return f"{chart_scores[chart] / highest_score * 100:5.1f}%  {chart.music.duration:>5.1f}s "
+            return f"{chart_scores[chart] / self.reference_chart_score() * 100:5.1f}%  {chart.music.duration:>5.1f}s "
 
         def title():
             sorted_skill_values = sorted(skill_values, reverse=True)

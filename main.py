@@ -81,7 +81,10 @@ async def main():
         if config.get("sync"):
             await bot.tree.sync()
             for gid in [790033228600705044, 821445433276629053]:
-                await bot.tree.sync(guild=await bot.fetch_guild(gid))
+                try:
+                    await bot.tree.sync(guild=await bot.fetch_guild(gid))
+                except discord.errors.NotFound:
+                    pass
 
     bot.setup_tasks.append(on_start())
 

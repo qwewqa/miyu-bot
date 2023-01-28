@@ -29,6 +29,7 @@ class FilterResults:
     start_index: int = 0
     start_tab_name: Optional[str] = None
     display_formatter: Optional["Callable"] = None
+    list_title: Optional[str] = None
 
 
 class FilterProcessor:

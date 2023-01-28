@@ -1,23 +1,28 @@
+import asyncio
 import datetime
 import enum
+import itertools
 import logging
 import re
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Tuple, Any
+from typing import Tuple, Any, List, Dict, Optional
 
 import discord
 from d4dj_utils.chart.chart import Chart
 from d4dj_utils.chart.mix import get_best_mix, get_mix_data, calculate_mix_rating
 from d4dj_utils.chart.score_calculator import calculate_score
-from d4dj_utils.master.chart_master import ChartDifficulty
+from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
 from d4dj_utils.master.music_master import MusicMaster
 from d4dj_utils.master.skill_master import SkillMaster
-from discord import AllowedMentions
+from discord import AllowedMentions, app_commands
 from discord.ext import commands
 
 from miyu_bot.bot.bot import MiyuBot, PrefContext
+from miyu_bot.bot.servers import Server, SERVER_NAMES
 from miyu_bot.commands.common.argument_parsing import parse_arguments, ParsedArguments
+from miyu_bot.commands.master_filter.filter_list_view import FilterListView
+from miyu_bot.commands.master_filter.filter_result import FilterResults
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
 
 
@@ -49,6 +54,166 @@ class Music(commands.Cog):
         "nm": ChartDifficulty.Normal,
         "es": ChartDifficulty.Easy,
     }
+
+    @commands.hybrid_command(
+        name="meta",
+    )
+    async def meta(
+        self,
+        ctx: PrefContext,
+        skills: str = "60",
+        groovy_boost: app_commands.Range[float, 0, 100] = 0,
+        skill_duration_up: app_commands.Range[float, 0, 100] = 0,
+        solo: bool = False,
+        auto: bool = False,
+        server: Optional[str] = None,
+    ):
+        """Lists songs by score.
+
+        Parameters
+        ----------
+        skills: str
+            A list of skills. E.g. 80,60,50,40 or 60 or 80x6.75,60x9,50x9,40x9
+        groovy_boost: float
+            Groovy score up percentage
+        skill_duration_up: float
+            Skill duration up percentage
+        solo: bool
+            Whether to calculate solo score
+        auto: bool
+            Whether to calculate auto score
+        server: str
+            The server to use. Defaults to the current server. Can be one of: 'jp' or 'en'
+        """
+        await ctx.defer()
+
+        def make_skill(score, duration):
+            return SkillMaster(
+                self.bot.assets[Server.JP], score_up_rate=score, max_seconds=duration
+            )
+
+        # Skill formats:
+        # score_up := [0-9]+
+        # skill_time := 'x' float  // if not specified, default to 6.75 for 80% score up, and 9 otherwise
+        # skill := score_up skill_time?
+        # skills := skill (',' skill)*
+        #
+        # Example: 80,60
+        # Example: 80x6.75,60x9,50x9,40x9
+
+        skill_values: List[Tuple[int, float]] = []
+        for skill in re.split(r"\s+|\s*,\s*", skills):
+            skill = skill.strip()
+            if not skill:
+                raise commands.BadArgument("Invalid skill format")
+            if skill[-1] == "x":
+                score_up = int(skill[:-1])
+                duration = 6.75 if score_up == 80 else 9
+            elif "x" in skill:
+                score_up, duration = skill.split("x")
+                score_up = int(score_up)
+                duration = float(duration)
+            else:
+                score_up = int(skill)
+                duration = 6.75 if score_up == 80 else 9
+            if not (0 <= score_up <= 200):
+                raise commands.BadArgument("Invalid skill format")
+            if not (0 <= duration <= 20):
+                raise commands.BadArgument("Invalid skill format")
+            skill_values.append((score_up, duration))
+
+        # Apply skill duration up
+        skill_values = [
+            (score_up, duration * (1 + skill_duration_up / 100))
+            for score_up, duration in skill_values
+        ]
+
+        if not skill_values or len(skill_values) > 4:
+            raise commands.BadArgument("Invalid skill format")
+
+        if len(skill_values) < 4:
+            # Pad using last skill/m
+            skill_values += [skill_values[-1]] * (4 - len(skill_values))
+
+        leader_skill = skill_values[0]
+
+        # find all permutations of skills, with weights
+        skill_permutations = {}
+        for perm in itertools.permutations(skill_values):
+            skill_permutations[perm + (leader_skill,)] = (
+                skill_permutations.get(perm, 0) + 1
+            )
+
+        weighted_skill_permutations = [
+            ([make_skill(score_up, duration) for score_up, duration in perm], weight)
+            for perm, weight in skill_permutations.items()
+        ]
+
+        if server is not None:
+            server = server.lower()
+            if server not in SERVER_NAMES:
+                raise commands.BadArgument("Invalid server name")
+            ctx.preferences.server = SERVER_NAMES[server]
+
+        charts: List[ChartMaster] = list(self.bot.master_filters.charts.values(ctx))
+        charts = [
+            chart
+            for chart in charts
+            if chart.music.is_available
+            and not chart.music.is_hidden
+            and chart.music.id > 3
+        ]
+
+        async def score_chart(chart):
+            await asyncio.sleep(0)
+            total_score = 0
+            total_weight = 0
+            for skill_perm, weight in weighted_skill_permutations:
+                score = self.bot.chart_scorer.score(
+                    chart=chart,
+                    power=450_000,
+                    skills=skill_perm,
+                    fever_multiplier=1.0 + groovy_boost / 100,
+                    enable_fever=not solo,
+                    autoplay=auto,
+                )
+                total_score += score * weight
+                total_weight += weight
+            return total_score / total_weight
+
+        chart_scores = {chart: await score_chart(chart) for chart in charts}
+        charts = sorted(charts, key=lambda chart: chart_scores[chart], reverse=True)
+
+        highest_score = chart_scores[charts[0]]
+
+        def format_score(_master_filter, _ctx, chart):
+            return f"{chart_scores[chart] / highest_score * 100:5.1f}%  {chart.music.duration:>5.1f}s "
+
+        def title():
+            sorted_skill_values = sorted(skill_values, reverse=True)
+            leader_skill_index = sorted_skill_values.index(leader_skill)
+            # put [] around leader skill
+            formatted_skills = " ".join(
+                f"{score_up}x{duration}"
+                if i != leader_skill_index
+                else f"[{score_up}x{duration}]"
+                for i, (score_up, duration) in enumerate(sorted_skill_values)
+            )
+            return f"Song Meta\nskills: {formatted_skills}\nfever_bonus: {groovy_boost}\nsolo: {solo}\nauto: {auto}"
+
+        results = FilterResults(
+            master_filter=self.bot.master_filters.charts,
+            command_source_info=None,
+            server=ctx.preferences.server,
+            values=charts,
+            display_formatter=format_score,
+            list_title=title(),
+        )
+
+        view = FilterListView(self.bot.master_filters.charts, ctx, results)
+        embed = view.active_embed
+
+        await ctx.send(embed=embed, view=view)
 
     @commands.hybrid_command(
         name="score",

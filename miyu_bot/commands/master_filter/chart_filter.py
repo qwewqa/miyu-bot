@@ -226,7 +226,9 @@ class ChartFilter(MasterFilter[ChartMaster]):
     @data_attribute(name="playable", is_flag=True)
     def playable(self, value: ChartMaster):
         return (
-            value.music.is_released and not value.music.is_hidden and value.music.id > 3
+            value.music.is_available
+            and not value.music.is_hidden
+            and value.music.id > 3
         )
 
     @data_attribute(

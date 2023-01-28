@@ -294,6 +294,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         filter_processor = FilterProcessor(self, source)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
+            await ctx.defer()
             arg = arg or await ParsedArguments.convert(ctx, "")
             results = filter_processor.get(arg, ctx)
             if not results.values:
@@ -332,6 +333,7 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
         filter_processor = FilterProcessor(self)
 
         async def command(ctx, *, arg: Optional[ParsedArguments]):
+            await ctx.defer()
             arg = arg or await ParsedArguments.convert(ctx, "")
             results = filter_processor.get(arg, ctx)
             if not results.values:

@@ -43,9 +43,15 @@ class FilterListView(PagedMessageView):
             self.master_filter.get_select_name(v) for v in self.values
         ]
         self.page_size = 20
-        base_embed = discord.Embed(
-            title=f'[{ctx.preferences.server.name}] {self.master_filter.l10n[ctx].format_value(self.master_filter.list_formatter.name or "search")}',
-        )
+
+        if results.list_title:
+            base_embed = discord.Embed(
+                title=f"[{ctx.preferences.server.name}] {results.list_title}",
+            )
+        else:
+            base_embed = discord.Embed(
+                title=f'[{ctx.preferences.server.name}] {self.master_filter.l10n[ctx].format_value(self.master_filter.list_formatter.name or "search")}',
+            )
         display_formatter = results.display_formatter
         if display_formatter:
             entries = [

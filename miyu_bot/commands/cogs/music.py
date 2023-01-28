@@ -206,7 +206,7 @@ class Music(commands.Cog):
             leader_skill_index = sorted_skill_values.index(leader_skill)
             # put [] around leader skill
             formatted_skills = " ".join(
-                f"{score_up}x{duration}"
+                f"{score_up}x{duration:.2f}"
                 if i != leader_skill_index
                 else f"[{score_up}x{duration:.2f}]"
                 for i, (score_up, duration) in enumerate(sorted_skill_values)

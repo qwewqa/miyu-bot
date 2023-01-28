@@ -56,7 +56,6 @@ class Music(commands.Cog):
         "es": ChartDifficulty.Easy,
     }
 
-    @functools.cache
     def reference_chart_score(self):
         reference_chart = self.bot.assets[Server.JP].chart_master[3200094]
         return self.bot.chart_scorer.score(
@@ -197,8 +196,10 @@ class Music(commands.Cog):
         chart_scores = {chart: await score_chart(chart) for chart in charts}
         charts = sorted(charts, key=lambda chart: chart_scores[chart], reverse=True)
 
+        ref_score = self.reference_chart_score()
+
         def format_score(_master_filter, _ctx, chart):
-            return f"{chart_scores[chart] / self.reference_chart_score() * 100:5.1f}%  {chart.music.duration:>5.1f}s "
+            return f"{chart_scores[chart] / ref_score * 100:5.1f}%  {chart.music.duration:>5.1f}s "
 
         def title():
             sorted_skill_values = sorted(skill_values, reverse=True)

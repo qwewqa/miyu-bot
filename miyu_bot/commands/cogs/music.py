@@ -196,7 +196,7 @@ class Music(commands.Cog):
             formatted_skills = " ".join(
                 f"{score_up}x{duration}"
                 if i != leader_skill_index
-                else f"[{score_up}x{duration}]"
+                else f"[{score_up}x{duration:.2f}]"
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
             return f"Song Meta\nskills: {formatted_skills}\ngroovy_score: {groovy_score}\nsolo: {solo}\nauto: {auto}"

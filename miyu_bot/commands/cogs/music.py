@@ -62,7 +62,7 @@ class Music(commands.Cog):
         self,
         ctx: PrefContext,
         skills: str = "60",
-        groovy_boost: app_commands.Range[float, 0, 100] = 0,
+        groovy_score: app_commands.Range[float, 0, 100] = 0,
         skill_duration_up: app_commands.Range[float, 0, 100] = 0,
         solo: bool = False,
         auto: bool = False,
@@ -74,7 +74,7 @@ class Music(commands.Cog):
         ----------
         skills: str
             A list of skills. E.g. 80,60,50,40 or 60 or 80x6.75,60x9,50x9,40x9
-        groovy_boost: float
+        groovy_score: float
             Groovy score up percentage
         skill_duration_up: float
             Skill duration up percentage
@@ -173,7 +173,7 @@ class Music(commands.Cog):
                     chart=chart,
                     power=450_000,
                     skills=skill_perm,
-                    fever_multiplier=1.0 + groovy_boost / 100,
+                    fever_multiplier=1.0 + groovy_score / 100,
                     enable_fever=not solo,
                     autoplay=auto,
                 )
@@ -199,7 +199,7 @@ class Music(commands.Cog):
                 else f"[{score_up}x{duration}]"
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
-            return f"Song Meta\nskills: {formatted_skills}\nfever_bonus: {groovy_boost}\nsolo: {solo}\nauto: {auto}"
+            return f"Song Meta\nskills: {formatted_skills}\ngroovy_score: {groovy_score}\nsolo: {solo}\nauto: {auto}"
 
         results = FilterResults(
             master_filter=self.bot.master_filters.charts,

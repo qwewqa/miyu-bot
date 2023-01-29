@@ -256,7 +256,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         score = float(score)
         skill_duration = skill_duration and float(skill_duration) or 9
         fever_score = fever_score and float(fever_score) or 0
-        fever_score = 1 + fever_score / 100
+        fever_score = fever_score / 100
         return f"{self.get_chart_score_formatted(value, score, skill_duration, fever_score, fever=True)}  {self.format_song_duration(value)} "
 
     @data_attribute(
@@ -270,14 +270,14 @@ class ChartFilter(MasterFilter[ChartMaster]):
         score, skill_duration = match.groups()
         score = float(score)
         skill_duration = skill_duration and float(skill_duration) or 9
-        return self.get_chart_score(value, score, skill_duration, 1.0, fever=False)
+        return self.get_chart_score(value, score, skill_duration, 0.0, fever=False)
 
     @score_solo.formatter
     def format_score_solo(self, value: ChartMaster, match: re.Match):
         score, skill_duration = match.groups()
         score = float(score)
         skill_duration = skill_duration and float(skill_duration) or 9
-        return f"{self.get_chart_score_formatted(value, score, skill_duration, 1.0, fever=False)}  {self.format_song_duration(value)} "
+        return f"{self.get_chart_score_formatted(value, score, skill_duration, 0.0, fever=False)}  {self.format_song_duration(value)} "
 
     _score_cache_keys = {
         *itertools.product([0, 20, 25, 30, 35, 40, 45, 50, 55, 60], [True, False])

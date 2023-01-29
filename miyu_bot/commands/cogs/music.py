@@ -74,8 +74,11 @@ class Music(commands.Cog):
         self,
         ctx: PrefContext,
         skills: str = "60",
-        groovy_score: app_commands.Range[float, 0, 100] = 0,
+        groovy_score_up: app_commands.Range[float, 0, 100] = 0,
         skill_duration_up: app_commands.Range[float, 0, 100] = 0,
+        passive_score_up: app_commands.Range[float, 0, 100] = 0,
+        auto_score_up: app_commands.Range[float, 0, 100] = 0,
+        power: app_commands.Range[int, 0, 999999] = 0,
         solo: bool = False,
         auto: bool = False,
         server: Optional[str] = None,
@@ -86,10 +89,16 @@ class Music(commands.Cog):
         ----------
         skills: str
             A list of skills. E.g. 80,60,50,40 or 60 or 80x6.75,60x9,50x9,40x9
-        groovy_score: float
+        groovy_score_up: float
             Groovy score up percentage
         skill_duration_up: float
             Skill duration up percentage
+        passive_score_up: float
+            Passive score up percentage
+        auto_score_up: float
+            Auto score up percentage
+        power: int
+            Team power
         solo: bool
             Whether to calculate solo score
         auto: bool
@@ -176,6 +185,12 @@ class Music(commands.Cog):
             and chart.music.id > 3
         ]
 
+        if power:
+            relative_display = False
+        else:
+            relative_display = True
+            power = 150_000
+
         async def score_chart(chart):
             await asyncio.sleep(0)
             total_score = 0
@@ -183,10 +198,12 @@ class Music(commands.Cog):
             for skill_perm, weight in weighted_skill_permutations:
                 score = self.bot.chart_scorer.score(
                     chart=chart,
-                    power=150_000,
+                    power=power,
                     skills=skill_perm,
-                    fever_multiplier=1.0 + groovy_score / 100,
+                    fever_score_up=groovy_score_up / 100,
                     enable_fever=not solo,
+                    passive_score_up=passive_score_up / 100,
+                    auto_score_up=auto_score_up / 100,
                     autoplay=auto,
                 )
                 total_score += score * weight
@@ -196,22 +213,30 @@ class Music(commands.Cog):
         chart_scores = {chart: await score_chart(chart) for chart in charts}
         charts = sorted(charts, key=lambda chart: chart_scores[chart], reverse=True)
 
-        ref_score = self.reference_chart_score()
+        if relative_display:
+            ref_score = self.reference_chart_score()
+            ref_length = 0
+        else:
+            ref_score =chart_scores[charts[0]]
+            ref_length = len(f"{ref_score:,}")
 
         def format_score(_master_filter, _ctx, chart):
-            return f"{chart_scores[chart] / ref_score * 100:5.1f}%  {chart.music.duration:>5.1f}s "
+            if relative_display:
+                return f"{chart_scores[chart] / ref_score * 100:5.1f}%  {chart.music.duration:>5.1f}s "
+            else:
+                return f"{int(chart_scores[chart]):>{ref_length},}  {chart.music.duration:>5.1f}s "
 
         def title():
             sorted_skill_values = sorted(skill_values, reverse=True)
             leader_skill_index = sorted_skill_values.index(leader_skill)
-            # put [] around leader skill
             formatted_skills = " ".join(
                 f"{score_up}x{duration:.2f}"
                 if i != leader_skill_index
                 else f"[{score_up}x{duration:.2f}]"
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
-            return f"Song Meta\nskills: {formatted_skills}\ngroovy_score: {groovy_score}\nsolo: {solo}\nauto: {auto}"
+            power_text = f"power: {power:,}\n" if not relative_display else ""
+            return f"Song Meta\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\nauto_score_up: {auto_score_up}\nsolo: {solo}\nauto: {auto}"
 
         results = FilterResults(
             master_filter=self.bot.master_filters.charts,

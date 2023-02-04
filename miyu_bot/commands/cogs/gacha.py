@@ -161,6 +161,7 @@ class Gacha(commands.Cog):
         aliases=["gachasim", "roll"],
         description="Simulates gacha given the gacha id (can be found using the !banner command and checking the footer).",
         help="!pull 1",
+        enabled=False,
     )
     async def pull(self, ctx: PrefContext, *, arg: Optional[ParsedArguments]):
         if not arg:

@@ -1,4 +1,5 @@
 import functools
+import itertools
 import re
 from datetime import datetime
 from typing import Sequence, List
@@ -200,8 +201,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
 
     @command_source(
         command_args=dict(
-            name="banner_rates",
+            name="rates",
             aliases=[
+                "banner_rates",
                 "bannerrates",
                 "gacha_rates",
                 "gacharates",
@@ -247,15 +249,8 @@ class GachaFilter(MasterFilter[GachaMaster]):
                     return
                 rates = [t.rate for t in table]
                 total_rate = sum(rates)
-                rate_up_rate = max(t.rate for t in table if t.card_id != 0)
 
-                # Exclude tables with no rate up, except those with very few rate ups (mainly for pity pull)
-                if total_rate == 0 or (
-                    rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05
-                ):
-                    continue
-
-                rate_up_card_entries = [t for t in table if t.rate == rate_up_rate]
+                rate_up_card_entries = [t for t in table if t.card]
 
                 for entry in rate_up_card_entries:
                     body += f"`{table_normalized_rate * entry.rate / total_rate * 100: >6.3f}% {self.format_card_name_for_list(entry.card)}`\n"
@@ -386,26 +381,9 @@ class GachaFilter(MasterFilter[GachaMaster]):
             table_rate: GachaTableRateMaster,
             tables: Sequence[Sequence[GachaTableMaster]],
         ):
-            # A bit redundant with the gacha tables embed source
-
-            for table_normalized_rate, table in zip(
-                table_rate.normalized_rates, tables
-            ):
-                if table_normalized_rate == 0:
-                    continue
-                if not table:  # Just in case it's not in data yet
-                    return
-                rates = [t.rate for t in table]
-                total_rate = sum(rates)
-                rate_up_rate = max(rates)
-
-                # Exclude tables with no rate up, except those with very few rate ups (mainly for pity pull)
-                if total_rate == 0 or (
-                    rate_up_rate == min(rates) and rate_up_rate / total_rate < 0.05
-                ):
-                    continue
-
-                results.update(t.card for t in table if t.rate == rate_up_rate)
+            for table in itertools.chain(*tables):
+                if table.card_id:
+                    results.add(table.card)
 
         for table_rate in gacha.table_rates:
             add_table(table_rate, gacha.tables)
@@ -434,26 +412,3 @@ class GachaFilter(MasterFilter[GachaMaster]):
     @cards_shortcut.check
     def check_gacha_shortcut(self, gacha: GachaMaster):
         return bool(self.get_gacha_rateup_cards(gacha))
-
-    @get_gacha_embed.shortcut_button(name="Pull")
-    @get_gacha_table_embed.shortcut_button(name="Pull")
-    async def pull_shortcut(
-        self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction
-    ):
-        await interaction.response.defer()
-        draw_data = [
-            d
-            for d in gacha.draw_data
-            if (d.stock_id == 902) or (d.stock_id in (1, 2) and d.stock_amount == 3000)
-        ]
-        if len(draw_data) != 1:
-            await ctx.send("Unsupported banner.")
-            return
-        draw_data = draw_data[0]
-        gacha_cog = self.bot.cogs["Gacha"]
-        view, embed, file = await gacha_cog.do_gacha_draw_and_get_message_data(
-            interaction.user, gacha, draw_data, ctx.assets, server
-        )
-        await ctx.send(
-            view=view, embed=embed, file=file
-        )  # response won't allow sending a file

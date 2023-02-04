@@ -216,7 +216,9 @@ class MasterFilter(Generic[TData], metaclass=MasterFilterMeta):
             else:
                 return list(self.default_filter[ctx.preferences.server].values())
 
-    def values(self, ctx: Optional[Union[miyu_bot.bot.bot.PrefContext, Server]]):
+    def values(
+        self, ctx: Optional[Union[miyu_bot.bot.bot.PrefContext, Server]]
+    ) -> typing.Iterable[TData]:
         if isinstance(ctx, Server):
             return self.default_filter[ctx].values()
         if ctx is not None and ctx.preferences.leaks:
@@ -403,7 +405,9 @@ class ShortcutButtonInfo:
     function: ShortcutButtonCallable
     emoji: Optional[Union[str, discord.Emoji]] = None
     name: Optional[str] = None
-    check: Callable[[MasterFilter, Any], bool] = lambda self, value: True
+    check: Callable[
+        [MasterFilter, Any, PrefContext], bool
+    ] = lambda self, value, ctx: True
 
 
 @dataclass

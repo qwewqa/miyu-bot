@@ -515,7 +515,7 @@ class CardFilter(MasterFilter[CardMaster]):
         ]
         return f"`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}"
 
-    @get_card_embed.shortcut_button(name="Gacha")
+    @get_card_embed.shortcut_button(name="Banner")
     async def gacha_shortcut(
         self, ctx, card: CardMaster, server, interaction: discord.Interaction
     ):
@@ -526,7 +526,7 @@ class CardFilter(MasterFilter[CardMaster]):
         await interaction.response.send_message(embed=embed, view=view)
 
     @gacha_shortcut.check
-    def check_gacha_shortcut(self, card: CardMaster):
+    def check_gacha_shortcut(self, card: CardMaster, _ctx):
         return card.gacha is not None
 
     @get_card_embed.shortcut_button(name="Event")
@@ -540,5 +540,5 @@ class CardFilter(MasterFilter[CardMaster]):
         await interaction.response.send_message(embed=embed, view=view)
 
     @event_shortcut.check
-    def check_event_shortcut(self, card: CardMaster):
+    def check_event_shortcut(self, card: CardMaster, _ctx):
         return card.event is not None

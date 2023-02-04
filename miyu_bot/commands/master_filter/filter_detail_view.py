@@ -315,7 +315,7 @@ class FilterDetailView(UserRestrictedView):
                     server_button.style = discord.ButtonStyle.secondary
                     server_button.disabled = True
         for shortcut_button in self.shortcut_buttons:
-            if shortcut_button.check(self.master_filter, value):
+            if shortcut_button.check(self.master_filter, value, self.ctx):
                 shortcut_button.disabled = False
                 shortcut_button.style = discord.ButtonStyle.success
             else:

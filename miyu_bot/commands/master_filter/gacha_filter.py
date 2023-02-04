@@ -410,5 +410,14 @@ class GachaFilter(MasterFilter[GachaMaster]):
         await interaction.response.send_message(embed=embed, view=view)
 
     @cards_shortcut.check
-    def check_gacha_shortcut(self, gacha: GachaMaster):
+    def check_gacha_shortcut(self, gacha: GachaMaster, _ctx):
         return bool(self.get_gacha_rateup_cards(gacha))
+
+    @get_gacha_embed.shortcut_button(name="Event")
+    @get_gacha_table_embed.shortcut_button(name="Event")
+    async def event_shortcut(
+        self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction
+    ):
+        f = ctx.bot.master_filters.events
+        view, embed = f.get_simple_list_view(ctx, gacha.events, server)
+        await interaction.response.send_message(embed=embed, view=view)

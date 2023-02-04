@@ -1,4 +1,5 @@
 import datetime as dt
+import functools
 import re
 from typing import Optional, Union
 
@@ -324,3 +325,53 @@ class EventFilter(MasterFilter[EventMaster]):
         else:
             parameter_emoji = grey_emoji_id
         return f"`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {event.name}"
+
+    def get_event_banners(self, event: EventMaster, ctx):
+        return tuple(
+            gacha
+            for gacha in self.bot.master_filters.gacha.values(ctx)
+            if gacha.event == event
+        )
+
+    @get_event_embed.shortcut_button(name="Banners")
+    async def banners_shortcut(
+        self,
+        ctx: PrefContext,
+        event: EventMaster,
+        server,
+        interaction: discord.Interaction,
+    ):
+        f = ctx.bot.master_filters.gacha
+        view, embed = f.get_simple_list_view(
+            ctx, self.get_event_banners(event, ctx), server
+        )
+        await interaction.response.send_message(embed=embed, view=view)
+
+    @banners_shortcut.check
+    def check_banners_shortcut(self, event: EventMaster, ctx: PrefContext):
+        return bool(self.get_event_banners(event, ctx))
+
+    def get_event_cards(self, event: EventMaster, ctx):
+        return tuple(
+            card
+            for card in self.bot.master_filters.cards.values(ctx)
+            if card.event == event
+        )
+
+    @get_event_embed.shortcut_button(name="Cards")
+    async def cards_shortcut(
+        self,
+        ctx: PrefContext,
+        event: EventMaster,
+        server,
+        interaction: discord.Interaction,
+    ):
+        f = ctx.bot.master_filters.cards
+        view, embed = f.get_simple_list_view(
+            ctx, self.get_event_cards(event, ctx), server
+        )
+        await interaction.response.send_message(embed=embed, view=view)
+
+    @cards_shortcut.check
+    def check_cards_shortcut(self, event: EventMaster, ctx: PrefContext):
+        return bool(self.get_event_cards(event, ctx))

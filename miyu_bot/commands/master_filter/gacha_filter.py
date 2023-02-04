@@ -2,7 +2,7 @@ import functools
 import itertools
 import re
 from datetime import datetime
-from typing import Sequence, List
+from typing import Sequence, List, Dict
 
 import discord
 from d4dj_utils.master.card_master import CardMaster
@@ -374,7 +374,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
         return f"{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}"
 
     @functools.lru_cache()
-    def get_gacha_rateup_cards(self, gacha: GachaMaster) -> List[CardMaster]:
+    def get_gacha_rateup_card_set(self, gacha: GachaMaster) -> Dict[CardMaster, None]:
         results = set()
 
         def add_table(
@@ -394,9 +394,17 @@ class GachaFilter(MasterFilter[GachaMaster]):
         if gacha.sub_bonus:
             add_table(gacha.sub_bonus.table_rate, gacha.sub_bonus.tables)
 
-        return sorted(
-            [result for result in results if result], key=lambda c: (-c.rarity_id, c.id)
-        )
+        # Use dict as an ordered set
+        return {
+            v: None
+            for v in sorted(
+                [result for result in results if result],
+                key=lambda c: (-c.rarity_id, c.id),
+            )
+        }
+
+    def get_gacha_rateup_cards(self, gacha: GachaMaster) -> List[CardMaster]:
+        return list(self.get_gacha_rateup_card_set(gacha))
 
     @get_gacha_embed.shortcut_button(name="Cards")
     @get_gacha_table_embed.shortcut_button(name="Cards")
@@ -419,5 +427,11 @@ class GachaFilter(MasterFilter[GachaMaster]):
         self, ctx, gacha: GachaMaster, server, interaction: discord.Interaction
     ):
         f = ctx.bot.master_filters.events
-        view, embed = f.get_simple_list_view(ctx, gacha.events, server)
+        view, embed = f.get_simple_detail_view(
+            ctx, [gacha.event], server, f.get_event_embed
+        )
         await interaction.response.send_message(embed=embed, view=view)
+
+    @event_shortcut.check
+    def check_event_shortcut(self, gacha: GachaMaster, _ctx):
+        return bool(gacha.event)

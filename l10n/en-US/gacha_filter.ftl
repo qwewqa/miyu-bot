@@ -23,6 +23,8 @@ info-desc =
 gacha-type = { $gacha-type ->
     [Normal] Normal
     [StepUp] Step Up
+    [Audition] Audition
+    [Guaranteed] Guaranteed
    *[other] Unknown
 }
 
@@ -31,8 +33,9 @@ category = { $category ->
     [Tutorial] Tutorial
     [Event] Event
     [Birthday] Birthday
-    [Special] Special
+    [StartDash] Start Dash
     [Revival] Revival
+    [Special] Special
    *[other] Unknown
 }
 

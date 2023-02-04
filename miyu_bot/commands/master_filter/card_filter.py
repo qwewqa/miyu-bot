@@ -529,6 +529,24 @@ class CardFilter(MasterFilter[CardMaster]):
     def check_gacha_shortcut(self, card: CardMaster, _ctx):
         return card.gacha is not None
 
+    def get_rateup_gachas(self, card: CardMaster, ctx):
+        f = ctx.bot.master_filters.gacha
+        return [g for g in f.values(ctx) if card in f.get_gacha_rateup_card_set(g)]
+
+    @get_card_embed.shortcut_button(name="Banners")
+    async def gacha_list_shortcut(
+        self, ctx, card: CardMaster, server, interaction: discord.Interaction
+    ):
+        f = ctx.bot.master_filters.gacha
+        view, embed = f.get_simple_list_view(
+            ctx, self.get_rateup_gachas(card, ctx), server
+        )
+        await interaction.response.send_message(embed=embed, view=view)
+
+    @gacha_list_shortcut.check
+    def check_gacha_list_shortcut(self, card: CardMaster, ctx):
+        return bool(self.get_rateup_gachas(card, ctx))
+
     @get_card_embed.shortcut_button(name="Event")
     async def event_shortcut(
         self, ctx, card: CardMaster, server, interaction: discord.Interaction

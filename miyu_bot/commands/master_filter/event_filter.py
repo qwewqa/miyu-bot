@@ -251,9 +251,12 @@ class EventFilter(MasterFilter[EventMaster]):
             bonus_parameter_emoji = parameter_bonus_emoji_ids_by_parameter_id[
                 event.bonus.event_point_parameter_bonus_id + 1
             ]
+            param_bonus_unit = "%"
+            if event.id <= 86:
+                param_bonus_unit = ""
             embed.add_field(
                 name=l10n.format_value("parameter-point-bonus"),
-                value=f"{event.bonus.event_point_parameter_bonus_value}% + {bonus_parameter_emoji} >{event.bonus.event_point_parameter_base_value}: 1% / {event.bonus.event_point_parameter_bonus_rate}"
+                value=f"{event.bonus.event_point_parameter_bonus_value}{param_bonus_unit} + {bonus_parameter_emoji} >{event.bonus.event_point_parameter_base_value}: 1{param_bonus_unit} / {event.bonus.event_point_parameter_bonus_rate}"
                 if event.bonus.event_point_parameter_bonus_rate
                 else l10n.format_value("no-parameter-point-bonus"),
                 inline=False,

@@ -26,10 +26,14 @@ class ChartScorer:
         enable_combo_bonus: bool = True,
     ) -> float:
         if isinstance(chart, Chart):
-            scoring_data = get_chart_scoring_data(chart, [s.max_seconds for s in skills])
+            scoring_data = get_chart_scoring_data(
+                chart, [s.max_seconds for s in skills]
+            )
         else:
             if self.get_chart(chart.id):
-                scoring_data = self.get_scoring_data(chart.id, tuple(s.max_seconds for s in skills))
+                scoring_data = self.get_scoring_data(
+                    chart.id, tuple(s.max_seconds for s in skills)
+                )
             else:
                 return 0
         return scoring_data.score(

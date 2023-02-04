@@ -217,7 +217,7 @@ class Music(commands.Cog):
             ref_score = self.reference_chart_score()
             ref_length = 0
         else:
-            ref_score =chart_scores[charts[0]]
+            ref_score = chart_scores[charts[0]]
             ref_length = len(f"{ref_score:,}")
 
         def format_score(_master_filter, _ctx, chart):

@@ -34,6 +34,32 @@ class Event(commands.Cog):
         self.leaderboard_loop.start()
         self.l10n = LocalizationManager(self.bot.fluent_loader, "event.ftl")
 
+        self.register_cutoff_commands()
+
+    def register_cutoff_commands(self):
+        for cutoff_name in [
+            *[f"t{i}" for i in range(1, 21)],
+            "t50",
+            "t100",
+            "t500",
+            "t1k",
+            "t2k",
+            "t5k",
+            "t10k",
+            "t20k",
+            "t30k",
+            "t50k",
+        ]:
+
+            @commands.hybrid_command(
+                name=cutoff_name,
+                description=f"Displays {cutoff_name} cutoff.",
+            )
+            async def _cutoff(ctx: PrefContext):
+                await self.cutoff(ctx, tier=cutoff_name)
+
+            self.bot.add_command(_cutoff)
+
     def cog_unload(self):
         self.leaderboard_loop.cancel()
 
@@ -310,27 +336,7 @@ class Event(commands.Cog):
 
     @commands.command(
         name="cutoff",
-        aliases=[
-            "co",
-            *[f"t{i}" for i in range(1, 21)],
-            "t50",
-            "t100",
-            "t500",
-            "t1000",
-            "t2000",
-            "t5000",
-            "t10000",
-            "t20000",
-            "t30000",
-            "t50000",
-            "t1k",
-            "t2k",
-            "t5k",
-            "t10k",
-            "t20k",
-            "t30k",
-            "t50k",
-        ],
+        aliases=["co"],
         description=f"Displays the cutoffs at different tiers.",
         help="!cutoff 50",
     )

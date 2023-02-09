@@ -53,15 +53,22 @@ class MusicFilter(MasterFilter[MusicMaster]):
         aliases=["expire", "end_date", "expiration", "expires"],
         is_sortable=True,
         is_comparable=True,
-        reverse_sort=True,
+        reverse_sort=False,
     )
     def end(self, ctx, value: MusicMaster):
         return ctx.convert_tz(value.end_datetime).date()
 
-    @end.formatter
     @date.formatter
     def format_date(self, ctx, value: MusicMaster):
         dt = ctx.convert_tz(value.start_datetime)
+        return f"{dt.year % 100:02}/{dt.month:02}/{dt.day:02}"
+
+    @end.formatter
+    def format_end(self, ctx, value: MusicMaster):
+        dt = ctx.convert_tz(value.end_datetime)
+        if dt > datetime.now(timezone.utc) + timedelta(days=365 * 50):
+            # Probably just a placeholder date, so don't show it
+            return "XX/XX/XX"
         return f"{dt.year % 100:02}/{dt.month:02}/{dt.day:02}"
 
     @end.compare_converter
@@ -351,7 +358,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         return (
             timedelta(0)
             < value.end_datetime - datetime.now(timezone.utc)
-            < timedelta(days=62)
+            < timedelta(days=365 * 2)
         )
 
     @data_attribute("expired", is_flag=True)

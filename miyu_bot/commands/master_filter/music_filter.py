@@ -31,7 +31,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         return value.category.name, value.name, None
 
     def is_released(self, value: MusicMaster) -> bool:
-        return value.is_available
+        return value.is_released
 
     @data_attribute("name", aliases=["title"], is_sortable=True)
     def name(self, value: MusicMaster):
@@ -341,6 +341,14 @@ class MusicFilter(MasterFilter[MusicMaster]):
             < value.end_datetime - datetime.now(timezone.utc)
             < timedelta(days=62)
         )
+
+    @data_attribute("expired", is_flag=True)
+    def expired(self, value: MusicMaster):
+        return value.end_datetime <= datetime.now(timezone.utc)
+
+    @data_attribute("playable", is_flag=True)
+    def playable(self, value: MusicMaster):
+        return value.is_available and not value.is_hidden and value.id > 3
 
     @command_source(
         command_args=dict(

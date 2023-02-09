@@ -254,47 +254,121 @@ class Music(commands.Cog):
 
     @commands.hybrid_command(
         name="score",
-        aliases=[],
-        description="Calculates chart score.",
-        help="!score Cyber Cyber diff=ex power=150000 acc=100 skill=50 $assist",
     )
-    async def score(self, ctx: PrefContext, *, arguments: ParsedArguments):
-        def format_skill(skill):
-            if skill.score_up_rate and skill.perfect_score_up_rate:
-                return f"{skill.score_up_rate}%+{skill.perfect_score_up_rate}%p"
-            elif skill.score_up_rate:
-                return f"{skill.score_up_rate}%"
-            elif skill.perfect_score_up_rate:
-                return f"{skill.perfect_score_up_rate}%p"
+    @app_commands.choices(
+        difficulty=[
+            app_commands.Choice(name="Expert", value=int(ChartDifficulty.Expert)),
+            app_commands.Choice(name="Hard", value=int(ChartDifficulty.Hard)),
+            app_commands.Choice(name="Normal", value=int(ChartDifficulty.Normal)),
+            app_commands.Choice(name="Easy", value=int(ChartDifficulty.Easy)),
+        ]
+    )
+    async def score(
+        self,
+        ctx: PrefContext,
+        song: str,
+        difficulty: app_commands.Choice[int] = ChartDifficulty.Expert,
+        skills: str = "60",
+        groovy_score_up: app_commands.Range[float, 0, 100] = 0,
+        skill_duration_up: app_commands.Range[float, 0, 100] = 0,
+        passive_score_up: app_commands.Range[float, 0, 100] = 0,
+        auto_score_up: app_commands.Range[float, 0, 100] = 0,
+        power: app_commands.Range[int, 0, 999999] = 0,
+        solo: bool = False,
+        auto: bool = False,
+        server: Optional[str] = None,
+    ):
+        """Lists songs by score.
+
+        Parameters
+        ----------
+        song: str
+            The song to use. Use 'mix' for mixes.
+        difficulty: ChartDifficulty
+            The difficulty to use. Defaults to Expert.
+            Ignored for mixes.
+        skills: str
+            A list of skills. E.g. 80,60,50,40 or 60 or 80x6.75,60x9,50x9,40x9
+        groovy_score_up: float
+            Groovy score up percentage
+        skill_duration_up: float
+            Skill duration up percentage
+        passive_score_up: float
+            Passive score up percentage
+        auto_score_up: float
+            Auto score up percentage
+        power: int
+            Team power
+        solo: bool
+            Whether to calculate solo score
+        auto: bool
+            Whether to calculate auto score
+        server: str
+            The server to use. Defaults to the current server. Can be one of: 'jp' or 'en'
+        """
+        await ctx.defer()
+
+        def make_skill(score, duration):
+            return SkillMaster(
+                self.bot.assets[Server.JP], score_up_rate=score, max_seconds=duration
+            )
+
+        # Skill formats:
+        # score_up := [0-9]+
+        # skill_time := 'x' float  // if not specified, default to 6.75 for 80% score up, and 9 otherwise
+        # skill := score_up skill_time?
+        # skills := skill (',' skill)*
+        #
+        # Example: 80,60
+        # Example: 80x6.75,60x9,50x9,40x9
+
+        skill_values: List[Tuple[int, float]] = []
+        for skill in re.split(r"\s+|\s*,\s*", skills):
+            skill = skill.strip()
+            if not skill:
+                raise commands.BadArgument("Invalid skill format")
+            if skill[-1] == "x":
+                score_up = int(skill[:-1])
+                duration = 6.75 if score_up == 80 else 9
+            elif "x" in skill:
+                score_up, duration = skill.split("x")
+                score_up = int(score_up)
+                duration = float(duration)
             else:
-                return f"0%"
+                score_up = int(skill)
+                duration = 6.75 if score_up == 80 else 9
+            if not (0 <= score_up <= 200):
+                raise commands.BadArgument("Invalid skill format")
+            if not (0 <= duration <= 20):
+                raise commands.BadArgument("Invalid skill format")
+            skill_values.append((score_up, duration))
 
-        difficulty = arguments.single(
-            ["diff", "difficulty"], default=None, converter=self.difficulty_names
-        )
-        power = arguments.single("power", default=150000, converter=lambda p: int(p))
-        accuracy = arguments.single(
-            ["acc", "accuracy"], default=100, converter=lambda a: float(a)
-        )
-        skill = arguments.single(["skill", "skills"], default=["40"], is_list=True)
-        skill_duration = arguments.single(
-            ["skill_duration", "sd", "skilldur"],
-            default=9.0,
-            converter=lambda a: float(a),
-        )
-        fever_bonus = arguments.single(
-            ["fever_bonus", "fb"], default=0, converter=lambda a: float(a)
-        )
-        fever_multiplier = 1 + fever_bonus / 100
-        assist = arguments.tag("assist")
-        random_skill_order = arguments.tags(["rng", "randomorder", "random_order"])
-        if difficulty:
-            song_name = arguments.text()
-        else:
-            song_name, difficulty = self.parse_chart_args(arguments.text())
-        arguments.require_all_arguments_used()
+        # Apply skill duration up
+        skill_values = [
+            (score_up, duration * (1 + skill_duration_up / 100))
+            for score_up, duration in skill_values
+        ]
 
-        if song_name.lower() == "mix":
+        if not skill_values or len(skill_values) > 4:
+            raise commands.BadArgument("Invalid skill format")
+
+        if len(skill_values) < 4:
+            # Pad using last skill/m
+            skill_values += [skill_values[-1]] * (4 - len(skill_values))
+
+        leader_skill = skill_values[0]
+
+        skill_permutations = set()
+        for perm in itertools.permutations(skill_values):
+            skill_permutations.add(perm + (leader_skill,))
+
+        if server is not None:
+            server = server.lower()
+            if server not in SERVER_NAMES:
+                raise commands.BadArgument("Invalid server name")
+            ctx.preferences.server = SERVER_NAMES[server]
+
+        if song.lower() == "mix":
             data = self.custom_mixes.get(ctx.author.id)
             if not data:
                 await ctx.send(
@@ -302,123 +376,71 @@ class Music(commands.Cog):
                 )
                 return
             chart = data.chart
-            title = "Mix Score:\n" + data.name
+            mode_title = "Mix Score:\n" + data.name
         else:
-            song = self.bot.master_filters.music.get(song_name, ctx)
+            music: MusicMaster = self.bot.master_filters.music.get(song, ctx)
+            if music is None:
+                raise commands.BadArgument("Invalid song")
+            chart = music.charts.get(difficulty)
+            if chart is None:
+                raise commands.BadArgument("Invalid difficulty")
+            mode_title = f"Song Score: {music.name} [{chart.difficulty.name}]"
 
-            if not song:
-                await ctx.send(f"Failed to find chart.")
-                return
-            if not song.charts:
-                await ctx.send("Song does not have charts.")
-                return
+        if power:
+            relative_display = False
+        else:
+            relative_display = True
+            power = 150_000
 
-            chart = song.charts[difficulty]
-            title = f"Song Score: {song.name} [{chart.difficulty.name}]"
+        scores: List[Tuple[int, List[Tuple[int, float]]]] = []
 
-        if not (0 <= accuracy <= 100):
-            await ctx.send("Accuracy must be between 0 and 100.")
-            return
-        accuracy /= 100
+        for skill_perm in skill_permutations:
+            score = self.bot.chart_scorer.score(
+                chart=chart,
+                power=power,
+                skills=[make_skill(*skill) for skill in skill_perm],
+                fever_score_up=groovy_score_up / 100,
+                enable_fever=not solo,
+                passive_score_up=passive_score_up / 100,
+                auto_score_up=auto_score_up / 100,
+                autoplay=auto,
+            )
+            scores.append((score, skill_perm))
 
-        skill_re = re.compile(
-            r"\d{1,3}(\.\d+)?%?|\d{1,3}(\.\d+)?%?\+\d{1,3}(\.\d+)?%?p|\d{1,3}(\.\d+)?%?p"
-        )
-
-        def create_dummy_skill(score, perfect):
-            return SkillMaster(
-                ctx.assets,
-                id=0,
-                min_recovery_value=0,
-                max_recovery_value=0,
-                combo_support_count=0,
-                score_up_rate=float(score),
-                min_seconds=5,
-                max_seconds=skill_duration,
-                perfect_score_up_rate=float(perfect),
+        def format_skill_sequence(skill_sequence: List[Tuple[int, float]]):
+            return " ".join(
+                f"{score_up:>2}x{duration:.2f}" for score_up, duration in skill_sequence[:4]
             )
 
-        skills = []
-        for s in skill:
-            if skill_re.fullmatch(s):
-                effects = [(e[:-1] if e[-1] == "%" else e) for e in s.split("+")]
-                skills.append(
-                    create_dummy_skill(
-                        next((e for e in effects if not e.endswith("p")), 0),
-                        next((e[:-1] for e in effects if e.endswith("p")), 0),
-                    )
+        def title():
+            sorted_skill_values = sorted(skill_values, reverse=True)
+            leader_skill_index = sorted_skill_values.index(leader_skill)
+            formatted_skills = " ".join(
+                f"{score_up}x{duration:.2f}"
+                if i != leader_skill_index
+                else f"[{score_up}x{duration:.2f}]"
+                for i, (score_up, duration) in enumerate(sorted_skill_values)
+            )
+            power_text = f"power: {power:,}\n" if not relative_display else ""
+            return f"{mode_title}\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\nauto_score_up: {auto_score_up}\nsolo: {solo}\nauto: {auto}"
+
+        def body():
+            if relative_display:
+                ref_score = self.reference_chart_score()
+                return "\n".join(
+                    f"{score / ref_score:.2%} : {format_skill_sequence(skill_perm)}"
+                    for score, skill_perm in sorted(scores, reverse=True)
                 )
             else:
-                await ctx.send("Invalid skill format.")
-                return
-
-        if len(skills) == 1:
-            skills = skills * 5
-        if len(skills) == 4:
-            skills = skills + [skills[0]]
-        if len(skills) != 5:
-            await ctx.send("Invalid skill count.")
-            return
-
-        if random_skill_order:
-            # Score calc doesn't care that these aren't actually ints
-            mean_score_up: Any = sum(s.score_up_rate for s in skills[:4]) / 4
-            mean_perfect_score_up: Any = (
-                sum(s.perfect_score_up_rate for s in skills[:4]) / 4
-            )
-            avg_skill = SkillMaster(
-                ctx.assets,
-                id=0,
-                min_recovery_value=0,
-                max_recovery_value=0,
-                combo_support_count=0,
-                score_up_rate=mean_score_up,
-                min_seconds=5,
-                max_seconds=skill_duration,
-                perfect_score_up_rate=mean_perfect_score_up,
-            )
-            skills = [avg_skill] * 4 + [skills[-1]]
-
-        embed = discord.Embed(
-            title=title,
-            description=f"Power: {power:,}\n"
-            f"Accuracy: {accuracy * 100:.1f}%\n"
-            f'Skills: {", ".join(format_skill(skill) for skill in skills)}\n'
-            f'Assist: {"On" if assist else "Off"}\n'
-            f"\u200b",
-        )
-
-        baseline = None
-        for heading, enable_fever, autoplay, enable_combo_bonus in [
-            ("Multi Live", True, False, True),
-            ("Multi Live (No Combo)", True, False, False),
-            ("Multi Live (Autoplay)", True, True, True),
-            ("Solo Live / No Groovy", False, False, True),
-            ("Solo Live (No Combo)", False, False, False),
-            ("Solo Live (Autoplay)", False, True, True),
-        ]:
-            score = int(
-                self.bot.chart_scorer(
-                    chart,
-                    power,
-                    skills,
-                    fever_multiplier,
-                    enable_fever,
-                    accuracy,
-                    assist,
-                    autoplay=autoplay,
-                    enable_combo_bonus=enable_combo_bonus,
+                longest_score = max(score for score, _ in scores)
+                score_digits = len(f"{longest_score:,}")
+                return "\n".join(
+                    f"{score:>{score_digits},} : {format_skill_sequence(skill_perm)}"
+                    for score, skill_perm in sorted(scores, reverse=True)
                 )
-            )
-            if not baseline:
-                baseline = score
-            embed.add_field(
-                name=heading,
-                value=f"Score: {score:,}\n"
-                f"Value: {score / baseline * 100:.1f}%"
-                f'{f" ({(score - baseline) / baseline * 100:+.1f}%)" if score != baseline else ""}',
-                inline=True,
-            )
+
+        embed = discord.Embed(title=title(), description=f"```{body()}```")
+
         await ctx.send(embed=embed)
 
     def parse_chart_args(self, arg: str) -> Tuple[str, ChartDifficulty]:

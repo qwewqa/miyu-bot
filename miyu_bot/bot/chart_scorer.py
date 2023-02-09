@@ -56,7 +56,7 @@ class ChartScorer:
         except FileNotFoundError:
             return None
 
-    @functools.lru_cache(maxsize=32768)
+    @functools.lru_cache(maxsize=100000)
     def get_scoring_data(
         self, cid: int, skill_durations: Tuple[float, ...]
     ) -> ChartScoringData:

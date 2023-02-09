@@ -48,11 +48,23 @@ class MusicFilter(MasterFilter[MusicMaster]):
     def date(self, ctx, value: MusicMaster):
         return ctx.convert_tz(value.start_datetime).date()
 
+    @data_attribute(
+        "end",
+        aliases=["expire", "end_date", "expiration", "expires"],
+        is_sortable=True,
+        is_comparable=True,
+        reverse_sort=True,
+    )
+    def end(self, ctx, value: MusicMaster):
+        return ctx.convert_tz(value.end_datetime).date()
+
+    @end.formatter
     @date.formatter
     def format_date(self, ctx, value: MusicMaster):
         dt = ctx.convert_tz(value.start_datetime)
         return f"{dt.year % 100:02}/{dt.month:02}/{dt.day:02}"
 
+    @end.compare_converter
     @date.compare_converter
     def date_compare_converter(self, ctx: PrefContext, s):
         match = re.fullmatch(r"(\d+)/(\d+)/(\d+)", s)

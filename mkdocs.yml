@@ -8,13 +8,13 @@ theme:
     - navigation.tabs
     - navigation.sections
 plugins:
+  - awesome-pages
   - i18n:
       default_language: en
       languages:
         en: English
         zh_TW: 繁體中文
         ja: 日本語
-  - awesome-pages
 markdown_extensions:
   - admonition
   - pymdownx.details

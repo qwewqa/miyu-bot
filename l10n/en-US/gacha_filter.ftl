@@ -25,6 +25,7 @@ gacha-type = { $gacha-type ->
     [StepUp] Step Up
     [Audition] Audition
     [Guaranteed] Guaranteed
+    [Fes] Fes
    *[other] Unknown
 }
 

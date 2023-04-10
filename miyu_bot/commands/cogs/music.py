@@ -307,7 +307,9 @@ class Music(commands.Cog):
         await ctx.defer()
 
         if difficulty is None:
-            difficulty = app_commands.Choice(name="Expert", value=int(ChartDifficulty.Expert))
+            difficulty = app_commands.Choice(
+                name="Expert", value=int(ChartDifficulty.Expert)
+            )
 
         def make_skill(score, duration):
             return SkillMaster(
@@ -410,7 +412,8 @@ class Music(commands.Cog):
 
         def format_skill_sequence(skill_sequence: List[Tuple[int, float]]):
             return " ".join(
-                f"{score_up:>2}x{duration:.2f}" for score_up, duration in skill_sequence[:4]
+                f"{score_up:>2}x{duration:.2f}"
+                for score_up, duration in skill_sequence[:4]
             )
 
         def title():

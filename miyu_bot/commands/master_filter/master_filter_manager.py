@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from miyu_bot.commands.master_filter.music_filter import MusicFilter
     from miyu_bot.commands.master_filter.stamp_filter import StampFilter
     from miyu_bot.commands.master_filter.chart_filter import ChartFilter
+    from miyu_bot.commands.master_filter.comic_filter import ComicFilter
 
 # The list of modules to import/reload.
 # Format is {'module_name': [('class_name', 'master_class_name', 'attribute_name_for_filter_manager', 'name')]}
@@ -36,6 +37,9 @@ _MODULES = {
     "miyu_bot.commands.master_filter.stamp_filter": [
         ("StampFilter", "StampMaster", "stamps", "stamp_filter")
     ],
+    "miyu_bot.commands.master_filter.comic_filter": [
+        ("ComicFilter", "ComicMaster", "comics", "comic_filter")
+    ],
 }
 
 
@@ -47,6 +51,7 @@ class MasterFilterManager:
     login_bonuses: LoginBonusFilter
     stamps: StampFilter
     charts: ChartFilter
+    comics: ComicFilter
 
     def __init__(self, bot):
         self.bot = bot

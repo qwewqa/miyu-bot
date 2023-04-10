@@ -504,6 +504,8 @@ class Music(commands.Cog):
         d: str,
         d_diff: str,
     ):
+        await ctx.defer()
+
         names = [a, b, c, d]
         diff_names = [a_diff, b_diff, c_diff, d_diff]
 

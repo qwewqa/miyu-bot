@@ -1,18 +1,16 @@
 import asyncio
 import datetime
 import enum
-import functools
 import itertools
 import logging
 import re
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Tuple, Any, List, Dict, Optional
+from typing import Tuple, List, Optional
 
 import discord
 from d4dj_utils.chart.chart import Chart
 from d4dj_utils.chart.mix import get_best_mix, get_mix_data, calculate_mix_rating
-from d4dj_utils.chart.score_calculator import calculate_score
 from d4dj_utils.master.chart_master import ChartDifficulty, ChartMaster
 from d4dj_utils.master.music_master import MusicMaster
 from d4dj_utils.master.skill_master import SkillMaster
@@ -21,7 +19,7 @@ from discord.ext import commands
 
 from miyu_bot.bot.bot import MiyuBot, PrefContext
 from miyu_bot.bot.servers import Server, SERVER_NAMES
-from miyu_bot.commands.common.argument_parsing import parse_arguments, ParsedArguments
+from miyu_bot.commands.common.argument_parsing import ArgumentError
 from miyu_bot.commands.master_filter.filter_list_view import FilterListView
 from miyu_bot.commands.master_filter.filter_result import FilterResults
 from miyu_bot.commands.master_filter.localization_manager import LocalizationManager
@@ -126,7 +124,7 @@ class Music(commands.Cog):
         for skill in re.split(r"\s+|\s*,\s*", skills):
             skill = skill.strip()
             if not skill:
-                raise commands.BadArgument("Invalid skill format")
+                raise ArgumentError("Invalid skill format")
             if skill[-1] == "x":
                 score_up = int(skill[:-1])
                 duration = 6.75 if score_up == 80 else 9
@@ -138,9 +136,9 @@ class Music(commands.Cog):
                 score_up = int(skill)
                 duration = 6.75 if score_up == 80 else 9
             if not (0 <= score_up <= 200):
-                raise commands.BadArgument("Invalid skill format")
+                raise ArgumentError("Invalid skill format")
             if not (0 <= duration <= 20):
-                raise commands.BadArgument("Invalid skill format")
+                raise ArgumentError("Invalid skill format")
             skill_values.append((score_up, duration))
 
         # Apply skill duration up
@@ -150,7 +148,7 @@ class Music(commands.Cog):
         ]
 
         if not skill_values or len(skill_values) > 4:
-            raise commands.BadArgument("Invalid skill format")
+            raise ArgumentError("Invalid skill format")
 
         if len(skill_values) < 4:
             # Pad using last skill/m
@@ -173,7 +171,7 @@ class Music(commands.Cog):
         if server is not None:
             server = server.lower()
             if server not in SERVER_NAMES:
-                raise commands.BadArgument("Invalid server name")
+                raise ArgumentError("Invalid server name")
             ctx.preferences.server = SERVER_NAMES[server]
 
         charts: List[ChartMaster] = list(self.bot.master_filters.charts.values(ctx))
@@ -267,7 +265,7 @@ class Music(commands.Cog):
         self,
         ctx: PrefContext,
         song: str,
-        difficulty: app_commands.Choice[int] = ChartDifficulty.Expert,
+        difficulty: app_commands.Choice[int] = None,
         skills: str = "60",
         groovy_score_up: app_commands.Range[float, 0, 100] = 0,
         skill_duration_up: app_commands.Range[float, 0, 100] = 0,
@@ -284,7 +282,7 @@ class Music(commands.Cog):
         ----------
         song: str
             The song to use. Use 'mix' for mixes.
-        difficulty: ChartDifficulty
+        difficulty: app_commands.Choice[int]
             The difficulty to use. Defaults to Expert.
             Ignored for mixes.
         skills: str
@@ -308,6 +306,9 @@ class Music(commands.Cog):
         """
         await ctx.defer()
 
+        if difficulty is None:
+            difficulty = app_commands.Choice(name="Expert", value=int(ChartDifficulty.Expert))
+
         def make_skill(score, duration):
             return SkillMaster(
                 self.bot.assets[Server.JP], score_up_rate=score, max_seconds=duration
@@ -326,7 +327,7 @@ class Music(commands.Cog):
         for skill in re.split(r"\s+|\s*,\s*", skills):
             skill = skill.strip()
             if not skill:
-                raise commands.BadArgument("Invalid skill format")
+                raise ArgumentError("Invalid skill format")
             if skill[-1] == "x":
                 score_up = int(skill[:-1])
                 duration = 6.75 if score_up == 80 else 9
@@ -338,9 +339,9 @@ class Music(commands.Cog):
                 score_up = int(skill)
                 duration = 6.75 if score_up == 80 else 9
             if not (0 <= score_up <= 200):
-                raise commands.BadArgument("Invalid skill format")
+                raise ArgumentError("Invalid skill format")
             if not (0 <= duration <= 20):
-                raise commands.BadArgument("Invalid skill format")
+                raise ArgumentError("Invalid skill format")
             skill_values.append((score_up, duration))
 
         # Apply skill duration up
@@ -350,7 +351,7 @@ class Music(commands.Cog):
         ]
 
         if not skill_values or len(skill_values) > 4:
-            raise commands.BadArgument("Invalid skill format")
+            raise ArgumentError("Invalid skill format")
 
         if len(skill_values) < 4:
             # Pad using last skill/m
@@ -365,7 +366,7 @@ class Music(commands.Cog):
         if server is not None:
             server = server.lower()
             if server not in SERVER_NAMES:
-                raise commands.BadArgument("Invalid server name")
+                raise ArgumentError("Invalid server name")
             ctx.preferences.server = SERVER_NAMES[server]
 
         if song.lower() == "mix":
@@ -380,10 +381,10 @@ class Music(commands.Cog):
         else:
             music: MusicMaster = self.bot.master_filters.music.get(song, ctx)
             if music is None:
-                raise commands.BadArgument("Invalid song")
-            chart = music.charts.get(difficulty)
+                raise ArgumentError("Invalid song")
+            chart = music.charts.get(difficulty.value)
             if chart is None:
-                raise commands.BadArgument("Invalid difficulty")
+                raise ArgumentError("Invalid difficulty")
             mode_title = f"Song Score: {music.name} [{chart.difficulty.name}]"
 
         if power:

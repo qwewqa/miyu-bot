@@ -46,6 +46,15 @@
          
     </url>
     <url>
+         <loc>https://miyu-docs.qwewqa.xyz/commands/info/comic/</loc>
+         <lastmod>2023-04-10</lastmod>
+         <changefreq>daily</changefreq>
+         <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/comic/"/>
+         <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/comic/"/>
+         <xhtml:link rel="alternate" hreflang="ja" href="https://miyu-docs.qwewqa.xyz/ja/commands/info/comic/"/>
+         
+    </url>
+    <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/event/</loc>
          <lastmod>2023-04-10</lastmod>
          <changefreq>daily</changefreq>

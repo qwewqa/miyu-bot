@@ -49,18 +49,19 @@ class DetailServerShortcutButton(discord.ui.Button["FilterDetailView"]):
 
     async def callback(self, interaction: Interaction):
         assert self.view is not None
+        await interaction.response.defer()
         value = self.view.master_filter.get_by_id(
             self.view.active_value.id, self.view.ctx, self.server
         )
         if value is None:
-            await interaction.response.semd_message(
+            await interaction.followup.send(
                 "Value not available for server.", ephemeral=True
             )
             await log_usage("filter_detail_server_shortcut_button")
         view, embed = self.view.master_filter.get_simple_detail_view(
             self.view.ctx, [value], self.server, self.view.source_info
         )
-        await interaction.response.send_message(embed=embed, view=view)
+        await interaction.followup.send(embed=embed, view=view)
         await log_usage("filter_detail_server_shortcut_button")
 
 

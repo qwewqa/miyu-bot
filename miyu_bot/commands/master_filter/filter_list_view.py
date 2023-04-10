@@ -16,13 +16,14 @@ if TYPE_CHECKING:
 class FilterListItemSelect(discord.ui.Select["FilterListView"]):
     async def callback(self, interaction: Interaction):
         assert self.view is not None
+        await interaction.response.defer()
         index = int(self.values[0])
         view = filter_detail_view.FilterDetailView(
             self.view.master_filter, self.view.ctx, self.view.base_results
         )
         view.page_index = index
         embed = view.active_embed
-        await interaction.response.send_message(embed=embed, view=view)
+        await interaction.followup.send(embed=embed, view=view)
         await log_usage("filter_list_item_select")
 
 

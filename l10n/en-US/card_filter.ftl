@@ -40,6 +40,7 @@ passive-desc = { $type ->
     [FeverSupport] { groovy-support-desc }
     [ScoreUpWithDamage] { life-boost-desc }
     [AutoScoreUp] { auto-support-desc }
+    [ManualScoreUp] { manual-support-desc }
     [SupportableScoreUp] { supportable-score-up-desc }
     [SupportableSkillLonger] { supportable-skill-longer-desc }
    *[other] None
@@ -54,6 +55,8 @@ life-boost-desc =
     Constant Score Up: { $min-value }-{ $max-value }%
 auto-support-desc =
     Auto Score Up: { $min-value }-{ $max-value }%
+manual-support-desc =
+    Manual Score Up: { $min-value }-{ $max-value }%
 supportable-score-up-desc =
     Support Available
     Score Up: { $min-value }-{ $max-value }%

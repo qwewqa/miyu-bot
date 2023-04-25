@@ -33,6 +33,7 @@ unit_emoji_ids = defaultdict(
         "lyrical_lily": "<:unit_lyrical_lily:792069679673114644>",
         "call_of_artemis": "<:unit_call_of_artemis:1059287417590403162>",
         "unichord": "<:unit_unichord:1059287416483106996>",
+        "abyssmare": "<:unit_abyssmare:1100511716992884777>",
     },
 )
 
@@ -49,6 +50,7 @@ unit_emoji_ids_by_unit_id = defaultdict(
         6: unit_emoji_ids["lyrical_lily"],
         7: unit_emoji_ids["call_of_artemis"],
         8: unit_emoji_ids["unichord"],
+        9: unit_emoji_ids["abyssmare"],
     },
 )
 

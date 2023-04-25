@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/event/">
       
       
-        <link rel="prev" href="../chart/">
+        <link rel="prev" href="../comic/">
       
       
         <link rel="next" href="../gacha/">
@@ -325,6 +325,20 @@
     <li class="md-nav__item">
       <a href="../chart/" class="md-nav__link">
         Chart
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../comic/" class="md-nav__link">
+        Comic
       </a>
     </li>
   
@@ -856,12 +870,12 @@
 </details>
 <details class="example">
 <summary>Examples</summary>
-<p><code>character=esora</code><br />
-<code>character=haruna,rika,dalia</code><br />
-<code>character!=haruna,rika,dalia</code><br />
-<code>character==haruna,rika,dalia</code><br />
-<code>$haruna $rika $dalia</code><br />
-<code>$!esora $!hayate</code></p>
+<p><code>character=kurumi</code><br />
+<code>character=noa,rei,neo</code><br />
+<code>character!=noa,rei,neo</code><br />
+<code>character==noa,rei,neo</code><br />
+<code>$noa $rei $neo</code><br />
+<code>$!kurumi $!toka</code></p>
 </details>
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -889,11 +903,11 @@
 <summary>Examples</summary>
 <p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=happy_around!</code><br />
-<code>unit=peaky_p-key,merm4id,lyrical_lily</code><br />
-<code>unit!=peaky_p-key,merm4id,lyrical_lily</code><br />
-<code>$peaky_p-key $merm4id $lyrical_lily</code><br />
-<code>$!happy_around! $!燐舞曲</code></p>
+<code>unit=unichørd</code><br />
+<code>unit=スペシャル,peaky_p-key,call_of_artemis</code><br />
+<code>unit!=スペシャル,peaky_p-key,call_of_artemis</code><br />
+<code>$スペシャル $peaky_p-key $call_of_artemis</code><br />
+<code>$!unichørd $!happy_around!</code></p>
 </details>
 <h3 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -915,9 +929,9 @@
 <p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
 <code>attribute=party</code><br />
-<code>attribute=cool,street,elegant</code><br />
-<code>attribute!=cool,street,elegant</code><br />
-<code>$cool $street $elegant</code><br />
+<code>attribute=cute,cool,elegant</code><br />
+<code>attribute!=cute,cool,elegant</code><br />
+<code>$cute $cool $elegant</code><br />
 <code>$!party $!cute</code></p>
 </details>
 <h3 id="type">type<a class="headerlink" href="#type" title="Permanent link">&para;</a></h3>
@@ -933,7 +947,9 @@
 <li>medley  </li>
 <li>poker  </li>
 <li>raid  </li>
-<li>slot</li>
+<li>slot  </li>
+<li>growth  </li>
+<li>rave</li>
 </ul>
 </details>
 <details class="example">
@@ -941,11 +957,11 @@
 <p><code>sort=type</code><br />
 <code>sort&lt;type</code><br />
 <code>disp=type</code><br />
-<code>type=bingo</code><br />
-<code>type=nothing,raid,slot</code><br />
-<code>type!=nothing,raid,slot</code><br />
-<code>$nothing $raid $slot</code><br />
-<code>$!bingo $!slot</code></p>
+<code>type=medley</code><br />
+<code>type=poker,growth,nothing</code><br />
+<code>type!=poker,growth,nothing</code><br />
+<code>$poker $growth $nothing</code><br />
+<code>$!medley $!slot</code></p>
 </details>
 <h3 id="parameter">parameter<a class="headerlink" href="#parameter" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
@@ -969,11 +985,11 @@
 <summary>Examples</summary>
 <p><code>sort=parameter</code><br />
 <code>sort&lt;parameter</code><br />
-<code>parameter=heart</code><br />
-<code>parameter=technique,physical,heart</code><br />
-<code>parameter!=technique,physical,heart</code><br />
-<code>$technique $physical $heart</code><br />
-<code>$!heart $!no_parameter</code></p>
+<code>parameter=technique</code><br />
+<code>parameter=physical,no_parameter,technique</code><br />
+<code>parameter!=physical,no_parameter,technique</code><br />
+<code>$physical $no_parameter $technique</code><br />
+<code>$!technique $!heart</code></p>
 </details>
 
 

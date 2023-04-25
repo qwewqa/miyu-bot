@@ -194,6 +194,22 @@ class CardFilter(MasterFilter[CardMaster]):
         return ctx.localize(datetime(year=y, month=m, day=d)).date()
 
     @data_attribute(
+        "permanent",
+        aliases=["perm", "perma"],
+        is_flag=True,
+    )
+    def permanent(self, value: CardMaster):
+        return value.permanent
+
+    @data_attribute(
+        "limited",
+        aliases=["lim", "limit"],
+        is_flag=True,
+    )
+    def limited(self, value: CardMaster):
+        return not value.permanent
+
+    @data_attribute(
         "rarity",
         aliases=["stars"],
         is_keyword=True,
@@ -421,7 +437,7 @@ class CardFilter(MasterFilter[CardMaster]):
                     "event": f'{card.event.name if card.event else "None"}',
                     "gacha": f'{card.gacha.name if card.gacha else "None"}',
                     "availability": card.availability.name,
-                    "limited": not (card.gacha_card_attribute & 1),
+                    "limited": not card.permanent,
                 },
             ),
             inline=False,

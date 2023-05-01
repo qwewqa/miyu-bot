@@ -462,6 +462,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rarity_keyword" class="md-nav__link">
+    rarity_keyword
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rarity" class="md-nav__link">
     rarity
   </a>
@@ -901,6 +908,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#rarity_keyword" class="md-nav__link">
+    rarity_keyword
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#rarity" class="md-nav__link">
     rarity
   </a>
@@ -1071,12 +1085,12 @@
 <summary>Examples</summary>
 <p><code>sort=character</code><br />
 <code>sort&lt;character</code><br />
-<code>character=airi</code><br />
-<code>character=muni,tsubaki,neo</code><br />
-<code>character!=muni,tsubaki,neo</code><br />
-<code>$muni $tsubaki $neo</code><br />
-<code>$!airi $!shano</code><br />
-<code>muni tsubaki neo</code></p>
+<code>character=hayate</code><br />
+<code>character=dalia,miyu,kyoko</code><br />
+<code>character!=dalia,miyu,kyoko</code><br />
+<code>$dalia $miyu $kyoko</code><br />
+<code>$!hayate $!haruna</code><br />
+<code>dalia miyu kyoko</code></p>
 </details>
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1107,11 +1121,11 @@
 <summary>Examples</summary>
 <p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=unichørd</code><br />
-<code>unit=燐舞曲,unichørd,lyrical_lily</code><br />
-<code>unit!=燐舞曲,unichørd,lyrical_lily</code><br />
-<code>$燐舞曲 $unichørd $lyrical_lily</code><br />
-<code>$!unichørd $!call_of_artemis</code></p>
+<code>unit=merm4id</code><br />
+<code>unit=merm4id,その他,photon_maiden</code><br />
+<code>unit!=merm4id,その他,photon_maiden</code><br />
+<code>$merm4id $その他 $photon_maiden</code><br />
+<code>$!merm4id $!スペシャル</code></p>
 </details>
 <h3 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1137,10 +1151,10 @@
 <p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
 <code>attribute=elegant</code><br />
-<code>attribute=elegant,party,cool</code><br />
-<code>attribute!=elegant,party,cool</code><br />
-<code>$elegant $party $cool</code><br />
-<code>$!elegant $!party</code></p>
+<code>attribute=street,elegant,party</code><br />
+<code>attribute!=street,elegant,party</code><br />
+<code>$street $elegant $party</code><br />
+<code>$!elegant $!cool</code></p>
 </details>
 <h3 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1321,14 +1335,37 @@
 <p><code>$limited</code><br />
 <code>$!limited</code></p>
 </details>
+<h3 id="rarity_keyword">rarity_keyword<a class="headerlink" href="#rarity_keyword" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p><a href="/commands/general-usage/#tag">Tag</a>, <a href="/commands/general-usage/#keyword">Keyword</a></p>
+</div>
+<details class="note">
+<summary>Tags</summary>
+<ul>
+<li>7*, 7\*, *7, \*7, SP, sp  </li>
+<li>6*, 6\*, *6, \*6, NV, nv, nav, navi  </li>
+<li>5*, 5\*, *5, \*5, CP, cp  </li>
+<li>4*, 4\*, *4, \*4  </li>
+<li>3*, 3\*, *3, \*3  </li>
+<li>2*, 2\*, *2, \*2  </li>
+<li>1*, 1\*, *1, \*1</li>
+</ul>
+</details>
+<details class="example">
+<summary>Examples</summary>
+<p><code>$7* $5* $3*</code><br />
+<code>$!3* $!4*</code><br />
+<code>7* 5* 3*</code></p>
+</details>
 <h3 id="rarity">rarity<a class="headerlink" href="#rarity" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
-<p>stars</p>
+<p>rare, star, stars</p>
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/commands/general-usage/#sortable">Sortable</a>, <a href="/commands/general-usage/#keyword">Keyword</a></p>
+<p><a href="/commands/general-usage/#sortable">Sortable</a>, <a href="/commands/general-usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -1337,17 +1374,23 @@
 <details class="note">
 <summary>Tags</summary>
 <ul>
-<li>4*, 4\*  </li>
-<li>3*, 3\*  </li>
-<li>2*, 2\*  </li>
-<li>1*, 1\*</li>
+<li>7*, 7\*, *7, \*7, SP, sp, 7  </li>
+<li>6*, 6\*, *6, \*6, NV, nv, nav, navi, 6  </li>
+<li>5*, 5\*, *5, \*5, CP, cp, 5  </li>
+<li>4*, 4\*, *4, \*4, 4  </li>
+<li>3*, 3\*, *3, \*3, 3  </li>
+<li>2*, 2\*, *2, \*2, 2  </li>
+<li>1*, 1\*, *1, \*1, 1</li>
 </ul>
 </details>
 <details class="example">
 <summary>Examples</summary>
 <p><code>sort=rarity</code><br />
 <code>sort&lt;rarity</code><br />
-<code>2* 1* 4*</code></p>
+<code>rarity=5*</code><br />
+<code>rarity=7*,3*,5*</code><br />
+<code>rarity!=7*,3*,5*</code><br />
+<code>rarity&gt;2*</code></p>
 </details>
 <h3 id="skill">skill<a class="headerlink" href="#skill" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">

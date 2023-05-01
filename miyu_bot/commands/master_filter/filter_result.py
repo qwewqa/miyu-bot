@@ -125,6 +125,7 @@ class FilterProcessor:
                 converter=self.master_filter.wrap_compare_converter(
                     ctx, a.compare_converter
                 )
+                or a.value_mapping
                 or (lambda s: float(s)),
             )
             for a in self.comparable_data_attributes

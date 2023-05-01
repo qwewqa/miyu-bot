@@ -209,25 +209,72 @@ class CardFilter(MasterFilter[CardMaster]):
     def limited(self, value: CardMaster):
         return not value.permanent
 
+    rarity_aliases = {
+        r"7*": 7,
+        r"7\*": 7,
+        r"*7": 7,
+        r"\*7": 7,
+        r"SP": 7,
+        r"sp": 7,
+        r"6*": 6,
+        r"6\*": 6,
+        r"*6": 6,
+        r"\*6": 6,
+        r"NV": 6,
+        r"nv": 6,
+        r"nav": 6,
+        r"navi": 6,
+        r"5*": 5,
+        r"5\*": 5,
+        r"*5": 5,
+        r"\*5": 5,
+        r"CP": 5,
+        r"cp": 5,
+        r"4*": 4,
+        r"4\*": 4,
+        r"*4": 4,
+        r"\*4": 4,
+        r"3*": 3,
+        r"3\*": 3,
+        r"*3": 3,
+        r"\*3": 3,
+        r"2*": 2,
+        r"2\*": 2,
+        r"*2": 2,
+        r"\*2": 2,
+        r"1*": 1,
+        r"1\*": 1,
+        r"*1": 1,
+        r"\*1": 1,
+    }
+
+    @data_attribute(
+        "rarity_keyword",
+        is_keyword=True,
+        is_tag=True,
+        value_mapping=rarity_aliases,
+    )
+    def rarity_name(self, value: CardMaster):
+        return value.rarity_id
+
     @data_attribute(
         "rarity",
-        aliases=["stars"],
-        is_keyword=True,
-        value_mapping={
-            r"4*": 4,
-            r"4\*": 4,
-            r"3*": 3,
-            r"3\*": 3,
-            r"2*": 2,
-            r"2\*": 2,
-            r"1*": 1,
-            r"1\*": 1,
-        },
+        aliases=["rare", "star", "stars"],
+        is_comparable=True,
         is_sortable=True,
         reverse_sort=True,
+        help_sample_argument="SP",
     )
     def rarity(self, value: CardMaster):
-        return value.rarity_id
+        return value.rarity.value
+
+    @rarity.init
+    def init_rarity(self, info: DataAttributeInfo):
+        rarity_master = self.bot.assets[0].rarity_master
+        aliases = {k: rarity_master[v].value for k, v in self.rarity_aliases.items()}
+        for rarity in rarity_master.values():
+            aliases[str(rarity.id)] = rarity.value
+        info.value_mapping = aliases
 
     @data_attribute(
         "skill",
@@ -529,7 +576,7 @@ class CardFilter(MasterFilter[CardMaster]):
         parameter_emoji = parameter_bonus_emoji_ids_by_parameter_id[
             self.get_highest_parameter(card) + 1
         ]
-        return f"`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {card.rarity_id}★ {card.name} {card.character.first_name_english}"
+        return f"`{unit_emoji}`+`{attribute_emoji}`+`{parameter_emoji}` {card.rarity.rarity_name} {card.name} {card.character.first_name_english}"
 
     @get_card_embed.shortcut_button(name="Banner")
     async def gacha_shortcut(

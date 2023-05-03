@@ -254,7 +254,7 @@ class CardFilter(MasterFilter[CardMaster]):
         is_tag=True,
         value_mapping=rarity_aliases,
     )
-    def rarity_name(self, value: CardMaster):
+    def rarity_keyword(self, value: CardMaster):
         return value.rarity_id
 
     @data_attribute(
@@ -476,7 +476,7 @@ class CardFilter(MasterFilter[CardMaster]):
             value=l10n.format_value(
                 "info-desc",
                 {
-                    "rarity": f"{card.rarity_id}★",
+                    "rarity": f"{card.rarity.rarity_name}",
                     "character": f"{card.character.full_name_english}",
                     "attribute": f"{attribute_emoji_ids_by_attribute_id[card.attribute_id]} {card.attribute.en_name.capitalize()}",
                     "unit": f"{unit_emoji_ids_by_unit_id[card.character.unit_id]} {card.character.unit.name}",
@@ -564,7 +564,7 @@ class CardFilter(MasterFilter[CardMaster]):
         return embed
 
     def format_card_name(self, card):
-        return f"{card.rarity_id}★ {card.name} {card.character.full_name_english}"
+        return f"{card.rarity.rarity_name} {card.name} {card.character.full_name_english}"
 
     @list_formatter(
         name="card-search",

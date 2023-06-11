@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/"/>
@@ -11,7 +11,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/privacy-policy/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/privacy-policy/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/privacy-policy/"/>
@@ -20,7 +20,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/general-usage/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/general-usage/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/general-usage/"/>
@@ -29,7 +29,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/card/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/card/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/card/"/>
@@ -38,7 +38,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/chart/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/chart/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/chart/"/>
@@ -47,7 +47,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/comic/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/comic/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/comic/"/>
@@ -56,7 +56,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/event/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/event/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/event/"/>
@@ -65,7 +65,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/gacha/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/gacha/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/gacha/"/>
@@ -74,7 +74,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/login-bonus/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/login-bonus/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/login-bonus/"/>
@@ -83,7 +83,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/music/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/music/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/music/"/>
@@ -92,7 +92,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/info/stamp/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/info/stamp/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/info/stamp/"/>
@@ -101,7 +101,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/utility/audio/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/utility/audio/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/utility/audio/"/>
@@ -110,7 +110,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/utility/card/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/utility/card/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/utility/card/"/>
@@ -119,7 +119,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/utility/event/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/utility/event/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/utility/event/"/>
@@ -128,7 +128,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/utility/gacha/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/utility/gacha/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/utility/gacha/"/>
@@ -137,7 +137,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/utility/music/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/utility/music/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/utility/music/"/>
@@ -146,7 +146,7 @@
     </url>
     <url>
          <loc>https://miyu-docs.qwewqa.xyz/commands/utility/preferences/</loc>
-         <lastmod>2023-05-01</lastmod>
+         <lastmod>2023-06-11</lastmod>
          <changefreq>daily</changefreq>
          <xhtml:link rel="alternate" hreflang="en" href="https://miyu-docs.qwewqa.xyz/en/commands/utility/preferences/"/>
          <xhtml:link rel="alternate" hreflang="zh_TW" href="https://miyu-docs.qwewqa.xyz/zh_TW/commands/utility/preferences/"/>

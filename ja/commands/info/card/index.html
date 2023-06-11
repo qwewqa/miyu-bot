@@ -441,6 +441,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#default_sort" class="md-nav__link">
+    default_sort
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#date" class="md-nav__link">
     date
   </a>
@@ -887,6 +894,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#default_sort" class="md-nav__link">
+    default_sort
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#date" class="md-nav__link">
     date
   </a>
@@ -1085,12 +1099,12 @@
 <summary>Examples</summary>
 <p><code>sort=character</code><br />
 <code>sort&lt;character</code><br />
-<code>character=hayate</code><br />
-<code>character=dalia,miyu,kyoko</code><br />
-<code>character!=dalia,miyu,kyoko</code><br />
-<code>$dalia $miyu $kyoko</code><br />
-<code>$!hayate $!haruna</code><br />
-<code>dalia miyu kyoko</code></p>
+<code>character=airi</code><br />
+<code>character=muni,tsubaki,neo</code><br />
+<code>character!=muni,tsubaki,neo</code><br />
+<code>$muni $tsubaki $neo</code><br />
+<code>$!airi $!shano</code><br />
+<code>muni tsubaki neo</code></p>
 </details>
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1121,11 +1135,11 @@
 <summary>Examples</summary>
 <p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=merm4id</code><br />
-<code>unit=merm4id,その他,photon_maiden</code><br />
-<code>unit!=merm4id,その他,photon_maiden</code><br />
-<code>$merm4id $その他 $photon_maiden</code><br />
-<code>$!merm4id $!スペシャル</code></p>
+<code>unit=unichørd</code><br />
+<code>unit=燐舞曲,unichørd,lyrical_lily</code><br />
+<code>unit!=燐舞曲,unichørd,lyrical_lily</code><br />
+<code>$燐舞曲 $unichørd $lyrical_lily</code><br />
+<code>$!unichørd $!call_of_artemis</code></p>
 </details>
 <h3 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1151,10 +1165,10 @@
 <p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
 <code>attribute=elegant</code><br />
-<code>attribute=street,elegant,party</code><br />
-<code>attribute!=street,elegant,party</code><br />
-<code>$street $elegant $party</code><br />
-<code>$!elegant $!cool</code></p>
+<code>attribute=elegant,party,cool</code><br />
+<code>attribute!=elegant,party,cool</code><br />
+<code>$elegant $party $cool</code><br />
+<code>$!elegant $!party</code></p>
 </details>
 <h3 id="id">id<a class="headerlink" href="#id" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -1277,6 +1291,16 @@
 <code>physical!=9348</code><br />
 <code>physical&gt;9348</code></p>
 </details>
+<h3 id="default_sort">default_sort<a class="headerlink" href="#default_sort" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p><a href="/commands/general-usage/#sortable">Sortable (Default)</a></p>
+</div>
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=default_sort</code><br />
+<code>sort&lt;default_sort</code></p>
+</details>
 <h3 id="date">date<a class="headerlink" href="#date" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
 <p class="admonition-title">Aliases</p>
@@ -1284,7 +1308,7 @@
 </div>
 <div class="admonition info">
 <p class="admonition-title">Type</p>
-<p><a href="/commands/general-usage/#sortable">Sortable (Default)</a>, <a href="/commands/general-usage/#display">Display</a>, <a href="/commands/general-usage/#comparable">Comparable</a></p>
+<p><a href="/commands/general-usage/#sortable">Sortable</a>, <a href="/commands/general-usage/#display">Display</a>, <a href="/commands/general-usage/#comparable">Comparable</a></p>
 </div>
 <div class="admonition question">
 <p class="admonition-title">Description</p>
@@ -1354,9 +1378,9 @@
 </details>
 <details class="example">
 <summary>Examples</summary>
-<p><code>$7* $5* $3*</code><br />
-<code>$!3* $!4*</code><br />
-<code>7* 5* 3*</code></p>
+<p><code>$3* $5* $1*</code><br />
+<code>$!6* $!7*</code><br />
+<code>3* 5* 1*</code></p>
 </details>
 <h3 id="rarity">rarity<a class="headerlink" href="#rarity" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
@@ -1387,10 +1411,10 @@
 <summary>Examples</summary>
 <p><code>sort=rarity</code><br />
 <code>sort&lt;rarity</code><br />
-<code>rarity=5*</code><br />
-<code>rarity=7*,3*,5*</code><br />
-<code>rarity!=7*,3*,5*</code><br />
-<code>rarity&gt;2*</code></p>
+<code>rarity=2*</code><br />
+<code>rarity=6*,5*,7*</code><br />
+<code>rarity!=6*,5*,7*</code><br />
+<code>rarity&gt;3*</code></p>
 </details>
 <h3 id="skill">skill<a class="headerlink" href="#skill" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">

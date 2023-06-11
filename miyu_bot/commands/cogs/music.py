@@ -75,7 +75,7 @@ class Music(commands.Cog):
         groovy_score_up: app_commands.Range[float, 0, 100] = 0,
         skill_duration_up: app_commands.Range[float, 0, 100] = 0,
         passive_score_up: app_commands.Range[float, 0, 100] = 0,
-        auto_score_up: app_commands.Range[float, 0, 100] = 0,
+        general_score_up: app_commands.Range[float, 0, 100] = 0,
         power: app_commands.Range[int, 0, 999999] = 0,
         solo: bool = False,
         auto: bool = False,
@@ -93,8 +93,8 @@ class Music(commands.Cog):
             Skill duration up percentage
         passive_score_up: float
             Passive score up percentage
-        auto_score_up: float
-            Auto score up percentage
+        general_score_up: float
+            Auto/manual score up percentage
         power: int
             Team power
         solo: bool
@@ -201,7 +201,8 @@ class Music(commands.Cog):
                     fever_score_up=groovy_score_up / 100,
                     enable_fever=not solo,
                     passive_score_up=passive_score_up / 100,
-                    auto_score_up=auto_score_up / 100,
+                    auto_score_up=general_score_up / 100,
+                    manual_score_up=general_score_up / 100,
                     autoplay=auto,
                 )
                 total_score += score * weight
@@ -234,7 +235,7 @@ class Music(commands.Cog):
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
             power_text = f"power: {power:,}\n" if not relative_display else ""
-            return f"Song Meta\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\nauto_score_up: {auto_score_up}\nsolo: {solo}\nauto: {auto}"
+            return f"Song Meta\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\ngeneral_score_up: {general_score_up}\nsolo: {solo}\nauto: {auto}"
 
         results = FilterResults(
             master_filter=self.bot.master_filters.charts,
@@ -270,7 +271,7 @@ class Music(commands.Cog):
         groovy_score_up: app_commands.Range[float, 0, 100] = 0,
         skill_duration_up: app_commands.Range[float, 0, 100] = 0,
         passive_score_up: app_commands.Range[float, 0, 100] = 0,
-        auto_score_up: app_commands.Range[float, 0, 100] = 0,
+        general_score_up: app_commands.Range[float, 0, 100] = 0,
         power: app_commands.Range[int, 0, 999999] = 0,
         solo: bool = False,
         auto: bool = False,
@@ -293,8 +294,8 @@ class Music(commands.Cog):
             Skill duration up percentage
         passive_score_up: float
             Passive score up percentage
-        auto_score_up: float
-            Auto score up percentage
+        general_score_up: float
+            Auto/manual score up percentage
         power: int
             Team power
         solo: bool
@@ -405,7 +406,8 @@ class Music(commands.Cog):
                 fever_score_up=groovy_score_up / 100,
                 enable_fever=not solo,
                 passive_score_up=passive_score_up / 100,
-                auto_score_up=auto_score_up / 100,
+                auto_score_up=general_score_up / 100,
+                manual_score_up=general_score_up / 100,
                 autoplay=auto,
             )
             scores.append((score, skill_perm))
@@ -426,7 +428,7 @@ class Music(commands.Cog):
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
             power_text = f"power: {power:,}\n" if not relative_display else ""
-            return f"{mode_title}\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\nauto_score_up: {auto_score_up}\nsolo: {solo}\nauto: {auto}"
+            return f"{mode_title}\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\ngeneral_score_up: {general_score_up}\nsolo: {solo}\nauto: {auto}"
 
         def body():
             if relative_display:

@@ -32,7 +32,7 @@ class EventFilter(MasterFilter[EventMaster]):
         return value.name
 
     def get_select_name(self, value: EventMaster):
-        return value.event_type.name, value.name, None
+        return value.name, value.event_type.name, None
 
     def is_released(self, value: EventMaster) -> bool:
         return value.start_datetime < dt.datetime.now(dt.timezone.utc) + dt.timedelta(

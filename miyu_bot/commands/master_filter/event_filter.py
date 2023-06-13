@@ -161,6 +161,45 @@ class EventFilter(MasterFilter[EventMaster]):
             else 99
         )
 
+    @data_attribute(
+        "duration",
+        aliases=["length", "time", "len"],
+        is_sortable=True,
+        is_comparable=True,
+        is_eq=True,
+    )
+    def duration(self, value: EventMaster):
+        return value.duration.total_seconds()
+
+    @duration.formatter
+    def format_duration(self, ctx, value: EventMaster):
+        duration_hour_part = round((value.duration.seconds / 3600), 2)
+        duration_hour_part = (
+            duration_hour_part
+            if not duration_hour_part.is_integer()
+            else int(duration_hour_part)
+        )
+        unpadded = f"{value.duration.days}d {duration_hour_part}h"
+        return unpadded.ljust(6)
+
+    @duration.compare_converter
+    def duration_compare_converter(self, ctx: PrefContext, s):
+        time_units = {
+            "d": 24 * 60 * 60,
+            "h": 60 * 60,
+            "m": 60,
+            "s": 1,
+        }
+
+        total_seconds = 0
+        time_parts = re.findall(r"(\d+)([dhms])", s)
+
+        for part in time_parts:
+            amount, unit = part
+            total_seconds += int(amount) * time_units[unit]
+
+        return total_seconds
+
     @command_source(
         command_args=dict(
             name="event", description="Displays event info.", help="!event cooking"

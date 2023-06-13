@@ -28,7 +28,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         return f'{value.music.name} {value.music.special_unit_name}{" (Hidden)" if value.music.is_hidden else ""} {value.difficulty.name.lower()}'.strip()
 
     def get_select_name(self, value: ChartMaster):
-        return f"{value.difficulty.name}", f"{value.music.name}", None
+        return f"{value.music.name}", f"{value.difficulty.name}", None
 
     def is_released(self, value: ChartMaster) -> bool:
         return value.music.is_released

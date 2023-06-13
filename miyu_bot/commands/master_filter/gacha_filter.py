@@ -32,7 +32,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
         return f"{value.name} {value.id}"
 
     def get_select_name(self, value: GachaMaster):
-        return value.category.name, value.name, None
+        return value.name, value.category.name, None
 
     @data_attribute("name", aliases=["title"], is_sortable=True)
     def name(self, value: GachaMaster):

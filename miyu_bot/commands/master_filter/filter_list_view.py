@@ -118,7 +118,7 @@ class FilterListView(PagedMessageView):
     def get_item_select_options(self):
         return [
             SelectOption(
-                label=self.select_option_details[i][0],
+                label=f"{i + 1}. {self.select_option_details[i][0]}",
                 description=self.select_option_details[i][1],
                 emoji=self.select_option_details[i][2],
                 value=str(i),

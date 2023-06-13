@@ -40,7 +40,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         return "".join(digits[int(d)] for d in str(num))
 
     def get_select_name(self, value: MusicMaster):
-        return value.category.name, value.name, None
+        return value.name, value.category.name, None
 
     def is_released(self, value: MusicMaster) -> bool:
         return value.is_released

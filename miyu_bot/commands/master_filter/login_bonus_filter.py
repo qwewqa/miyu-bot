@@ -19,7 +19,7 @@ class LoginBonusFilter(MasterFilter[LoginBonusMaster]):
         return value.title
 
     def get_select_name(self, value: LoginBonusMaster):
-        return value.login_bonus_type.name, value.title, None
+        return value.title, value.login_bonus_type.name, None
 
     @data_attribute("name", aliases=["title"], is_sortable=True)
     def name(self, value: LoginBonusMaster):

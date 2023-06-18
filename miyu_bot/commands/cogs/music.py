@@ -79,6 +79,7 @@ class Music(commands.Cog):
         power: app_commands.Range[int, 0, 999999] = 0,
         solo: bool = False,
         auto: bool = False,
+        max_level: Optional[str] = None,
         server: Optional[str] = None,
     ):
         """Lists songs by score.
@@ -101,6 +102,8 @@ class Music(commands.Cog):
             Whether to calculate solo score
         auto: bool
             Whether to calculate auto score
+        max_level: str
+            The maximum level of songs to include
         server: str
             The server to use. Defaults to the current server. Can be one of: 'jp' or 'en'
         """
@@ -110,6 +113,15 @@ class Music(commands.Cog):
             return SkillMaster(
                 self.bot.assets[Server.JP], score_up_rate=score, max_seconds=duration
             )
+
+        if max_level is None:
+            max_level_value = 99999
+        else:
+            max_level_re = re.compile(r"(\d+)(\+)?")
+            match = max_level_re.fullmatch(max_level)
+            if not match:
+                raise ArgumentError("Invalid max level")
+            max_level_value = int(match.group(1)) + (0.5 if match.group(2) else 0)
 
         # Skill formats:
         # score_up := [0-9]+
@@ -181,7 +193,11 @@ class Music(commands.Cog):
             if chart.music.is_available
             and not chart.music.is_hidden
             and chart.music.id > 3
+            and chart.level <= max_level_value
         ]
+
+        if not charts:
+            raise ArgumentError("No satisfying charts")
 
         if power:
             relative_display = False
@@ -234,8 +250,9 @@ class Music(commands.Cog):
                 else f"[{score_up}x{duration:.2f}]"
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
-            power_text = f"power: {power:,}\n" if not relative_display else ""
-            return f"Song Meta\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\ngeneral_score_up: {general_score_up}\nsolo: {solo}\nauto: {auto}"
+            power_text = f"Power: {power:,}\n" if not relative_display else ""
+            max_level_text = f"Max Level: {max_level}\n" if max_level else ""
+            return f"Song Meta\n{power_text}{max_level_text}Skills: {formatted_skills}\nGroovy Score Up: {groovy_score_up}\nPassive Score Up: {passive_score_up}\nGeneral Score Up: {general_score_up}\nSolo: {solo}\nAuto: {auto}"
 
         results = FilterResults(
             master_filter=self.bot.master_filters.charts,

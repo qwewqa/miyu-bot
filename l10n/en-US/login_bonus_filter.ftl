@@ -16,6 +16,13 @@ login-bonus-type-name = { $login-bonus-type ->
     [VipSilver] Silver Mileage
     [VipGold] Gold Mileage
     [VipPlatinum] Platinum Mileage
+    [EventBingo] Bingo
+    [EventMedley] Medley
+    [EventPoker] Poker
+    [EventRaid] Raid
+    [EventSlot] Slot
+    [EventGrow] Grow
+    [EventRave] Rave
    *[other] Unknown
 }
 

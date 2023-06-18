@@ -461,6 +461,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#duration" class="md-nav__link">
+    duration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -767,6 +774,13 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#duration" class="md-nav__link">
+    duration
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -871,11 +885,11 @@
 <details class="example">
 <summary>Examples</summary>
 <p><code>character=muni</code><br />
-<code>character=rika,noa,esora</code><br />
-<code>character!=rika,noa,esora</code><br />
-<code>character==rika,noa,esora</code><br />
-<code>$rika $noa $esora</code><br />
-<code>$!muni $!maho</code></p>
+<code>character=mana,rika,tsubaki</code><br />
+<code>character!=mana,rika,tsubaki</code><br />
+<code>character==mana,rika,tsubaki</code><br />
+<code>$mana $rika $tsubaki</code><br />
+<code>$!muni $!yuka</code></p>
 </details>
 <h3 id="unit">unit<a class="headerlink" href="#unit" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -903,11 +917,11 @@
 <summary>Examples</summary>
 <p><code>sort=unit</code><br />
 <code>sort&lt;unit</code><br />
-<code>unit=unichørd</code><br />
-<code>unit=mixed,happy_around!,その他</code><br />
-<code>unit!=mixed,happy_around!,その他</code><br />
-<code>$mixed $happy_around! $その他</code><br />
-<code>$!unichørd $!merm4id</code></p>
+<code>unit=lyrical_lily</code><br />
+<code>unit=スペシャル,photon_maiden,merm4id</code><br />
+<code>unit!=スペシャル,photon_maiden,merm4id</code><br />
+<code>$スペシャル $photon_maiden $merm4id</code><br />
+<code>$!lyrical_lily $!unichørd</code></p>
 </details>
 <h3 id="attribute">attribute<a class="headerlink" href="#attribute" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -928,11 +942,11 @@
 <summary>Examples</summary>
 <p><code>sort=attribute</code><br />
 <code>sort&lt;attribute</code><br />
-<code>attribute=elegant</code><br />
-<code>attribute=elegant,street,party</code><br />
-<code>attribute!=elegant,street,party</code><br />
-<code>$elegant $street $party</code><br />
-<code>$!elegant $!cool</code></p>
+<code>attribute=street</code><br />
+<code>attribute=party,cute,cool</code><br />
+<code>attribute!=party,cute,cool</code><br />
+<code>$party $cute $cool</code><br />
+<code>$!street $!party</code></p>
 </details>
 <h3 id="type">type<a class="headerlink" href="#type" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
@@ -957,11 +971,11 @@
 <p><code>sort=type</code><br />
 <code>sort&lt;type</code><br />
 <code>disp=type</code><br />
-<code>type=bingo</code><br />
-<code>type=bingo,slot,medley</code><br />
-<code>type!=bingo,slot,medley</code><br />
-<code>$bingo $slot $medley</code><br />
-<code>$!bingo $!rave</code></p>
+<code>type=raid</code><br />
+<code>type=rave,slot,bingo</code><br />
+<code>type!=rave,slot,bingo</code><br />
+<code>$rave $slot $bingo</code><br />
+<code>$!raid $!nothing</code></p>
 </details>
 <h3 id="parameter">parameter<a class="headerlink" href="#parameter" title="Permanent link">&para;</a></h3>
 <div class="admonition abstract">
@@ -985,11 +999,29 @@
 <summary>Examples</summary>
 <p><code>sort=parameter</code><br />
 <code>sort&lt;parameter</code><br />
-<code>parameter=physical</code><br />
-<code>parameter=technique,heart,no_parameter</code><br />
-<code>parameter!=technique,heart,no_parameter</code><br />
-<code>$technique $heart $no_parameter</code><br />
-<code>$!physical $!technique</code></p>
+<code>parameter=heart</code><br />
+<code>parameter=no_parameter,physical,technique</code><br />
+<code>parameter!=no_parameter,physical,technique</code><br />
+<code>$no_parameter $physical $technique</code><br />
+<code>$!heart $!technique</code></p>
+</details>
+<h3 id="duration">duration<a class="headerlink" href="#duration" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">Aliases</p>
+<p>length, time, len</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Type</p>
+<p><a href="/commands/general-usage/#sortable">Sortable</a>, <a href="/commands/general-usage/#display">Display</a>, <a href="/commands/general-usage/#comparable">Comparable</a>, <a href="/commands/general-usage/#equality">Equality</a></p>
+</div>
+<details class="example">
+<summary>Examples</summary>
+<p><code>sort=duration</code><br />
+<code>sort&lt;duration</code><br />
+<code>disp=duration</code><br />
+<code>duration=[value]</code><br />
+<code>duration!=[value]</code><br />
+<code>duration&gt;[value]</code></p>
 </details>
 
 

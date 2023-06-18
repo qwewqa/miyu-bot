@@ -519,18 +519,43 @@ class Music(commands.Cog):
         self,
         ctx: commands.Context,
         a: str,
-        a_diff: str,
         b: str,
-        b_diff: str,
         c: str,
-        c_diff: str,
         d: str,
-        d_diff: str,
     ):
+        """Creates a custom mix.
+
+        Parameters
+        ----------
+        a : str
+            The first song. E.g. "synchro", "synchro hard", "synchro hd", etc.
+        b : str
+            The second song.
+        c : str
+            The third song.
+        d : str
+            The fourth song.
+        """
         await ctx.defer()
 
-        names = [a, b, c, d]
-        diff_names = [a_diff, b_diff, c_diff, d_diff]
+        def extract_difficulty(name: str) -> Tuple[str, ChartDifficulty]:
+            split_args = name.split()
+
+            difficulty = ChartDifficulty.Expert
+            if len(split_args) >= 2:
+                final_word = split_args[-1].lower()
+                if final_word.lower() in self.difficulty_names:
+                    difficulty = self.difficulty_names[final_word.lower()]
+                    name = name[: -len(final_word) - 1].strip()
+            return name, difficulty
+
+        names = []
+        diffs = []
+
+        for arg in [a, b, c, d]:
+            name, diff = extract_difficulty(arg)
+            names.append(name)
+            diffs.append(diff)
 
         songs = []
         for name in names:
@@ -544,16 +569,6 @@ class Music(commands.Cog):
                 await ctx.send(f'Song "{song.name}" does not have mix enabled.')
                 return
             songs.append(song)
-        diffs = []
-        for diff_name in diff_names:
-            diff = self.difficulty_names.get(diff_name.lower())
-            if not diff:
-                await ctx.send(
-                    f'Unknown difficulty "{diff_name}".',
-                    allowed_mentions=AllowedMentions.none(),
-                )
-                return
-            diffs.append(diff)
 
         mix = Chart.create_mix(songs, diffs)
         mix_image = await self.bot.loop.run_in_executor(

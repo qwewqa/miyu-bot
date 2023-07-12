@@ -536,6 +536,7 @@ class Music(commands.Cog):
         b: str,
         c: str,
         d: str,
+        server: Optional[str] = None,
     ):
         """Creates a custom mix.
 
@@ -551,6 +552,13 @@ class Music(commands.Cog):
             The fourth song.
         """
         await ctx.defer()
+
+        if server is not None:
+            server = server.lower()
+            if server not in SERVER_NAMES:
+                raise ArgumentError("Invalid server name")
+            ctx.preferences.server = SERVER_NAMES[server]
+            ctx.assets = ctx.bot.assets[ctx.preferences.server]
 
         def extract_difficulty(name: str) -> Tuple[str, ChartDifficulty]:
             split_args = name.split()
@@ -584,7 +592,28 @@ class Music(commands.Cog):
                 return
             songs.append(song)
 
-        mix = Chart.create_mix(songs, diffs)
+        song_ids = tuple(song.id for song in songs)
+        if hidden_mix := next(
+            (
+                mix.details
+                for mix in ctx.assets.hidden_music_mix_master.values()
+                if mix.trigger_music_ids == song_ids
+            ),
+            None,
+        ):
+            original_mix_masters = [
+                song.mix_info[section] for song, section in zip(songs, [1, 2, 2, 3])
+            ]
+            mix_masters = [
+                hidden_mix_details.apply_to(mix_master)
+                for hidden_mix_details, mix_master in zip(hidden_mix, original_mix_masters)
+            ]
+            is_hidden_mix = True
+        else:
+            mix_masters = None
+            is_hidden_mix = False
+
+        mix = Chart.create_mix(songs, diffs, mix_masters)
         mix_image = await self.bot.loop.run_in_executor(
             self.bot.thread_pool, mix.render
         )
@@ -614,7 +643,8 @@ class Music(commands.Cog):
             f"Ordered: {all(a == b for a, b in zip(get_best_mix(songs), songs))}\n"
             f'Skills: {", ".join("{:.2f}s".format(t - mix.info.start_time) if t not in mix.info.base_skill_times else "[{:.2f}s]".format(t - mix.info.start_time) for t in mix.info.skill_times)}\n'
             f"Fever: {mix.info.fever_start - mix.info.start_time:.2f}s - {mix.info.fever_end - mix.info.start_time:.2f}s\n"
-            f'Transitions: {", ".join("{:.2f}s".format(t - mix.info.start_time) for t in mix.info.medley_transition_times)}',
+            f'Transitions: {", ".join("{:.2f}s".format(t - mix.info.start_time) for t in mix.info.medley_transition_times)}\n'
+            f"Special: {is_hidden_mix}",
             inline=False,
         )
         embed.add_field(

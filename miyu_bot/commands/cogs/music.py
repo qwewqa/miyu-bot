@@ -485,7 +485,21 @@ class Music(commands.Cog):
         description="Finds order of songs when mixed.",
         help='!mixorder grgr grgr grgr "cyber cyber"',
     )
-    async def mix_order(self, ctx: commands.Context, a: str, b: str, c: str, d: str):
+    async def mix_order(
+        self,
+        ctx: commands.Context,
+        a: str,
+        b: str,
+        c: str,
+        d: str,
+        server: Optional[str] = None,
+    ):
+        if server is not None:
+            server = server.lower()
+            if server not in SERVER_NAMES:
+                raise ArgumentError("Invalid server name")
+            ctx.preferences.server = SERVER_NAMES[server]
+
         songs = []
         for name in [a, b, c, d]:
             song = self.bot.master_filters.music.get(name, ctx)

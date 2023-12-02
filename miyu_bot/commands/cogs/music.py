@@ -436,6 +436,9 @@ class Music(commands.Cog):
             )
 
         def title():
+            return f"{mode_title}"
+
+        def body():
             sorted_skill_values = sorted(skill_values, reverse=True)
             leader_skill_index = sorted_skill_values.index(leader_skill)
             formatted_skills = " ".join(
@@ -445,24 +448,35 @@ class Music(commands.Cog):
                 for i, (score_up, duration) in enumerate(sorted_skill_values)
             )
             power_text = f"power: {power:,}\n" if not relative_display else ""
-            return f"{mode_title}\n{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\ngeneral_score_up: {general_score_up}\nsolo: {solo}\nauto: {auto}"
+            arg_detail = f"{power_text}skills: {formatted_skills}\ngroovy_score_up: {groovy_score_up}\npassive_score_up: {passive_score_up}\ngeneral_score_up: {general_score_up}\nsolo: {solo}\nauto: {auto}\n"
 
-        def body():
             if relative_display:
                 ref_score = self.reference_chart_score()
-                return "\n".join(
-                    f"{score / ref_score:.2%} : {format_skill_sequence(skill_perm)}"
-                    for score, skill_perm in sorted(scores, reverse=True)
+                return (
+                    "```"
+                    + arg_detail
+                    + "``` ```"
+                    + "\n".join(
+                        f"{score / ref_score:.2%} : {format_skill_sequence(skill_perm)}"
+                        for score, skill_perm in sorted(scores, reverse=True)
+                    )
+                    + "```"
                 )
             else:
                 longest_score = max(score for score, _ in scores)
                 score_digits = len(f"{longest_score:,}")
-                return "\n".join(
-                    f"{score:>{score_digits},} : {format_skill_sequence(skill_perm)}"
-                    for score, skill_perm in sorted(scores, reverse=True)
+                return (
+                    "```"
+                    + arg_detail
+                    + "``` ```"
+                    + "\n".join(
+                        f"{score:>{score_digits},} : {format_skill_sequence(skill_perm)}"
+                        for score, skill_perm in sorted(scores, reverse=True)
+                    )
+                    + "```"
                 )
 
-        embed = discord.Embed(title=title(), description=f"```{body()}```")
+        embed = discord.Embed(title=title(), description=body())
 
         await ctx.send(embed=embed)
 
@@ -606,7 +620,9 @@ class Music(commands.Cog):
             ]
             mix_masters = [
                 hidden_mix_details.apply_to(mix_master)
-                for hidden_mix_details, mix_master in zip(hidden_mix, original_mix_masters)
+                for hidden_mix_details, mix_master in zip(
+                    hidden_mix, original_mix_masters
+                )
             ]
             is_hidden_mix = True
         else:

@@ -32,12 +32,8 @@ class MusicFilter(MasterFilter[MusicMaster]):
             parts.append("(Hidden)")
         if value.read_name:
             parts.append(f"{value.read_name}")
-        parts.append(self.num_to_special_digits(f"{value.id:>07}"))
+        parts.append(f"{value.category.name}")
         return " ".join(parts)
-
-    def num_to_special_digits(self, num) -> str:
-        digits = "𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫"
-        return "".join(digits[int(d)] for d in str(num))
 
     def get_select_name(self, value: MusicMaster):
         return value.name, value.category.name, None
@@ -553,10 +549,10 @@ class MusicFilter(MasterFilter[MusicMaster]):
         embed.add_field(
             name=l10n.format_value("ratings"),
             value=f"NTS: {round(chart.trends[0] * 100, 2)}%\n"
-                  f"DNG: {round(chart.trends[1] * 100, 2)}%\n"
-                  f"SCR: {round(chart.trends[2] * 100, 2)}%\n"
-                  f"EFT: {round(chart.trends[3] * 100, 2)}%\n"
-                  f"TEC: {round(chart.trends[4] * 100, 2)}%\n",
+            f"DNG: {round(chart.trends[1] * 100, 2)}%\n"
+            f"SCR: {round(chart.trends[2] * 100, 2)}%\n"
+            f"EFT: {round(chart.trends[3] * 100, 2)}%\n"
+            f"TEC: {round(chart.trends[4] * 100, 2)}%\n",
             inline=True,
         )
         embed.set_footer(

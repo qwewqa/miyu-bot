@@ -2,9 +2,9 @@ import logging
 import math
 import re
 import timeit
-import datetime
+import unicodedata
 from dataclasses import dataclass, field
-from typing import Dict, Tuple, List, Optional, Iterable
+from typing import Dict, Tuple, List, Optional
 
 import pykakasi
 
@@ -250,9 +250,14 @@ def strip_vowels(s):
 
 _kks = pykakasi.kakasi()
 
+def normalize(input_str):
+    nfkd_form = unicodedata.normalize('NFKD', input_str)
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
 
 def romanize(s: str) -> str:
     s = str(s)
+    s = normalize(s)
     s = re.sub("['・]", "", s)
     s = re.sub("[A-Za-z]+", lambda ele: f" {ele[0]} ", s)
     s = re.sub("[0-9]+", lambda ele: f" {ele[0]} ", s)

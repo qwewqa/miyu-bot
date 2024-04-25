@@ -447,6 +447,111 @@ class CardFilter(MasterFilter[CardMaster]):
             return f"{self.auto_score(value):>5.2f}%"
         else:
             return f"   ---"
+        
+    @data_attribute(
+        "manual_up",
+        aliases=[
+            "manualup",
+            "manual_score_up",
+            "manualscoreup",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="2.5",
+    )
+    def manual_up(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.ManualScoreUp:
+            return passive_skill.max_value * 100
+        return 0
+    
+    @manual_up.formatter
+    def manual_up_formatter(self, value: CardMaster):
+        if self.manual_up(value) > 0:
+            return f"{self.manual_up(value):>5.2f}%"
+        else:
+            return f"   ---"
+        
+    @data_attribute(
+        "score_up",
+        aliases=[
+            "scoreup",
+            "support_score_up",
+            "supportscoreup",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="4",
+    )
+    def score_up(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.SupportableScoreUp:
+            return passive_skill.max_value * 100
+        return 0
+
+    @score_up.formatter
+    def score_up_formatter(self, value: CardMaster):
+        if self.score_up(value) > 0:
+            return f"{self.score_up(value):>5.2f}%"
+        else:
+            return f"   ---"
+        
+    @data_attribute(
+        "skill_duration_up",
+        aliases=[
+            "skilldurationup",
+            "skill_duration",
+            "skillduration",
+            "support_skill_duration_up",
+            "supportskilldurationup",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="15",
+    )
+    def skill_duration_up(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.SupportableSkillLonger:
+            return passive_skill.max_value * 100
+        return 0
+
+    @skill_duration_up.formatter
+    def skill_duration_up_formatter(self, value: CardMaster):
+        if self.skill_duration_up(value) > 0:
+            return f"{self.skill_duration_up(value):>5.2f}%"
+        else:
+            return f"   ---"
+        
+    @data_attribute(
+        "sympathy",
+        aliases=[
+            "support_sympathy",
+            "supportsympathy",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="2",
+    )
+    def sympathy(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.SupportableSympathy:
+            return passive_skill.max_value * 100
+        return 0
+
+    @sympathy.formatter
+    def sympathy_formatter(self, value: CardMaster):
+        if self.sympathy(value) > 0:
+            return f"{self.sympathy(value):>5.2f}%"
+        else:
+            return f"   ---"
 
     @command_source(
         command_args=dict(

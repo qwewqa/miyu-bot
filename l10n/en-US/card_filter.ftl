@@ -43,7 +43,7 @@ passive-desc = { $type ->
     [ManualScoreUp] { manual-support-desc }
     [SupportableScoreUp] { supportable-score-up-desc }
     [SupportableSkillLonger] { supportable-skill-longer-desc }
-    [Sympathy] { sympathy-desc }
+    [SupportableSympathy] { supportable-sympathy-desc }
    *[other] None
 }
 groovy-bonus-desc =
@@ -68,8 +68,10 @@ supportable-skill-longer-desc =
     Skill Duration Up: { $min-value }-{ $max-value }%
     Bonus Value: {$sub-value}%
     Bonus Character: { $bonus-character }
-sympathy-desc = 
+supportable-sympathy-desc =
+    Support Available at +1
     Sympathy: { $min-value }-{ $max-value }%
+    Multiplied by # of cards with Sympathy on team
 
 card-id = Card Id: { $card-id }
 

@@ -28,7 +28,7 @@ from miyu_bot.commands.master_filter.master_filter import (
 
 class CardFilter(MasterFilter[CardMaster]):
     def get_name(self, value: CardMaster) -> str:
-        return f"{value.name} {value.character.first_name_english}"
+        return f"{value.name} {value.character.first_name_english} {value.rarity_id}"
 
     def get_select_name(self, value: CardMaster):
         emoji = attribute_emoji_ids_by_attribute_id[value.attribute_id]

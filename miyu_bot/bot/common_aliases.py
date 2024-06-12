@@ -85,4 +85,6 @@ class CommonAliases:
         "uni": "unichord",
         "am": "abyssmare",
         "abyss": "abyssmare",
+        "abcd": "a_bad_cynic_doggo",
+        "doggo": "a_bad_cynic_doggo",
     }

@@ -1,3 +1,5 @@
+comic-search = Comic Search
+
 comic-desc =
     { $episode-number }
     Released: { $start-date }

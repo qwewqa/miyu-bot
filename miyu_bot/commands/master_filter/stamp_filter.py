@@ -17,7 +17,7 @@ class StampFilter(MasterFilter[StampMaster]):
 
     @command_source()
     def get_stamp_embed(self, ctx, stamp: StampMaster, server):
-        embed = discord.Embed(title=self.format_stamp_name(stamp), description="ID: " + self.id)
+        embed = discord.Embed(title=self.format_stamp_name(stamp), description="ID: " + stamp.id)
         return embed
 
     @list_formatter(

@@ -6,6 +6,7 @@ from d4dj_utils.master.stamp_master import StampMaster
 from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.master_filter.master_filter import (
     MasterFilter,
+    data_attribute,
     command_source,
     list_formatter,
 )
@@ -20,6 +21,18 @@ class StampFilter(MasterFilter[StampMaster]):
         
     def get_select_name(self, value: StampMaster) -> Tuple[str, str, None]:
         return f"{value.name}", f'{value.quote.replace("～", "ー") if value.quote else value.description}', None
+
+    @data_attribute("id", is_sortable=True, is_comparable=True)
+    def id(self, value: StampMaster):
+        return value.id
+
+    @id.formatter
+    def format_id(self, value: StampMaster):
+        return f"{value.id:>05}"
+    
+    @data_attribute("name", aliases=["title"], is_sortable=True)
+    def name(self, value: StampMaster) -> str:
+        return value.name
 
     @command_source()
     def get_stamp_embed(self, ctx, stamp: StampMaster, server):

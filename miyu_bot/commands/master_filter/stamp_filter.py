@@ -1,8 +1,9 @@
-import discord
-from d4dj_utils.master.stamp_master import StampMaster
-from miyu_bot.commands.common.asset_paths import get_asset_filename
 from typing import Tuple
 
+import discord
+from d4dj_utils.master.stamp_master import StampMaster
+
+from miyu_bot.commands.common.asset_paths import get_asset_filename
 from miyu_bot.commands.master_filter.master_filter import (
     MasterFilter,
     command_source,
@@ -23,11 +24,11 @@ class StampFilter(MasterFilter[StampMaster]):
     @command_source()
     def get_stamp_embed(self, ctx, stamp: StampMaster, server):
         l10n = self.l10n[ctx]
-        embed = discord.Embed(title=self.format_stamp_name(stamp), description="ID: " + str(stamp.id))
+        embed = discord.Embed(title=self.format_stamp_name(stamp))
 
         embed.set_image(url=self.bot.asset_url + get_asset_filename(stamp.stamp_path))
 
-        embed.set_footer(text=l10n.format_value("stamp-id", {"stamp-id": f"{stamp.id:>07}"}))
+        embed.set_footer(text=l10n.format_value("stamp-id", {"stamp-id": f"{stamp.id:>05}"}))
         return embed
 
     @list_formatter(

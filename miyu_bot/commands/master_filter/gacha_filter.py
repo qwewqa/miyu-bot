@@ -373,7 +373,7 @@ class GachaFilter(MasterFilter[GachaMaster]):
         attribute_emoji = attribute_emoji_ids_by_attribute_id[card.attribute_id]
         return f"{unit_emoji} {attribute_emoji} {card.rarity_id}★ {card.name} {card.character.first_name_english}"
 
-    @functools.lru_cache()
+    @functools.lru_cache(maxsize=None)
     def get_gacha_rateup_card_set(self, gacha: GachaMaster) -> Dict[CardMaster, None]:
         results = set()
 

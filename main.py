@@ -31,7 +31,7 @@ async def main():
         command_prefix=when_mentioned,
         case_insensitive=True,
         activity=discord.Game(name="https://miyu-docs.qwewqa.xyz/"),
-        owner_ids={169163991434788865},
+        owner_ids={169163991434788865,433089131158175765},
         allowed_mentions=discord.AllowedMentions.none(),
         intents=intents,
     )

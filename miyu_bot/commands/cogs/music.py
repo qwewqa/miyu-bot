@@ -88,7 +88,7 @@ class Music(commands.Cog):
         solo: bool = False,
         auto: bool = False,
         max_level: Optional[str] = None,
-        difficulty: app_commands.Choice[int] = None,
+        difficulty: Optional[app_commands.Choice[int]] = None,
         server: Optional[str] = None,
     ):
         """Lists songs by score.

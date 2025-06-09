@@ -68,6 +68,14 @@ class Music(commands.Cog):
     @commands.hybrid_command(
         name="meta",
     )
+    @app_commands.choices(
+        difficulty=[
+            app_commands.Choice(name="Expert", value=int(ChartDifficulty.Expert)),
+            app_commands.Choice(name="Hard", value=int(ChartDifficulty.Hard)),
+            app_commands.Choice(name="Normal", value=int(ChartDifficulty.Normal)),
+            app_commands.Choice(name="Easy", value=int(ChartDifficulty.Easy)),
+        ]
+    )
     async def meta(
         self,
         ctx: PrefContext,
@@ -80,6 +88,7 @@ class Music(commands.Cog):
         solo: bool = False,
         auto: bool = False,
         max_level: Optional[str] = None,
+        difficulty: app_commands.Choice[int] = None,
         server: Optional[str] = None,
     ):
         """Lists songs by score.
@@ -104,6 +113,8 @@ class Music(commands.Cog):
             Whether to calculate auto score
         max_level: str
             The maximum level of songs to include
+        difficulty: app_commands.Choice[int]
+            The difficulty to use. If not set, will include all difficulties.
         server: str
             The server to use. Defaults to the current server. Can be one of: 'jp' or 'en'
         """
@@ -194,6 +205,7 @@ class Music(commands.Cog):
             and not chart.music.is_hidden
             and chart.music.id > 3
             and chart.level <= max_level_value
+            and (difficulty is None or chart.difficulty == difficulty)
         ]
 
         if not charts:

@@ -88,7 +88,7 @@ class Music(commands.Cog):
         solo: bool = False,
         auto: bool = False,
         max_level: Optional[str] = None,
-        difficulty: Optional[app_commands.Choice[int]] = None,
+        difficulty: app_commands.Choice[int] = None,
         server: Optional[str] = None,
     ):
         """Lists songs by score.
@@ -264,7 +264,6 @@ class Music(commands.Cog):
             )
             power_text = f"Power: {power:,}\n" if not relative_display else ""
             max_level_text = f"Max Level: {max_level}\n" if max_level else ""
-            difficulty = f"Difficulty: {difficulty.name}\n" if difficulty else ""
             return f"Song Meta\n{power_text}{max_level_text}Skills: {formatted_skills}\nGroovy Score Up: {groovy_score_up}\nPassive Score Up: {passive_score_up}\nGeneral Score Up: {general_score_up}\nSolo: {solo}\nAuto: {auto}"
 
         results = FilterResults(

@@ -15,7 +15,6 @@ info = Information
 song-info-desc =
     Category: { song-category-name }
     Duration: { $duration }
-    DurationInt: { $durationInt }
     BPM: { $bpm }
     Section Trend: { section-trend-name }
     Sort Order: { $sort-order }
@@ -56,7 +55,6 @@ song-search = Song Search
 chart-info-desc =
     Level: { $level }
     Duration: { $duration }
-    DurationInt: { $durationInt }
     Unit: { $unit-name }
     Category: { song-category-name }
     BPM: { $bpm }

@@ -396,6 +396,7 @@ class CardFilter(MasterFilter[CardMaster]):
             "passive_score",
             "passivescore",
             "passive_score_up",
+            "lifeboost",
         ],
         is_comparable=True,
         is_sortable=True,

@@ -89,6 +89,7 @@ class Music(commands.Cog):
         auto: bool = False,
         max_level: Optional[str] = None,
         difficulty: app_commands.Choice[int] = None,
+        sort: Optional[str] = None,
         server: Optional[str] = None,
     ):
         """Lists songs by score.
@@ -115,6 +116,8 @@ class Music(commands.Cog):
             The maximum level of songs to include
         difficulty: app_commands.Choice[int]
             The difficulty to use. If not set, will include all difficulties.
+        sort: str
+            Sort by 'score' or 'duration'. Defaults to 'score'
         server: str
             The server to use. Defaults to the current server. Can be one of: 'jp' or 'en'
         """
@@ -236,8 +239,21 @@ class Music(commands.Cog):
                 total_score += score * weight
                 total_weight += weight
             return total_score / total_weight
+        
+        tasks = [score_chart(chart) for chart in charts]
+        scores = await asyncio.gather(*tasks)
 
-        chart_scores = {chart: await score_chart(chart) for chart in charts}
+        chart_scores = dict(zip(charts, scores))
+
+        if sort is not None:
+            sort = sort.lower()
+            if sort == "score":
+                charts = sorted(charts, key=lambda c: chart_scores[c], reverse=True)
+            elif sort == "duration":
+                charts = sorted(charts, key=lambda c: c.music.duration, reverse=True)
+            else:
+                raise ArgumentError("Invalid sort option")
+                
         charts = sorted(charts, key=lambda chart: chart_scores[chart], reverse=True)
 
         if relative_display:

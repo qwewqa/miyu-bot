@@ -431,6 +431,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                 {
                     "song-category": song.category.name,
                     "duration": self.format_duration(song.duration),
+                    "durationInt": song.song_duration_int,
                     "bpm": song.bpm,
                     "section-trend": song.section_trend.name,
                     "sort-order": song.default_order,
@@ -522,6 +523,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                     "duration": self.format_duration(song.duration),
                     "unit-name": song.special_unit_name or song.unit.name,
                     "song-category": song.category.name,
+                    "durationInt": song.song_duration_int,
                     "bpm": song.bpm,
                     "designer": f"{chart.designer.name} ({chart.designer.id})",
                     "skills": ", ".join(

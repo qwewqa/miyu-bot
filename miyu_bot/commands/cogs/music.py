@@ -253,6 +253,8 @@ class Music(commands.Cog):
                 charts = sorted(charts, key=lambda c: c.music.duration, reverse=True)
             else:
                 raise ArgumentError("Invalid sort option")
+        else:
+            charts = sorted(charts, key=lambda c: chart_scores[c], reverse=True)
 
         if relative_display:
             ref_score = self.reference_chart_score()

@@ -25,14 +25,16 @@ class ChartFilter(MasterFilter[ChartMaster]):
         self.bot.setup_tasks.append(self.preload_song_scores())
 
     def get_name(self, value: ChartMaster) -> str:
-        parts = [value.music.name]
+        parts = []
+        parts.append(value.music.name)
         if value.music.special_unit_name:
             parts.append(value.music.special_unit_name)
         if value.music.is_hidden:
             parts.append("(Hidden)")
         if value.music.read_name:
-            parts.append(f"{value.music.read_name}")
-        parts.append(f"{value.music.category.name}")
+            parts.append(value.music.read_name)
+        parts.append(value.music.category.name)
+        parts.append(value.difficulty.name.lower())
         return " ".join(parts)
 
     def get_select_name(self, value: ChartMaster):

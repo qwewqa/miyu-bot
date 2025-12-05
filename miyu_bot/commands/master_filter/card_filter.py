@@ -739,6 +739,9 @@ class CardFilter(MasterFilter[CardMaster]):
                     "sub-value": f"{100 * passive.sub_value:.2f}".rstrip("0").rstrip(
                         "."
                     ),
+                    "extra-value": f"{100 * passive.extra_value:.2f}".rstrip("0").rstrip(
+                        "."
+                    ),
                 },
             ),
             inline=False,

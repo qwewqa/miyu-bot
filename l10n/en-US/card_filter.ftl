@@ -41,6 +41,9 @@ passive-desc = { $type ->
     [ScoreUpWithDamage] { life-boost-desc }
     [AutoScoreUp] { auto-support-desc }
     [ManualScoreUp] { manual-support-desc }
+    [LifeProtect] { life-protect-desc }
+    [TapHealing] { tap-healing-desc }
+    [ComboBoost] { combo-boost-desc }
     [SupportableScoreUp] { supportable-score-up-desc }
     [SupportableSkillLonger] { supportable-skill-longer-desc }
     [SupportableSympathy] { supportable-sympathy-desc }
@@ -58,6 +61,15 @@ auto-support-desc =
     Auto Score Up: { $min-value }-{ $max-value }%
 manual-support-desc =
     Manual Score Up: { $min-value }-{ $max-value }%
+life-protect-desc =
+    Tension Reduction Up: { $sub-value }%
+    Constant Score Down: { $min-value }-{ $max-value }%
+tap-healing-desc =
+    Every { $min-value }-{ $max-value } Perfects, recover { $extra-value} tension
+    Tension over 1001, Score Up { $sub-value }%
+combo-boost-desc =
+    Combo Score Up: { $min-value }-{ $max-value }%
+    When Combo over { $extra-value}, additional { $sub-value }% Score Up
 supportable-score-up-desc =
     Support Available
     Score Up: { $min-value }-{ $max-value }%

@@ -448,7 +448,7 @@ class CardFilter(MasterFilter[CardMaster]):
             return f"{self.auto_score(value):>5.2f}%"
         else:
             return f"   ---"
-        
+
     @data_attribute(
         "manual_up",
         aliases=[
@@ -467,14 +467,14 @@ class CardFilter(MasterFilter[CardMaster]):
         if passive_skill.type == PassiveSkillType.ManualScoreUp:
             return passive_skill.max_value * 100
         return 0
-    
+
     @manual_up.formatter
     def manual_up_formatter(self, value: CardMaster):
         if self.manual_up(value) > 0:
             return f"{self.manual_up(value):>5.2f}%"
         else:
             return f"   ---"
-        
+
     @data_attribute(
         "score_up",
         aliases=[
@@ -500,7 +500,7 @@ class CardFilter(MasterFilter[CardMaster]):
             return f"{self.score_up(value):>5.2f}%"
         else:
             return f"   ---"
-        
+
     @data_attribute(
         "skill_duration_up",
         aliases=[
@@ -528,7 +528,7 @@ class CardFilter(MasterFilter[CardMaster]):
             return f"{self.skill_duration_up(value):>5.2f}%"
         else:
             return f"   ---"
-        
+
     @data_attribute(
         "sympathy",
         aliases=[
@@ -551,6 +551,78 @@ class CardFilter(MasterFilter[CardMaster]):
     def sympathy_formatter(self, value: CardMaster):
         if self.sympathy(value) > 0:
             return f"{self.sympathy(value):>5.2f}%"
+        else:
+            return f"   ---"
+
+    @data_attribute(
+        "lifeprotect",
+        aliases=[
+            "life_protect",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="2",
+    )
+    def lifeprotect(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.LifeProtect:
+            return passive_skill.max_value * 100
+        return 0
+
+    @lifeprotect.formatter
+    def lifeprotect_formatter(self, value: CardMaster):
+        if self.lifeprotect(value) > 0:
+            return f"{self.lifeprotect(value):>5.2f}%"
+        else:
+            return f"   ---"
+
+    @data_attribute(
+        "taphealing",
+        aliases=[
+            "tap_healing",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="2",
+    )
+    def taphealing(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.TapHealing:
+            return passive_skill.max_value * 100
+        return 0
+
+    @taphealing.formatter
+    def taphealing_formatter(self, value: CardMaster):
+        if self.taphealing(value) > 0:
+            return f"{self.taphealing(value):>5.2f}%"
+        else:
+            return f"   ---"
+
+    @data_attribute(
+        "comboboost",
+        aliases=[
+            "combo_boost",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="2",
+    )
+    def comboboost(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.ComboBoost:
+            return passive_skill.max_value * 100
+        return 0
+
+    @comboboost.formatter
+    def comboboost_formatter(self, value: CardMaster):
+        if self.comboboost(value) > 0:
+            return f"{self.comboboost(value):>5.2f}%"
         else:
             return f"   ---"
 

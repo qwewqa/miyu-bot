@@ -65,11 +65,11 @@ life-protect-desc =
     Tension Reduction Up: { $sub-value }%
     Constant Score Down: { $min-value }-{ $max-value }%
 tap-healing-desc =
-    Every { $min-value }-{ $max-value } Perfects, recover { $extra-value} tension
-    Tension over 1001, Score Up { $sub-value }%
+    Every { $min-value } ({ $max-value }) Perfects, +{ $extra-value} tension
+    When Tension > 1001, Score Up { $sub-value }%
 combo-boost-desc =
     Combo Score Up: { $min-value }-{ $max-value }%
-    When Combo over { $extra-value}, additional { $sub-value }% Score Up
+    If Combo > { $extra-value}, +{ $sub-value }% Score Up
 supportable-score-up-desc =
     Support Available
     Score Up: { $min-value }-{ $max-value }%

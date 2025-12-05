@@ -720,6 +720,14 @@ class CardFilter(MasterFilter[CardMaster]):
             ),
             inline=True,
         )
+
+        def format_passive_value(value: float) -> str:
+            # Values of 10 and 6 are raw, not percentages
+            is_raw = value in (10, 6)
+
+            scaled = value if is_raw else value * 100
+            return f"{scaled:.2f}".rstrip("0").rstrip(".")
+
         passive: PassiveSkillMaster = card.passive_skill
         embed.add_field(
             name=l10n.format_value("passive"),
@@ -730,18 +738,10 @@ class CardFilter(MasterFilter[CardMaster]):
                     "bonus-character": passive.bonus_character.first_name_english
                     if passive.bonus_character
                     else l10n.format_value("none"),
-                    "min-value": f"{100 * passive.min_value:.2f}".rstrip("0").rstrip(
-                        "."
-                    ),
-                    "max-value": f"{100 * passive.max_value:.2f}".rstrip("0").rstrip(
-                        "."
-                    ),
-                    "sub-value": f"{100 * passive.sub_value:.2f}".rstrip("0").rstrip(
-                        "."
-                    ),
-                    "extra-value": f"{100 * passive.extra_value:.2f}".rstrip("0").rstrip(
-                        "."
-                    ),
+                    "min-value": format_passive_value(passive.min_value),
+                    "max-value": format_passive_value(passive.max_value),
+                    "sub-value": f"{100 * passive.sub_value:.2f}".rstrip("0").rstrip("."),
+                    "extra-value": f"{passive.extra_value:.2f}".rstrip("0").rstrip("."),
                 },
             ),
             inline=False,

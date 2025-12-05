@@ -62,7 +62,7 @@ auto-support-desc =
 manual-support-desc =
     Manual Score Up: { $min-value }-{ $max-value }%
 life-protect-desc =
-    Tension Reduction Up: { $sub-value }%
+    Tension Reduction Down: { $sub-value }%
     Constant Score Down: { $min-value }-{ $max-value }%
 tap-healing-desc =
     Every { $min-value } ({ $max-value }) Perfects, +{ $extra-value} tension

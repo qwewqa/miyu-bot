@@ -626,6 +626,31 @@ class CardFilter(MasterFilter[CardMaster]):
         else:
             return f"   ---"
 
+    @data_attribute(
+        "sympathyplus",
+        aliases=[
+            "sympathy_plus",
+            "sympathy+",
+        ],
+        is_comparable=True,
+        is_sortable=True,
+        reverse_sort=True,
+        is_flag=True,
+        help_sample_argument="2",
+    )
+    def sympathyplus(self, value: CardMaster):
+        passive_skill = value.passive_skill
+        if passive_skill.type == PassiveSkillType.SympathyPlus:
+            return passive_skill.max_value * 100
+        return 0
+
+    @sympathyplus.formatter
+    def sympathyplus_formatter(self, value: CardMaster):
+        if self.sympathyplus(value) > 0:
+            return f"{self.sympathyplus(value):>5.2f}%"
+        else:
+            return f"   ---"
+
     @command_source(
         command_args=dict(
             name="card", description="Displays card info.", help="!card secretcage"

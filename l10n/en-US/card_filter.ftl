@@ -47,6 +47,7 @@ passive-desc = { $type ->
     [SupportableScoreUp] { supportable-score-up-desc }
     [SupportableSkillLonger] { supportable-skill-longer-desc }
     [SupportableSympathy] { supportable-sympathy-desc }
+    [SupportableSympathyPlus] { supportable-sympathy-plus-desc }
    *[other] None
 }
 groovy-bonus-desc =
@@ -84,6 +85,11 @@ supportable-sympathy-desc =
     Support Available at +1
     Sympathy: { $min-value }-{ $max-value }%
     Multiplied by # of cards with Sympathy on team
+supportable-sympathy-plus-desc =
+    Support Available at +1
+    Sympathy+: { $min-value }-{ $max-value }%
+    Multiplied by # of cards with Sympathy on team
+    Effect increased by # of Sympathy cards owned x { $sub-value }%
 
 card-id = Card Id: { $card-id }
 

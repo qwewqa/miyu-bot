@@ -38,6 +38,7 @@ class Music(commands.Cog):
         self.l10n = LocalizationManager(self.bot.fluent_loader, "music.ftl")
 
     difficulty_names = {
+        "groovy": ChartDifficulty.Groovy,
         "expert": ChartDifficulty.Expert,
         "hard": ChartDifficulty.Hard,
         "normal": ChartDifficulty.Normal,
@@ -48,6 +49,7 @@ class Music(commands.Cog):
         "hrd": ChartDifficulty.Hard,
         "nrm": ChartDifficulty.Normal,
         "esy": ChartDifficulty.Easy,
+        "gr": ChartDifficulty.Groovy,
         "ex": ChartDifficulty.Expert,
         "hd": ChartDifficulty.Hard,
         "nm": ChartDifficulty.Normal,
@@ -70,6 +72,7 @@ class Music(commands.Cog):
     )
     @app_commands.choices(
         difficulty=[
+            app_commands.Choice(name="Groovy", value=int(ChartDifficulty.Groovy)),
             app_commands.Choice(name="Expert", value=int(ChartDifficulty.Expert)),
             app_commands.Choice(name="Hard", value=int(ChartDifficulty.Hard)),
             app_commands.Choice(name="Normal", value=int(ChartDifficulty.Normal)),
@@ -301,6 +304,7 @@ class Music(commands.Cog):
     )
     @app_commands.choices(
         difficulty=[
+            app_commands.Choice(name="Groovy", value=int(ChartDifficulty.Groovy)),
             app_commands.Choice(name="Expert", value=int(ChartDifficulty.Expert)),
             app_commands.Choice(name="Hard", value=int(ChartDifficulty.Hard)),
             app_commands.Choice(name="Normal", value=int(ChartDifficulty.Normal)),

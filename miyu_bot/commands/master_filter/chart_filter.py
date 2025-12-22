@@ -48,6 +48,7 @@ class ChartFilter(MasterFilter[ChartMaster]):
         ChartDifficulty.Normal: "NM",
         ChartDifficulty.Hard: "HD",
         ChartDifficulty.Expert: "EX",
+        ChartDifficulty.Groovy: "GR",
     }
 
     @data_attribute("name", aliases=["title"], is_sortable=True)

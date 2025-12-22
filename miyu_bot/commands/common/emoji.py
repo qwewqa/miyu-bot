@@ -7,8 +7,7 @@ difficulty_emoji_ids = {
     ChartDifficulty.Normal: "<:difficulty_normal:790050636489555998>",
     ChartDifficulty.Hard: "<:difficulty_hard:790050636548276252>",
     ChartDifficulty.Expert: "<:difficulty_expert:790050636225052694>",
-    # For the future, if it ever comes
-    # ChartDifficulty.Special: '<:difficulty_special:790050636556533820>',
+    ChartDifficulty.Groovy: "<:difficulty_groovy:790050636556533820>",
 }
 
 parameter_bonus_emoji_ids = {

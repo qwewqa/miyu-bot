@@ -180,6 +180,35 @@ class MusicFilter(MasterFilter[MusicMaster]):
                 return f"{int(level):>2} "
         else:
             return f"N/A"
+        
+    @data_attribute(
+        "groovy",
+        aliases=["gr"],
+        is_sortable=True,
+        is_comparable=True,
+        reverse_sort=True,
+    )
+    def groovy(self, value: MusicMaster):
+        if chart := value.charts.get(5):
+            level = chart.level
+            if chart.override_level and re.fullmatch(r"\d+\+?", chart.override_level):
+                level = self.level_compare_converter(chart.override_level)
+            if level > 99:
+                return 0
+            else:
+                return level
+        return -1
+
+    @groovy.formatter
+    def format_groovy(self, value: MusicMaster):
+        level = self.groovy(value)
+        if level == -1:
+            return "N/A"
+        else:
+            if level % 1 != 0:
+                return f"{int(level - 0.5):>2}+"
+            else:
+                return f"{int(level):>2} "
 
     @data_attribute(
         "expert",
@@ -298,6 +327,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
                 return f"{int(level):>2} "
 
     @level.compare_converter
+    @groovy.compare_converter
     @expert.compare_converter
     @hard.compare_converter
     @normal.compare_converter
@@ -457,6 +487,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         return embed
 
     difficulty_names = {
+        "groovy": 4,
         "expert": 3,
         "hard": 2,
         "normal": 1,
@@ -467,6 +498,7 @@ class MusicFilter(MasterFilter[MusicMaster]):
         "hrd": 2,
         "nrm": 1,
         "esy": 0,
+        "gr": 4,
         "ex": 3,
         "hd": 2,
         "nm": 1,

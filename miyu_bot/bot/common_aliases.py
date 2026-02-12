@@ -87,4 +87,5 @@ class CommonAliases:
         "abyss": "abyssmare",
         "abcd": "a_bad_cynic_doggo",
         "doggo": "a_bad_cynic_doggo",
+        "egg": "egoegg",
     }

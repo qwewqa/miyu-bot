@@ -359,6 +359,10 @@ class MusicFilter(MasterFilter[MusicMaster]):
     @data_attribute("durationInt", is_sortable=True, is_comparable=True)
     def durationInt(self, value: MusicMaster):
         return value.durationInt
+    
+    @durationInt.formatter
+    def format_durationInt(self, value: MusicMaster):
+        return f"{int(value.durationInt):>2} "
 
     @data_attribute("bpm", is_sortable=True, is_comparable=True, reverse_sort=True)
     def bpm(self, value: MusicMaster):

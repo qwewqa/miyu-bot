@@ -355,6 +355,10 @@ class MusicFilter(MasterFilter[MusicMaster]):
             return 60 * int(groups[0]) + float(groups[1])
         else:
             return float(s)
+        
+    @data_attribute("durationInt", is_sortable=True, is_comparable=True)
+    def durationInt(self, value: MusicMaster):
+        return value.durationInt
 
     @data_attribute("bpm", is_sortable=True, is_comparable=True, reverse_sort=True)
     def bpm(self, value: MusicMaster):
